@@ -24,13 +24,12 @@ Rectangle {
   readonly property bool m3: Theme.material
   readonly property int inset: m3 ? 0 : 2
 
+  // Repeater delegates are children of the Repeater, not the Row. Resolve
+  // the requested segment through itemAt() so arrow/Home/End navigation can
+  // actually move keyboard focus as well as changing the selected value.
   function focusIndex(i) {
-    for (const child of segments.children) {
-      if (child.index === i && typeof child.forceActiveFocus === "function") {
-        child.forceActiveFocus();
-        return;
-      }
-    }
+    const item = segmentRepeater.itemAt(i);
+    if (item && typeof item.forceActiveFocus === "function") item.forceActiveFocus();
   }
 
   implicitWidth: Theme.controlWidth
@@ -52,6 +51,7 @@ Rectangle {
       anchors.fill: parent
 
       Repeater {
+        id: segmentRepeater
         model: root.model
 
         Rectangle {
