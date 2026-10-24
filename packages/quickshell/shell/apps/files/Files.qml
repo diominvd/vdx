@@ -33,13 +33,20 @@ Item {
   // the table's columns from the right edge, as Settings › Columns shows them: ⋮, the date, the size,
   // the type; the name takes the rest. Each {x, w}; seps: a separator in the middle of each gap
   function cols(w) {
-    let r = w - Theme.gapWide - (FilesService.rowActions ? 28 : 0);
+    let r = Math.max(0, w - Theme.gapWide - (FilesService.rowActions ? 28 : 0));
     const c = { seps: [] };
-    const take = (key, width) => { c[key] = { x: r - width, w: width }; r -= width + Theme.gapWide; c.seps.push(r + Theme.gapWide / 2); };
+    // Saved column widths are preferences, not permission to overflow a small
+    // viewport. Shrink each visible column to the space left after its gap.
+    const take = (key, width) => {
+      const actual = Math.max(0, Math.min(width, r - Theme.gapWide));
+      c[key] = { x: Math.max(0, r - actual), w: actual };
+      r = Math.max(0, r - actual - Theme.gapWide);
+      c.seps.push(Math.max(0, r + Theme.gapWide / 2));
+    };
     if (FilesService.showDate) take("date", dateWidth);
     if (FilesService.showSize) take("size", sizeWidth);
     if (FilesService.showKind) take("kind", kindWidth);
-    c.nameEnd = r;
+    c.nameEnd = Math.max(0, r);
     return c;
   }
   // where a row's icon starts: after the box to tick
