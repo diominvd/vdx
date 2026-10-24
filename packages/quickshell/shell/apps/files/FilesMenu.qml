@@ -13,7 +13,7 @@ Rectangle {
 
   visible: false
   width: parent ? Math.min(260, parent.width) : 260
-  height: column.implicitHeight + 2 * Theme.gapLoose
+  height: Math.min(column.implicitHeight + 2 * Theme.gapLoose, parent ? parent.height : column.implicitHeight + 2 * Theme.gapLoose)
   radius: Theme.radiusSurface
   color: Theme.background0
   border.width: Theme.windowFrameWidth
