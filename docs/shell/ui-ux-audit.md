@@ -151,6 +151,7 @@ A visual change is not complete until these combinations are checked; testing on
 - The file manager's path/search row clamps the breadcrumb width, and picker footer text fields cannot receive negative widths when Cancel/Accept controls consume the available space.
 - The file preview now shrinks to preserve a minimum strip for the file list and collapses with its splitter when the body is too narrow, rather than extending beyond the window.
 - The file table now treats saved date/size/type widths as preferences: each visible column shrinks to the remaining viewport width and clamps its origin/separator, so narrow windows cannot push the table columns off-screen.
+- The Wi-Fi speed-test view clamps path-leg and metric widths in compact popups; its throughput text now yields space to the Run again button and elides rather than overlapping it.
 - Cache-row size and rollback controls clamp to nonnegative widths, and the Installed tab's filter selectors cap themselves to the available pane width even below their normal minimum.
 - `KitSliderRow` now clamps its inline slider width when the icon and value consume a narrow popup row, while preserving the full-width captioned layout.
 - `KitSideRow` now separates the icon key from the accessible action name; removable USB rows announce the concrete Mount/Unmount action and device name instead of an icon identifier.
