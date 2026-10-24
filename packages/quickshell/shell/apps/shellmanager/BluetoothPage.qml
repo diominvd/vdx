@@ -83,6 +83,7 @@ KitColumn {
     hint: "Then hidden again"
 
     KitSegments {
+      accessibleName: "Discoverable duration"
       model: [{ label: "Forever", value: 0 }, { label: "2 min", value: 120 }, { label: "5 min", value: 300 }]
       current: root.adapter.timeout
       onPicked: value => bt.setAdapter(["--discoverable-timeout", String(value)])
@@ -114,7 +115,7 @@ KitColumn {
       required property var modelData
 
       label: modelData.name
-      hint: modelData.battery !== null ? modelData.battery + " % battery" : "Connected"
+      hint: modelData.battery != null ? modelData.battery + " % battery" : "Connected"
 
       KitButton {
         width: Theme.buttonWidth
