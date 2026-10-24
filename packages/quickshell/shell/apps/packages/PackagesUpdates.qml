@@ -50,7 +50,7 @@ Column {
     }
 
     KitLabel {
-      width: parent.width - 28
+      width: Math.max(0, parent.width - 28)
       text: "SELECT ALL"
       value: page.ps.pickedUpdates.length + " OF " + page.ps.count + " · " + Format.shortSize(page.ps.repoPickedSize)
     }
