@@ -123,7 +123,7 @@ PanelWindow {
         readonly property bool current: modelData === root.active && !Hypr.minimized(modelData)
         readonly property bool down: Hypr.minimized(modelData)
 
-        width: Math.min(220, 40 + label.implicitWidth)
+        width: Math.max(40, Math.min(220, 40 + label.implicitWidth))
         height: parent.height
         // only the active window is lit: the pointer passing over the windows lights nothing
         color: current ? Theme.background3 : Theme.clear
@@ -152,7 +152,7 @@ PanelWindow {
           id: label
           x: 32
           anchors.verticalCenter: parent.verticalCenter
-          width: Math.min(implicitWidth, 220 - 40)
+          width: Math.max(0, Math.min(implicitWidth, item.width - 40))
           elide: Text.ElideRight
           text: item.modelData.title || Hypr.classOf(item.modelData)
           color: item.down ? Theme.muted : Theme.foreground0
