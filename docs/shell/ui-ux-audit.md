@@ -163,6 +163,8 @@ A visual change is not complete until these combinations are checked; testing on
 - Cache-row size and rollback controls clamp to nonnegative widths, and the Installed tab's filter selectors cap themselves to the available pane width even below their normal minimum.
 - `KitSliderRow` now clamps its inline slider width when the icon and value consume a narrow popup row, while preserving the full-width captioned layout.
 - `KitInfo` now caps the value column to half the available row and elides long labels, preventing long values and labels from colliding in narrow information panels.
+- The Launcher now clamps result-title widths and ignores activation-key auto-repeat for Enter and Tab, preventing repeated launches/category changes when a key is held.
+- The window switcher scales its cell width to the available screen width (with a conservative minimum) and derives thumbnail height from the cell width; verify on the smallest supported display, as runtime geometry has not been exercised here.
 - `KitSideRow` now separates the icon key from the accessible action name; removable USB rows announce the concrete Mount/Unmount action and device name instead of an icon identifier.
 - Sidebar keyboard focus now scrolls its own `Flickable` to keep focused section/group links visible during Tab navigation; verify keyboard traversal at a short window height.
 - `KitInput` now explicitly names its `TextInput` from the field placeholder and identifies masked inputs in its accessible description; confirm announcements with the screen reader available in the target desktop session.
@@ -184,6 +186,8 @@ A visual change is not complete until these combinations are checked; testing on
 
 - [x] Clamp folder tile widths and file-table separators to nonnegative values in compact viewports.
 - [x] Keep `KitInfo` label/value rows inside narrow panels: reserve at most half the row for long values and elide the label instead of letting the two text columns overlap.
+- [x] Keep Launcher result text widths nonnegative and prevent held Enter/Tab keys from repeatedly launching an item or cycling categories.
+- [x] Scale the window switcher's preview cells and thumbnail height to the screen width so a five-column grid is less likely to overflow on smaller displays.
 
 ## Acceptance criteria
 
