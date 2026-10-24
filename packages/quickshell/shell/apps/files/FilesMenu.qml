@@ -49,48 +49,48 @@ Rectangle {
         model: root.items
 
         Rectangle {
-        id: item
+          id: item
 
-        required property var modelData
+          required property var modelData
 
-        width: column.width
-        height: 28
-        radius: Theme.radiusControl
-        color: area.containsMouse && !modelData.disabled ? Theme.controlHover : Theme.clear
-        opacity: modelData.disabled ? 0.4 : 1
-        Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
+          width: column.width
+          height: 28
+          radius: Theme.radiusControl
+          color: area.containsMouse && !modelData.disabled ? Theme.controlHover : Theme.clear
+          opacity: modelData.disabled ? 0.4 : 1
+          Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
-        KitText {
-          anchors { left: parent.left; leftMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
-          width: Math.max(0, parent.width - (hint.visible ? hint.width + 2 * Theme.gapMedium : Theme.gapMedium))
-          elide: Text.ElideRight
-          text: item.modelData.label
-        }
+          KitText {
+            anchors { left: parent.left; leftMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+            width: Math.max(0, parent.width - (hint.visible ? hint.width + 2 * Theme.gapMedium : Theme.gapMedium))
+            elide: Text.ElideRight
+            text: item.modelData.label
+          }
 
-        KitText {
-          id: hint
-          anchors { right: parent.right; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
-          width: Math.min(90, Math.max(0, parent.width * 0.35))
-          horizontalAlignment: Text.AlignRight
-          elide: Text.ElideLeft
-          visible: !!item.modelData.hint
-          text: item.modelData.hint ?? ""
-          color: Theme.muted
-          font.pixelSize: Theme.fontSize - 2
-        }
+          KitText {
+            id: hint
+            anchors { right: parent.right; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+            width: Math.min(90, Math.max(0, parent.width * 0.35))
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideLeft
+            visible: !!item.modelData.hint
+            text: item.modelData.hint ?? ""
+            color: Theme.muted
+            font.pixelSize: Theme.fontSize - 2
+          }
 
-        MouseArea {
-          id: area
-          anchors.fill: parent
-          hoverEnabled: true
-          enabled: !item.modelData.disabled
-          cursorShape: Qt.PointingHandCursor
-          onClicked: {
-            root.close();
-            item.modelData.run();
+          MouseArea {
+            id: area
+            anchors.fill: parent
+            hoverEnabled: true
+            enabled: !item.modelData.disabled
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+              root.close();
+              item.modelData.run();
+            }
           }
         }
-      }
       }
     }
   }
