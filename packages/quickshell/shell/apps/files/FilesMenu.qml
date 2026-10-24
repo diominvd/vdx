@@ -12,7 +12,7 @@ Rectangle {
   property var items: []
 
   visible: false
-  width: 260
+  width: parent ? Math.min(260, parent.width) : 260
   height: column.implicitHeight + 2 * Theme.gapLoose
   radius: Theme.radiusSurface
   color: Theme.background0
@@ -33,7 +33,7 @@ Rectangle {
     id: column
     x: Theme.gapLoose
     y: Theme.gapLoose
-    width: root.width - 2 * Theme.gapLoose
+    width: Math.max(0, root.width - 2 * Theme.gapLoose)
 
     Repeater {
       model: root.items
@@ -52,11 +52,17 @@ Rectangle {
 
         KitText {
           anchors { left: parent.left; leftMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+          width: Math.max(0, parent.width - (hint.visible ? hint.width + 2 * Theme.gapMedium : Theme.gapMedium))
+          elide: Text.ElideRight
           text: item.modelData.label
         }
 
         KitText {
+          id: hint
           anchors { right: parent.right; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+          width: Math.min(90, Math.max(0, parent.width * 0.35))
+          horizontalAlignment: Text.AlignRight
+          elide: Text.ElideLeft
           visible: !!item.modelData.hint
           text: item.modelData.hint ?? ""
           color: Theme.muted
