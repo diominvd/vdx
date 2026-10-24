@@ -24,6 +24,9 @@ Item {
   // the panes and columns: dragged by their strips, kept in the options
   property int sideW: FilesService.opt("sideWidth", 190)
   property int previewW: FilesService.opt("previewWidth", 240)
+  // Keep a useful strip for the file list; the preview collapses before it can
+  // push the list beyond the available width in compact windows.
+  readonly property real effectivePreviewW: Math.min(previewW, Math.max(0, body.width - 180))
   property int sizeWidth: FilesService.opt("sizeWidth", 84)
   property int dateWidth: FilesService.opt("dateWidth", 124)
   readonly property int kindWidth: 72
@@ -495,13 +498,13 @@ Item {
 
       FilesCrumbs {
         id: crumbs
-        width: parent.width - searchField.width - parent.spacing
+        width: Math.max(0, parent.width - searchField.width - parent.spacing)
         onDone: root.forceActiveFocus()
       }
 
       KitInput {
         id: searchField
-        width: Math.min(260, parent.width * 0.32)
+        width: Math.max(0, Math.min(260, parent.width * 0.32))
         placeholder: FilesService.everywhere ? "Search all of Home…" : FilesService.virtual ? "filter" : "Search here and below…"
         passKeys: [Qt.Key_Escape]
         text: FilesService.query
@@ -523,7 +526,7 @@ Item {
         visible: !FilesService.atComputer
         x: 0
         y: 0
-        width: body.width - (root.previewing ? previewSplit.width + root.previewW : 0)
+        width: Math.max(0, body.width - (root.previewing && root.effectivePreviewW > 0 ? previewSplit.width + root.effectivePreviewW : 0))
         height: body.height
       }
 
@@ -540,7 +543,7 @@ Item {
       // the strip between the list and the preview: drag it to resize the preview
       FilesSplit {
         id: previewSplit
-        visible: root.previewing
+        visible: root.previewing && root.effectivePreviewW > 0
         x: listFrame.width
         y: 0
         height: body.height
@@ -552,10 +555,10 @@ Item {
       FilesPreview {
         id: previewFrame
         files: root
-        visible: root.previewing
-        x: body.width - root.previewW
+        visible: root.previewing && root.effectivePreviewW > 0
+        x: body.width - root.effectivePreviewW
         y: 0
-        width: root.previewW
+        width: root.effectivePreviewW
         height: body.height
       }
     }
@@ -574,7 +577,7 @@ Item {
 
         KitInput {
           id: saveField
-          width: parent.width - cancelButton.width - acceptButton.width - 2 * parent.spacing
+          width: Math.max(0, parent.width - cancelButton.width - acceptButton.width - 2 * parent.spacing)
           visible: root.picker !== null && root.picker.mode === "save"
           placeholder: "file name"
           text: root.picker ? root.picker.name : ""
@@ -584,7 +587,7 @@ Item {
         }
 
         KitText {
-          width: parent.width - cancelButton.width - acceptButton.width - 2 * parent.spacing
+          width: Math.max(0, parent.width - cancelButton.width - acceptButton.width - 2 * parent.spacing)
           visible: root.picker !== null && root.picker.mode !== "save"
           verticalAlignment: Text.AlignVCenter
           elide: Text.ElideRight
