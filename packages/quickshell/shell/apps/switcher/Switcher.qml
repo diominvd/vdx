@@ -26,6 +26,11 @@ ScrimWindow {
     .filter(t => t.workspace?.id === wsId || (Hypr.minimized(t) && Hypr.tagsOf(t).includes("min" + wsId)))
     .sort((a, b) => order(a) - order(b))
   property int index: 0
+  // Window lists can change while the switcher is open (for example, when an
+  // application exits). Keep the selection valid so the next pick is stable.
+  onWindowsChanged: {
+    if (index >= windows.length) index = Math.max(0, windows.length - 1);
+  }
 
   // the grid: cells of 240 px, at most 5 in a row
   readonly property int spacing: Theme.gapWide
