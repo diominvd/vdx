@@ -47,7 +47,7 @@ Rectangle {
     x: Theme.gapLoose + Theme.iconSmall + Theme.gapMedium
     height: 34   // the same height as the list's captions
     verticalAlignment: Text.AlignVCenter
-    width: root.width - x - Theme.gapSmall
+    width: Math.max(0, root.width - x - Theme.gapSmall)
     text: root.title
     color: Theme.muted
     elide: Text.ElideRight
