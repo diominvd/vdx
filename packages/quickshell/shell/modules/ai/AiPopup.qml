@@ -52,6 +52,7 @@ KitFrame {
     }
 
     KitSwitch {
+      accessibleName: "Ollama service"
       anchors.verticalCenter: parent.verticalCenter
       visible: root.tab === "ollama" && OllamaService.installed
       checked: OllamaService.running

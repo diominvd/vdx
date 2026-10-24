@@ -169,6 +169,7 @@ KitColumn {
     hint: "Automatic line between modules"
 
     KitSwitch {
+      accessibleName: "Separators"
       checked: ShellSettings.barSeparators
       onToggled: ShellSettings.setLook("barSeparators", !checked)
     }
@@ -202,6 +203,7 @@ KitColumn {
     hint: "Off: chips only"
 
     KitSwitch {
+      accessibleName: "Show the player"
       checked: ShellSettings.hubPlayer
       onToggled: ShellSettings.setLook("hubPlayer", !checked)
     }
@@ -213,6 +215,7 @@ KitColumn {
     hint: "On any bar module"
 
     KitSwitch {
+      accessibleName: "Right click opens options"
       checked: ShellSettings.barRightSettings
       onToggled: ShellSettings.set("barRightSettings", !checked)
     }
@@ -251,6 +254,7 @@ KitColumn {
     hint: BarLayout.shared ? "Every monitor shows one bar" : "Main and extra differ"
 
     KitSwitch {
+      accessibleName: "Same bar everywhere"
       checked: BarLayout.shared
       onToggled: {
         BarLayout.setShared(!BarLayout.shared);
@@ -264,6 +268,7 @@ KitColumn {
     hint: root.barOn ? "On " + root.screenName : "No bar on " + root.screenName
 
     KitSwitch {
+      accessibleName: "Show bar"
       checked: root.barOn
       onToggled: BarLayout.setBarOn(root.screenName, !root.barOn)
     }
@@ -276,6 +281,7 @@ KitColumn {
     hint: "Off: island hides when empty"
 
     KitSwitch {
+      accessibleName: "Island clock"
       checked: BarLayout.islandClock(root.screenName)
       onToggled: BarLayout.setIslandClock(root.screenName, !checked)
     }

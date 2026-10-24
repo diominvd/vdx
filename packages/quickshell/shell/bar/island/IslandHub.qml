@@ -156,11 +156,41 @@ Item {
           width: appRow.width + 2 * Theme.gapWide
           height: 32
           radius: Theme.radiusCard
-          color: appHover.hovered ? Theme.background2 : Theme.background1
+          property bool keyboardPressed: false
+          color: keyboardPressed || appTap.pressed ? Theme.background3 : appHover.hovered ? Theme.background2 : Theme.background1
           Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
+          // Launcher and keybind chips are custom buttons; expose the same
+          // action to keyboard and assistive-technology users as to the pointer.
+          Rectangle {
+            anchors.fill: parent
+            radius: parent.radius
+            color: "transparent"
+            border.width: appChip.activeFocus ? 2 : 0
+            border.color: Theme.foreground0
+          }
+
+          activeFocusOnTab: true
+          Accessible.role: Accessible.Button
+          Accessible.name: appChip.modelData.label
+          Accessible.description: appChip.modelData.view === "launcher" ? "Open application launcher" : "Open keyboard shortcuts"
           HoverHandler { id: appHover; cursorShape: Qt.PointingHandCursor }
-          TapHandler { onTapped: root.app(appChip.modelData.view) }
+          TapHandler { id: appTap; onTapped: { appChip.forceActiveFocus(); root.app(appChip.modelData.view); } }
+          onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+          Keys.onPressed: event => {
+            if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+            if (!event.isAutoRepeat) {
+              keyboardPressed = true;
+              root.app(appChip.modelData.view);
+            }
+            event.accepted = true;
+          }
+          Keys.onReleased: event => {
+            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+              keyboardPressed = false;
+              event.accepted = true;
+            }
+          }
 
           Row {
             id: appRow

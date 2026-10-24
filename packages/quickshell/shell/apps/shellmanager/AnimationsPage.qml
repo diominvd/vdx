@@ -37,6 +37,7 @@ Column {
     hint: "Off: everything snaps in place"
 
     KitSwitch {
+      accessibleName: "Animations"
       checked: ShellSettings.motion
       onToggled: ShellSettings.set("motion", !checked)
     }
@@ -88,10 +89,36 @@ Column {
         Behavior on x { enabled: Motion.on; NumberAnimation { duration: Motion.slow * 2; easing.type: Easing.InOutCubic } }
       }
 
+      // The preview is an action, not decoration: keep it usable without a pointer.
       MouseArea {
+        id: previewArea
         anchors.fill: parent
-        cursorShape: Motion.on ? Qt.PointingHandCursor : Qt.ArrowCursor
-        onClicked: sample.play()
+        enabled: Motion.on
+        hoverEnabled: true
+        activeFocusOnTab: enabled
+        Accessible.role: Accessible.Button
+        Accessible.name: "Preview animation"
+        Accessible.description: enabled ? "Play the animation sample" : "Enable animations to preview"
+        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+        onClicked: {
+          forceActiveFocus();
+          sample.play();
+        }
+        Keys.onPressed: event => {
+          if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+          if (!event.isAutoRepeat) sample.play();
+          event.accepted = true;
+        }
+      }
+
+      Rectangle {
+        anchors.fill: parent
+        visible: previewArea.activeFocus
+        color: Theme.clear
+        radius: Theme.radiusControl
+        border.width: 2
+        border.color: Theme.foreground0
+        z: 2
       }
     }
   }
@@ -146,6 +173,7 @@ Column {
       hint: modelData.hint
 
       KitSwitch {
+        accessibleName: modelData.label
         disabled: !ShellSettings.motion
         checked: ShellSettings[part.modelData.key]
         onToggled: ShellSettings.set(part.modelData.key, !checked)

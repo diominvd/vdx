@@ -17,6 +17,25 @@ Item {
   implicitWidth: label.implicitWidth
   implicitHeight: label.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: BarLayout.label("brightness")
+  Accessible.description: "Open brightness controls; use the mouse wheel to change brightness"
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) { popup.toggle(); }
+    event.accepted = true;
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
   KitBarItem {
     id: label
     icon: BrightnessService.nightActive ? "moon" : "sun"
@@ -29,7 +48,7 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: popup.toggle()
+    onClicked: { root.forceActiveFocus(); popup.toggle(); }
     onWheel: wheel => {
       if (wheel.angleDelta.y !== 0 && BrightnessService.available)
         BrightnessService.stepBrightness(wheel.angleDelta.y > 0 ? BrightnessService.scrollStep : -BrightnessService.scrollStep);

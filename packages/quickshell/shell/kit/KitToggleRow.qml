@@ -13,6 +13,7 @@ KitRow {
   readonly property bool checked: ModuleSettings.get(module, key, fallback)
 
   KitSwitch {
+    accessibleName: root.label
     checked: root.checked
     onToggled: ModuleSettings.set(root.module, root.key, !root.checked)
   }

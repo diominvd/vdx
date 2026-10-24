@@ -21,6 +21,7 @@ Column {
   property bool busy: false
   property bool disabled: false
   property bool expanded: false
+  property int highlightedIndex: -1
   // The box takes the standard width (KitRow's, so the right edges line up) when
   // the row has room for it; a narrower row gives the label half of it (less the
   // gap). It never grows past the standard width: a long choice elides in the box.
@@ -65,6 +66,42 @@ Column {
   z: expanded ? 10 : 0
 
   onDisabledChanged: if (disabled) expanded = false
+  onBusyChanged: if (busy) expanded = false
+  // Do not leave a logically open menu behind when its row is hidden.
+  onVisibleChanged: if (!visible) expanded = false
+  onModelChanged: {
+    if (!expanded) return;
+    const index = model.findIndex(choice => choice.value === current);
+    highlightedIndex = model.length > 0 ? Math.max(0, index) : -1;
+  }
+  onCurrentChanged: {
+    if (!expanded) return;
+    const index = model.findIndex(choice => choice.value === current);
+    highlightedIndex = model.length > 0 ? Math.max(0, index) : -1;
+  }
+  onExpandedChanged: highlightedIndex = expanded && model.length > 0
+    ? Math.max(0, model.findIndex(choice => choice.value === current)) : -1
+
+  function moveHighlight(delta) {
+    if (model.length === 0) { highlightedIndex = -1; return; }
+    highlightedIndex = Math.max(0, Math.min(model.length - 1, highlightedIndex + delta));
+
+    // Scroll only when the highlighted row leaves the viewport. Avoid jumping
+    // an extra row on every arrow press near the bottom of the list.
+    const optionTop = highlightedIndex * rowHeight;
+    const optionBottom = optionTop + rowHeight;
+    const viewportTop = scroller.contentY;
+    const viewportBottom = viewportTop + scroller.height;
+    if (optionTop < viewportTop) scroller.contentY = optionTop;
+    else if (optionBottom > viewportBottom) scroller.contentY = optionBottom - scroller.height;
+  }
+
+  function chooseHighlighted() {
+    if (disabled || busy || highlightedIndex < 0 || highlightedIndex >= model.length) return;
+    const choice = model[highlightedIndex];
+    if (choice.value !== current) picked(choice.value);
+    expanded = false;
+  }
 
   Item {
     id: row
@@ -95,12 +132,25 @@ Column {
     Rectangle {
       id: box
       anchors.right: parent.right
+      // Keep native enabled state aligned with the custom disabled appearance.
+      // Busy selects remain enabled/focusable so "Loading options" is announced.
+      enabled: !root.disabled
+      activeFocusOnTab: !root.disabled
+      Accessible.role: Accessible.ComboBox
+      Accessible.name: root.label
+      Accessible.description: root.busy ? qsTr("Loading options")
+        : root.expanded && root.highlightedIndex >= 0 && root.highlightedIndex < root.model.length
+          ? qsTr("Highlighted option: %1").arg(root.model[root.highlightedIndex].label)
+            + (root.selected ? ". " + qsTr("Current value: %1").arg(root.selected.label) : "")
+            + (root.hint !== "" ? ". " + root.hint : "")
+          : root.hint + (root.hint !== "" ? ". " : "")
+            + (root.selected ? qsTr("Current value: %1").arg(root.selected.label) : qsTr("No value selected"))
       width: root.boxWidth
       height: Theme.controlHeight
       radius: Theme.radiusControl
       color: boxArea.containsMouse && !root.disabled ? Theme.hoverOn(root.boxed) : Theme.fillOn(root.boxed)
-      border.width: Theme.frameWidth
-      border.color: root.expanded ? Theme.accentFor("selects", Theme.foreground2)
+      border.width: activeFocus ? 2 : Theme.frameWidth
+      border.color: activeFocus ? Theme.foreground0 : root.expanded ? Theme.accentFor("selects", Theme.foreground2)
         : boxArea.containsMouse ? Theme.foreground2 : Theme.gray
       opacity: root.disabled ? 0.4 : 1
 
@@ -138,12 +188,59 @@ Column {
         }
       }
 
+      Keys.onDownPressed: event => {
+        if (root.disabled || root.busy) { event.accepted = true; return; }
+        if (!root.expanded) root.expanded = true;
+        else root.moveHighlight(1);
+        event.accepted = true;
+      }
+      Keys.onUpPressed: event => {
+        if (root.disabled || root.busy) { event.accepted = true; return; }
+        if (!root.expanded) root.expanded = true;
+        else root.moveHighlight(-1);
+        event.accepted = true;
+      }
+      Keys.onHomePressed: event => {
+        if (!root.disabled && !root.busy && root.expanded && root.model.length > 0) {
+          root.highlightedIndex = 0;
+          scroller.contentY = 0;
+        }
+        event.accepted = true;
+      }
+      Keys.onEndPressed: event => {
+        if (!root.disabled && !root.busy && root.expanded && root.model.length > 0) {
+          root.highlightedIndex = root.model.length - 1;
+          scroller.contentY = Math.max(0, scroller.contentHeight - scroller.height);
+        }
+        event.accepted = true;
+      }
+      // Activation keys must not reopen/close the menu repeatedly when held.
+      Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+        if (!event.isAutoRepeat && !root.disabled && !root.busy) {
+          if (root.expanded) root.chooseHighlighted();
+          else root.expanded = true;
+        }
+        event.accepted = true;
+      }
+      Keys.onEscapePressed: event => {
+        if (root.expanded) {
+          root.expanded = false;
+          event.accepted = true;
+        }
+      }
+
       MouseArea {
         id: boxArea
         anchors.fill: parent
         hoverEnabled: true
-        cursorShape: root.disabled ? Qt.ArrowCursor : Qt.PointingHandCursor
-        onClicked: if (!root.disabled && !root.busy) root.expanded = !root.expanded
+        cursorShape: root.disabled || root.busy ? Qt.ArrowCursor : Qt.PointingHandCursor
+        onClicked: {
+          if (!root.disabled && !root.busy) {
+            box.forceActiveFocus();
+            root.expanded = !root.expanded;
+          }
+        }
       }
     }
   }
@@ -164,7 +261,7 @@ Column {
       visible: root.expanded
       width: parent.width
       x: 0
-      height: Math.min(options.implicitHeight, root.maxRows * root.rowHeight) + 2 * inset
+      height: Math.max(2 * inset, Math.min(options.implicitHeight, Math.max(0, root.maxRows) * root.rowHeight) + 2 * inset)
       radius: Theme.radiusControl
       // round corners keep the rows off the frame's curve
       readonly property int inset: Theme.frameWidth + (Theme.round ? 3 : 0)
@@ -189,8 +286,8 @@ Column {
         id: scroller
         x: list.inset
         y: list.inset
-        width: parent.width - 2 * list.inset
-        height: parent.height - 2 * list.inset
+        width: Math.max(0, parent.width - 2 * list.inset)
+        height: Math.max(0, parent.height - 2 * list.inset)
         contentHeight: options.implicitHeight
         interactive: contentHeight > height
         boundsBehavior: Flickable.StopAtBounds
@@ -213,6 +310,16 @@ Column {
         id: options
         width: parent.width
 
+        KitText {
+          visible: root.model.length === 0
+          width: parent.width
+          height: root.rowHeight
+          text: qsTr("No options available")
+          color: Theme.muted
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+        }
+
         Repeater {
           model: root.model
 
@@ -220,27 +327,42 @@ Column {
             id: option
 
             required property var modelData
+            required property int index
 
             readonly property bool active: modelData.value === root.current
+            readonly property bool highlighted: index === root.highlightedIndex
+
+            // Expose each popup choice to assistive technology. The closed
+            // control announces the highlighted item; these nodes expose the
+            // available labels, optional notes, and the committed selection.
+            Accessible.role: Accessible.ListItem
+            Accessible.name: modelData.label
+            Accessible.description: modelData.note ?? ""
+            Accessible.selected: active
 
             width: options.width
             height: root.rowHeight
             radius: Math.max(0, Theme.radiusControl - 2)
-            color: active ? Theme.background3 : optionArea.containsMouse ? Theme.controlHover : Theme.clear
+            color: active || highlighted ? Theme.background3 : optionArea.containsMouse ? Theme.controlHover : Theme.clear
             Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
             KitText {
               anchors { left: parent.left; leftMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
+              width: Math.max(0, parent.width - Theme.gapLoose * 2 - Theme.iconSmall - Theme.gapSmall - (optionNote.visible ? optionNote.width + Theme.gapSmall : 0))
+              elide: Text.ElideRight
               text: option.modelData.label
-              color: option.active || optionArea.containsMouse ? Theme.foreground0 : Theme.foreground2
+              color: option.active || option.highlighted || optionArea.containsMouse ? Theme.foreground0 : Theme.foreground2
               Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
               font.weight: option.active ? Font.ExtraBold : Font.DemiBold
             }
 
             KitText {
+              id: optionNote
               anchors { right: parent.right; rightMargin: Theme.gapLoose + Theme.iconSmall + Theme.gapSmall; verticalCenter: parent.verticalCenter }
               visible: (option.modelData.note ?? "") !== ""
               text: option.modelData.note ?? ""
+              elide: Text.ElideRight
+              width: Math.min(implicitWidth, Math.max(0, parent.width / 3))
               color: Theme.muted
               font.pixelSize: Theme.fontSize - 2
             }
@@ -257,8 +379,10 @@ Column {
               id: optionArea
               anchors.fill: parent
               hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
+              enabled: !root.disabled && !root.busy
+              cursorShape: root.disabled || root.busy ? Qt.ArrowCursor : Qt.PointingHandCursor
               onClicked: {
+                box.forceActiveFocus();
                 if (!option.active) root.picked(option.modelData.value);
                 root.expanded = false;
               }

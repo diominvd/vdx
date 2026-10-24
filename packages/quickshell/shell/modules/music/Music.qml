@@ -32,6 +32,25 @@ Item {
   implicitWidth: label.implicitWidth
   implicitHeight: label.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: BarLayout.label("music")
+  Accessible.description: "Open music player controls; middle-click toggles playback"
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) { popup.toggle(); }
+    event.accepted = true;
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
   KitBarItem {
     id: label
     // the icon marks the idle label only; while playing the track speaks for itself
@@ -46,6 +65,7 @@ Item {
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
     cursorShape: Qt.PointingHandCursor
     onClicked: mouse => {
+      root.forceActiveFocus();
       if (mouse.button === Qt.MiddleButton) PlayerService.togglePlay();
       else popup.toggle();
     }

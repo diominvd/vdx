@@ -97,7 +97,7 @@ KitColumn {
     width: parent.width
     text: "SHAPE"
     value: (ShellSettings.corners === "round" ? "ROUND " + ShellSettings.cornerRadius + " PX" : "SHARP")
-      + " · " + (ShellSettings.solidIcons ? "SOLID" : "OUTLINE")
+      + " · " + (ShellSettings.solidIcons ? "FILL" : "REGULAR")
   }
 
   CornersSection { id: cornersSection; width: parent.width }

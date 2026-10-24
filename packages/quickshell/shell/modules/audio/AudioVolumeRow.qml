@@ -15,6 +15,7 @@ KitSliderRow {
 
   enabled: !!audio
   clickable: true
+  accessibleName: muted ? "Unmute audio" : "Mute audio"
   icon: muted ? iconOff : iconOn
   iconTint: muted ? Theme.red : Theme.foreground0
   value: audio?.volume ?? 0

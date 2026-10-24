@@ -45,6 +45,25 @@ Item {
   implicitWidth: strip.implicitWidth
   implicitHeight: strip.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: BarLayout.label("sysmon")
+  Accessible.description: "Open system metrics"
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) { popup.toggle(); }
+    event.accepted = true;
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
   Row {
     id: strip
     spacing: Theme.gapMedium
@@ -86,7 +105,7 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: popup.toggle()
+    onClicked: { root.forceActiveFocus(); popup.toggle(); }
   }
 
   BarPopup {

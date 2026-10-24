@@ -54,6 +54,7 @@ KitColumn {
     hint: "A slider per part, in one proportion"
 
     KitSwitch {
+      accessibleName: "Separately"
       checked: ShellSettings.cornerSplit
       onToggled: ShellSettings.set("cornerSplit", !ShellSettings.cornerSplit)
     }

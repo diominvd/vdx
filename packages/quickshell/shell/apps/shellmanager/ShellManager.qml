@@ -91,17 +91,40 @@ Rectangle {
     const then = index.filter(e => !first.includes(e) && (e.hint + " " + e.where).toLowerCase().includes(q));
     return first.concat(then).slice(0, 30);
   }
-  onResultsChanged: picked = 0
+  onResultsChanged: {
+    picked = 0;
+    found.contentY = 0;
+  }
 
   function search(words) {
     searchField.text = words;
     searchField.input.forceActiveFocus();
   }
 
+  // Tab navigation can move focus into a group below the visible sidebar.
+  // Scroll only the sidebar viewport; don't move the main settings page.
+  function ensureNavItemVisible(item) {
+    const y = item.mapToItem(nav.contentItem, 0, 0).y;
+    const top = nav.contentY;
+    const bottom = top + nav.height;
+    if (y < top) nav.contentY = y;
+    else if (y + item.height > bottom) nav.contentY = y + item.height - nav.height;
+  }
+
   function openResult(e) {
     if (!e) return;
     const [tab, target] = e.target.split(":");
     navigate(tab, target ?? "");
+  }
+
+  // Keep the highlighted index valid even while the search has no matches.
+  function moveSearchSelection(key) {
+    if (results.length === 0) {
+      picked = 0;
+      return;
+    }
+    const delta = key === Qt.Key_Down ? 1 : -1;
+    picked = Math.max(0, Math.min(results.length - 1, picked + delta));
   }
 
   FileView {
@@ -185,6 +208,11 @@ Rectangle {
   // the gap under the header line, the sidebar's and the page's alike
   readonly property int contentGap: Theme.gapGroup
 
+  // Keep a useful page area when Shell Manager is opened in a narrow window.
+  // A fixed 24px inset on each side used to consume almost half the content
+  // pane on compact widths (and could make pages narrower than their controls).
+  readonly property int pageInset: Math.min(24, Math.max(8, Math.floor(page.width * 0.06)))
+
   // ---- navigation ----
   Rectangle {
     id: sidebar
@@ -215,10 +243,14 @@ Rectangle {
       // level with the page's first row (pages.y under the header): one top for both columns
       y: brand.y + brand.height + root.contentGap
       width: nav.width
-      placeholder: "Search…"
+      placeholder: qsTr("Search…")
+      accessibleName: qsTr("Search settings")
+      accessibleDescription: root.results.length === 0
+        ? qsTr("No matching settings")
+        : qsTr("%1 results. Use Up and Down to choose, Enter to open.").arg(root.results.length)
       passKeys: [Qt.Key_Up, Qt.Key_Down]
-      onAccepted: root.openResult(root.results[root.picked])
-      onKeyPassed: key => root.picked = Math.max(0, Math.min(root.results.length - 1, root.picked + (key === Qt.Key_Down ? 1 : -1)))
+      onAccepted: root.openResult(root.results.length > 0 ? root.results[root.picked] : null)
+      onKeyPassed: key => root.moveSearchSelection(key)
     }
 
     // the sections scroll when their group links outgrow the window
@@ -226,8 +258,8 @@ Rectangle {
       id: nav
       x: Theme.windowPadding
       y: searchField.y + searchField.height + Theme.gapMedium
-      width: parent.width - 2 * Theme.windowPadding
-      height: parent.height - y - Theme.windowPadding
+      width: Math.max(0, parent.width - 2 * Theme.windowPadding)
+      height: Math.max(0, parent.height - y - Theme.windowPadding)
       visible: !root.searching
       contentHeight: navColumn.implicitHeight
       clip: true
@@ -280,6 +312,8 @@ Rectangle {
             width: parent.width
             height: 28
             color: section.active ? Theme.background3 : itemArea.containsMouse ? Theme.background1 : Theme.clear
+            border.width: itemArea.activeFocus ? 2 : 0
+            border.color: Theme.foreground0
             Behavior on color { enabled: Motion.pages; ColorAnimation { duration: Motion.quick } }
 
             KitIcon {
@@ -292,7 +326,11 @@ Rectangle {
 
             KitText {
               anchors { left: itemIcon.right; leftMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
+              // Reserve room for the trailing expand chevron and its inset. Long
+              // translated labels must not collide with it in a compact sidebar.
+              width: Math.max(0, section.width - itemIcon.width - Theme.gapLoose * 4 - Theme.iconSmall)
               text: section.modelData.label
+              elide: Text.ElideRight
               color: section.active ? Theme.foreground0 : Theme.foreground2
               font.weight: section.active ? Font.ExtraBold : Font.DemiBold
             }
@@ -312,10 +350,22 @@ Rectangle {
               id: itemArea
               anchors.fill: parent
               hoverEnabled: true
+              activeFocusOnTab: true
+              Accessible.role: Accessible.Button
+              Accessible.name: section.modelData.label
+              Accessible.description: section.hasJumps ? "Open section and its groups" : "Open section"
               cursorShape: section.active && !section.hasJumps ? Qt.ArrowCursor : Qt.PointingHandCursor
-              onClicked: {
+              function activateSection() {
+                forceActiveFocus();
                 if (section.active) root.navOpen = !root.navOpen;
-                else root.tab = section.modelData.value;
+                else { root.tab = section.modelData.value; root.navOpen = false; }
+              }
+              onActiveFocusChanged: if (activeFocus) root.ensureNavItemVisible(itemArea)
+              onClicked: activateSection()
+              Keys.onPressed: event => {
+                if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+                if (!event.isAutoRepeat) activateSection();
+                event.accepted = true;
               }
             }
           }
@@ -350,6 +400,8 @@ Rectangle {
                   width: subs.width
                   height: 26
                   color: subArea.containsMouse ? Theme.background1 : Theme.clear
+                  border.width: subArea.activeFocus ? 2 : 0
+                  border.color: Theme.foreground0
                   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
                   // where the page is, as a thin line beside the name
@@ -374,8 +426,18 @@ Rectangle {
                     id: subArea
                     anchors.fill: parent
                     hoverEnabled: true
+                    activeFocusOnTab: true
+                    Accessible.role: Accessible.Button
+                    Accessible.name: sub.modelData.label
+                    Accessible.description: "Jump to section in " + section.modelData.label
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: root.jumpTo(sub.modelData)
+                    onActiveFocusChanged: if (activeFocus) root.ensureNavItemVisible(subArea)
+                    onClicked: { forceActiveFocus(); root.jumpTo(sub.modelData); }
+                    Keys.onPressed: event => {
+                      if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+                      if (!event.isAutoRepeat) root.jumpTo(sub.modelData);
+                      event.accepted = true;
+                    }
                   }
                 }
               }
@@ -412,6 +474,8 @@ Rectangle {
       height: hitText.implicitHeight + 2 * Theme.gapTight
       radius: Theme.radiusControl
       color: index === root.picked ? Theme.background3 : hitArea.containsMouse ? Theme.background1 : Theme.clear
+      border.width: hitArea.activeFocus ? 2 : 0
+      border.color: Theme.foreground0
 
       Column {
         id: hitText
@@ -437,16 +501,37 @@ Rectangle {
         id: hitArea
         anchors.fill: parent
         hoverEnabled: true
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Button
+        Accessible.name: hit.modelData.label
+        Accessible.description: hit.modelData.where
         cursorShape: Qt.PointingHandCursor
-        onClicked: root.openResult(hit.modelData)
+        onClicked: { forceActiveFocus(); root.openResult(hit.modelData); }
+        Keys.onPressed: event => {
+          if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+          if (!event.isAutoRepeat) root.openResult(hit.modelData);
+          event.accepted = true;
+        }
       }
     }
 
-    KitText {
+    Item {
+      // ListView delegates live in content coordinates, not viewport coordinates.
+      // Resetting contentY on result changes keeps this empty state centered in view.
+      x: found.contentX
+      y: found.contentY
+      width: found.width
+      height: found.height
       visible: root.results.length === 0
-      x: Theme.gapLoose
-      text: "Nothing matches"
-      color: Theme.muted
+      z: 2
+
+      KitText {
+        anchors.centerIn: parent
+        width: Math.max(0, parent.width - 2 * Theme.gapLoose)
+        horizontalAlignment: Text.AlignHCenter
+        text: qsTr("No matching settings")
+        color: Theme.muted
+      }
     }
   }
 
@@ -517,10 +602,10 @@ Rectangle {
     // a new page comes in: a fade and a short move from the right
     Item {
       id: pages
-      x: 24 + 16 * (1 - pageIn.shown)
+      x: root.pageInset + 16 * (1 - pageIn.shown)
       opacity: pageIn.shown
       y: root.contentGap
-      width: page.width - 48
+      width: Math.max(0, page.width - 2 * root.pageInset)
       implicitHeight: Math.max(appearance.visible ? appearance.implicitHeight : 0,
                                bar.visible ? bar.implicitHeight : 0,
                                themes.visible ? themes.height : 0,

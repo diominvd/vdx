@@ -94,6 +94,7 @@ KitColumn {
       hint: !ws.radioOn ? "Off: nothing connects" : ws.connected ? "Connected to " + ws.ssid : "On, not connected"
 
       KitSwitch {
+        accessibleName: "Wi-Fi"
         checked: ws.radioOn
         disabled: ws.toggling
         onToggled: ws.toggleRadio()
@@ -228,6 +229,7 @@ KitColumn {
       hint: "Joins when it is in range"
 
       KitSwitch {
+        accessibleName: "Connect automatically"
         checked: root.chosen?.autoconnect ?? false
         onToggled: ws.setSaved(root.chosen.uuid, "autoconnect", root.chosen.autoconnect ? "no" : "yes")
       }
@@ -458,6 +460,7 @@ KitColumn {
       hint: "Joins when the cable is in"
 
       KitSwitch {
+        accessibleName: "Connect automatically"
         checked: root.eth?.autoconnect ?? false
         disabled: !root.eth?.uuid
         onToggled: ws.setSaved(root.eth.uuid, "autoconnect", root.eth.autoconnect ? "no" : "yes")
@@ -527,6 +530,7 @@ KitColumn {
       hint: "Off: IPv4 only"
 
       KitSwitch {
+        accessibleName: "IPv6"
         checked: root.eth?.ipv6 ?? true
         disabled: !root.eth?.uuid
         onToggled: ws.setSaved(root.eth.uuid, "ipv6", root.eth.ipv6 ? "off" : "auto")

@@ -72,22 +72,54 @@ Item {
     visible: root.clockOn
     width: clock.implicitWidth
     height: Theme.islandHeight
+    property bool keyboardPressed: false
+    onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
 
     KitText {
       id: clock
       anchors.centerIn: parent
       text: Qt.formatDateTime(root.now, root.format)
       font.weight: Font.Bold
+      scale: parent.keyboardPressed || clockArea.pressed ? 0.97 : 1
+      Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
     }
 
     HoverHandler { id: clockHover }
 
+    // When configured for click-to-open, the clock is a real keyboard button too.
+    activeFocusOnTab: root.clockOn && ShellSettings.clockOpens === "click"
+    Accessible.role: Accessible.Button
+    Accessible.name: "Open Island hub"
+    Accessible.description: "Open the Island hub"
+    Rectangle {
+      anchors.fill: parent
+      radius: Theme.radiusControl
+      color: "transparent"
+      border.width: parent.activeFocus ? 2 : 0
+      border.color: Theme.foreground0
+    }
+    Keys.onPressed: event => {
+      if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+      if (!event.isAutoRepeat && activeFocusOnTab) {
+        keyboardPressed = true;
+        root.clockClicked();
+      }
+      event.accepted = true;
+    }
+    Keys.onReleased: event => {
+      if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+        keyboardPressed = false;
+        event.accepted = true;
+      }
+    }
+
     // the hub opens on a click here instead of a hover (Bar › Behaviour › Open the hub)
     MouseArea {
+      id: clockArea
       anchors.fill: parent
       enabled: ShellSettings.clockOpens === "click"
       cursorShape: Qt.PointingHandCursor
-      onClicked: root.clockClicked()
+      onClicked: { parent.forceActiveFocus(); root.clockClicked(); }
     }
   }
 

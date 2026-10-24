@@ -121,6 +121,7 @@ Rectangle {
       KitInput {
         id: field
         width: parent.width
+        accessibleName: "Unlock password"
         echoMode: TextInput.Password
         placeholder: "Password"
         enabled: !root.lock.busy

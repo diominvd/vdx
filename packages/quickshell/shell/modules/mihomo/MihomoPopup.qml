@@ -27,6 +27,7 @@ KitFrame {
     }
 
     KitSwitch {
+      accessibleName: "Proxy service"
       anchors.verticalCenter: parent.verticalCenter
       checked: MihomoService.serviceOn
       onToggled: MihomoService.toggleService()

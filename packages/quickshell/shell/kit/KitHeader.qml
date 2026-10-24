@@ -35,8 +35,10 @@ Item {
     id: caption
     anchors {
       left: icon.right; leftMargin: Theme.gapMedium
-      right: actionRow.left; rightMargin: actionRow.width > 0 ? 10 : 0
     }
+    // Action buttons can consume most of a compact header; never give the
+    // title/subtitle column a negative width when the popup narrows.
+    width: Math.max(0, root.width - icon.width - Theme.gapMedium - actionRow.width - (actionRow.width > 0 ? 10 : 0))
     spacing: 3
 
     KitText {

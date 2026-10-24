@@ -14,6 +14,7 @@ Item {
 
   property real value: 0                 // 0..1
   property bool dimmed: false
+  property string accessibleName: ""
   property color tint: Theme.foreground0
   property var snaps: []
   property bool ticks: true              // false: the stops still snap, no marks
@@ -46,9 +47,41 @@ Item {
   }
 
   function send(v) {
+    // A compact/hidden layout can temporarily give the slider zero width.
+    // Ignore invalid coordinates instead of propagating NaN into the value.
+    if (!isFinite(v)) return;
     dragValue = nearest(Math.max(0, Math.min(1, v)));
     moved(dragValue);
   }
+
+  function keyboardStep(delta) {
+    if (!enabled) return;
+    // Step from the position currently shown, not only the externally supplied
+    // value: a caller may apply changes asynchronously or debounce updates.
+    const current = shown;
+    let next;
+    if (snaps.length > 0) {
+      let closest = 0;
+      for (let i = 1; i < snaps.length; i++)
+        if (Math.abs(snaps[i] - current) < Math.abs(snaps[closest] - current)) closest = i;
+      next = snaps[Math.max(0, Math.min(snaps.length - 1, closest + delta))];
+    } else {
+      next = Math.max(0, Math.min(1, current + delta * 0.01));
+    }
+    send(next);
+    letGo(dragValue);
+  }
+
+  activeFocusOnTab: enabled
+  Accessible.role: Accessible.Slider
+  Accessible.name: accessibleName !== "" ? accessibleName : qsTr("Slider")
+  Accessible.value: Math.round(shown * 100)
+  Keys.onLeftPressed: event => { keyboardStep(-1); event.accepted = true; }
+  Keys.onDownPressed: event => { keyboardStep(-1); event.accepted = true; }
+  Keys.onRightPressed: event => { keyboardStep(1); event.accepted = true; }
+  Keys.onUpPressed: event => { keyboardStep(1); event.accepted = true; }
+  Keys.onHomePressed: event => { if (enabled) { send(0); letGo(dragValue); } event.accepted = true; }
+  Keys.onEndPressed: event => { if (enabled) { send(1); letGo(dragValue); } event.accepted = true; }
 
   implicitWidth: 120
   implicitHeight: m3 ? 28 : 18
@@ -183,14 +216,29 @@ Item {
     border.color: Theme.background0
   }
 
+  Rectangle {
+    anchors.fill: parent
+    color: Theme.clear
+    radius: Theme.radiusControl
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+    z: 1
+  }
+
   MouseArea {
     id: area
     anchors.fill: parent
     hoverEnabled: true
     preventStealing: true
     cursorShape: Qt.PointingHandCursor
-    onPressed: mouse => root.send(mouse.x / width)
-    onPositionChanged: mouse => { if (pressed) root.send(mouse.x / width); }
+    onPressed: mouse => {
+      if (width <= 0) return;
+      root.forceActiveFocus();
+      root.send(mouse.x / width);
+    }
+    onPositionChanged: mouse => {
+      if (pressed && width > 0) root.send(mouse.x / width);
+    }
     onReleased: root.letGo(root.dragValue)
     onCanceled: root.letGo(root.dragValue)   // a click the page took over still counts
   }

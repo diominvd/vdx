@@ -129,6 +129,7 @@ Item {
         hint: "Your files, without the caches"
 
         KitSwitch {
+          accessibleName: "Home"
           anchors.verticalCenter: parent.verticalCenter
           checked: root.source("home")
           disabled: bs.busy
@@ -142,6 +143,7 @@ Item {
         hint: "/etc · root-only files are skipped"
 
         KitSwitch {
+          accessibleName: "System config"
           anchors.verticalCenter: parent.verticalCenter
           checked: root.source("etc")
           disabled: bs.busy
@@ -155,6 +157,7 @@ Item {
         hint: "Wi-Fi, logins, Bluetooth · asks once"
 
         KitSwitch {
+          accessibleName: "Root-only files"
           anchors.verticalCenter: parent.verticalCenter
           checked: root.source("root")
           disabled: bs.busy
@@ -168,6 +171,7 @@ Item {
         hint: "Pacman list, services, groups"
 
         KitSwitch {
+          accessibleName: "Packages and services"
           anchors.verticalCenter: parent.verticalCenter
           checked: root.source("packages")
           disabled: bs.busy

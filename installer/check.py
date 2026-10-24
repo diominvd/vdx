@@ -319,6 +319,25 @@ def shell_problems() -> list[str]:
     uses = [(srel(p), n, no) for p, text in qml.items() for n, no in icon_uses(p, text)]
     uses += [("apps/apps.json", a["icon"], 0) for a in apps if "icon" in a]
     out += [f"{f}:{no}: no icon {n!r} in kit/icons" for f, n, no in uses if n not in outline]
+    # Every KitIcon Phosphor alias must have both locally bundled weights. This
+    # catches a typo or a missing asset before it becomes an invisible glyph.
+    kit_icon = icons.parent / "KitIcon.qml"
+    kit_text = kit_icon.read_text() if kit_icon.is_file() else ""
+    phosphor = icons / "phosphor"
+    aliases = dict(re.findall(r'"([a-z0-9-]+)"\s*:\s*"([a-z0-9-]+)"', kit_text))
+    for key, glyph in sorted(aliases.items()):
+        for suffix in ("", "-fill"):
+            asset = phosphor / f"{glyph}{suffix}.svg"
+            if not asset.is_file():
+                out.append(f"kit/KitIcon.qml: {key!r} maps to missing Phosphor asset {asset.name}")
+    # Every key in the legacy catalogue must be covered, otherwise it silently
+    # falls back to Material and the migration can regress unnoticed.
+    catalogue = icons / "material.txt"
+    if catalogue.is_file():
+        legacy_keys = {line.split()[0] for line in catalogue.read_text().splitlines()
+                       if line.strip() and not line.lstrip().startswith("#")}
+        out += [f"kit/KitIcon.qml: missing Phosphor alias for legacy key {key!r}"
+                for key in sorted(legacy_keys - aliases.keys())]
     # imports
     for p, text in qml.items():
         for m in re.finditer(r"^import qs\.([\w.]+)", text, re.M):

@@ -77,6 +77,7 @@ Item {
 
       KitInput {
         id: repo
+        accessibleName: "Backup repository location"
         placeholder: "/a/folder · or sftp:user@host:/path · Enter sets it"
         text: bs.config.repo ?? ""
         onAccepted: bs.init(text.trim())
@@ -195,6 +196,7 @@ Item {
         hint: "Only for the automatic runs"
 
         KitSwitch {
+          accessibleName: "Notify when it ends"
           anchors.verticalCenter: parent.verticalCenter
           checked: bs.config.notify === true
           disabled: bs.busy
@@ -215,6 +217,7 @@ Item {
         hint: "The newest by these counts, after a backup"
 
         KitSwitch {
+          accessibleName: "Remove old snapshots"
           anchors.verticalCenter: parent.verticalCenter
           checked: root.keep.on === true
           disabled: bs.busy
@@ -302,7 +305,7 @@ Item {
         spacing: Theme.gapMedium
 
         KitInput {
-          width: parent.width - chooseExtra.width - parent.spacing
+          width: Math.max(0, parent.width - chooseExtra.width - parent.spacing)
           placeholder: "/an/absolute/path · Enter adds it"
           onAccepted: {
             const path = text.trim();
@@ -406,6 +409,7 @@ Item {
           labelColor: modelData.risk === "medium" ? Theme.yellow : Theme.foreground0
 
           KitSwitch {
+            accessibleName: modelData.shown
             anchors.verticalCenter: parent.verticalCenter
             checked: bs.aiPicked[modelData.path] === true
             disabled: bs.busy

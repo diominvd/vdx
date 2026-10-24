@@ -45,16 +45,29 @@ Rectangle {
 
   // the uninstall button asks once more, like the cleaner's
   property bool armed: false
-  onTabChanged: armed = false
+  // A tab can have a very different content height. Always start it at the
+  // top rather than inheriting the previous tab's scroll position.
+  onTabChanged: {
+    armed = false;
+    list.contentY = 0;
+  }
+  onQueryChanged: list.contentY = 0
+  onFilterChanged: list.contentY = 0
+  onSortByChanged: list.contentY = 0
+  onCacheViewChanged: list.contentY = 0
 
   Timer { id: disarm; interval: 3000; onTriggered: root.armed = false }
 
   // list columns: name + hint (hint() keeps it to ~36 chars), source,
   // version (takes what is left, so no gap opens in the middle), size
-  readonly property int nameWidth: 250
-  readonly property int sourceWidth: 72
-  readonly property int sizeWidth: 90
-  readonly property real versionWidth: list.width - 28 - nameWidth - 12 - sourceWidth - sizeWidth - 16
+  // The package rows share their width between the name, source, version
+  // and size. Fixed desktop widths made the version column negative in narrow
+  // windows, which could push row content outside the scroll viewport.
+  readonly property int nameWidth: Math.min(250, Math.max(110, Math.floor(list.width * 0.42)))
+  readonly property int sourceWidth: Math.min(72, Math.max(48, Math.floor(list.width * 0.16)))
+  readonly property int sizeWidth: Math.min(90, Math.max(64, Math.floor(list.width * 0.18)))
+  readonly property real versionWidth: Math.max(0,
+    list.width - 28 - nameWidth - 12 - sourceWidth - sizeWidth - 16)
 
   // where a package comes from: its repo (core, extra, …) or AUR
   function source(p) {

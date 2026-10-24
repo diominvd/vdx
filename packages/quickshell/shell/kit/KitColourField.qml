@@ -11,6 +11,7 @@ Rectangle {
 
   property string value: ""
   property string placeholder: "#32302f"
+  property string accessibleName: "Hex colour"
   property bool live: false
   property bool open: false
   readonly property bool valid: /^#?[0-9a-fA-F]{6}$/.test(value.trim())
@@ -47,13 +48,37 @@ Rectangle {
     height: 18
     radius: Theme.radiusControl
     color: root.valid ? root.colour : "transparent"
-    border.width: Theme.frameWidth
-    border.color: Theme.gray
+    scale: chipArea.pressed || chipArea.keyboardPressed ? 0.92 : 1
+    Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+    border.width: chipArea.activeFocus ? 2 : Theme.frameWidth
+    border.color: chipArea.activeFocus ? Theme.foreground0 : Theme.gray
 
     MouseArea {
+      id: chipArea
       anchors.fill: parent
-      cursorShape: Qt.PointingHandCursor
-      onClicked: root.chipClicked()
+      enabled: root.enabled
+      activeFocusOnTab: enabled
+      property bool keyboardPressed: false
+      onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+      Accessible.role: Accessible.Button
+      Accessible.name: "Open colour picker"
+      Accessible.description: root.valid ? "Current colour " + root.colour : "Current colour is invalid"
+      cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+      onClicked: { forceActiveFocus(); root.chipClicked(); }
+      Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+        if (!event.isAutoRepeat) {
+          keyboardPressed = true;
+          root.chipClicked();
+        }
+        event.accepted = true;
+      }
+      Keys.onReleased: event => {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+          keyboardPressed = false;
+          event.accepted = true;
+        }
+      }
     }
   }
 
@@ -68,6 +93,9 @@ Rectangle {
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSize
     font.weight: Theme.fontWeight
+    Accessible.name: root.accessibleName
+    Accessible.description: root.valid ? qsTr("Current colour: %1").arg(root.colour)
+      : qsTr("Enter a six-digit hexadecimal colour")
 
     Text {
       visible: input.text === "" && !input.activeFocus
@@ -102,11 +130,32 @@ Rectangle {
 
     Behavior on rotation { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
 
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: -Theme.gapSmall
+      visible: chevronArea.activeFocus
+      radius: Theme.radiusControl
+      color: Theme.clear
+      border.width: 2
+      border.color: Theme.foreground0
+    }
+
     MouseArea {
+      id: chevronArea
       anchors.fill: parent
       anchors.margins: -Theme.gapMedium
-      cursorShape: Qt.PointingHandCursor
-      onClicked: root.chipClicked()
+      enabled: root.enabled
+      activeFocusOnTab: enabled
+      Accessible.role: Accessible.Button
+      Accessible.name: "Open colour picker"
+      Accessible.description: root.open ? "Colour picker is open" : "Open the colour picker"
+      cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+      onClicked: { forceActiveFocus(); root.chipClicked(); }
+      Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+        if (!event.isAutoRepeat) root.chipClicked();
+        event.accepted = true;
+      }
     }
   }
 }

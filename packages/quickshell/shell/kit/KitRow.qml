@@ -61,6 +61,17 @@ Item {
     spacing: Theme.gapMedium
   }
 
+  // A single switch inherits the row's label unless it already has an
+  // explicit accessible name, without duplicating labels in every screen.
+  Binding {
+    when: slot.children.length === 1 && root.label !== ""
+      && slot.children[0].checked !== undefined
+      && slot.children[0].accessibleName === ""
+    target: slot.children.length === 1 ? slot.children[0] : null
+    property: "accessibleName"
+    value: root.label
+  }
+
   // the one control of a wide row takes the standard width
   Binding {
     when: root.wide && slot.children.length > 0

@@ -3,7 +3,7 @@ import qs.config
 import qs.kit
 
 // Power off, reboot, lock, hibernate, suspend as tiles. Lock and suspend act
-// at once; the rest ask once — the tile turns to "Sure?" for 3 s.
+// at once; the rest ask once — the tile turns to "Confirm?" for 3 s.
 // Keys: Left / Right, Enter.
 Item {
   id: root
@@ -53,8 +53,15 @@ Item {
         height: 64
         radius: Theme.radiusCard
         color: armed ? Theme.background3 : lit ? Theme.background2 : Theme.background1
-        border.width: root.current === index ? Theme.frameWidth : 0
-        border.color: Theme.gray
+        border.width: tile.activeFocus ? Math.max(2, Theme.frameWidth) : root.current === index ? Theme.frameWidth : 0
+        border.color: tile.activeFocus ? Theme.foreground0 : Theme.gray
+
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Button
+        Accessible.name: tile.armed ? "Confirm " + tile.modelData.label : tile.modelData.label
+        Accessible.description: tile.modelData.confirm
+          ? (tile.armed ? "Press again within three seconds to confirm" : "Requires a second activation to confirm")
+          : "Activate " + tile.modelData.label
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
         Column {
@@ -70,7 +77,7 @@ Item {
           }
           KitText {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: tile.armed ? "Sure?" : tile.modelData.label
+            text: tile.armed ? "Confirm?" : tile.modelData.label
             font.pixelSize: Theme.fontSize - 2
             font.weight: tile.armed ? Font.ExtraBold : Theme.fontWeight
             color: tile.lit ? Theme.foreground0 : Theme.foreground2
@@ -82,7 +89,16 @@ Item {
           anchors.fill: parent
           hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
-          onClicked: root.press(tile.index)
+          onClicked: { tile.forceActiveFocus(); root.press(tile.index); }
+        }
+
+        Keys.onPressed: event => {
+          if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+          if (!event.isAutoRepeat) {
+            root.current = tile.index;
+            root.press(tile.index);
+          }
+          event.accepted = true;
         }
       }
     }

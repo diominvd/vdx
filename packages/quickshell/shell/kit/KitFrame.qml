@@ -33,7 +33,8 @@ Rectangle {
     id: column
     x: root.padding
     y: root.padding - root.headerInset
-    width: root.width - 2 * root.padding
+    // Keep the content column valid if the popup is temporarily narrower than its padding.
+    width: Math.max(0, root.width - 2 * root.padding)
     spacing: Theme.gapGroup
   }
 }

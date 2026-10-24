@@ -24,7 +24,10 @@ Row {
     KitButton {
       required property var modelData
 
-      width: root.stretch ? (root.width - root.spacing * (root.model.length - 1)) / root.model.length : implicitWidth
+      // A long choice list in a narrow window must not produce negative widths.
+      width: root.stretch
+        ? Math.max(0, (root.width - root.spacing * Math.max(0, root.model.length - 1)) / Math.max(1, root.model.length))
+        : implicitWidth
       icon: modelData.icon ?? ""
       text: modelData.label
       selected: modelData.value === root.current

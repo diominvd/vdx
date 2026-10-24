@@ -13,11 +13,25 @@ Rectangle {
   property var model: []
   property var current: null
   property bool disabled: false
+  // The setting row supplies the label for the group of radio-like segments.
+  property string accessibleName: ""
+
+  Accessible.role: Accessible.Grouping
+  Accessible.name: accessibleName !== "" ? accessibleName : qsTr("Options")
 
   signal picked(var value)
 
   readonly property bool m3: Theme.material
   readonly property int inset: m3 ? 0 : 2
+
+  function focusIndex(i) {
+    for (const child of segments.children) {
+      if (child.index === i && typeof child.forceActiveFocus === "function") {
+        child.forceActiveFocus();
+        return;
+      }
+    }
+  }
 
   implicitWidth: Theme.controlWidth
   implicitHeight: Theme.controlHeight
@@ -47,9 +61,61 @@ Rectangle {
           required property int index
 
           readonly property bool selected: modelData.value === root.current
+
+          // Keep each option's native enabled state consistent with the whole control.
+          enabled: !root.disabled
+          activeFocusOnTab: !root.disabled && (selected || (index === 0 && !root.model.some(choice => choice.value === root.current)))
+          Accessible.role: Accessible.RadioButton
+          Accessible.name: modelData.label
+          Accessible.checked: selected
+
+          Keys.onSpacePressed: event => {
+            if (!event.isAutoRepeat && !root.disabled && !selected) root.picked(modelData.value);
+            event.accepted = true;
+          }
+          Keys.onReturnPressed: event => {
+            if (!event.isAutoRepeat && !root.disabled && !selected) root.picked(modelData.value);
+            event.accepted = true;
+          }
+          Keys.onEnterPressed: event => {
+            if (!event.isAutoRepeat && !root.disabled && !selected) root.picked(modelData.value);
+            event.accepted = true;
+          }
+          Keys.onHomePressed: event => {
+            if (!root.disabled && root.model.length > 0) {
+              if (root.model[0].value !== root.current) root.picked(root.model[0].value);
+              Qt.callLater(() => root.focusIndex(0));
+            }
+            event.accepted = true;
+          }
+          Keys.onEndPressed: event => {
+            if (!root.disabled && root.model.length > 0) {
+              const last = root.model.length - 1;
+              if (root.model[last].value !== root.current) root.picked(root.model[last].value);
+              Qt.callLater(() => root.focusIndex(last));
+            }
+            event.accepted = true;
+          }
+          Keys.onLeftPressed: event => {
+            if (!root.disabled && root.model.length > 0) {
+              const next = (index - 1 + root.model.length) % root.model.length;
+              if (root.model[next].value !== root.current) root.picked(root.model[next].value);
+              Qt.callLater(() => root.focusIndex(next));
+            }
+            event.accepted = true;
+          }
+          Keys.onRightPressed: event => {
+            if (!root.disabled && root.model.length > 0) {
+              const next = (index + 1) % root.model.length;
+              if (root.model[next].value !== root.current) root.picked(root.model[next].value);
+              Qt.callLater(() => root.focusIndex(next));
+            }
+            event.accepted = true;
+          }
           readonly property bool hovered: area.containsMouse && !root.disabled && !selected
 
-          width: segments.width / root.model.length
+          // Keep delegate geometry finite if a caller temporarily supplies an empty model.
+          width: segments.width / Math.max(1, root.model.length)
           height: segments.height
           radius: 0      // the outer corners come from the clip; each segment's own corners would notch the joint
           color: selected ? Theme.background3 : hovered ? Theme.background2 : Theme.clear
@@ -66,7 +132,7 @@ Rectangle {
 
           Row {
             anchors.centerIn: parent
-            width: Math.min(implicitWidth, parent.width - Theme.gapMedium)
+            width: Math.max(0, Math.min(implicitWidth, parent.width - Theme.gapMedium))
             spacing: Theme.gapSmall
 
             KitIcon {
@@ -81,7 +147,7 @@ Rectangle {
             KitText {
               id: label
               anchors.verticalCenter: parent.verticalCenter
-              width: Math.min(implicitWidth, segment.width - Theme.gapMedium - (tick.visible ? tick.width + parent.spacing : 0))
+              width: Math.max(0, Math.min(implicitWidth, segment.width - Theme.gapMedium - (tick.visible ? tick.width + parent.spacing : 0)))
               elide: Text.ElideRight
               text: segment.modelData.label
               color: segment.selected ? Theme.accentFor("choices", Theme.foreground0) : Theme.foreground2
@@ -89,12 +155,26 @@ Rectangle {
             }
           }
 
+          Rectangle {
+            anchors.fill: parent
+            color: Theme.clear
+            border.width: segment.activeFocus ? 2 : 0
+            border.color: Theme.foreground0
+            z: 1
+            radius: 0
+          }
+
           MouseArea {
             id: area
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: root.disabled ? Qt.ArrowCursor : Qt.PointingHandCursor
-            onClicked: if (!root.disabled && !segment.selected) root.picked(segment.modelData.value)
+            onClicked: {
+              if (!root.disabled) {
+                segment.forceActiveFocus();
+                if (!segment.selected) root.picked(segment.modelData.value);
+              }
+            }
           }
         }
       }

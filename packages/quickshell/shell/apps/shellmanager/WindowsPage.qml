@@ -100,6 +100,7 @@ KitColumn {
     hint: "Super + Tab: this workspace's windows"
 
     KitSwitch {
+      accessibleName: "Switcher"
       checked: root.o.switcher
       onToggled: root.o.switcher = !root.o.switcher
     }
@@ -111,6 +112,7 @@ KitColumn {
     hint: "This workspace's windows, in a bar"
 
     KitSwitch {
+      accessibleName: "Taskbar"
       checked: root.o.taskbar
       onToggled: root.o.taskbar = !root.o.taskbar
     }
@@ -192,6 +194,7 @@ KitColumn {
     hint: ""
 
     KitSwitch {
+      accessibleName: "Shadows"
       checked: root.o.shadows
       onToggled: root.ws.setOption("shadows", !root.o.shadows)
     }

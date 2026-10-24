@@ -88,11 +88,30 @@ Item {
       id: shellButton
       icon: "sliders"
       text: BarLayout.label("shell")
+      activeFocusOnTab: true
+      Accessible.role: Accessible.Button
+      Accessible.name: BarLayout.label("shell")
+      Accessible.description: "Toggle Shell Manager"
+
+      Rectangle {
+        anchors.fill: parent
+        radius: Theme.radiusControl
+        color: "transparent"
+        border.width: shellButton.activeFocus ? 2 : 0
+        border.color: Theme.foreground0
+      }
+
+      function toggleManager() { ShellSettings.managerOpen = !ShellSettings.managerOpen; }
+      Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+        if (!event.isAutoRepeat) toggleManager();
+        event.accepted = true;
+      }
 
       MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: ShellSettings.managerOpen = !ShellSettings.managerOpen
+        onClicked: { shellButton.forceActiveFocus(); shellButton.toggleManager(); }
       }
     }
   }

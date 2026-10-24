@@ -16,15 +16,15 @@ Column {
 
     KitInput {
       id: field
-      width: parent.width - filterBox.width - sortBox.width - 16
+      width: Math.max(0, parent.width - filterBox.width - sortBox.width - parent.spacing * 2)
       placeholder: "Search by name, description or program…"
       onTextChanged: page.query = text.trim().toLowerCase()
     }
 
     KitSelect {
       id: filterBox
-      width: 150
-      boxWidth: 150
+      width: Math.min(150, Math.max(72, (parent.width - 96) / 2))
+      boxWidth: width
       overlay: true
       model: [{ label: "All types", value: "all" }, { label: "Apps", value: "apps" },
               { label: "Pacman", value: "repo" }, { label: "AUR", value: "aur" }]
@@ -34,8 +34,8 @@ Column {
 
     KitSelect {
       id: sortBox
-      width: 150
-      boxWidth: 150
+      width: Math.min(150, Math.max(72, (parent.width - 96) / 2))
+      boxWidth: width
       overlay: true
       model: [{ label: "By name", value: "name" }, { label: "By size", value: "size" }, { label: "By date", value: "date" }]
       current: page.sortBy
@@ -50,13 +50,14 @@ Column {
 
     PackageCheck {
       anchors.verticalCenter: parent.verticalCenter
+      accessibleName: qsTr("Select all shown packages")
       checked: page.shown.length > 0 && page.shownPicked === page.shown.length
       partial: page.shownPicked > 0 && page.shownPicked < page.shown.length
       onToggled: page.ps.pickMany(page.shown.map(p => p.name), !checked)
     }
 
     KitLabel {
-      width: parent.width - 28
+      width: Math.max(0, parent.width - 28)
       text: "SELECT ALL SHOWN"
       value: page.shownPicked + " PICKED"
     }

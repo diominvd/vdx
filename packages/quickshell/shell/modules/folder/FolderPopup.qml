@@ -47,9 +47,23 @@ KitFrame {
 
         readonly property var module: BarLayout.modules.find(p => p.id === modelData) ?? null
 
-        width: (root.width - 2 * root.padding - 2 * 6) / 3   // three to a row, 6 between
+        width: Math.max(0, (root.width - 2 * root.padding - 2 * 6) / 3)   // three to a row, 6 between
         height: 58
         color: tileArea.containsMouse ? Theme.background3 : Theme.background1
+        border.width: tile.activeFocus ? Math.max(2, Theme.frameWidth) : 0
+        border.color: Theme.foreground0
+
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Button
+        Accessible.name: tile.module?.label ?? tile.modelData
+        Accessible.description: "Open this bar module"
+
+        Keys.onPressed: event => {
+          if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+          if (!event.isAutoRepeat) { root.picked(tile.modelData); }
+          event.accepted = true;
+        }
+
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
         Column {
@@ -74,7 +88,7 @@ KitFrame {
           anchors.fill: parent
           hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
-          onClicked: root.picked(tile.modelData)
+          onClicked: { tile.forceActiveFocus(); root.picked(tile.modelData); }
         }
       }
     }

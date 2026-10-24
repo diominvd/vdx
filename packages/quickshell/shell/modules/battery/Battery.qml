@@ -18,6 +18,25 @@ Item {
   implicitWidth: label.implicitWidth
   implicitHeight: label.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: BarLayout.label("battery")
+  Accessible.description: "Open battery and power details"
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) popup.toggle();
+    event.accepted = true;
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
   // Content with "Charge only" drops the icon; Name and Icon keep it
   readonly property bool showIcon: ModuleSettings.get("battery", "text", "content") !== "content"
     || ModuleSettings.get("battery", "shows", "both") !== "charge"
@@ -39,7 +58,7 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: popup.toggle()
+    onClicked: { root.forceActiveFocus(); popup.toggle(); }
   }
 
   BarPopup {

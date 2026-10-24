@@ -84,15 +84,51 @@ Item {
         }
       }
 
+      Rectangle {
+        anchors.fill: parent
+        radius: Theme.pill(height)
+        color: "transparent"
+        border.width: drag.activeFocus ? 2 : 0
+        border.color: Theme.foreground0
+      }
+
       MouseArea {
         id: drag
         property real at: 0
         anchors.fill: parent
         enabled: IslandService.length > 0
+        activeFocusOnTab: enabled
+        Accessible.role: Accessible.Slider
+        Accessible.name: "Seek playback"
+        Accessible.description: root.time(IslandService.position) + " of " + root.time(IslandService.length)
         cursorShape: Qt.PointingHandCursor
-        onPressed: mouse => at = Math.max(0, Math.min(1, mouse.x / width))
+        onPressed: mouse => { forceActiveFocus(); at = Math.max(0, Math.min(1, mouse.x / width)); }
         onPositionChanged: mouse => at = Math.max(0, Math.min(1, mouse.x / width))
         onReleased: IslandService.seek(at)
+        Keys.onLeftPressed: event => {
+          IslandService.seek(Math.max(0, IslandService.position - 5) / IslandService.length)
+          event.accepted = true
+        }
+        Keys.onRightPressed: event => {
+          IslandService.seek(Math.min(IslandService.length, IslandService.position + 5) / IslandService.length)
+          event.accepted = true
+        }
+        Keys.onUpPressed: event => {
+          IslandService.seek(Math.min(IslandService.length, IslandService.position + 5) / IslandService.length)
+          event.accepted = true
+        }
+        Keys.onDownPressed: event => {
+          IslandService.seek(Math.max(0, IslandService.position - 5) / IslandService.length)
+          event.accepted = true
+        }
+        Keys.onHomePressed: event => {
+          IslandService.seek(0)
+          event.accepted = true
+        }
+        Keys.onEndPressed: event => {
+          IslandService.seek(1)
+          event.accepted = true
+        }
       }
     }
 
