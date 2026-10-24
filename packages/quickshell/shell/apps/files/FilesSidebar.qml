@@ -145,6 +145,7 @@ Item {
           text: modelData.name
           hint: modelData.mount !== "" ? "" : modelData.size
           action: modelData.mount !== "" ? "eject" : "power"
+          actionLabel: modelData.mount !== "" ? qsTr("Unmount %1").arg(modelData.name) : qsTr("Mount %1").arg(modelData.name)
           current: modelData.mount !== "" && FilesService.path.startsWith(modelData.mount)
           onClicked: modelData.mount !== "" ? FilesService.go(modelData.mount) : FilesService.mountDevice(modelData, true)
           onActioned: modelData.mount !== "" ? FilesService.unmountDevice(modelData) : FilesService.mountDevice(modelData, false)
