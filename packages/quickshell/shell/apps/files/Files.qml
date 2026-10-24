@@ -405,7 +405,7 @@ Item {
       files: root
       x: root.padding
       y: brand.y + brand.height + Theme.gapGroup
-      width: root.sideW - root.padding
+      width: Math.max(0, root.sideW - root.padding)
       height: parent.height - root.padding - y
     }
   }
@@ -710,7 +710,7 @@ Item {
 
       Row {
         required property var modelData
-        width: infoCard.width - 2 * infoCard.padding
+        width: Math.max(0, infoCard.width - 2 * infoCard.padding)
         spacing: Theme.gapMedium
 
         KitText {
@@ -721,7 +721,7 @@ Item {
         }
 
         KitText {
-          width: parent.width - 96 - parent.spacing
+          width: Math.max(0, parent.width - 96 - parent.spacing)
           text: modelData.value
           wrapMode: Text.WrapAnywhere
           font.pixelSize: Theme.fontSize - 1
@@ -747,7 +747,7 @@ Item {
 
       Row {
         required property var modelData
-        width: helpCard.width - 2 * helpCard.padding
+        width: Math.max(0, helpCard.width - 2 * helpCard.padding)
         spacing: Theme.gapMedium
 
         KitText {
@@ -757,7 +757,7 @@ Item {
         }
 
         KitText {
-          width: parent.width - 150 - parent.spacing
+          width: Math.max(0, parent.width - 150 - parent.spacing)
           text: modelData.action
           color: Theme.muted
           font.pixelSize: Theme.fontSize - 1
