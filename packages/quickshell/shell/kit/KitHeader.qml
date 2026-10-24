@@ -15,7 +15,9 @@ Item {
   default property alias actions: actionRow.data
 
   width: parent ? parent.width : 0
-  implicitHeight: Math.max(caption.implicitHeight, actionRow.height)
+  // The icon has a fixed 24px box; include it so compact font settings cannot
+  // make the header shorter than its own leading icon.
+  implicitHeight: Math.max(24, caption.implicitHeight, actionRow.height)
 
   Item {
     id: icon
