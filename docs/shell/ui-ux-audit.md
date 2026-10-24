@@ -144,6 +144,7 @@ A visual change is not complete until these combinations are checked; testing on
 - The cache tab also used a fixed 260px version column and fixed 150px filter, with a fixed-width size label beside rollback actions. Those now clamp to the available row width, and size labels elide instead of competing with the action; verify the narrowest supported window at runtime.
 - Shell Manager's page pane previously used a fixed 24px inset on both sides regardless of its width. The inset now scales down on compact panes (with an 8px floor), preserving more room for controls; verify actual minimum window sizes and page headers in Quickshell.
 - `KitRow` now clamps the label/hint column to a nonnegative width when a trailing control is wider than a compact row, avoiding negative anchor geometry before wide rows switch to their stacked layout.
+- The Installed Packages toolbar now uses a wrapping `Flow`; the search field retains a usable minimum width and filter selectors move to another line instead of clipping when the window is narrow.
 - `KitSliderRow` now clamps its inline slider width when the icon and value consume a narrow popup row, while preserving the full-width captioned layout.
 - `KitSideRow` now separates the icon key from the accessible action name; removable USB rows announce the concrete Mount/Unmount action and device name instead of an icon identifier.
 - Sidebar keyboard focus now scrolls its own `Flickable` to keep focused section/group links visible during Tab navigation; verify keyboard traversal at a short window height.
