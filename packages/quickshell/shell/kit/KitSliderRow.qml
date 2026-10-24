@@ -126,11 +126,12 @@ Item {
 
   KitSlider {
     id: slider
+    // Compute the inline width explicitly: at compact popup widths the icon
+    // and value can consume the entire row, so opposing anchors could produce
+    // a negative slider width before the popup reaches its normal minimum.
+    x: root.captioned ? 0 : iconBox.x + iconBox.width + 8
+    width: Math.max(0, root.captioned ? root.width : root.width - x - inlineValue.width - 10)
     anchors {
-      left: root.captioned ? parent.left : iconBox.right
-      leftMargin: root.captioned ? 0 : 8
-      right: root.captioned ? parent.right : inlineValue.left
-      rightMargin: root.captioned ? 0 : 10
       bottom: parent.bottom
       bottomMargin: root.captioned ? 0 : 4
     }
