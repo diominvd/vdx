@@ -184,6 +184,7 @@ KitColumn {
       label: "Show"
 
       KitSegments {
+        accessibleName: "Show saved networks"
         model: [{ label: "In range", value: "range" }, { label: "All", value: "all" }]
         current: root.scope
         onPicked: value => root.scope = value
@@ -242,6 +243,7 @@ KitColumn {
       hint: "Higher joins first"
 
       KitSegments {
+        accessibleName: "Priority"
         model: [{ label: "Low", value: -10 }, { label: "Normal", value: 0 }, { label: "High", value: 10 }]
         current: root.chosen?.priority ?? 0
         onPicked: value => ws.setSaved(root.chosen.uuid, "priority", String(value))
@@ -264,6 +266,7 @@ KitColumn {
       hint: "Yes: apps save data"
 
       KitSegments {
+        accessibleName: "Metered connection"
         model: [{ label: "Auto", value: "unknown" }, { label: "Yes", value: "yes" }, { label: "No", value: "no" }]
         current: root.chosen?.metered ?? "unknown"
         onPicked: value => ws.setSaved(root.chosen.uuid, "metered", value)
@@ -410,6 +413,7 @@ KitColumn {
       hint: "Auto picks a free one"
 
       KitSegments {
+        accessibleName: "Hotspot channel"
         model: [{ label: "Auto", value: "auto" }, { label: "1", value: "1" }, { label: "6", value: "6" }, { label: "11", value: "11" }]
         current: (root.hs?.channel ?? "0") === "0" ? "auto" : root.hs?.channel
         onPicked: value => ws.setHotspotSetting("channel", value)
@@ -441,7 +445,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Wired"
       hint: "Off until you connect again"
 
@@ -455,7 +459,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Connect automatically"
       hint: "Joins when the cable is in"
 
@@ -468,12 +472,13 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       wide: true
       label: "Addressing"
       hint: "Manual: a fixed address"
 
       KitSegments {
+        accessibleName: "IP addressing method"
         model: [{ label: "Auto", value: "auto" }, { label: "Manual", value: "manual" }]
         current: root.manual ? "manual" : "auto"
         onPicked: value => {
@@ -488,7 +493,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null && root.manual
+      visible: root.eth != null && root.manual
       wide: true
       label: "Address"
       hint: "Address and prefix"
@@ -502,7 +507,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null && root.manual
+      visible: root.eth != null && root.manual
       wide: true
       label: "Gateway"
       hint: "Press Enter to apply"
@@ -516,7 +521,7 @@ KitColumn {
     }
 
     KitSelect {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "DNS"
       hint: "Applies now while connected"
       model: root.dnsChoices
@@ -525,7 +530,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "IPv6"
       hint: "Off: IPv4 only"
 
@@ -538,7 +543,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       wide: true
       label: "Metered"
       hint: "Yes: apps save data"
@@ -551,25 +556,25 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Address"
       KitText { text: root.eth?.ip || "—"; color: Theme.foreground2 }
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Gateway"
       KitText { text: root.eth?.gateway || "—"; color: Theme.foreground2 }
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Speed"
       KitText { text: root.eth?.speed || "—"; color: Theme.foreground2 }
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "MAC"
       KitText { text: root.eth?.mac ?? "—"; color: Theme.foreground2 }
     }
