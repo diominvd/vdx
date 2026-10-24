@@ -146,7 +146,7 @@ Item {
   Column {
     id: listColumn
 
-    anchors { left: parent.left; top: parent.top; right: parent.right; rightMargin: root.selected ? root.previewWidth + Theme.gapWide : 0 }
+    anchors { left: parent.left; top: parent.top; right: parent.right; rightMargin: root.selected ? Math.min(root.previewWidth + Theme.gapWide, Math.max(0, root.width - 220)) : 0 }
     spacing: Theme.gapMedium
 
     KitLabel {
