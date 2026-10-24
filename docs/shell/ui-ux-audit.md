@@ -271,3 +271,7 @@ A visual change is not complete until these combinations are checked; testing on
 
 - [x] Scale cleaner category size labels and backup snapshot sizes to narrow row widths.
 - [x] Guard keybind tab navigation when the tab model is empty or the current tab is missing.
+
+- [x] Give the Network page's segmented choices meaningful accessible group names instead of the generic “Options” label.
+- [x] Treat both `null` and `undefined` as an absent Ethernet device so the Ethernet controls stay hidden until a device object exists.
+- [x] Give Bluetooth discoverability-duration choices an accessible group name and handle an unavailable battery value consistently.
