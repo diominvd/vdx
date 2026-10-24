@@ -549,6 +549,7 @@ KitColumn {
       hint: "Yes: apps save data"
 
       KitSegments {
+        accessibleName: "Ethernet metered connection"
         model: [{ label: "Auto", value: "unknown" }, { label: "Yes", value: "yes" }, { label: "No", value: "no" }]
         current: root.eth?.metered ?? "unknown"
         onPicked: value => ws.setSaved(root.eth.uuid, "metered", value)
