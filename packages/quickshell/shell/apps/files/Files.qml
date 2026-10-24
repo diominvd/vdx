@@ -26,7 +26,7 @@ Item {
   property int previewW: FilesService.opt("previewWidth", 240)
   // Keep a useful strip for the file list; the preview collapses before it can
   // push the list beyond the available width in compact windows.
-  readonly property real effectivePreviewW: Math.min(previewW, Math.max(0, body.width - 180))
+  readonly property real effectivePreviewW: Math.min(Math.max(0, previewW), Math.max(0, body.width - 180))
   property int sizeWidth: FilesService.opt("sizeWidth", 84)
   property int dateWidth: FilesService.opt("dateWidth", 124)
   readonly property int kindWidth: 72
