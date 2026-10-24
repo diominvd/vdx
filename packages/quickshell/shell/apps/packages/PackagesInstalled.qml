@@ -9,14 +9,15 @@ Column {
   required property var page   // the Packages window
   spacing: Theme.gapGroup
 
-  // one toolbar: search, then the two dropdowns on the right
-  Row {
+  // Search and filters share a line when possible; Flow wraps them on narrow
+  // windows instead of squeezing the search field to zero or clipping controls.
+  Flow {
     width: parent.width
     spacing: Theme.gapMedium
 
     KitInput {
       id: field
-      width: Math.max(0, parent.width - filterBox.width - sortBox.width - parent.spacing * 2)
+      width: Math.max(160, parent.width - filterBox.width - sortBox.width - parent.spacing * 2)
       placeholder: "Search by name, description or program…"
       onTextChanged: page.query = text.trim().toLowerCase()
     }
