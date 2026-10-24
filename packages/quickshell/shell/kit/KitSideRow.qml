@@ -19,6 +19,8 @@ Rectangle {
   property bool moved: false           // the press became a drag: no click
   property real pressY: 0
   property string action: ""
+  // Semantic action name for assistive technology; `action` remains the icon key.
+  property string actionLabel: ""
 
   signal clicked()
   signal rightClicked(point at)
@@ -112,8 +114,8 @@ Rectangle {
     property bool keyboardPressed: false
     onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
     Accessible.role: Accessible.Button
-    Accessible.name: "Action for " + root.text
-    Accessible.description: root.action
+    Accessible.name: root.actionLabel !== "" ? root.actionLabel : qsTr("Action for %1").arg(root.text)
+    Accessible.description: root.actionLabel !== "" ? "" : qsTr("Additional row action")
     cursorShape: visible ? Qt.PointingHandCursor : Qt.ArrowCursor
     onClicked: { forceActiveFocus(); root.actioned(); }
     Keys.onPressed: event => {
