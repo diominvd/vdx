@@ -25,7 +25,7 @@ ScrimWindow {
   // canvas units are logical pixels; a row is one monitor and the gap is 80 of them
   readonly property real gap: 80
   readonly property real pitch: mh + gap
-  readonly property real zoom: height * 0.33 / mh
+  readonly property real zoom: Math.max(0.01, height * 0.33 / Math.max(1, mh))
 
   // the monitor's own workspaces; the rows start at the lowest one
   readonly property var taken: Hyprland.workspaces.values.filter(w => w.id > 0 && w.monitor === root.monitor).map(w => w.id)
