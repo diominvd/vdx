@@ -35,6 +35,8 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Constrain and wrap Files empty/error/search-result messages to the list viewport so long search terms and status text do not spill past narrow windows.
 - [x] Clamp Files column captions, breadcrumb strips, and empty pinned-section dividers to non-negative widths.
 - [x] Make This Computer's storage table reduce the free-space and usage columns before the name column is squeezed, and clamp separator/name widths in compact windows.
+- [x] Apply the calculated effective widths to Files' parent/child column panels, so the reserved central-list space is enforced by the actual layout rather than only computed.
+- [x] Cap the file context menu to the parent window height and make its item list scrollable when there is not enough vertical space.
 - [x] Clamp the inline `KitSliderRow` value width to the row viewport so a narrow popup cannot let the reading extend beyond its parent.
 - [x] Keep native Qt `enabled` state aligned with `disabled` in `KitSelect` and each `KitSegments` option; busy selects remain focusable to announce loading.
 - [x] Connect setting labels to switches rendered by `KitToggleRow` and several standalone settings/module switches.
