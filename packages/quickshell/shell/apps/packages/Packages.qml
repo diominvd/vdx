@@ -175,13 +175,19 @@ Rectangle {
 
     Item {
       width: parent.width
-      // the actions row is empty (zero high) on the cache tab: the text sets the height then
-      height: Math.max(actions.height, info.height)
+      // Let the status text and actions stack when the window is narrow. Keeping
+      // them side by side gives the status column a negative width on small panes.
+      height: footerContent.implicitHeight
 
       Column {
-        id: info
-        anchors { left: parent.left; right: actions.left; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
-        spacing: Theme.gapTight
+        id: footerContent
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        spacing: Theme.gapWide
+
+        Column {
+          id: info
+          width: parent.width
+          spacing: Theme.gapTight
 
         KitText {
           width: parent.width
@@ -213,10 +219,10 @@ Rectangle {
         }
       }
 
-      Row {
-        id: actions
-        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-        spacing: Theme.gapMedium
+        Flow {
+          id: actions
+          width: parent.width
+          spacing: Theme.gapMedium
 
         KitButton {
           visible: root.tab === "updates"
@@ -252,6 +258,7 @@ Rectangle {
           disabled: root.ps.pickedNames.length === 0
           onClicked: root.uninstall()
         }
+      }
       }
     }
   }
