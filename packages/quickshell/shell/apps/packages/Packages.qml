@@ -63,8 +63,8 @@ Rectangle {
   // The package rows share their width between the name, source, version
   // and size. Fixed desktop widths made the version column negative in narrow
   // windows, which could push row content outside the scroll viewport.
-  readonly property int sourceWidth: Math.min(72, Math.max(0, Math.floor(list.width * 0.16)))
-  readonly property int sizeWidth: Math.min(90, Math.max(0, Math.floor(list.width * 0.18)))
+  readonly property int sourceWidth: Math.min(72, Math.max(0, Math.floor(list.width * 0.14)))
+  readonly property int sizeWidth: Math.min(90, Math.max(0, Math.floor(list.width * 0.14)))
   readonly property int nameWidth: Math.min(250, Math.max(0,
     Math.min(Math.floor(list.width * 0.42), list.width - 28 - 12 - sourceWidth - sizeWidth - 16)))
   readonly property real versionWidth: Math.max(0,
