@@ -150,7 +150,7 @@ Item {
               required property var modelData
               files: root.files
               entry: modelData
-              width: (head.width - (tiles.across - 1) * Theme.gapMedium) / tiles.across
+              width: Math.max(0, (head.width - (tiles.across - 1) * Theme.gapMedium) / tiles.across)
             }
           }
         }
@@ -253,7 +253,7 @@ Item {
             onFinished: { startX = 0; startDate = 0; FilesService.setOption("dateWidth", files.dateWidth); }
           }
 
-          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: parent.width - 2 * Theme.gapWide; height: 1; color: Theme.background3 }
+          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: Math.max(0, parent.width - 2 * Theme.gapWide); height: 1; color: Theme.background3 }
         }
       }
 
@@ -299,7 +299,7 @@ Item {
         Rectangle {
           visible: row.index > 0 && !row.picked
           x: Theme.gapWide
-          width: parent.width - 2 * Theme.gapWide
+          width: Math.max(0, parent.width - 2 * Theme.gapWide)
           height: 1
           color: Theme.background2
         }
