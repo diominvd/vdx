@@ -14,8 +14,10 @@ Rectangle {
   // the storage in the sort's order: by name, or by size (the largest first)
   readonly property var storage: FilesService.volumes.slice().sort((a, b) =>
     FilesService.computerSort === "size" ? b.total - a.total : a.name.localeCompare(b.name))
-  readonly property int barWidth: 140       // the list's fixed columns: the used bar, the space text
-  readonly property int spaceWidth: 180
+  // Keep a useful name column when the window is narrow; right-side columns
+  // shrink before they are allowed to push their start positions off-screen.
+  readonly property real barWidth: Math.max(0, Math.min(140, (root.width - 120 - 2 * Theme.gapWide) / 2))
+  readonly property real spaceWidth: Math.max(0, Math.min(180, root.width - 120 - 2 * Theme.gapWide - barWidth))
   readonly property int rowH: 48
 
   radius: Theme.radiusCard
@@ -229,7 +231,7 @@ Rectangle {
 
             Column {
               x: rowGlyph.x + rowGlyph.width + Theme.gapMedium
-              width: box.spaceX - Theme.gapWide - x
+              width: Math.max(0, box.spaceX - Theme.gapWide - x)
               anchors.verticalCenter: parent.verticalCenter
 
               KitText {
