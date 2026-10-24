@@ -174,6 +174,9 @@ A visual change is not complete until these combinations are checked; testing on
 - Settings persist through `ShellSettings` / `ModuleSettings`; changing the shape or meaning of a stored key requires a migration and tests, not just a renamed control.
 - The shell is a single Quickshell process. Shared controls and popup/service lifecycle changes have a wide blast radius and should be introduced in small, reviewable commits.
 
+- [x] Clamp the file table row separator and file-name/rename fields to nonnegative widths when the viewport collapses below the column budget.
+- [x] Keep the file manager context-menu delegate nesting readable after adding its scroll viewport; narrow-window behavior still requires a live Quickshell check.
+
 ## Acceptance criteria
 
 ### Icon system
