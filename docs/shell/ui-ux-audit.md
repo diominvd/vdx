@@ -32,6 +32,7 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Clamp `KitFrame` content width to zero or greater when a popup is temporarily narrower than its padding.
 - [x] Clamp the `KitHeader` title/subtitle column to zero or greater when actions leave insufficient room in a compact popup.
 - [x] Keep Files' parent/child columns proportional to the available viewport and reserve space for the central file list when saved widths would otherwise crowd it out.
+- [x] Constrain and wrap Files empty/error/search-result messages to the list viewport so long search terms and status text do not spill past narrow windows.
 - [x] Clamp the inline `KitSliderRow` value width to the row viewport so a narrow popup cannot let the reading extend beyond its parent.
 - [x] Keep native Qt `enabled` state aligned with `disabled` in `KitSelect` and each `KitSegments` option; busy selects remain focusable to announce loading.
 - [x] Connect setting labels to switches rendered by `KitToggleRow` and several standalone settings/module switches.
