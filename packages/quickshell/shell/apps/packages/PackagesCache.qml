@@ -92,7 +92,7 @@ Column {
 
       KitText {
         anchors.verticalCenter: parent.verticalCenter
-        width: Math.min(80, Math.max(48, parent.width * 0.2))
+        width: Math.min(80, Math.max(0, parent.width * 0.2))
         horizontalAlignment: Text.AlignRight
         elide: Text.ElideLeft
         text: Format.shortSize(modelData.size)
@@ -100,7 +100,7 @@ Column {
       }
 
       KitButton {
-        width: Math.min(Theme.buttonWidth, Math.max(76, parent.width - 80 - Theme.gapMedium * 2))
+        width: Math.max(0, Math.min(Theme.buttonWidth, parent.width - 80 - Theme.gapMedium * 2))
         anchors.verticalCenter: parent.verticalCenter
         icon: "rotate-ccw"
         text: "Roll back"
