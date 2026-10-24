@@ -109,10 +109,6 @@ Rectangle {
 
     KitText {
       visible: root.text !== ""
-      // Explicitly budget for the icon/spinner and button padding. Long labels
-      // elide inside narrow buttons instead of painting beyond the control.
-      width: Math.max(0, root.width - (root.busy || root.icon !== "" ? Theme.fontSize + 1 + content.spacing : 0) - (Theme.material ? 32 : 24))
-      elide: Text.ElideRight
       text: root.text
       color: root.selected ? Theme.accentFor("choices", Theme.foreground0) : Theme.foreground0
       font.weight: root.selected ? Font.ExtraBold : Font.DemiBold
