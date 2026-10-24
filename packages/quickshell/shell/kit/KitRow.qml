@@ -28,11 +28,11 @@ Item {
 
   Column {
     id: text
-    anchors {
-      left: parent.left
-      right: root.stacked ? parent.right : slot.left
-      rightMargin: root.stacked ? 0 : 12
-    }
+    anchors.left: parent.left
+    // A fixed-width trailing control can exceed a compact row. Clamp the
+    // label column instead of allowing anchor arithmetic to produce a
+    // negative width before the row reaches its stacked layout threshold.
+    width: Math.max(0, root.stacked ? root.width : root.width - slot.width - 12)
     y: root.stacked ? 0 : (root.height - height) / 2
     spacing: Theme.gapTight
 
