@@ -28,10 +28,12 @@ ScrimWindow {
   property int index: 0
 
   // the grid: cells of 240 px, at most 5 in a row
-  readonly property int cellWidth: 240
-  readonly property int thumbHeight: 150
   readonly property int spacing: Theme.gapWide
   readonly property int columns: Math.max(1, Math.min(5, windows.length))
+  // Keep the grid within the available screen width on smaller displays.
+  readonly property int cellWidth: Math.max(120, Math.min(240,
+    Math.floor((width - 2 * Theme.popupPadding - (columns - 1) * spacing) / columns)))
+  readonly property int thumbHeight: Math.max(90, Math.round(cellWidth * 0.625))
 
   function order(t) { return t.lastIpcObject?.focusHistoryID ?? 1000; }
 
