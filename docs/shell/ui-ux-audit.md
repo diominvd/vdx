@@ -27,6 +27,8 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Keep the window switcher selection valid when a window closes while it is open.
 - [x] Guard overview zoom against transient zero-sized monitor/window geometry.
 - [x] Clamp taskbar window labels against the actual item width in compact layouts.
+- [x] Make music menu rows keyboard operable, accessibly named, and visibly focused.
+- [x] Scale the capture-library preview panel to the available window width instead of reserving a fixed width.
 - [x] Clamp the segmented-control label container and text width to zero or greater when a segment is narrower than its internal spacing.
 - [x] Clamp backup path entry, package selection label, Shell Manager navigation, and search empty-state dimensions to zero or greater for compact windows.
 - [x] Clamp Bluetooth and Wi-Fi connected-device name widths when status/battery labels consume the remaining row space.
