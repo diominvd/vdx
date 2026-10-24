@@ -213,7 +213,7 @@ Rectangle {
             Rectangle {
               visible: row.index > 0
               x: Theme.gapWide
-              width: parent.width - 2 * Theme.gapWide
+              width: Math.max(0, parent.width - 2 * Theme.gapWide)
               height: 1
               color: Theme.background2
             }
