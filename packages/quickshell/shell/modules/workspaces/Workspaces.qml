@@ -60,9 +60,27 @@ Row {
       Accessible.description: highlighted ? "Current or active workspace" : "Switch to workspace " + modelData.id
 
       Keys.onPressed: event => {
-        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
-        if (!event.isAutoRepeat) { modelData.activate(); }
-        event.accepted = true;
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+          if (!event.isAutoRepeat) modelData.activate();
+          event.accepted = true;
+          return;
+        }
+
+        // Keys has no onHomePressed/onEndPressed convenience handlers.
+        if (event.key === Qt.Key_Home) {
+          if (root.visibleWorkspaces.length > 0) {
+            root.visibleWorkspaces[0].activate();
+            Qt.callLater(() => root.focusWorkspace(0));
+          }
+          event.accepted = true;
+        } else if (event.key === Qt.Key_End) {
+          const last = root.visibleWorkspaces.length - 1;
+          if (last >= 0) {
+            root.visibleWorkspaces[last].activate();
+            Qt.callLater(() => root.focusWorkspace(last));
+          }
+          event.accepted = true;
+        }
       }
       Keys.onLeftPressed: event => {
         const next = Math.max(0, index - 1);
@@ -72,15 +90,6 @@ Row {
       Keys.onRightPressed: event => {
         const next = Math.min(root.visibleWorkspaces.length - 1, index + 1);
         if (next !== index) { root.visibleWorkspaces[next].activate(); Qt.callLater(() => root.focusWorkspace(next)); }
-        event.accepted = true;
-      }
-      Keys.onHomePressed: event => {
-        if (root.visibleWorkspaces.length > 0) { root.visibleWorkspaces[0].activate(); Qt.callLater(() => root.focusWorkspace(0)); }
-        event.accepted = true;
-      }
-      Keys.onEndPressed: event => {
-        const last = root.visibleWorkspaces.length - 1;
-        if (last >= 0) { root.visibleWorkspaces[last].activate(); Qt.callLater(() => root.focusWorkspace(last)); }
         event.accepted = true;
       }
       readonly property color tone: area.containsMouse
