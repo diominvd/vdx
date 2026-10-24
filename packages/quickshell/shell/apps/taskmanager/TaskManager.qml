@@ -67,10 +67,13 @@ Rectangle {
   Timer { id: disarm; interval: 3000; onTriggered: root.armed = "" }
 
   // column widths; the name takes what is left
-  readonly property int colUser: 110
-  readonly property int colCount: 80
-  readonly property int colCpu: 70
-  readonly property int colMem: 90
+  // Scale numeric columns down on narrow windows so the process table stays
+  // within its viewport instead of pushing columns past the right edge.
+  readonly property real colScale: Math.min(1, Math.max(0.1, (width - 100) / 350))
+  readonly property real colUser: 110 * colScale
+  readonly property real colCount: 80 * colScale
+  readonly property real colCpu: 70 * colScale
+  readonly property real colMem: 90 * colScale
 
   // ---- top: header, meters, column titles ----
   Column {
@@ -124,7 +127,7 @@ Rectangle {
           readonly property int at: graph.hoverIndex >= 0 ? graph.hoverIndex : modelData.values.length - 1
           readonly property real now: modelData.values[at] ?? 0
 
-          width: (parent.width - 3 * parent.spacing) / 4
+          width: Math.max(0, (parent.width - 3 * parent.spacing) / 4)
           spacing: Theme.gapMedium
 
           KitLabel {
@@ -163,13 +166,13 @@ Rectangle {
       Title { x: parent.width - root.colMem - root.colCpu - root.colCount - root.colUser; label: "USER" }
       Title {
         x: parent.width - root.colMem - root.colCpu - root.colCount
-        width: root.colCount - 10
+        width: Math.max(0, root.colCount - 10)
         horizontalAlignment: Text.AlignRight
         key: root.tm.grouped ? "" : "pid"
         label: root.tm.grouped ? "PROCS" : "PID"
       }
-      Title { x: parent.width - root.colMem - root.colCpu; width: root.colCpu - 10; horizontalAlignment: Text.AlignRight; key: "cpu"; label: "CPU" }
-      Title { x: parent.width - root.colMem; width: root.colMem - 10; horizontalAlignment: Text.AlignRight; key: "mem"; label: "MEMORY" }
+      Title { x: parent.width - root.colMem - root.colCpu; width: Math.max(0, root.colCpu - 10); horizontalAlignment: Text.AlignRight; key: "cpu"; label: "CPU" }
+      Title { x: parent.width - root.colMem; width: Math.max(0, root.colMem - 10); horizontalAlignment: Text.AlignRight; key: "mem"; label: "MEMORY" }
     }
   }
 
@@ -205,7 +208,7 @@ Rectangle {
       KitText {
         id: userText
         x: parent.width - root.colMem - root.colCpu - root.colCount - root.colUser
-        width: root.colUser - 10
+        width: Math.max(0, root.colUser - 10)
         anchors.verticalCenter: parent.verticalCenter
         text: row.modelData.user
         elide: Text.ElideRight
