@@ -179,6 +179,10 @@ A visual change is not complete until these combinations are checked; testing on
 
 - [x] Make file-manager context-menu actions keyboard reachable with Up/Down navigation, Enter/Space activation, Escape dismissal, disabled-item skipping, visible focus, and automatic scrolling to the focused action.
 
+- [x] Clamp the file manager sidebar width and information/help panel text columns to nonnegative values when the window is extremely narrow.
+
+- [x] Clamp folder tile widths and file-table separators to nonnegative values in compact viewports.
+
 ## Acceptance criteria
 
 ### Icon system
