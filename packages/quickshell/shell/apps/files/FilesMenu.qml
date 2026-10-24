@@ -10,6 +10,7 @@ Rectangle {
   id: root
 
   property var items: []
+  property int activeIndex: -1
 
   visible: false
   width: parent ? Math.min(260, parent.width) : 260
@@ -21,13 +22,45 @@ Rectangle {
 
   function open(x, y, list) {
     items = list;
+    activeIndex = -1;
     // kept inside the window
     this.x = Math.max(0, Math.min(x, parent.width - width));
     this.y = Math.max(0, Math.min(y, parent.height - height));
     visible = true;
+    for (let i = 0; i < items.length; i++) {
+      if (!items[i].disabled) {
+        focusItem(i);
+        break;
+      }
+    }
   }
 
-  function close() { visible = false; }
+  function focusItem(index) {
+    if (index < 0 || index >= items.length) return;
+    activeIndex = index;
+    const target = menuItems.itemAt(index);
+    if (!target) return;
+    target.forceActiveFocus();
+    scroller.contentY = Math.max(0, Math.min(scroller.contentHeight - scroller.height, target.y + target.height - scroller.height));
+    if (target.y < scroller.contentY) scroller.contentY = target.y;
+  }
+
+  function moveFocus(delta) {
+    if (items.length === 0) return;
+    let index = activeIndex;
+    for (let step = 0; step < items.length; step++) {
+      index = (index + delta + items.length) % items.length;
+      if (!items[index].disabled) {
+        focusItem(index);
+        return;
+      }
+    }
+  }
+
+  function close() {
+    visible = false;
+    activeIndex = -1;
+  }
 
   Flickable {
     id: scroller
@@ -46,12 +79,38 @@ Rectangle {
       width: scroller.width
 
       Repeater {
+        id: menuItems
         model: root.items
 
         Rectangle {
           id: item
 
           required property var modelData
+          required property int index
+
+          activeFocusOnTab: !modelData.disabled
+          Accessible.role: Accessible.MenuItem
+          Accessible.name: modelData.label
+          Accessible.description: modelData.hint ?? ""
+          border.width: activeFocus ? 2 : 0
+          border.color: Theme.foreground0
+
+          Keys.onPressed: event => {
+            if (event.key === Qt.Key_Up || event.key === Qt.Key_Down) {
+              root.moveFocus(event.key === Qt.Key_Up ? -1 : 1);
+              event.accepted = true;
+            } else if (event.key === Qt.Key_Escape) {
+              root.close();
+              event.accepted = true;
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+              if (!event.isAutoRepeat && !modelData.disabled) {
+                root.close();
+                modelData.run();
+              }
+              event.accepted = true;
+            }
+          }
+          onActiveFocusChanged: if (activeFocus) root.activeIndex = index
 
           width: column.width
           height: 28
