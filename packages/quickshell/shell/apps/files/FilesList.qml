@@ -95,6 +95,9 @@ Item {
     KitText {
       anchors { top: parent.top; topMargin: Theme.gapGroup + (FilesService.canUp && !FilesService.searching ? root.rowH : 0); horizontalCenter: parent.horizontalCenter }
       visible: FilesService.shown.length === 0 && !FilesService.loading
+      width: Math.max(0, parent.width - 2 * Theme.gapMedium)
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.WordWrap
       text: FilesService.error !== "" ? FilesService.error
           : FilesService.dupes ? "No file here has a copy."
           : FilesService.searching || FilesService.query.trim() !== "" ? "Nothing matches \"" + FilesService.query.trim() + "\""
