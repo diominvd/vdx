@@ -50,6 +50,7 @@ KitColumn {
     hint: "Material: filled, no frames"
 
     KitSegments {
+      accessibleName: "Control style"
       model: [
         { label: "Terminal", value: false },
         { label: "Material", value: true }
@@ -66,6 +67,7 @@ KitColumn {
     hint: "The theme's light or dark twin"
 
     KitSegments {
+      accessibleName: "Colour scheme"
       disabled: ThemeService.busy
       model: [{ label: "Dark", value: false }, { label: "Light", value: true }]
       current: ThemeService.light
@@ -80,6 +82,7 @@ KitColumn {
     hint: "In every password field"
 
     KitSegments {
+      accessibleName: "Password field style"
       model: [{ label: "Dots", value: true }, { label: "Squares", value: false }]
       current: ShellSettings.passwordDots
       onPicked: value => ShellSettings.set("passwordDots", value)
