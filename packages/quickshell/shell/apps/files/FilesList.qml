@@ -41,9 +41,9 @@ Item {
   // the Columns view: the parent folder on the left, the selected folder on the right
   FilesColumn {
     id: parentCol
-    visible: files.columnsView && FilesService.canUp
+    visible: root.wantsParentColumn && root.effectiveParentW > 0
     anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
-    width: files.parentW
+    width: root.effectiveParentW
     folder: visible ? FilesService.parentOf(FilesService.path) : ""
     highlight: FilesService.path
     title: "PARENT"
@@ -52,9 +52,9 @@ Item {
 
   FilesColumn {
     id: childCol
-    visible: files.columnsView && files.selectedDir
+    visible: root.wantsChildColumn && root.effectiveChildW > 0
     anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
-    width: files.childW
+    width: root.effectiveChildW
     folder: visible ? FilesService.selected[0].path : ""
     title: visible ? FilesService.selected[0].name.toUpperCase() : ""
     onOpened: p => FilesService.go(p)
