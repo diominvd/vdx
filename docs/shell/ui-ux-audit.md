@@ -148,6 +148,8 @@ A visual change is not complete until these combinations are checked; testing on
 - The Updates tab's select-all label now clamps its calculated width at zero, matching the Installed tab and avoiding negative text geometry in unusually narrow popups.
 - Package name/source/size columns now scale down without hard minimum widths, and the version column receives only the remaining space; the list no longer exceeds its viewport solely because the window is narrower than the desktop column minimums.
 - The package manager footer now stacks status text above a wrapping action flow, so the action buttons no longer force the status column to a negative width in compact windows.
+- The file manager's path/search row clamps the breadcrumb width, and picker footer text fields cannot receive negative widths when Cancel/Accept controls consume the available space.
+- The file preview now shrinks to preserve a minimum strip for the file list and collapses with its splitter when the body is too narrow, rather than extending beyond the window.
 - Cache-row size and rollback controls clamp to nonnegative widths, and the Installed tab's filter selectors cap themselves to the available pane width even below their normal minimum.
 - `KitSliderRow` now clamps its inline slider width when the icon and value consume a narrow popup row, while preserving the full-width captioned layout.
 - `KitSideRow` now separates the icon key from the accessible action name; removable USB rows announce the concrete Mount/Unmount action and device name instead of an icon identifier.
