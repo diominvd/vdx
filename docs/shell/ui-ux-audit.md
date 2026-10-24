@@ -177,6 +177,8 @@ A visual change is not complete until these combinations are checked; testing on
 - [x] Clamp the file table row separator and file-name/rename fields to nonnegative widths when the viewport collapses below the column budget.
 - [x] Keep the file manager context-menu delegate nesting readable after adding its scroll viewport; narrow-window behavior still requires a live Quickshell check.
 
+- [x] Make file-manager context-menu actions keyboard reachable with Up/Down navigation, Enter/Space activation, Escape dismissal, disabled-item skipping, visible focus, and automatic scrolling to the focused action.
+
 ## Acceptance criteria
 
 ### Icon system
