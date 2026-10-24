@@ -55,12 +55,32 @@ Rectangle {
     font.pixelSize: Theme.fontSize - 2
     font.weight: active ? Font.ExtraBold : Font.DemiBold
     font.letterSpacing: 1
+    Accessible.role: key !== "" ? Accessible.Button : Accessible.StaticText
+    Accessible.name: label + (active ? ", sorted descending" : "")
+
+    Rectangle {
+      anchors.fill: parent
+      z: -1
+      radius: Theme.radiusControl
+      color: Theme.clear
+      border.width: area.activeFocus ? 1 : 0
+      border.color: Theme.foreground0
+    }
 
     MouseArea {
+      id: area
       anchors.fill: parent
       enabled: parent.key !== ""
+      activeFocusOnTab: enabled
       cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-      onClicked: TaskManagerService.setSort(parent.key)
+      onClicked: { forceActiveFocus(); TaskManagerService.setSort(parent.key); }
+      Keys.onPressed: event => {
+        if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)
+            && !event.isAutoRepeat && enabled) {
+          TaskManagerService.setSort(parent.key);
+          event.accepted = true;
+        }
+      }
     }
   }
 
