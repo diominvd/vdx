@@ -41,8 +41,10 @@ Rectangle {
     const target = menuItems.itemAt(index);
     if (!target) return;
     target.forceActiveFocus();
-    scroller.contentY = Math.max(0, Math.min(scroller.contentHeight - scroller.height, target.y + target.height - scroller.height));
     if (target.y < scroller.contentY) scroller.contentY = target.y;
+    else if (target.y + target.height > scroller.contentY + scroller.height) {
+      scroller.contentY = Math.min(scroller.contentHeight - scroller.height, target.y + target.height - scroller.height);
+    }
   }
 
   function moveFocus(delta) {
