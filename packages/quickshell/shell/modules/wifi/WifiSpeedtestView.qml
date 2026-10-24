@@ -147,7 +147,8 @@ Column {
 
     Column {
       id: throughput
-      anchors { left: parent.left; right: runButton.left; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+      anchors { left: parent.left; verticalCenter: parent.verticalCenter }
+      width: Math.max(0, parent.width - runButton.width - Theme.gapMedium)
       spacing: Theme.gapHair
 
       KitLabel { width: Math.min(140, parent.width); text: "THROUGHPUT NOW" }
