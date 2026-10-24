@@ -52,6 +52,8 @@ Rectangle {
   KitText {
     visible: root.storage.length === 0
     anchors { left: parent.left; top: parent.top; topMargin: Theme.gapGroup }
+    width: Math.max(0, parent.width - 2 * Theme.gapWide)
+    wrapMode: Text.WordWrap
     text: "No storage found"
     color: Theme.muted
   }
@@ -163,9 +165,9 @@ Rectangle {
       color: Theme.background1
 
       // the fixed columns from the right: the used bar, the space; the name takes the rest
-      readonly property real barX: width - Theme.gapWide - root.barWidth
-      readonly property real spaceX: barX - Theme.gapWide - root.spaceWidth
-      readonly property var seps: [barX - Theme.gapWide / 2, spaceX - Theme.gapWide / 2]
+      readonly property real barX: Math.max(0, width - Theme.gapWide - root.barWidth)
+      readonly property real spaceX: Math.max(0, barX - Theme.gapWide - root.spaceWidth)
+      readonly property var seps: [Math.max(0, barX - Theme.gapWide / 2), Math.max(0, spaceX - Theme.gapWide / 2)]
 
       Column {
         id: table
@@ -185,7 +187,7 @@ Rectangle {
             Rectangle { required property real modelData; x: modelData; y: Theme.gapMedium; width: 1; height: captions.height - 2 * Theme.gapMedium; color: Theme.background3 }
           }
 
-          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: parent.width - 2 * Theme.gapWide; height: 1; color: Theme.background3 }
+          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: Math.max(0, parent.width - 2 * Theme.gapWide); height: 1; color: Theme.background3 }
         }
 
         Repeater {
