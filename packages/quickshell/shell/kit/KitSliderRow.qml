@@ -117,7 +117,8 @@ Item {
     id: inlineValue
     visible: !root.captioned
     anchors { right: parent.right; verticalCenter: slider.verticalCenter }
-    width: metrics.advanceWidth("150%")
+    // Keep the value inside the row on narrow popups; the slider can yield all remaining space.
+    width: Math.max(0, Math.min(root.width, metrics.advanceWidth("150%")))
     horizontalAlignment: Text.AlignRight
     text: root.text
     color: root.dimmed ? Theme.gray : Theme.foreground2
