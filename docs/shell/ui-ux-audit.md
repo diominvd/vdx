@@ -275,3 +275,5 @@ A visual change is not complete until these combinations are checked; testing on
 - [x] Give the Network page's segmented choices meaningful accessible group names instead of the generic “Options” label.
 - [x] Treat both `null` and `undefined` as an absent Ethernet device so the Ethernet controls stay hidden until a device object exists.
 - [x] Give Bluetooth discoverability-duration choices an accessible group name and handle an unavailable battery value consistently.
+- [x] Name segmented controls across Appearance, Themes, Windows and Ethernet settings so assistive technology announces the setting being changed rather than generic options.
+- [x] Keep the Network page's Ethernet controls hidden when the adapter is either `null` or `undefined`.
