@@ -149,7 +149,7 @@ A visual change is not complete until these combinations are checked; testing on
 - Package name/source/size columns now scale down without hard minimum widths, and the version column receives only the remaining space; the list no longer exceeds its viewport solely because the window is narrower than the desktop column minimums.
 - The package manager footer now stacks status text above a wrapping action flow, so the action buttons no longer force the status column to a negative width in compact windows.
 - The file manager's path/search row clamps the breadcrumb width, and picker footer text fields cannot receive negative widths when Cancel/Accept controls consume the available space.
-- The file preview now shrinks to preserve a minimum strip for the file list and collapses with its splitter when the body is too narrow, rather than extending beyond the window.
+- The file preview now shrinks to preserve a minimum strip for the file list and collapses with its splitter when the body is too narrow, rather than extending beyond the window. The effective preview width also clamps invalid negative saved values.
 - The file table now treats saved date/size/type widths as preferences: each visible column shrinks to the remaining viewport width and clamps its origin/separator, so narrow windows cannot push the table columns off-screen.
 - The Wi-Fi speed-test view clamps path-leg and metric widths in compact popups; its throughput text now yields space to the Run again button and elides rather than overlapping it.
 - The file context menu caps itself to the parent window width, clamps its inner column, and gives item labels and shortcut hints separate width budgets with elision.
