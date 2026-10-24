@@ -162,6 +162,7 @@ A visual change is not complete until these combinations are checked; testing on
 - The file context menu caps itself to the parent window width, clamps its inner column, and gives item labels and shortcut hints separate width budgets with elision.
 - Cache-row size and rollback controls clamp to nonnegative widths, and the Installed tab's filter selectors cap themselves to the available pane width even below their normal minimum.
 - `KitSliderRow` now clamps its inline slider width when the icon and value consume a narrow popup row, while preserving the full-width captioned layout.
+- `KitInfo` now caps the value column to half the available row and elides long labels, preventing long values and labels from colliding in narrow information panels.
 - `KitSideRow` now separates the icon key from the accessible action name; removable USB rows announce the concrete Mount/Unmount action and device name instead of an icon identifier.
 - Sidebar keyboard focus now scrolls its own `Flickable` to keep focused section/group links visible during Tab navigation; verify keyboard traversal at a short window height.
 - `KitInput` now explicitly names its `TextInput` from the field placeholder and identifies masked inputs in its accessible description; confirm announcements with the screen reader available in the target desktop session.
@@ -182,6 +183,7 @@ A visual change is not complete until these combinations are checked; testing on
 - [x] Clamp the file manager sidebar width and information/help panel text columns to nonnegative values when the window is extremely narrow.
 
 - [x] Clamp folder tile widths and file-table separators to nonnegative values in compact viewports.
+- [x] Keep `KitInfo` label/value rows inside narrow panels: reserve at most half the row for long values and elide the label instead of letting the two text columns overlap.
 
 ## Acceptance criteria
 
