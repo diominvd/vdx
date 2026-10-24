@@ -12,16 +12,40 @@ Item {
   property string note: ""
   property bool danger: false
   property bool disabled: false
+  property bool keyboardPressed: false
 
   signal activated()
 
   width: parent ? parent.width : 0
   implicitHeight: labelText.implicitHeight + 2 * Theme.gapTight
+  activeFocusOnTab: !disabled
+  Accessible.role: Accessible.Button
+  Accessible.name: root.label
+  Accessible.description: root.note
+  onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+  onDisabledChanged: if (disabled) keyboardPressed = false
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat && !disabled) {
+      keyboardPressed = true;
+      activated();
+    }
+    event.accepted = true;
+  }
+  Keys.onReleased: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    keyboardPressed = false;
+    event.accepted = true;
+  }
 
   Rectangle {
     anchors.fill: parent
     radius: Theme.radiusControl
-    color: !root.disabled && area.containsMouse ? Theme.controlHover : Theme.clear
+    color: root.keyboardPressed ? Theme.background3
+      : !root.disabled && (area.containsMouse || root.activeFocus) ? Theme.controlHover : Theme.clear
+    border.width: root.activeFocus ? Math.max(2, Theme.frameWidth) : 0
+    border.color: Theme.foreground0
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
   }
 
