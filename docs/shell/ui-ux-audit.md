@@ -167,6 +167,7 @@ A visual change is not complete until these combinations are checked; testing on
 - The window switcher scales its cell width to the available screen width (with a conservative minimum) and derives thumbnail height from the cell width; verify on the smallest supported display, as runtime geometry has not been exercised here.
 - Task Manager scales user/PID/CPU/memory column budgets with the available window width and clamps each numeric column's inner width; its four telemetry tiles also clamp to nonnegative widths. The narrowest supported window still needs runtime verification.
 - Clipboard history now clamps its scroll viewport height to a nonnegative value when the available vertical space is unusually small.
+- Sortable Task Manager headings now expose button semantics and an accessible label, support Tab plus Enter/Space, and show a focus outline; confirm announcements and focus contrast in the target desktop session.
 - `KitSideRow` now separates the icon key from the accessible action name; removable USB rows announce the concrete Mount/Unmount action and device name instead of an icon identifier.
 - Sidebar keyboard focus now scrolls its own `Flickable` to keep focused section/group links visible during Tab navigation; verify keyboard traversal at a short window height.
 - `KitInput` now explicitly names its `TextInput` from the field placeholder and identifies masked inputs in its accessible description; confirm announcements with the screen reader available in the target desktop session.
@@ -192,6 +193,7 @@ A visual change is not complete until these combinations are checked; testing on
 - [x] Scale the window switcher's preview cells and thumbnail height to the screen width so a five-column grid is less likely to overflow on smaller displays.
 - [x] Scale Task Manager's numeric process-table columns down with the window width and clamp its four metric tiles to nonnegative widths.
 - [x] Clamp the Clipboard history Flickable height to zero or greater when the content area is compressed by a short window.
+- [x] Make sortable Task Manager column headings keyboard reachable, visibly focused, and accessibly named; ignore activation-key auto-repeat.
 
 ## Acceptance criteria
 
