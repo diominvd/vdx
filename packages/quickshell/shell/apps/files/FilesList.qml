@@ -375,7 +375,7 @@ Item {
         KitText {
           id: name
           x: row.header ? Theme.gapWide : files.nameX + root.slot + Theme.gapMedium
-          width: row.c.nameEnd - x - (FilesService.isStarred(row.modelData.path) ? 22 : 0)
+          width: Math.max(0, row.c.nameEnd - x - (FilesService.isStarred(row.modelData.path) ? 22 : 0))
           anchors.verticalCenter: parent.verticalCenter
           visible: !row.editing
           text: row.header ? (FilesService.isCollapsed(row.modelData.group) ? "▸ " : "▾ ") + row.modelData.name
@@ -410,7 +410,7 @@ Item {
         // a rename: the name's place, enter keeps it, escape drops it
         KitInput {
           x: name.x
-          width: row.c.nameEnd - x
+          width: Math.max(0, row.c.nameEnd - x)
           anchors.verticalCenter: parent.verticalCenter
           visible: row.editing
           passKeys: [Qt.Key_Escape]
