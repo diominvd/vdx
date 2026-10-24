@@ -46,8 +46,10 @@ KitFrame {
   }
 
   function step(d) {
+    if (kb.tabs.length === 0) return;
     const i = kb.tabs.findIndex(t => t.value === tab);
-    tab = kb.tabs[(i + d + kb.tabs.length) % kb.tabs.length].value;
+    const current = i < 0 ? 0 : i;
+    tab = kb.tabs[(current + d + kb.tabs.length) % kb.tabs.length].value;
   }
 
   // opened: the settings' tab, the search cleared (if so set), the English layout, the binds read again
