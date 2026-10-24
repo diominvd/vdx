@@ -24,7 +24,7 @@ Column {
 
     KitSelect {
       id: filterBox
-      width: Math.min(150, Math.max(100, (parent.width - 160 - Theme.gapMedium * 2) / 2))
+      width: Math.min(parent.width, 150, Math.max(100, (parent.width - 160 - Theme.gapMedium * 2) / 2))
       boxWidth: width
       overlay: true
       model: [{ label: "All types", value: "all" }, { label: "Apps", value: "apps" },
@@ -35,7 +35,7 @@ Column {
 
     KitSelect {
       id: sortBox
-      width: Math.min(150, Math.max(100, (parent.width - 160 - Theme.gapMedium * 2) / 2))
+      width: Math.min(parent.width, 150, Math.max(100, (parent.width - 160 - Theme.gapMedium * 2) / 2))
       boxWidth: width
       overlay: true
       model: [{ label: "By name", value: "name" }, { label: "By size", value: "size" }, { label: "By date", value: "date" }]
