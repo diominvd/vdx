@@ -21,6 +21,23 @@ Item {
   readonly property int allRows: FilesService.rows.length
   readonly property int picked: FilesService.selection.length
 
+  // Side columns are user-resizable, but their saved widths must not consume
+  // the entire viewport on a compact window. Reserve room for the active file
+  // list and both splitters, then proportionally share what remains.
+  readonly property bool wantsParentColumn: files.columnsView && FilesService.canUp
+  readonly property bool wantsChildColumn: files.columnsView && files.selectedDir
+  readonly property real sideColumnBudget: Math.max(0, root.width - 120
+    - (wantsParentColumn ? parentStrip.width : 0)
+    - (wantsChildColumn ? childStrip.width : 0))
+  readonly property real requestedSideWidth: (wantsParentColumn ? files.parentW : 0)
+    + (wantsChildColumn ? files.childW : 0)
+  readonly property real effectiveParentW: wantsParentColumn
+    ? Math.min(files.parentW, requestedSideWidth > 0
+      ? sideColumnBudget * files.parentW / requestedSideWidth : 0) : 0
+  readonly property real effectiveChildW: wantsChildColumn
+    ? Math.min(files.childW, requestedSideWidth > 0
+      ? sideColumnBudget * files.childW / requestedSideWidth : 0) : 0
+
   // the Columns view: the parent folder on the left, the selected folder on the right
   FilesColumn {
     id: parentCol
