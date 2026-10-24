@@ -12,7 +12,7 @@ Rectangle {
   property var app: null
   property var settings: ({})
 
-  readonly property real k: width / ShellAppsService.screenW
+  readonly property real k: width / Math.max(1, ShellAppsService.screenW)
   readonly property bool tiled: settings.mode === "tiled"
   readonly property var size: app ? ShellAppsService.sizeOf(app, settings) : [0, 0]
   readonly property real winW: Math.min(ShellAppsService.screenW, size[0]) * k
@@ -21,7 +21,7 @@ Rectangle {
   readonly property real pointerX: width * 0.38
   readonly property real pointerY: height * 0.42
 
-  height: width * ShellAppsService.screenH / ShellAppsService.screenW
+  height: width * Math.max(1, ShellAppsService.screenH) / Math.max(1, ShellAppsService.screenW)
   color: Theme.background1
   border.width: Theme.frameWidth
   border.color: Theme.gray
@@ -58,8 +58,8 @@ Rectangle {
 
     x: root.tiled ? root.width / 2 + 2 : Math.max(0, Math.min(root.width - root.winW, wantX))
     y: root.tiled ? barBottom + 3 : Math.max(0, Math.min(root.height - root.winH, wantY))
-    width: root.tiled ? root.width / 2 - 5 : root.winW
-    height: root.tiled ? root.height - barBottom - 6 : root.winH
+    width: root.tiled ? Math.max(0, root.width / 2 - 5) : root.winW
+    height: root.tiled ? Math.max(0, root.height - barBottom - 6) : root.winH
     color: Theme.background0
     border.width: Theme.frameWidth
     border.color: Theme.frame
@@ -84,7 +84,7 @@ Rectangle {
     visible: root.tiled
     x: 3
     y: win.y
-    width: root.width / 2 - 5
+    width: Math.max(0, root.width / 2 - 5)
     height: win.height
     color: "transparent"
     border.width: Theme.frameWidth
