@@ -263,3 +263,8 @@ A visual change is not complete until these combinations are checked; testing on
 - Do not claim a runtime interaction is verified based only on static source inspection.
 
 - `IslandHub.qml`: Launcher and Keys chips now expose button semantics, visible keyboard focus, and Enter/Space activation; still requires a live Quickshell check.
+
+- [x] Keep Shell Manager window previews finite when monitor geometry is temporarily zero-sized or very small.
+- [x] Prevent the Shell Manager window-options dialog from receiving a negative width.
+- [x] Give package names and versions more room in narrow package-manager layouts.
+- [x] Preserve capture-library list space when the preview is open.
