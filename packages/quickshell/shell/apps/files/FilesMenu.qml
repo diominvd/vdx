@@ -29,13 +29,23 @@ Rectangle {
 
   function close() { visible = false; }
 
-  Column {
-    id: column
+  Flickable {
+    id: scroller
     x: Theme.gapLoose
     y: Theme.gapLoose
     width: Math.max(0, root.width - 2 * Theme.gapLoose)
+    height: Math.max(0, root.height - 2 * Theme.gapLoose)
+    contentWidth: width
+    contentHeight: column.implicitHeight
+    clip: true
+    interactive: contentHeight > height
+    boundsBehavior: Flickable.StopAtBounds
 
-    Repeater {
+    Column {
+      id: column
+      width: scroller.width
+
+      Repeater {
       model: root.items
 
       Rectangle {
@@ -81,6 +91,7 @@ Rectangle {
           }
         }
       }
+    }
     }
   }
 }
