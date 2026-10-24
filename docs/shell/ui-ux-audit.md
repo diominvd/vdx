@@ -268,3 +268,6 @@ A visual change is not complete until these combinations are checked; testing on
 - [x] Prevent the Shell Manager window-options dialog from receiving a negative width.
 - [x] Give package names and versions more room in narrow package-manager layouts.
 - [x] Preserve capture-library list space when the preview is open.
+
+- [x] Scale cleaner category size labels and backup snapshot sizes to narrow row widths.
+- [x] Guard keybind tab navigation when the tab model is empty or the current tab is missing.
