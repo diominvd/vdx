@@ -46,9 +46,9 @@ Rectangle {
       width: scroller.width
 
       Repeater {
-      model: root.items
+        model: root.items
 
-      Rectangle {
+        Rectangle {
         id: item
 
         required property var modelData
@@ -91,7 +91,7 @@ Rectangle {
           }
         }
       }
-    }
+      }
     }
   }
 }
