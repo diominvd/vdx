@@ -128,7 +128,7 @@ Item {
       Rectangle {
         visible: root.pinnedItems.length === 0
         x: Theme.gapLoose
-        width: sidebar.width - 2 * Theme.gapLoose
+        width: Math.max(0, sidebar.width - 2 * Theme.gapLoose)
         height: 1
         color: Theme.background3
       }
