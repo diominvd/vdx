@@ -65,6 +65,12 @@ Minimal, monospace, near-monochrome. Reference: the Wi-Fi popup.
 - Group names: `BAR` (the module's face), `POPUP`, `WINDOW` / `LIST`,
   `OPENING`, `SAFETY` (the "Ask before …" toggles); a row shown only with
   another option sits under it and hides with it.
+- Keyboard and accessibility: every shared action control MUST be reachable by Tab,
+  expose a visible focus ring, and activate with Enter/Space where appropriate.
+  Switches expose their setting label and checked state; icon-only buttons provide
+  an explicit human-readable accessible name (the icon key is only a fallback).
+  Disabled and busy controls MUST ignore activation from both pointer and keyboard.
+  Do not rely on hover as the only state cue.
 - Selected = `background3` fill + ExtraBold; its text takes the accent only when
   Choices is on (rule 2). Hover =
   `background1` (one step up from the surface).
@@ -89,9 +95,12 @@ Minimal, monospace, near-monochrome. Reference: the Wi-Fi popup.
   clock, Overview's workspace numbers, the Fonts page's specimen.
 - Bar: one colour per item; a missing value shows `--`.
 - Key hints: `Super + S`; footers `key action · key action`, lowercase.
-- Icons: Material Symbols SVG in `kit/icons`, `fill="#ffffff"`; every icon
-  has a filled twin of the same name in `solid/` and Rounded twins in
-  `round/` and `round/solid/` (Material names: `icons/material.txt`).
+- Icons: Phosphor SVGs are the preferred local set in `kit/icons/phosphor/`.
+  `KitIcon.solid` selects the matching `-fill.svg` variant; icon weight is
+  independent of corner shape. Existing Material-era icon keys remain supported
+  by the alias map in `KitIcon.qml`; unmapped keys use the legacy Material
+  assets. The vendored Phosphor icons are MIT-licensed (see
+  `kit/icons/phosphor/LICENSE`). `icons/material.txt` documents the legacy set.
 - Refactors keep the look; a new look is prototyped on one popup first.
 - Motion: every animation goes through `config/Motion.qml` — a Behavior takes
   `enabled: Motion.<part>` (popups, panels, controls, bar, pages, lock, island) and a
@@ -156,7 +165,7 @@ Pages by the user's area; the look follows macOS System Settings.
 - MUST — overridden: a row another setting overrides stays visible and
   `disabled`, hint `Set by <Page> › <Row>`; a row meaningless without its parent
   hides with it (above).
-- MUST — reset: two-step, `KitResetButton` (`Reset` → `Sure?` for 3 s, then
+- MUST — reset: two-step, `KitResetButton` (`Reset` → `Reset now?` for 3 s, then
   back), right of the page's or item's header; disabled while nothing differs
   from the defaults.
 - MUST — colour choice: named colours → `KitSwatches`; a free colour →
@@ -165,7 +174,7 @@ Pages by the user's area; the look follows macOS System Settings.
   wrapped, `Theme.fontSize - 1`; it clears on the next success.
 - MUST — pending: an apply that runs (install, reload) shows `busy` on its
   button or a `KitSpinner`; the rest of the page stays usable.
-- SHOULD (not built yet) — focus: one token `Theme.focusRing`, a 2 px `foreground2`
+- IN PROGRESS — focus and keyboard access: `KitButton`, `KitSwitch`, `KitSegments` and `KitSelect` now have keyboard handling and/or visible focus indication plus accessibility metadata. Continue auditing standalone controls and unify the focus-ring token/style; verify behavior at runtime. The intended behavior is that Space toggles a switch, arrows navigate choices, Enter activates, and `Accessible.name` comes from the row's label. Current design details follow: one token `Theme.focusRing`, a 2 px `foreground2`
   outline at `radiusControl`, on keyboard focus only; Space toggles a switch,
   arrows move Choices, Enter activates; `Accessible.name` = the row's label.
 - SHOULD — no "Advanced" fold: rarely used groups go last on their page.

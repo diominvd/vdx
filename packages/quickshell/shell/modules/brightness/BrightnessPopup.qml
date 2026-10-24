@@ -56,6 +56,7 @@ KitFrame {
       hint: "Warmer colours for the evening"
 
       KitSwitch {
+        accessibleName: "Night light"
         checked: BrightnessService.nightActive
         onToggled: BrightnessService.setNight(!BrightnessService.nightActive)
       }

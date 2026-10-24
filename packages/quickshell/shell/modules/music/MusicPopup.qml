@@ -72,6 +72,7 @@ KitFrame {
     // the music service (MPD) on or off: off stops it, on plays what it kept (else the likes);
     // other players (a browser) are not its to stop
     KitSwitch {
+      accessibleName: "MPD playback"
       anchors.verticalCenter: parent.verticalCenter
       visible: root.mpdOn
       checked: root.on

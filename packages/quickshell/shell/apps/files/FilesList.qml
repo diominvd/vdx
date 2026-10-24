@@ -21,12 +21,29 @@ Item {
   readonly property int allRows: FilesService.rows.length
   readonly property int picked: FilesService.selection.length
 
+  // Side columns are user-resizable, but their saved widths must not consume
+  // the entire viewport on a compact window. Reserve room for the active file
+  // list and both splitters, then proportionally share what remains.
+  readonly property bool wantsParentColumn: files.columnsView && FilesService.canUp
+  readonly property bool wantsChildColumn: files.columnsView && files.selectedDir
+  readonly property real sideColumnBudget: Math.max(0, root.width - 120
+    - (wantsParentColumn ? parentStrip.width : 0)
+    - (wantsChildColumn ? childStrip.width : 0))
+  readonly property real requestedSideWidth: (wantsParentColumn ? files.parentW : 0)
+    + (wantsChildColumn ? files.childW : 0)
+  readonly property real effectiveParentW: wantsParentColumn
+    ? Math.min(files.parentW, requestedSideWidth > 0
+      ? sideColumnBudget * files.parentW / requestedSideWidth : 0) : 0
+  readonly property real effectiveChildW: wantsChildColumn
+    ? Math.min(files.childW, requestedSideWidth > 0
+      ? sideColumnBudget * files.childW / requestedSideWidth : 0) : 0
+
   // the Columns view: the parent folder on the left, the selected folder on the right
   FilesColumn {
     id: parentCol
-    visible: files.columnsView && FilesService.canUp
+    visible: root.wantsParentColumn && root.effectiveParentW > 0
     anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
-    width: files.parentW
+    width: root.effectiveParentW
     folder: visible ? FilesService.parentOf(FilesService.path) : ""
     highlight: FilesService.path
     title: "PARENT"
@@ -35,9 +52,9 @@ Item {
 
   FilesColumn {
     id: childCol
-    visible: files.columnsView && files.selectedDir
+    visible: root.wantsChildColumn && root.effectiveChildW > 0
     anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
-    width: files.childW
+    width: root.effectiveChildW
     folder: visible ? FilesService.selected[0].path : ""
     title: visible ? FilesService.selected[0].name.toUpperCase() : ""
     onOpened: p => FilesService.go(p)
@@ -78,6 +95,9 @@ Item {
     KitText {
       anchors { top: parent.top; topMargin: Theme.gapGroup + (FilesService.canUp && !FilesService.searching ? root.rowH : 0); horizontalCenter: parent.horizontalCenter }
       visible: FilesService.shown.length === 0 && !FilesService.loading
+      width: Math.max(0, parent.width - 2 * Theme.gapMedium)
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.WordWrap
       text: FilesService.error !== "" ? FilesService.error
           : FilesService.dupes ? "No file here has a copy."
           : FilesService.searching || FilesService.query.trim() !== "" ? "Nothing matches \"" + FilesService.query.trim() + "\""
@@ -130,7 +150,7 @@ Item {
               required property var modelData
               files: root.files
               entry: modelData
-              width: (head.width - (tiles.across - 1) * Theme.gapMedium) / tiles.across
+              width: Math.max(0, (head.width - (tiles.across - 1) * Theme.gapMedium) / tiles.across)
             }
           }
         }
@@ -233,7 +253,7 @@ Item {
             onFinished: { startX = 0; startDate = 0; FilesService.setOption("dateWidth", files.dateWidth); }
           }
 
-          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: parent.width - 2 * Theme.gapWide; height: 1; color: Theme.background3 }
+          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: Math.max(0, parent.width - 2 * Theme.gapWide); height: 1; color: Theme.background3 }
         }
       }
 
@@ -279,7 +299,7 @@ Item {
         Rectangle {
           visible: row.index > 0 && !row.picked
           x: Theme.gapWide
-          width: parent.width - 2 * Theme.gapWide
+          width: Math.max(0, parent.width - 2 * Theme.gapWide)
           height: 1
           color: Theme.background2
         }
@@ -355,7 +375,7 @@ Item {
         KitText {
           id: name
           x: row.header ? Theme.gapWide : files.nameX + root.slot + Theme.gapMedium
-          width: row.c.nameEnd - x - (FilesService.isStarred(row.modelData.path) ? 22 : 0)
+          width: Math.max(0, row.c.nameEnd - x - (FilesService.isStarred(row.modelData.path) ? 22 : 0))
           anchors.verticalCenter: parent.verticalCenter
           visible: !row.editing
           text: row.header ? (FilesService.isCollapsed(row.modelData.group) ? "▸ " : "▾ ") + row.modelData.name
@@ -390,7 +410,7 @@ Item {
         // a rename: the name's place, enter keeps it, escape drops it
         KitInput {
           x: name.x
-          width: row.c.nameEnd - x
+          width: Math.max(0, row.c.nameEnd - x)
           anchors.verticalCenter: parent.verticalCenter
           visible: row.editing
           passKeys: [Qt.Key_Escape]

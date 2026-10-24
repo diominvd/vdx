@@ -13,18 +13,49 @@ Rectangle {
 
   property bool checked: false
   property bool disabled: false
+  property string accessibleName: ""
+
+  // Mirror the custom disabled state into Qt so focus and accessibility clients
+  // treat an unavailable switch as disabled, not merely visually dimmed.
+  enabled: !disabled
   property color trackColor: Theme.background3   // darker on a filled (selected) row
   readonly property bool accented: checked && Theme.accentOn("switches")
   readonly property bool m3: Theme.material
+  // Match pointer feedback for keyboard input and ignore held-key auto-repeat.
+  property bool keyboardPressed: false
   readonly property bool hovered: area.containsMouse && !disabled
+  readonly property bool pressed: (area.pressed || keyboardPressed) && !disabled
+  onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+  onDisabledChanged: if (disabled) keyboardPressed = false
 
   signal toggled()
+
+  activeFocusOnTab: !disabled
+  Accessible.role: Accessible.CheckBox
+  Accessible.name: accessibleName !== "" ? accessibleName : qsTr("Switch")
+  Accessible.checked: checked
+
+  Keys.onPressed: event => {
+    if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+      if (!event.isAutoRepeat) {
+        keyboardPressed = !disabled;
+        if (!disabled) toggled();
+      }
+      event.accepted = true;
+    }
+  }
+  Keys.onReleased: event => {
+    if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+      keyboardPressed = false;
+      event.accepted = true;
+    }
+  }
 
   implicitWidth: m3 ? 44 : 36
   implicitHeight: m3 ? 24 : 20
   radius: Theme.pill(height)
-  border.width: m3 ? (checked ? 0 : 2) : hovered ? Theme.frameWidth : 0
-  border.color: m3 ? Theme.gray : Theme.foreground2
+  border.width: activeFocus ? 2 : m3 ? (checked ? 0 : 2) : hovered ? Theme.frameWidth : 0
+  border.color: activeFocus ? Theme.foreground0 : m3 ? Theme.gray : hovered ? Theme.foreground2 : Theme.gray
   opacity: disabled ? 0.4 : 1
 
   gradient: Gradient {
@@ -56,8 +87,8 @@ Rectangle {
   Rectangle {
     id: knob
 
-    property int size: !root.m3 ? 14
-                              : area.pressed && !root.disabled ? root.height - 2
+    property int size: !root.m3 ? (root.pressed ? 16 : 14)
+                              : root.pressed ? root.height - 2
                               : root.checked || root.hovered ? root.height - 6 : root.height - 10
     readonly property int edge: root.m3 ? (root.height - size) / 2 : 3
 
@@ -88,7 +119,12 @@ Rectangle {
     id: area
     anchors.fill: parent
     hoverEnabled: true
-    cursorShape: Qt.PointingHandCursor
-    onClicked: if (!root.disabled) root.toggled()
+    cursorShape: root.disabled ? Qt.ArrowCursor : Qt.PointingHandCursor
+    onClicked: {
+      if (!root.disabled) {
+        root.forceActiveFocus();
+        root.toggled();
+      }
+    }
   }
 }

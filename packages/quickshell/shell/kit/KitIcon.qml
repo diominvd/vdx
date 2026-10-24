@@ -2,11 +2,9 @@ import QtQuick
 import QtQuick.Effects
 import qs.config
 
-// An SVG icon from kit/icons (Material Symbols), recoloured to `tint`. The
-// files are drawn in white, so colorization maps them to any theme colour.
-// `solid` (the user's icon style, Shell Manager › Appearance, unless set) picks
-// the filled variant from icons/solid; round corners (Appearance › Corners) the
-// Rounded set in icons/round (names: icons/material.txt).
+// Shared icon renderer. Phosphor is the default for mapped names; legacy
+// Material Symbols remain as a compatibility fallback for unmapped names.
+// Icon weight is independent of window corner geometry.
 Item {
   id: root
 
@@ -15,19 +13,129 @@ Item {
   property int size: Theme.fontSize + 3
   property bool solid: ShellSettings.solidIcons
 
-  // the battery glyphs are wide and short, so drawn alone they look smaller
-  // than the others: their box is a third larger, the glyph's height matches
+  // Keep the existing KitIcon API stable while mapping Material-era aliases
+  // to the matching local Phosphor glyph. Dynamic states use explicit aliases.
+  readonly property string phosphorName: ({
+    "activity": "pulse",
+    "app-window": "app-window",
+    "arrow-left": "arrow-left",
+    "arrow-right": "arrow-right",
+    "arrow-up": "arrow-up",
+    "battery-0": "battery-empty",
+    "battery-2": "battery-low",
+    "battery-4": "battery-medium",
+    "battery-5": "battery-full",
+    "battery-6": "battery-full",
+    "battery-bolt": "battery-charging",
+    "battery-full": "battery-full",
+    "battery-plugged": "battery-charging",
+    "battery-saver": "battery-charging-vertical",
+    "bell": "bell",
+    "bluetooth": "bluetooth",
+    "bluetooth-off": "bluetooth-x",
+    "bot": "robot",
+    "brush": "paint-brush",
+    "camera": "camera",
+    "check": "check",
+    "chevron-down": "caret-down",
+    "chevron-right": "caret-right",
+    "circle": "circle",
+    "clipboard": "clipboard-text",
+    "clock": "clock",
+    "columns": "columns",
+    "cpu": "cpu",
+    "crop": "crop",
+    "cursor": "cursor",
+    "download": "download",
+    "eject": "eject",
+    "external": "arrow-square-out",
+    "eye-off": "eye-slash",
+    "file": "file-text",
+    "folder": "folder",
+    "gauge": "gauge",
+    "grid": "squares-four",
+    "hard-drive": "hard-drive",
+    "headphones": "headphones",
+    "heart": "heart",
+    "heart-filled": "heart",
+    "history": "clock-counter-clockwise",
+    "home": "house",
+    "info": "info",
+    "keyboard": "keyboard",
+    "laptop": "laptop",
+    "layout": "squares-four",
+    "list": "list-bullets",
+    "lock": "lock",
+    "log-out": "sign-out",
+    "menu": "list",
+    "message": "chat-circle",
+    "mic": "microphone",
+    "mic-off": "microphone-slash",
+    "monitor": "monitor",
+    "moon": "moon",
+    "more": "dots-three-vertical",
+    "music": "music-note",
+    "package": "package",
+    "palette": "palette",
+    "pause": "pause",
+    "play": "play",
+    "plus": "plus",
+    "power": "power",
+    "public": "globe",
+    "puzzle": "puzzle-piece",
+    "radio": "radio",
+    "refresh": "arrow-clockwise",
+    "repeat": "repeat",
+    "repeat-1": "repeat-once",
+    "rotate-ccw": "arrow-counter-clockwise",
+    "scan": "scan",
+    "search": "magnifying-glass",
+    "server": "hard-drives",
+    "settings": "gear",
+    "shield": "shield",
+    "shuffle": "shuffle",
+    "skip-back": "skip-back",
+    "skip-forward": "skip-forward",
+    "sliders": "sliders-horizontal",
+    "square": "square",
+    "star": "star",
+    "sun": "sun",
+    "text": "text-t",
+    "tiling": "squares-four",
+    "trash": "trash",
+    "usb": "usb",
+    "video": "video-camera",
+    "volume": "speaker-high",
+    "volume-x": "speaker-slash",
+    "wifi": "wifi-high",
+    "wifi-off": "wifi-slash",
+    "x": "x",
+    "zap": "lightning"
+  }[name] ?? "")
+
+  readonly property bool phosphorAvailable: phosphorName !== ""
+
+  // `heart-filled` is a semantic state, not just a weight preference: keep
+  // liked tracks visibly filled even when the global icon weight is Regular.
+  readonly property bool forceFill: name === "heart-filled"
+
+  // Battery glyphs are wide and short, so give them a slightly wider box.
   readonly property real optical: name.startsWith("battery-") ? 1.35 : 1
 
+  // Widen battery glyphs without making the whole icon taller.
   implicitWidth: size * optical
-  implicitHeight: size * optical
+  implicitHeight: size
 
   Image {
     id: image
     anchors.fill: parent
     source: root.name === "" ? ""
-      : Qt.resolvedUrl("icons/" + (Theme.round ? "round/" : "") + (root.solid ? "solid/" : "") + root.name + ".svg")
+      : root.phosphorAvailable
+        ? Qt.resolvedUrl("icons/phosphor/" + root.phosphorName + ((root.solid || root.forceFill) ? "-fill" : "") + ".svg")
+        : Qt.resolvedUrl("icons/" + (Theme.round ? "round/" : "") + (root.solid ? "solid/" : "") + root.name + ".svg")
     sourceSize { width: root.implicitWidth * 2; height: root.implicitHeight * 2 }
+    // SVGs can have different viewBox ratios; never stretch a glyph to fill its box.
+    fillMode: Image.PreserveAspectFit
     smooth: true
     visible: false
   }

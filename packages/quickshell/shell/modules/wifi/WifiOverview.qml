@@ -35,6 +35,7 @@ Column {
     }
 
     KitSwitch {
+      accessibleName: "Wi-Fi"
       anchors.verticalCenter: parent.verticalCenter
       checked: WifiService.radioOn
       onToggled: WifiService.toggleRadio()
@@ -57,7 +58,7 @@ Column {
 
       KitText {
         id: address
-        width: parent.width - quality.implicitWidth - 12
+        width: Math.max(0, parent.width - quality.implicitWidth - 12)
         text: "This PC  " + (WifiService.ipAddress || "—")
         elide: Text.ElideRight
       }

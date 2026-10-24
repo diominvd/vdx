@@ -67,7 +67,7 @@ Item {
     id: strip
     visible: !root.editing
     anchors { left: parent.left; leftMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
-    width: Math.min(row.implicitWidth, parent.width - 2 * Theme.gapSmall)
+    width: Math.max(0, Math.min(row.implicitWidth, parent.width - 2 * Theme.gapSmall))
     height: parent.height
     contentWidth: row.implicitWidth
     contentX: Math.max(0, row.implicitWidth - width)     // the end (the folder shown) stays in sight

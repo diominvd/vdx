@@ -81,7 +81,7 @@ Item {
 
           KitText {
             anchors.verticalCenter: parent.verticalCenter
-            width: 80
+            width: Math.max(0, Math.min(80, parent.width * 0.2))
             horizontalAlignment: Text.AlignRight
             text: Format.shortSize(modelData.size)
             color: Theme.foreground2

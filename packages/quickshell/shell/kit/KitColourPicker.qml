@@ -69,14 +69,16 @@ Item {
       id: content
       x: root.pad
       y: root.pad
-      width: parent.width - 2 * root.pad
+      width: Math.max(0, parent.width - 2 * root.pad)
       height: square.height
-      spacing: root.pad
+      spacing: Math.min(root.pad, width / (root.palette.length > 0 ? 4 : 3))
 
       // ---- saturation (→) × brightness (↑) ----
       Rectangle {
         id: square
-        width: root.palette.length > 0 ? Math.min(180, content.width / 2) : content.width - hueBar.width - content.spacing
+        width: root.palette.length > 0
+          ? Math.max(0, Math.min(180, (content.width - hueBar.width - 2 * content.spacing) / 2))
+          : Math.max(0, content.width - hueBar.width - content.spacing)
         height: 96
         radius: Math.min(6, Theme.radiusControl + 2)
         gradient: Gradient {
@@ -109,6 +111,7 @@ Item {
           anchors.fill: parent
           cursorShape: Qt.CrossCursor
           function pick(m, done) {
+            if (width <= 0 || height <= 0) return;
             root.sat = root.clamp(m.x / width);
             root.val = 1 - root.clamp(m.y / height);
             root.emitColour(done);
@@ -122,7 +125,7 @@ Item {
       // ---- hue, top to bottom ----
       Rectangle {
         id: hueBar
-        width: 10
+        width: Math.min(10, Math.max(0, content.width - content.spacing))
         height: square.height
         radius: Theme.pill(width)
         gradient: Gradient {
@@ -150,6 +153,7 @@ Item {
           anchors { fill: parent; leftMargin: -6; rightMargin: -6 }
           cursorShape: Qt.PointingHandCursor
           function pick(m, done) {
+            if (width <= 0 || height <= 0) return;
             root.hue = root.clamp(m.y / height);
             root.emitColour(done);
           }
@@ -163,7 +167,7 @@ Item {
       Grid {
         id: tiles
         visible: root.palette.length > 0
-        width: content.width - square.width - hueBar.width - 2 * content.spacing
+        width: Math.max(0, content.width - square.width - hueBar.width - 2 * content.spacing)
         height: square.height
         rows: root.paletteRows
         columns: root.paletteCols
@@ -178,8 +182,8 @@ Item {
             readonly property var pair: root.colours(modelData)
             readonly property bool chosen: root.picked === modelData
 
-            width: (tiles.width - (root.paletteCols - 1) * Theme.gapSmall) / root.paletteCols
-            height: root.paletteRows > 1 ? (square.height - Theme.gapSmall) / 2 : square.height
+            width: Math.max(0, (tiles.width - (root.paletteCols - 1) * Theme.gapSmall) / root.paletteCols)
+            height: root.paletteRows > 1 ? Math.max(0, (square.height - Theme.gapSmall) / 2) : Math.max(0, square.height)
             radius: Math.min(6, Theme.radiusControl + 2)
             readonly property color ink: Colour.hsvOf(String(pair[0]))?.v > 0.6 ? Qt.rgba(0, 0, 0, 1) : Qt.rgba(1, 1, 1, 1)
             border.width: chosen ? Theme.ring : tileArea.containsMouse ? Theme.hairline : 0

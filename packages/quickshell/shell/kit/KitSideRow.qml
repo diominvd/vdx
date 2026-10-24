@@ -19,6 +19,8 @@ Rectangle {
   property bool moved: false           // the press became a drag: no click
   property real pressY: 0
   property string action: ""
+  // Semantic action name for assistive technology; `action` remains the icon key.
+  property string actionLabel: ""
 
   signal clicked()
   signal rightClicked(point at)
@@ -29,7 +31,9 @@ Rectangle {
   width: parent ? parent.width : 0
   height: 28
   radius: Theme.radiusControl
-  color: current ? Theme.background3 : area.containsMouse ? Theme.background2 : Theme.clear
+  color: current || area.pressed || area.keyboardPressed ? Theme.background3 : area.containsMouse ? Theme.background2 : Theme.clear
+  border.width: area.activeFocus ? 2 : 0
+  border.color: Theme.foreground0
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   KitIcon {
@@ -41,7 +45,8 @@ Rectangle {
   }
 
   KitText {
-    anchors { left: glyph.right; leftMargin: Theme.gapMedium; right: hintText.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
+    anchors { left: glyph.right; leftMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+    width: Math.max(0, parent.width - glyph.x - glyph.width - Theme.gapMedium - hintText.width - Theme.gapSmall - hintText.anchors.rightMargin)
     text: root.text
     elide: Text.ElideRight
     color: root.current ? Theme.foreground0 : Theme.foreground2
@@ -51,8 +56,10 @@ Rectangle {
   KitText {
     id: hintText
     anchors { right: parent.right; rightMargin: Theme.gapLoose + actionButton.width * (root.action !== "" ? 1 : 0); verticalCenter: parent.verticalCenter }
+    width: visible ? Math.min(implicitWidth, Math.max(0, (parent.width - glyph.x - glyph.width - Theme.gapMedium - anchors.rightMargin) * 0.35)) : 0
     visible: root.hint !== ""
     text: root.hint
+    elide: Text.ElideRight
     color: Theme.muted
     font.pixelSize: Theme.fontSize - 2
   }
@@ -61,6 +68,12 @@ Rectangle {
     id: area
     anchors.fill: parent
     hoverEnabled: true
+    activeFocusOnTab: true
+    property bool keyboardPressed: false
+    onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+    Accessible.role: Accessible.Button
+    Accessible.name: root.text
+    Accessible.description: root.hint
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     cursorShape: Qt.PointingHandCursor
     onPressed: mouse => { root.moved = false; root.pressY = mouse.y; }
@@ -73,7 +86,21 @@ Rectangle {
     onClicked: mouse => {
       if (root.moved) return;
       if (mouse.button === Qt.RightButton) root.rightClicked(root.mapToItem(null, mouse.x, mouse.y));
-      else root.clicked();
+      else { forceActiveFocus(); root.clicked(); }
+    }
+    Keys.onPressed: event => {
+      if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+      if (!event.isAutoRepeat) {
+        keyboardPressed = true;
+        root.clicked();
+      }
+      event.accepted = true;
+    }
+    Keys.onReleased: event => {
+      if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+        keyboardPressed = false;
+        event.accepted = true;
+      }
     }
   }
 
@@ -83,8 +110,37 @@ Rectangle {
     anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
     width: height
     hoverEnabled: true
-    cursorShape: Qt.PointingHandCursor
-    onClicked: root.actioned()
+    activeFocusOnTab: visible
+    property bool keyboardPressed: false
+    onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+    Accessible.role: Accessible.Button
+    Accessible.name: root.actionLabel !== "" ? root.actionLabel : qsTr("Action for %1").arg(root.text)
+    Accessible.description: root.actionLabel !== "" ? "" : qsTr("Additional row action")
+    cursorShape: visible ? Qt.PointingHandCursor : Qt.ArrowCursor
+    onClicked: { forceActiveFocus(); root.actioned(); }
+    Keys.onPressed: event => {
+      if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+      if (!event.isAutoRepeat) {
+        keyboardPressed = true;
+        root.actioned();
+      }
+      event.accepted = true;
+    }
+    Keys.onReleased: event => {
+      if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+        keyboardPressed = false;
+        event.accepted = true;
+      }
+    }
+
+    Rectangle {
+      anchors.fill: parent
+      visible: actionButton.activeFocus || actionButton.containsMouse || actionButton.pressed || actionButton.keyboardPressed
+      radius: Theme.radiusControl
+      color: actionButton.keyboardPressed || actionButton.pressed ? Theme.background3 : actionButton.containsMouse ? Theme.background2 : Theme.clear
+      border.width: actionButton.activeFocus ? 2 : 0
+      border.color: Theme.foreground0
+    }
 
     KitIcon {
       anchors.centerIn: parent

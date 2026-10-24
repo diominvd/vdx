@@ -128,7 +128,7 @@ Item {
       Rectangle {
         visible: root.pinnedItems.length === 0
         x: Theme.gapLoose
-        width: sidebar.width - 2 * Theme.gapLoose
+        width: Math.max(0, sidebar.width - 2 * Theme.gapLoose)
         height: 1
         color: Theme.background3
       }
@@ -145,6 +145,7 @@ Item {
           text: modelData.name
           hint: modelData.mount !== "" ? "" : modelData.size
           action: modelData.mount !== "" ? "eject" : "power"
+          actionLabel: modelData.mount !== "" ? qsTr("Unmount %1").arg(modelData.name) : qsTr("Mount %1").arg(modelData.name)
           current: modelData.mount !== "" && FilesService.path.startsWith(modelData.mount)
           onClicked: modelData.mount !== "" ? FilesService.go(modelData.mount) : FilesService.mountDevice(modelData, true)
           onActioned: modelData.mount !== "" ? FilesService.unmountDevice(modelData) : FilesService.mountDevice(modelData, false)

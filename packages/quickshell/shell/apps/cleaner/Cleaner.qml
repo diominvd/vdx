@@ -111,13 +111,14 @@ Rectangle {
 
               KitText {
                 anchors.verticalCenter: parent.verticalCenter
-                width: 80
+                width: Math.max(0, Math.min(80, parent.width * 0.2))
                 horizontalAlignment: Text.AlignRight
                 text: modelData.size > 0 ? Format.shortSize(modelData.size) : "empty"
                 color: modelData.size > 0 ? Theme.foreground2 : Theme.muted
               }
 
               KitSwitch {
+                accessibleName: modelData.label
                 anchors.verticalCenter: parent.verticalCenter
                 checked: root.cs.picked[modelData.id] === true
                 onToggled: root.cs.pick(modelData.id, !checked)
@@ -189,6 +190,7 @@ Rectangle {
           }
 
           KitSwitch {
+            accessibleName: modelData.path
             anchors.verticalCenter: parent.verticalCenter
             checked: root.cs.aiPicked[modelData.path] === true
             onToggled: root.cs.aiPick(modelData.path, !checked)

@@ -37,6 +37,7 @@ KitColumn {
     hint: root.mode.about
 
     KitSegments {
+      accessibleName: "Window layout mode"
       model: root.ws.choices
       current: root.ws.mode
       onPicked: value => root.ws.setMode(value)
@@ -61,6 +62,7 @@ KitColumn {
     hint: "Where it opens"
 
     KitSegments {
+      accessibleName: "New window placement"
       model: [{ label: "Master", value: "master" }, { label: "Stack", value: "slave" }]
       current: root.o.newStatus
       onPicked: value => root.ws.setOption("newStatus", value)
@@ -74,6 +76,7 @@ KitColumn {
     hint: ""
 
     KitSegments {
+      accessibleName: "Master column width"
       model: [{ label: "1/3", value: 0.333 }, { label: "1/2", value: 0.5 }, { label: "2/3", value: 0.667 }, { label: "Full", value: 1 }]
       current: root.o.columnWidth
       onPicked: value => root.ws.setOption("columnWidth", value)
@@ -88,6 +91,7 @@ KitColumn {
     hint: "On switching to floating"
 
     KitSegments {
+      accessibleName: "Floating window arrangement"
       model: [{ label: "Cascade", value: "cascade" }, { label: "Grid", value: "grid" }, { label: "Centre", value: "center" }]
       current: root.o.arrange
       onPicked: value => root.ws.setOption("arrange", value)
@@ -100,6 +104,7 @@ KitColumn {
     hint: "Super + Tab: this workspace's windows"
 
     KitSwitch {
+      accessibleName: "Switcher"
       checked: root.o.switcher
       onToggled: root.o.switcher = !root.o.switcher
     }
@@ -111,6 +116,7 @@ KitColumn {
     hint: "This workspace's windows, in a bar"
 
     KitSwitch {
+      accessibleName: "Taskbar"
       checked: root.o.taskbar
       onToggled: root.o.taskbar = !root.o.taskbar
     }
@@ -123,6 +129,7 @@ KitColumn {
     hint: root.o.taskbarShape === "island" ? "A pill over the windows" : "A strip along the bottom"
 
     KitSegments {
+      accessibleName: "Taskbar shape"
       model: [{ label: "Strip", value: "strip" }, { label: "Island", value: "island" }]
       current: root.o.taskbarShape
       onPicked: value => root.o.taskbarShape = value
@@ -135,6 +142,7 @@ KitColumn {
     hint: "The modes' wheel binds"
 
     KitSegments {
+      accessibleName: "Window scrolling keys"
       model: [{ label: "Wheel", value: "wheel" }, { label: "Arrows", value: "arrows" }, { label: "Both", value: "both" }]
       current: root.o.scrollKeys
       onPicked: value => root.ws.setOption("scrollKeys", value)
@@ -176,6 +184,7 @@ KitColumn {
         : ShellSettings.accent ? "The focused one in the theme's colour" : "Accent can colour them"
 
     KitSegments {
+      accessibleName: "Window border colour"
       model: [{ label: "Off", value: "off" }, { label: "Theme", value: "theme" }]
         .concat(ShellSettings.accent ? [{ label: "Accent", value: "accent" }] : [])
       current: frameRow.frame
@@ -192,6 +201,7 @@ KitColumn {
     hint: ""
 
     KitSwitch {
+      accessibleName: "Shadows"
       checked: root.o.shadows
       onToggled: root.ws.setOption("shadows", !root.o.shadows)
     }

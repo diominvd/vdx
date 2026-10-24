@@ -18,6 +18,25 @@ Item {
   implicitWidth: label.implicitWidth
   implicitHeight: label.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: label.text
+  Accessible.description: "Toggle between the configured clock format and the full date"
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) { root.full = !root.full; }
+    event.accepted = true;
+  }
+
   KitText {
     id: label
     text: Qt.formatDateTime(root.now, root.full ? "dddd, dd MMMM yyyy HH:mm:ss" : root.format)
@@ -35,6 +54,6 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: root.full = !root.full
+    onClicked: { root.forceActiveFocus(); root.full = !root.full; }
   }
 }

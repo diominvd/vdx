@@ -13,6 +13,9 @@ Item {
   property string icon: ""
   property color iconTint: Theme.foreground0
   property bool clickable: false
+  // Name for the optional icon action; sliders can override their own name separately.
+  property string accessibleName: ""
+  property string sliderAccessibleName: ""
   property real value: 0
   property string text: ""
   property bool dimmed: false
@@ -63,9 +66,11 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      visible: root.clickable && iconArea.containsMouse
+      visible: root.clickable && (iconArea.containsMouse || iconArea.activeFocus || iconArea.keyboardPressed)
       radius: Theme.radiusControl
-      color: Theme.background1
+      color: iconArea.keyboardPressed || iconArea.pressed ? Theme.background3 : Theme.background1
+      border.width: iconArea.activeFocus ? 2 : 0
+      border.color: Theme.foreground0
     }
 
     KitIcon {
@@ -73,15 +78,36 @@ Item {
       name: root.icon
       tint: root.iconTint
       size: 16
+      scale: iconArea.pressed || iconArea.keyboardPressed ? 0.9 : 1
+      Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
     }
 
     MouseArea {
       id: iconArea
       anchors.fill: parent
-      enabled: root.clickable
+      enabled: root.clickable && root.enabled
       hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onClicked: root.iconClicked()
+      activeFocusOnTab: enabled
+      property bool keyboardPressed: false
+      onActiveFocusChanged: if (!activeFocus) keyboardPressed = false
+      Accessible.role: Accessible.Button
+      Accessible.name: root.accessibleName !== "" ? root.accessibleName : root.icon.replace("-", " ")
+      cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+      Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+        if (!event.isAutoRepeat && enabled) {
+          keyboardPressed = true;
+          root.iconClicked();
+        }
+        event.accepted = true;
+      }
+      Keys.onReleased: event => {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+          keyboardPressed = false;
+          event.accepted = true;
+        }
+      }
+      onClicked: { forceActiveFocus(); root.iconClicked(); }
     }
   }
 
@@ -91,7 +117,8 @@ Item {
     id: inlineValue
     visible: !root.captioned
     anchors { right: parent.right; verticalCenter: slider.verticalCenter }
-    width: metrics.advanceWidth("150%")
+    // Keep the value inside the row on narrow popups; the slider can yield all remaining space.
+    width: Math.max(0, Math.min(root.width, metrics.advanceWidth("150%")))
     horizontalAlignment: Text.AlignRight
     text: root.text
     color: root.dimmed ? Theme.gray : Theme.foreground2
@@ -100,14 +127,17 @@ Item {
 
   KitSlider {
     id: slider
+    // Compute the inline width explicitly: at compact popup widths the icon
+    // and value can consume the entire row, so opposing anchors could produce
+    // a negative slider width before the popup reaches its normal minimum.
+    x: root.captioned ? 0 : iconBox.x + iconBox.width + 8
+    width: Math.max(0, root.captioned ? root.width : root.width - x - inlineValue.width - 10)
     anchors {
-      left: root.captioned ? parent.left : iconBox.right
-      leftMargin: root.captioned ? 0 : 8
-      right: root.captioned ? parent.right : inlineValue.left
-      rightMargin: root.captioned ? 0 : 10
       bottom: parent.bottom
       bottomMargin: root.captioned ? 0 : 4
     }
+    accessibleName: root.sliderAccessibleName !== "" ? root.sliderAccessibleName
+      : root.label !== "" ? root.label : root.icon
     value: root.value
     dimmed: root.dimmed
     tint: root.tint

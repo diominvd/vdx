@@ -1,5 +1,6 @@
-# kit icon -> Material Symbols name. Sharp: icons/, Rounded: icons/round/ (Appearance › Corners);
-# filled twins in solid/. https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/<name>/{default,fill1}/24px.svg
+# Legacy fallback: kit icon -> Material Symbols name. Used only when KitIcon has no Phosphor alias.
+# Sharp: icons/, Rounded: icons/round/; filled twins in solid/ and round/solid/.
+# https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/<name>/{default,fill1}/24px.svg
 activity monitor_heart
 app-window web_asset
 arrow-left arrow_back

@@ -31,6 +31,7 @@ KitColumn {
     hint: "Pauses MPD while a player plays"
 
     KitSwitch {
+      accessibleName: "Pause on other sound"
       checked: ShellSettings.pauseMusic
       onToggled: ShellSettings.set("pauseMusic", !checked)
     }
@@ -42,6 +43,7 @@ KitColumn {
     hint: "Only music the shell paused"
 
     KitSwitch {
+      accessibleName: "Resume when it stops"
       checked: ShellSettings.resumeMusic
       onToggled: ShellSettings.set("resumeMusic", !checked)
     }

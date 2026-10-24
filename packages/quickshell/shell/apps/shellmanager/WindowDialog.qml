@@ -29,7 +29,7 @@ Item {
   KitFrame {
     id: dialog
     anchors.centerIn: parent
-    width: Math.min(parent.width - 48, 560)
+    width: Math.max(0, Math.min(parent.width - 48, 560))
 
     KitHeader {
       icon: "app-window"

@@ -80,7 +80,7 @@ KitFrame {
     width: parent.width
     visible: root.shown.length > 0
     // the popup caps it at 440; the window stops it at the frame's bottom padding
-    height: Math.min(contentHeight, root.framed ? 440 : root.height - 2 * root.padding + root.headerInset - y)
+    height: Math.max(0, Math.min(contentHeight, root.framed ? 440 : root.height - 2 * root.padding + root.headerInset - y))
     contentHeight: rows.implicitHeight
     interactive: contentHeight > height
     clip: true
@@ -106,7 +106,7 @@ KitFrame {
 
           // a new copy eases in
           KitAppear { target: item; seen: root.seen; key: String(item.modelData.id) }
-          readonly property bool hot: area.containsMouse || remove.containsMouse
+          readonly property bool hot: area.containsMouse || remove.containsMouse || area.activeFocus || remove.activeFocus
 
           width: rows.width
           spacing: 3
@@ -123,6 +123,8 @@ KitFrame {
               radius: Theme.radiusControl
               anchors { fill: parent; margins: -4 }
               color: item.hot ? Theme.background1 : Theme.clear
+              border.width: area.activeFocus || remove.activeFocus ? Math.max(2, Theme.frameWidth) : 0
+              border.color: Theme.foreground0
             }
 
             Column {
@@ -202,6 +204,20 @@ KitFrame {
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
               drag.target: dragProxy
+              activeFocusOnTab: true
+              Accessible.role: Accessible.Button
+              Accessible.name: (item.image ? "Copy image from clipboard, " : "Copy clipboard text, ")
+                + root.when(item.modelData.time)
+              Accessible.description: item.image ? "Copies the image to the clipboard" : item.modelData.preview
+              Keys.onPressed: event => {
+                if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+                if (!event.isAutoRepeat) {
+                  ClipboardService.copy(item.modelData.id);
+                  root.copiedId = item.modelData.id;
+                  copiedTimer.restart();
+                }
+                event.accepted = true;
+              }
               onClicked: {
                 ClipboardService.copy(item.modelData.id);
                 root.copiedId = item.modelData.id;
@@ -216,6 +232,15 @@ KitFrame {
               height: kind.implicitHeight
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
+              activeFocusOnTab: true
+              Accessible.role: Accessible.Button
+              Accessible.name: "Delete clipboard entry"
+              Accessible.description: root.when(item.modelData.time)
+              Keys.onPressed: event => {
+                if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+                if (!event.isAutoRepeat) ClipboardService.remove(item.modelData.id);
+                event.accepted = true;
+              }
               onClicked: ClipboardService.remove(item.modelData.id)
             }
 

@@ -39,6 +39,7 @@ KitFrame {
       : "VOLUME " + AudioService.volume + "%"
 
     KitSwitch {
+      accessibleName: "Live audio output"
       anchors.verticalCenter: parent.verticalCenter
       checked: AudioService.live
       onToggled: AudioService.setMuted(AudioService.live)

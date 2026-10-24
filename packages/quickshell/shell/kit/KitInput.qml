@@ -8,6 +8,9 @@ Rectangle {
   id: root
 
   property string placeholder: ""
+  // Prefer a semantic label when the placeholder is a long hint or changes with state.
+  property string accessibleName: ""
+  property string accessibleDescription: ""
   property alias text: textInput.text
   property alias input: textInput
   property alias echoMode: textInput.echoMode
@@ -59,6 +62,11 @@ Rectangle {
     clip: true
     selectByMouse: true
     activeFocusOnTab: true
+    // TextInput has its own accessible node; expose the field's visible purpose
+    // even when a screen reader does not announce the placeholder automatically.
+    Accessible.name: root.accessibleName !== "" ? root.accessibleName
+      : root.placeholder !== "" ? root.placeholder : qsTr("Text input")
+    Accessible.description: masked ? qsTr("Password field") : root.accessibleDescription
     selectionColor: Theme.background3
     selectedTextColor: Theme.foreground0
     font.family: Theme.fontFamily

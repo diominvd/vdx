@@ -70,9 +70,15 @@ KitFrame {
       if (k === Qt.Key_Escape) root.back();
       else if (k === Qt.Key_Down) root.current = Math.min(root.current + 1, root.items.length - 1);
       else if (k === Qt.Key_Up) root.current = Math.max(root.current - 1, 0);
-      else if (k === Qt.Key_Return || k === Qt.Key_Enter) root.runAt(root.current);
-      else if (k === Qt.Key_Backtab || (k === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) root.step(-1);
-      else if (k === Qt.Key_Tab) root.step(1);
+      else if (k === Qt.Key_Return || k === Qt.Key_Enter) {
+        if (!event.isAutoRepeat) root.runAt(root.current);
+      }
+      else if (k === Qt.Key_Backtab || (k === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
+        if (!event.isAutoRepeat) root.step(-1);
+      }
+      else if (k === Qt.Key_Tab) {
+        if (!event.isAutoRepeat) root.step(1);
+      }
       else return;
       event.accepted = true;
     }
@@ -140,7 +146,7 @@ KitFrame {
         Column {
           x: 46
           anchors.verticalCenter: parent.verticalCenter
-          width: parent.width - x - keys.width - 20
+          width: Math.max(0, parent.width - x - keys.width - 20)
 
           KitText {
             width: parent.width

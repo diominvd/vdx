@@ -89,6 +89,7 @@ KitFrame {
       hint: "Quiet profile, longer battery"
 
       KitSwitch {
+        accessibleName: "Power saver"
         checked: BatteryService.saver
         onToggled: BatteryService.setSaver(!BatteryService.saver)
       }

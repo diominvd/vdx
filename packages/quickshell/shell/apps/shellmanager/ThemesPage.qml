@@ -201,6 +201,7 @@ Row {
 
       // the preview in the theme's dark or light twin
       KitSegments {
+        accessibleName: "Theme preview appearance"
         width: 150
         model: [{ label: "Dark", value: false }, { label: "Light", value: true }]
         current: root.previewLight

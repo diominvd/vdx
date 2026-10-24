@@ -42,6 +42,7 @@ KitColumn {
     hint: "Off: nothing connects"
 
     KitSwitch {
+      accessibleName: "Bluetooth"
       checked: bt.powered
       disabled: bt.toggling
       onToggled: bt.togglePower()
@@ -68,6 +69,7 @@ KitColumn {
     dimmed: !bt.powered
 
     KitSwitch {
+      accessibleName: "Visible to others"
       checked: root.adapter.discoverable
       disabled: !bt.powered
       onToggled: bt.setAdapter(["--discoverable", root.adapter.discoverable ? "off" : "on"])
@@ -81,6 +83,7 @@ KitColumn {
     hint: "Then hidden again"
 
     KitSegments {
+      accessibleName: "Discoverable duration"
       model: [{ label: "Forever", value: 0 }, { label: "2 min", value: 120 }, { label: "5 min", value: 300 }]
       current: root.adapter.timeout
       onPicked: value => bt.setAdapter(["--discoverable-timeout", String(value)])
@@ -93,6 +96,7 @@ KitColumn {
     dimmed: !bt.powered
 
     KitSwitch {
+      accessibleName: "Pairable"
       checked: root.adapter.pairable
       disabled: !bt.powered
       onToggled: bt.setAdapter(["--pairable", root.adapter.pairable ? "off" : "on"])
@@ -111,7 +115,7 @@ KitColumn {
       required property var modelData
 
       label: modelData.name
-      hint: modelData.battery !== null ? modelData.battery + " % battery" : "Connected"
+      hint: modelData.battery != null ? modelData.battery + " % battery" : "Connected"
 
       KitButton {
         width: Theme.buttonWidth
@@ -156,6 +160,7 @@ KitColumn {
     hint: "Trusted: joins when near"
 
     KitSwitch {
+      accessibleName: "Connect automatically"
       checked: root.chosen?.trusted ?? false
       onToggled: bt.setTrusted(root.chosen, !root.chosen.trusted)
     }
@@ -167,6 +172,7 @@ KitColumn {
     hint: "Refused; a connected one drops"
 
     KitSwitch {
+      accessibleName: "Blocked"
       checked: root.chosen?.blocked ?? false
       onToggled: bt.setBlocked(root.chosen, !root.chosen.blocked)
     }

@@ -34,6 +34,25 @@ Item {
   implicitWidth: face.implicitWidth
   implicitHeight: face.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: CaptureService.recording ? "Stop screen recording" : "Open screen capture"
+  Accessible.description: CaptureService.recording ? "Stop the current recording" : "Open screen capture options"
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) { CaptureService.open(); }
+    event.accepted = true;
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
   KitBarItem {
     id: face
     icon: CaptureService.recording ? "circle" : "camera"
@@ -44,6 +63,6 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: CaptureService.open()
+    onClicked: { root.forceActiveFocus(); CaptureService.open(); }
   }
 }

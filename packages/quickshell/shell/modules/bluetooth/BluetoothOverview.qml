@@ -31,6 +31,7 @@ Column {
     }
 
     KitSwitch {
+      accessibleName: "Bluetooth"
       anchors.verticalCenter: parent.verticalCenter
       checked: BluetoothService.powered
       disabled: BluetoothService.toggling
@@ -75,7 +76,7 @@ Column {
 
       KitText {
         id: deviceName
-        width: parent.width - deviceBattery.implicitWidth - 12
+        width: Math.max(0, parent.width - deviceBattery.implicitWidth - 12)
         text: root.main?.name ?? ""
         elide: Text.ElideRight
       }

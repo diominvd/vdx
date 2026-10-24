@@ -96,12 +96,12 @@ Item {
           return;
         }
         if (!c.visible || c.height <= 0 || c.width <= 0 && !c.isKitLabel) return;
-        if (c.isKitLabel) { close(); c.x = root.padX; c.width = parent.width - 2 * root.padX; return; }
+        if (c.isKitLabel) { close(); c.x = root.padX; c.width = Math.max(0, parent.width - 2 * root.padX); return; }
         const inner = sectionOf(c);
         if (inner) { c.x = 0; c.width = parent.width; walk(inner, dy + c.y + (inner === c ? 0 : inner.y)); return; }
         if (c.kitUnboxed) { close(); c.x = 0; c.width = parent.width; return; }
         c.x = root.padX;
-        c.width = parent.width - 2 * root.padX;
+        c.width = Math.max(0, parent.width - 2 * root.padX);
         if (c.rowStyle !== undefined) c.rowStyle = true;
         const top = dy + c.y, bottom = top + c.height;
         if (run) { hair.push(top - root.padY); run.bottom = bottom; }
@@ -151,7 +151,7 @@ Item {
       required property real modelData
       x: root.padX - root.x
       y: Math.round(modelData - root.y)    // on a whole pixel: a sharp hairline
-      width: root.column ? root.column.width - 2 * root.padX : 0
+      width: root.column ? Math.max(0, root.column.width - 2 * root.padX) : 0
       height: 1
       color: Theme.background2
     }

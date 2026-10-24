@@ -10,14 +10,27 @@ Rectangle {
 
   property bool checked: false
   property bool partial: false
+  property string accessibleName: qsTr("Select package")
   signal toggled()
 
   width: 16
   height: 16
   radius: Math.min(Theme.radiusControl, 4)
   color: checked || partial ? Theme.background3 : Theme.controlFill
-  border.width: Theme.frameWidth
-  border.color: checked || partial ? Theme.foreground0 : Theme.muted
+  border.width: activeFocus ? 2 : Theme.frameWidth
+  border.color: activeFocus ? Theme.foreground0 : checked || partial ? Theme.foreground0 : Theme.muted
+
+  activeFocusOnTab: enabled
+  Accessible.role: Accessible.CheckBox
+  Accessible.name: accessibleName
+  Accessible.checked: checked
+  Accessible.description: partial ? qsTr("Partially selected") : checked ? qsTr("Selected") : qsTr("Not selected")
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter) return;
+    if (!event.isAutoRepeat && enabled) toggled();
+    event.accepted = true;
+  }
 
   KitIcon {
     anchors.centerIn: parent
@@ -38,7 +51,11 @@ Rectangle {
 
   MouseArea {
     anchors.fill: parent
-    cursorShape: Qt.PointingHandCursor
-    onClicked: root.toggled()
+    cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+    onClicked: {
+      if (!root.enabled) return;
+      root.forceActiveFocus();
+      root.toggled();
+    }
   }
 }

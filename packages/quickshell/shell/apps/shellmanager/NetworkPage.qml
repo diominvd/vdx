@@ -94,6 +94,7 @@ KitColumn {
       hint: !ws.radioOn ? "Off: nothing connects" : ws.connected ? "Connected to " + ws.ssid : "On, not connected"
 
       KitSwitch {
+        accessibleName: "Wi-Fi"
         checked: ws.radioOn
         disabled: ws.toggling
         onToggled: ws.toggleRadio()
@@ -183,6 +184,7 @@ KitColumn {
       label: "Show"
 
       KitSegments {
+        accessibleName: "Show saved networks"
         model: [{ label: "In range", value: "range" }, { label: "All", value: "all" }]
         current: root.scope
         onPicked: value => root.scope = value
@@ -228,6 +230,7 @@ KitColumn {
       hint: "Joins when it is in range"
 
       KitSwitch {
+        accessibleName: "Connect automatically"
         checked: root.chosen?.autoconnect ?? false
         onToggled: ws.setSaved(root.chosen.uuid, "autoconnect", root.chosen.autoconnect ? "no" : "yes")
       }
@@ -240,6 +243,7 @@ KitColumn {
       hint: "Higher joins first"
 
       KitSegments {
+        accessibleName: "Priority"
         model: [{ label: "Low", value: -10 }, { label: "Normal", value: 0 }, { label: "High", value: 10 }]
         current: root.chosen?.priority ?? 0
         onPicked: value => ws.setSaved(root.chosen.uuid, "priority", String(value))
@@ -262,6 +266,7 @@ KitColumn {
       hint: "Yes: apps save data"
 
       KitSegments {
+        accessibleName: "Metered connection"
         model: [{ label: "Auto", value: "unknown" }, { label: "Yes", value: "yes" }, { label: "No", value: "no" }]
         current: root.chosen?.metered ?? "unknown"
         onPicked: value => ws.setSaved(root.chosen.uuid, "metered", value)
@@ -408,6 +413,7 @@ KitColumn {
       hint: "Auto picks a free one"
 
       KitSegments {
+        accessibleName: "Hotspot channel"
         model: [{ label: "Auto", value: "auto" }, { label: "1", value: "1" }, { label: "6", value: "6" }, { label: "11", value: "11" }]
         current: (root.hs?.channel ?? "0") === "0" ? "auto" : root.hs?.channel
         onPicked: value => ws.setHotspotSetting("channel", value)
@@ -439,7 +445,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Wired"
       hint: "Off until you connect again"
 
@@ -453,11 +459,12 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Connect automatically"
       hint: "Joins when the cable is in"
 
       KitSwitch {
+        accessibleName: "Connect automatically"
         checked: root.eth?.autoconnect ?? false
         disabled: !root.eth?.uuid
         onToggled: ws.setSaved(root.eth.uuid, "autoconnect", root.eth.autoconnect ? "no" : "yes")
@@ -465,12 +472,13 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       wide: true
       label: "Addressing"
       hint: "Manual: a fixed address"
 
       KitSegments {
+        accessibleName: "IP addressing method"
         model: [{ label: "Auto", value: "auto" }, { label: "Manual", value: "manual" }]
         current: root.manual ? "manual" : "auto"
         onPicked: value => {
@@ -485,7 +493,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null && root.manual
+      visible: root.eth != null && root.manual
       wide: true
       label: "Address"
       hint: "Address and prefix"
@@ -499,7 +507,7 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null && root.manual
+      visible: root.eth != null && root.manual
       wide: true
       label: "Gateway"
       hint: "Press Enter to apply"
@@ -513,7 +521,7 @@ KitColumn {
     }
 
     KitSelect {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "DNS"
       hint: "Applies now while connected"
       model: root.dnsChoices
@@ -522,11 +530,12 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "IPv6"
       hint: "Off: IPv4 only"
 
       KitSwitch {
+        accessibleName: "IPv6"
         checked: root.eth?.ipv6 ?? true
         disabled: !root.eth?.uuid
         onToggled: ws.setSaved(root.eth.uuid, "ipv6", root.eth.ipv6 ? "off" : "auto")
@@ -534,12 +543,13 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       wide: true
       label: "Metered"
       hint: "Yes: apps save data"
 
       KitSegments {
+        accessibleName: "Ethernet metered connection"
         model: [{ label: "Auto", value: "unknown" }, { label: "Yes", value: "yes" }, { label: "No", value: "no" }]
         current: root.eth?.metered ?? "unknown"
         onPicked: value => ws.setSaved(root.eth.uuid, "metered", value)
@@ -547,25 +557,25 @@ KitColumn {
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Address"
       KitText { text: root.eth?.ip || "—"; color: Theme.foreground2 }
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Gateway"
       KitText { text: root.eth?.gateway || "—"; color: Theme.foreground2 }
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "Speed"
       KitText { text: root.eth?.speed || "—"; color: Theme.foreground2 }
     }
 
     KitRow {
-      visible: root.eth !== null
+      visible: root.eth != null
       label: "MAC"
       KitText { text: root.eth?.mac ?? "—"; color: Theme.foreground2 }
     }

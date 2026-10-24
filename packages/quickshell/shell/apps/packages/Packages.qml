@@ -45,16 +45,30 @@ Rectangle {
 
   // the uninstall button asks once more, like the cleaner's
   property bool armed: false
-  onTabChanged: armed = false
+  // A tab can have a very different content height. Always start it at the
+  // top rather than inheriting the previous tab's scroll position.
+  onTabChanged: {
+    armed = false;
+    list.contentY = 0;
+  }
+  onQueryChanged: list.contentY = 0
+  onFilterChanged: list.contentY = 0
+  onSortByChanged: list.contentY = 0
+  onCacheViewChanged: list.contentY = 0
 
   Timer { id: disarm; interval: 3000; onTriggered: root.armed = false }
 
   // list columns: name + hint (hint() keeps it to ~36 chars), source,
   // version (takes what is left, so no gap opens in the middle), size
-  readonly property int nameWidth: 250
-  readonly property int sourceWidth: 72
-  readonly property int sizeWidth: 90
-  readonly property real versionWidth: list.width - 28 - nameWidth - 12 - sourceWidth - sizeWidth - 16
+  // The package rows share their width between the name, source, version
+  // and size. Fixed desktop widths made the version column negative in narrow
+  // windows, which could push row content outside the scroll viewport.
+  readonly property int sourceWidth: Math.min(72, Math.max(0, Math.floor(list.width * 0.14)))
+  readonly property int sizeWidth: Math.min(90, Math.max(0, Math.floor(list.width * 0.14)))
+  readonly property int nameWidth: Math.min(250, Math.max(0,
+    Math.min(Math.floor(list.width * 0.42), list.width - 28 - 12 - sourceWidth - sizeWidth - 16)))
+  readonly property real versionWidth: Math.max(0,
+    list.width - 28 - nameWidth - 12 - sourceWidth - sizeWidth - 16)
 
   // where a package comes from: its repo (core, extra, …) or AUR
   function source(p) {
@@ -161,82 +175,89 @@ Rectangle {
 
     Item {
       width: parent.width
-      // the actions row is empty (zero high) on the cache tab: the text sets the height then
-      height: Math.max(actions.height, info.height)
+      // Stack status and actions instead of squeezing the status column beside
+      // a row of buttons on compact windows.
+      height: footerContent.implicitHeight
 
       Column {
-        id: info
-        anchors { left: parent.left; right: actions.left; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
-        spacing: Theme.gapTight
+        id: footerContent
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        spacing: Theme.gapWide
 
-        KitText {
+        Column {
+          id: info
           width: parent.width
-          elide: Text.ElideRight
-          font.weight: Font.ExtraBold
-          text: root.tab === "installed"
-              ? (root.ps.pickedNames.length > 0 ? root.ps.pickedNames.length + " picked · " + Format.shortSize(root.ps.pickedSize) : "Nothing picked")
-              : root.tab === "cache"
-              ? (root.ps.rollbackCount > 0 ? root.ps.rollbackCount + " to roll back" : "Nothing to roll back")
-              : (root.ps.pickedUpdates.length > 0
-                  ? root.ps.pickedUpdates.length + " picked" + (root.ps.repoPickedSize > 0 ? " · " + Format.shortSize(root.ps.repoPickedSize) : "")
-                  : "Nothing picked")
+          spacing: Theme.gapTight
+
+          KitText {
+            width: parent.width
+            elide: Text.ElideRight
+            font.weight: Font.ExtraBold
+            text: root.tab === "installed"
+                ? (root.ps.pickedNames.length > 0 ? root.ps.pickedNames.length + " picked · " + Format.shortSize(root.ps.pickedSize) : "Nothing picked")
+                : root.tab === "cache"
+                ? (root.ps.rollbackCount > 0 ? root.ps.rollbackCount + " to roll back" : "Nothing to roll back")
+                : (root.ps.pickedUpdates.length > 0
+                    ? root.ps.pickedUpdates.length + " picked" + (root.ps.repoPickedSize > 0 ? " · " + Format.shortSize(root.ps.repoPickedSize) : "")
+                    : "Nothing picked")
+          }
+
+          KitText {
+            width: parent.width
+            elide: Text.ElideRight
+            font.pixelSize: Theme.fontSize - 2
+            color: root.ps.status === "error" ? Theme.red : root.ps.status === "ok" ? Theme.green
+                 : root.tab === "updates" && root.ps.pickedUpdates.length > 0 && root.ps.pickedUpdates.length < root.ps.count ? Theme.yellow
+                 : Theme.muted
+            text: root.ps.message !== "" ? root.ps.message
+                : root.tab === "installed" ? "Removes what only they need (pacman -Rns)"
+                : root.tab === "cache" ? "Installs the cached file with pacman -U"
+                : root.ps.pickedUpdates.length > 0 && root.ps.pickedUpdates.length < root.ps.count
+                  ? "A partial update can break things: pick all if unsure"
+                : root.ps.aurPicked.length > 0 ? "AUR packages build in a terminal"
+                : "Download, then install: each asks in the panel"
+          }
         }
 
-        KitText {
+        Flow {
+          id: actions
           width: parent.width
-          elide: Text.ElideRight
-          font.pixelSize: Theme.fontSize - 2
-          color: root.ps.status === "error" ? Theme.red : root.ps.status === "ok" ? Theme.green
-               : root.tab === "updates" && root.ps.pickedUpdates.length > 0 && root.ps.pickedUpdates.length < root.ps.count ? Theme.yellow
-               : Theme.muted
-          text: root.ps.message !== "" ? root.ps.message
-              : root.tab === "installed" ? "Removes what only they need (pacman -Rns)"
-              : root.tab === "cache" ? "Installs the cached file with pacman -U"
-              : root.ps.pickedUpdates.length > 0 && root.ps.pickedUpdates.length < root.ps.count
-                ? "A partial update can break things: pick all if unsure"
-              : root.ps.aurPicked.length > 0 ? "AUR packages build in a terminal"
-              : "Download, then install: each asks in the panel"
-        }
-      }
+          spacing: Theme.gapMedium
 
-      Row {
-        id: actions
-        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-        spacing: Theme.gapMedium
+          KitButton {
+            visible: root.tab === "updates"
+            icon: "download"
+            text: "Update picked"
+            busy: root.ps.busy
+            disabled: root.ps.repoPicked.length === 0 || root.ps.stage !== ""
+            onClicked: root.ps.updatePicked()
+          }
 
-        KitButton {
-          visible: root.tab === "updates"
-          icon: "download"
-          text: "Update picked"
-          busy: root.ps.busy
-          disabled: root.ps.repoPicked.length === 0 || root.ps.stage !== ""
-          onClicked: root.ps.updatePicked()
-        }
+          KitButton {
+            visible: root.tab === "updates"
+            icon: "download"
+            text: "Update all"
+            disabled: root.ps.repoPending.length === 0 || root.ps.stage !== ""
+            onClicked: root.ps.updateAll()
+          }
 
-        KitButton {
-          visible: root.tab === "updates"
-          icon: "download"
-          text: "Update all"
-          disabled: root.ps.repoPending.length === 0 || root.ps.stage !== ""
-          onClicked: root.ps.updateAll()
-        }
+          KitButton {
+            visible: root.tab === "updates" && root.ps.aurPicked.length > 0
+            icon: "external"
+            text: "Build AUR"
+            disabled: root.ps.stage !== ""
+            onClicked: root.ps.updateAur()
+          }
 
-        KitButton {
-          visible: root.tab === "updates" && root.ps.aurPicked.length > 0
-          icon: "external"
-          text: "Build AUR"
-          disabled: root.ps.stage !== ""
-          onClicked: root.ps.updateAur()
-        }
-
-        KitButton {
-          visible: root.tab === "installed"
-          icon: root.armed ? "check" : "trash"
-          text: root.armed ? "Sure?" : "Uninstall"
-          selected: root.armed
-          busy: root.ps.busy
-          disabled: root.ps.pickedNames.length === 0
-          onClicked: root.uninstall()
+          KitButton {
+            visible: root.tab === "installed"
+            icon: root.armed ? "check" : "trash"
+            text: root.armed ? "Sure?" : "Uninstall"
+            selected: root.armed
+            busy: root.ps.busy
+            disabled: root.ps.pickedNames.length === 0
+            onClicked: root.uninstall()
+          }
         }
       }
     }

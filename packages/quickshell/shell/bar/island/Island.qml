@@ -269,10 +269,35 @@ Item {
         text: IslandService.noticeMore + " more notifications"
         color: Theme.muted
 
+        Rectangle {
+          anchors.fill: parent
+          radius: Theme.radiusCard
+          color: "transparent"
+          border.width: moreArea.activeFocus ? 2 : 0
+          border.color: Theme.foreground0
+        }
+
         MouseArea {
+          id: moreArea
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
-          onClicked: { root.flash = ""; IslandService.openNotifications(); }
+          activeFocusOnTab: visible
+          Accessible.role: Accessible.Button
+          Accessible.name: IslandService.noticeMore + " more notifications. Open notification center"
+          onClicked: {
+            forceActiveFocus()
+            root.flash = ""
+            IslandService.openNotifications()
+          }
+          Keys.onPressed: event => {
+            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+              if (!event.isAutoRepeat) {
+                root.flash = "";
+                IslandService.openNotifications();
+              }
+              event.accepted = true;
+            }
+          }
         }
       }
     }
@@ -448,13 +473,19 @@ Item {
     id: keys
     focus: root.grabbing
     Keys.onPressed: event => {
-      if (event.key === Qt.Key_Escape) root.collapse();
-      else if (root.view === "power") power.key(event.key);
-      else if (root.view !== "media") return;
-      else if (event.key === Qt.Key_Space) IslandService.togglePlay();
-      else if (event.key === Qt.Key_Left) IslandService.prev();
-      else if (event.key === Qt.Key_Right) IslandService.next();
-      else return;
+      if (event.key === Qt.Key_Escape) {
+        if (!event.isAutoRepeat) root.collapse();
+      } else if (root.view === "power") {
+        const activationKey = event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space;
+        if (!activationKey || !event.isAutoRepeat) power.key(event.key);
+      } else if (root.view !== "media") return;
+      else if (event.key === Qt.Key_Space) {
+        if (!event.isAutoRepeat) IslandService.togglePlay();
+      } else if (event.key === Qt.Key_Left) {
+        if (!event.isAutoRepeat) IslandService.prev();
+      } else if (event.key === Qt.Key_Right) {
+        if (!event.isAutoRepeat) IslandService.next();
+      } else return;
       event.accepted = true;
     }
   }

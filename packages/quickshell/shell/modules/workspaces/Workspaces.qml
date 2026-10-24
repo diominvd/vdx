@@ -19,6 +19,12 @@ Row {
   // desk 10 is key 0, so it sorts first: 0 1 2 … 9
   function order(ws) { return ws.id === 10 ? 0 : ws.id }
   readonly property var ordered: Hyprland.workspaces.values.slice().sort((a, b) => order(a) - order(b))
+  readonly property var visibleWorkspaces: ordered.filter(ws => !ws.name.startsWith("special"))
+
+  function focusWorkspace(index) {
+    const target = workspaceRepeater.itemAt(index);
+    if (target) target.forceActiveFocus();
+  }
 
   // the Repeater remakes every item when the list changes: only a workspace
   // not seen before opens up; the ones there at start do not
@@ -38,7 +44,8 @@ Row {
   }
 
   Repeater {
-    model: root.ordered
+    id: workspaceRepeater
+    model: root.visibleWorkspaces
 
     Item {
       id: workspace
@@ -47,7 +54,44 @@ Row {
 
       readonly property bool highlighted: modelData.focused || modelData.active
 
-      visible: !modelData.name.startsWith("special")
+      activeFocusOnTab: highlighted || (index === 0 && !root.visibleWorkspaces.some(ws => ws.focused || ws.active))
+      Accessible.role: Accessible.Button
+      Accessible.name: "Workspace " + modelData.id
+      Accessible.description: highlighted ? "Current or active workspace" : "Switch to workspace " + modelData.id
+
+      Keys.onPressed: event => {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+          if (!event.isAutoRepeat) modelData.activate();
+          event.accepted = true;
+          return;
+        }
+
+        // Keys has no onHomePressed/onEndPressed convenience handlers.
+        if (event.key === Qt.Key_Home) {
+          if (root.visibleWorkspaces.length > 0) {
+            root.visibleWorkspaces[0].activate();
+            Qt.callLater(() => root.focusWorkspace(0));
+          }
+          event.accepted = true;
+        } else if (event.key === Qt.Key_End) {
+          const last = root.visibleWorkspaces.length - 1;
+          if (last >= 0) {
+            root.visibleWorkspaces[last].activate();
+            Qt.callLater(() => root.focusWorkspace(last));
+          }
+          event.accepted = true;
+        }
+      }
+      Keys.onLeftPressed: event => {
+        const next = Math.max(0, index - 1);
+        if (next !== index) { root.visibleWorkspaces[next].activate(); Qt.callLater(() => root.focusWorkspace(next)); }
+        event.accepted = true;
+      }
+      Keys.onRightPressed: event => {
+        const next = Math.min(root.visibleWorkspaces.length - 1, index + 1);
+        if (next !== index) { root.visibleWorkspaces[next].activate(); Qt.callLater(() => root.focusWorkspace(next)); }
+        event.accepted = true;
+      }
       readonly property color tone: area.containsMouse
         ? (highlighted ? Theme.accentFor("modules", Theme.yellow) : Theme.foreground0)
         : (highlighted ? Theme.accentFor("modules", Theme.foreground1) : Theme.gray)
@@ -87,12 +131,21 @@ Row {
         Behavior on color { enabled: Motion.bar; ColorAnimation { duration: Motion.slow; easing.type: Motion.tint } }
       }
 
+      Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        border.width: workspace.activeFocus ? 2 : 0
+        border.color: Theme.foreground0
+        radius: Theme.radiusControl
+        z: 1
+      }
+
       MouseArea {
         id: area
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: workspace.modelData.activate()
+        onClicked: { workspace.forceActiveFocus(); workspace.modelData.activate(); }
       }
     }
   }

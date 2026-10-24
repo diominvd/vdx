@@ -70,8 +70,11 @@ Scope {
         Behavior on y { enabled: Motion.panels; NumberAnimation { id: slide; duration: Motion.ms(220); easing.type: Motion.easing } }
 
         // the confirm look: Enter runs, Escape cancels (the password field has its own)
-        Keys.onReturnPressed: if (root.ours && !root.asking && !RootService.running) RootService.run()
-        Keys.onEnterPressed: if (root.ours && !root.asking && !RootService.running) RootService.run()
+        Keys.onPressed: event => {
+          if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter) return;
+          if (!event.isAutoRepeat && root.ours && !root.asking && !RootService.running) RootService.run();
+          event.accepted = true;
+        }
         Keys.onEscapePressed: root.cancel()
 
         KitHeader {
@@ -140,6 +143,7 @@ Scope {
           id: password
           visible: root.asking
           width: parent.width
+          accessibleName: root.ours ? "Authentication password" : (root.flow?.inputPrompt ?? "Authentication response").replace(/:\s*$/, "")
           placeholder: root.ours ? "your password, to run it" : (root.flow?.inputPrompt ?? "Password").replace(/:\s*$/, "").toLowerCase()
           echoMode: root.flow?.responseVisible ? TextInput.Normal : TextInput.Password
           centerMasked: false

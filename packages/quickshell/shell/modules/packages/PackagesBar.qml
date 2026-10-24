@@ -19,6 +19,25 @@ Item {
   implicitWidth: face.implicitWidth
   implicitHeight: face.implicitHeight
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: BarLayout.label("packages")
+  Accessible.description: "Open package updates and rollback options"
+
+  Keys.onPressed: event => {
+    if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+    if (!event.isAutoRepeat) { popup.toggle(); }
+    event.accepted = true;
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: "transparent"
+    border.width: root.activeFocus ? 2 : 0
+    border.color: Theme.foreground0
+  }
+
   KitBarItem {
     id: face
     icon: "package"
@@ -30,7 +49,7 @@ Item {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: popup.toggle()
+    onClicked: { root.forceActiveFocus(); popup.toggle(); }
   }
 
   BarPopup {

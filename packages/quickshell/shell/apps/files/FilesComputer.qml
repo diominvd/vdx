@@ -14,8 +14,10 @@ Rectangle {
   // the storage in the sort's order: by name, or by size (the largest first)
   readonly property var storage: FilesService.volumes.slice().sort((a, b) =>
     FilesService.computerSort === "size" ? b.total - a.total : a.name.localeCompare(b.name))
-  readonly property int barWidth: 140       // the list's fixed columns: the used bar, the space text
-  readonly property int spaceWidth: 180
+  // Keep a useful name column when the window is narrow; right-side columns
+  // shrink before they are allowed to push their start positions off-screen.
+  readonly property real barWidth: Math.max(0, Math.min(140, (root.width - 120 - 2 * Theme.gapWide) / 2))
+  readonly property real spaceWidth: Math.max(0, Math.min(180, root.width - 120 - 2 * Theme.gapWide - barWidth))
   readonly property int rowH: 48
 
   radius: Theme.radiusCard
@@ -50,6 +52,8 @@ Rectangle {
   KitText {
     visible: root.storage.length === 0
     anchors { left: parent.left; top: parent.top; topMargin: Theme.gapGroup }
+    width: Math.max(0, parent.width - 2 * Theme.gapWide)
+    wrapMode: Text.WordWrap
     text: "No storage found"
     color: Theme.muted
   }
@@ -161,9 +165,9 @@ Rectangle {
       color: Theme.background1
 
       // the fixed columns from the right: the used bar, the space; the name takes the rest
-      readonly property real barX: width - Theme.gapWide - root.barWidth
-      readonly property real spaceX: barX - Theme.gapWide - root.spaceWidth
-      readonly property var seps: [barX - Theme.gapWide / 2, spaceX - Theme.gapWide / 2]
+      readonly property real barX: Math.max(0, width - Theme.gapWide - root.barWidth)
+      readonly property real spaceX: Math.max(0, barX - Theme.gapWide - root.spaceWidth)
+      readonly property var seps: [Math.max(0, barX - Theme.gapWide / 2), Math.max(0, spaceX - Theme.gapWide / 2)]
 
       Column {
         id: table
@@ -183,7 +187,7 @@ Rectangle {
             Rectangle { required property real modelData; x: modelData; y: Theme.gapMedium; width: 1; height: captions.height - 2 * Theme.gapMedium; color: Theme.background3 }
           }
 
-          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: parent.width - 2 * Theme.gapWide; height: 1; color: Theme.background3 }
+          Rectangle { anchors.bottom: parent.bottom; x: Theme.gapWide; width: Math.max(0, parent.width - 2 * Theme.gapWide); height: 1; color: Theme.background3 }
         }
 
         Repeater {
@@ -209,7 +213,7 @@ Rectangle {
             Rectangle {
               visible: row.index > 0
               x: Theme.gapWide
-              width: parent.width - 2 * Theme.gapWide
+              width: Math.max(0, parent.width - 2 * Theme.gapWide)
               height: 1
               color: Theme.background2
             }
@@ -229,7 +233,7 @@ Rectangle {
 
             Column {
               x: rowGlyph.x + rowGlyph.width + Theme.gapMedium
-              width: box.spaceX - Theme.gapWide - x
+              width: Math.max(0, box.spaceX - Theme.gapWide - x)
               anchors.verticalCenter: parent.verticalCenter
 
               KitText {

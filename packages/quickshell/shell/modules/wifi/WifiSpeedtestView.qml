@@ -44,7 +44,7 @@ Column {
       readonly property real names: machine.nameWidth + router.nameWidth + internet.nameWidth
       readonly property real hints: machine.naturalWidth + router.naturalWidth + internet.naturalWidth - names
       readonly property real hintScale: hints > 0 ? Math.max(0, Math.min(1, (width - 2 * legMin - 4 * spacing - names) / hints)) : 1
-      readonly property real linkWidth: (width - names - hintScale * hints - 4 * spacing) / 2
+      readonly property real linkWidth: Math.max(0, (width - names - hintScale * hints - 4 * spacing) / 2)
 
       function stopWidth(stop) {
         return stop.nameWidth + hintScale * (stop.naturalWidth - stop.nameWidth);
@@ -99,12 +99,14 @@ Column {
       Column {
         required property var modelData
 
-        width: (metrics.width - 2 * metrics.gap) / 3
+        width: Math.max(0, (metrics.width - 2 * metrics.gap) / 3)
         spacing: Theme.gapSmall
 
         KitLabel { text: modelData.label }
 
         KitText {
+          width: parent.width
+          elide: Text.ElideRight
           text: root.result ? (modelData.value < 10 ? modelData.value.toFixed(1) : Math.round(modelData.value)) : "—"
           color: root.result ? Theme.foreground0 : Theme.gray
           font.pixelSize: Theme.fontSize + 9
@@ -145,12 +147,15 @@ Column {
 
     Column {
       id: throughput
-      anchors.verticalCenter: parent.verticalCenter
+      anchors { left: parent.left; verticalCenter: parent.verticalCenter }
+      width: Math.max(0, parent.width - runButton.width - Theme.gapMedium)
       spacing: Theme.gapHair
 
-      KitLabel { width: 140; text: "THROUGHPUT NOW" }
+      KitLabel { width: Math.min(140, parent.width); text: "THROUGHPUT NOW" }
 
       KitText {
+        width: parent.width
+        elide: Text.ElideRight
         text: "↓ " + Format.humanRate(WifiService.down) + "   ↑ " + Format.humanRate(WifiService.up)
         font.pixelSize: Theme.fontSize - 1
       }

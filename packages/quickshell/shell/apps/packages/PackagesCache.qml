@@ -46,7 +46,7 @@ Column {
 
       KitText {
         anchors.verticalCenter: parent.verticalCenter
-        width: 260
+        width: Math.max(0, Math.min(260, parent.width - 24))
         horizontalAlignment: Text.AlignRight
         elide: Text.ElideLeft
         text: modelData.from + " → " + modelData.to
@@ -69,8 +69,8 @@ Column {
   }
 
   KitSelect {
-    width: 150
-    boxWidth: 150
+    width: Math.min(150, parent.width)
+    boxWidth: width
     overlay: true
     anchors.right: parent.right
     model: [{ label: "Old versions", value: "old" }, { label: "All versions", value: "all" }]
@@ -92,14 +92,15 @@ Column {
 
       KitText {
         anchors.verticalCenter: parent.verticalCenter
-        width: 80
+        width: Math.min(80, Math.max(0, parent.width * 0.2))
         horizontalAlignment: Text.AlignRight
+        elide: Text.ElideLeft
         text: Format.shortSize(modelData.size)
         color: Theme.muted
       }
 
       KitButton {
-        width: Theme.buttonWidth
+        width: Math.max(0, Math.min(Theme.buttonWidth, parent.width - 80 - Theme.gapMedium * 2))
         anchors.verticalCenter: parent.verticalCenter
         icon: "rotate-ccw"
         text: "Roll back"

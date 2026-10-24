@@ -19,12 +19,13 @@ Row {
 
   PackageCheck {
     anchors.verticalCenter: parent.verticalCenter
+    accessibleName: root.label
     checked: root.checked
     onToggled: root.toggled()
   }
 
   KitRow {
     id: row
-    width: root.width - root.spacing - 16
+    width: Math.max(0, root.width - root.spacing - 16)
   }
 }

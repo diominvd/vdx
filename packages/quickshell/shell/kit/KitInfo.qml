@@ -15,8 +15,10 @@ Item {
 
   KitText {
     id: labelText
+    width: Math.min(implicitWidth, Math.max(0, root.width - valueText.width - 16))
     text: root.label
     color: Theme.foreground2
+    elide: Text.ElideRight
     font.pixelSize: Theme.fontSize - 1
   }
 
@@ -25,7 +27,7 @@ Item {
   KitText {
     id: valueText
     anchors.right: parent.right
-    width: Math.min(Math.ceil(metrics.advanceWidth) + 1, root.width - labelText.implicitWidth - 16)
+    width: Math.min(Math.ceil(metrics.advanceWidth) + 1, Math.max(0, (root.width - 16) / 2))
     horizontalAlignment: Text.AlignRight
     text: root.value
     color: root.valueColor

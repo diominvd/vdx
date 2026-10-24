@@ -19,16 +19,51 @@ Row {
   property bool open: false              // the icons are out, while collapsible
   readonly property bool showIcons: !collapsible || open
 
+  function focusNeighbor(fromIndex, delta) {
+    const count = trayRepeater.count;
+    if (count < 1) return;
+    for (let step = 1; step <= count; step++) {
+      const next = (fromIndex + delta * step + count * 2) % count;
+      const candidate = trayRepeater.itemAt(next);
+      if (candidate && candidate.visible) {
+        candidate.forceActiveFocus();
+        return;
+      }
+    }
+  }
+
   spacing: Theme.gapSmall
 
   // the dots (closed) or the arrow (open) that folds the icons away again
-  MouseArea {
+  Item {
+    id: collapseButton
     visible: root.collapsible
     width: root.iconSize
     height: root.iconSize
     anchors.verticalCenter: parent.verticalCenter
-    cursorShape: Qt.PointingHandCursor
-    onClicked: root.open = !root.open
+    activeFocusOnTab: visible
+    Accessible.role: Accessible.Button
+    Accessible.name: root.open ? "Hide system tray icons" : "Show system tray icons"
+
+    Rectangle {
+      anchors.fill: parent
+      radius: Theme.radiusControl
+      color: "transparent"
+      border.width: collapseButton.activeFocus ? 2 : 0
+      border.color: Theme.foreground0
+    }
+
+    Keys.onPressed: event => {
+      if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+      if (!event.isAutoRepeat) { root.open = !root.open; }
+      event.accepted = true;
+    }
+
+    MouseArea {
+      anchors.fill: parent
+      cursorShape: Qt.PointingHandCursor
+      onClicked: { collapseButton.forceActiveFocus(); root.open = !root.open; }
+    }
 
     KitIcon {
       anchors.centerIn: parent
@@ -38,7 +73,9 @@ Row {
     }
   }
 
+
   Repeater {
+    id: trayRepeater
     model: SystemTray.items
 
     MouseArea {
@@ -53,6 +90,30 @@ Row {
       acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
       cursorShape: Qt.PointingHandCursor
       hoverEnabled: true
+      activeFocusOnTab: visible
+      Accessible.role: Accessible.Button
+      Accessible.name: modelData.tooltipTitle || "System tray item"
+      Accessible.description: modelData.tooltipDescription || (modelData.hasMenu ? "Open application menu" : "Activate application")
+
+      Rectangle {
+        anchors.fill: parent
+        radius: Theme.radiusControl
+        color: "transparent"
+        border.width: item.activeFocus ? 2 : 0
+        border.color: Theme.foreground0
+        z: 2
+      }
+
+      Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+        if (!event.isAutoRepeat) {
+          if (modelData.onlyMenu || modelData.hasMenu) openMenu();
+          else modelData.activate();
+        }
+        event.accepted = true;
+      }
+      Keys.onLeftPressed: event => { root.focusNeighbor(index, -1); event.accepted = true; }
+      Keys.onRightPressed: event => { root.focusNeighbor(index, 1); event.accepted = true; }
 
       Image {
         anchors.fill: parent
@@ -65,6 +126,7 @@ Row {
       }
 
       onClicked: mouse => {
+        item.forceActiveFocus();
         if (mouse.button === Qt.MiddleButton) modelData.secondaryActivate();
         else if (mouse.button === Qt.RightButton || modelData.onlyMenu || modelData.hasMenu) openMenu();
         else modelData.activate();

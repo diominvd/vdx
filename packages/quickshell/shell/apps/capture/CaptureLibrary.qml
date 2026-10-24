@@ -21,7 +21,7 @@ Item {
   // the first press asks again; a second press within a few seconds moves them all
   property bool confirming: false
 
-  readonly property int previewWidth: 232
+  readonly property int previewWidth: Math.min(232, Math.max(0, Math.floor(width * 0.38)))
   readonly property var selected: items.find(i => i.path === selectedPath) ?? null
   readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/quickshell-capture/thumbs"
 
@@ -146,7 +146,7 @@ Item {
   Column {
     id: listColumn
 
-    anchors { left: parent.left; top: parent.top; right: parent.right; rightMargin: root.selected ? root.previewWidth + Theme.gapWide : 0 }
+    anchors { left: parent.left; top: parent.top; right: parent.right; rightMargin: root.selected ? Math.min(root.previewWidth + Theme.gapWide, Math.max(0, root.width - 220)) : 0 }
     spacing: Theme.gapMedium
 
     KitLabel {

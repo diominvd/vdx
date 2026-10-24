@@ -98,6 +98,7 @@ KitColumn {
     hint: "Off: monochrome"
 
     KitSwitch {
+      accessibleName: "Accent"
       checked: ShellSettings.accent
       onToggled: ShellSettings.set("accent", !ShellSettings.accent)
     }
@@ -132,7 +133,7 @@ KitColumn {
 
       KitColourField {
         id: fromField
-        width: root.gradient ? (fields.width - swapButton.width - 2 * fields.spacing) / 2 : fields.width
+        width: root.gradient ? Math.max(0, (fields.width - swapButton.width - 2 * fields.spacing) / 2) : Math.max(0, fields.width)
         value: root.hexOf(0)
         placeholder: "#d79921"
         live: true
@@ -153,7 +154,7 @@ KitColumn {
       KitColourField {
         id: toField
         visible: root.gradient
-        width: (fields.width - swapButton.width - 2 * fields.spacing) / 2
+        width: Math.max(0, (fields.width - swapButton.width - 2 * fields.spacing) / 2)
         value: root.hexOf(1)
         placeholder: "#d79921"
         live: true
@@ -196,6 +197,7 @@ KitColumn {
       hint: modelData.hint
 
       KitSwitch {
+        accessibleName: modelData.label
         checked: target.targetOn
         onToggled: root.setTarget(modelData.value, !target.targetOn)
       }

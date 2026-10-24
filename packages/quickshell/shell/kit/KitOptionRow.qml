@@ -14,6 +14,7 @@ KitRow {
   property var model: []
 
   KitSegments {
+    accessibleName: root.label
     model: root.model
     current: ModuleSettings.get(root.module, root.key, root.fallback)
     onPicked: value => ModuleSettings.set(root.module, root.key, value)
