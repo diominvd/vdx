@@ -180,8 +180,8 @@ KitColumn {
         height: 64
         radius: Theme.radiusCard
         color: area.containsMouse && !picked ? Theme.background2 : Theme.background1
-        border.width: picked ? Theme.ring : Theme.hairline
-        border.color: picked ? Theme.foreground0 : Theme.background2
+        border.width: picked ? Theme.ring : area.activeFocus ? Theme.focusRingWidth : Theme.hairline
+        border.color: picked ? Theme.foreground0 : area.activeFocus ? Theme.focusRing : Theme.background2
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
         Column {
@@ -222,8 +222,16 @@ KitColumn {
           id: area
           anchors.fill: parent
           hoverEnabled: true
+          activeFocusOnTab: !CursorService.busy
+          Accessible.role: Accessible.Button
+          Accessible.name: root.cursorLabel(card.modelData.name)
+          Accessible.description: card.inUse ? "Currently in use"
+            : card.modelData.installed ? "Select this cursor theme" : "Not installed; select it and choose Apply to download"
           cursorShape: Qt.PointingHandCursor
-          onClicked: root.cursorSelected = card.modelData.name
+          onClicked: { forceActiveFocus(); root.cursorSelected = card.modelData.name; }
+          Keys.onReturnPressed: event => { if (!event.isAutoRepeat) root.cursorSelected = card.modelData.name; event.accepted = true; }
+          Keys.onEnterPressed: event => { if (!event.isAutoRepeat) root.cursorSelected = card.modelData.name; event.accepted = true; }
+          Keys.onSpacePressed: event => { if (!event.isAutoRepeat) root.cursorSelected = card.modelData.name; event.accepted = true; }
         }
       }
     }
