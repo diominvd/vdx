@@ -43,6 +43,7 @@ KitColumn {
     hint: "The shell's own text"
 
     KitSegments {
+      accessibleName: "Shell text size"
       model: [12, 13, 14, 15].map(n => ({ label: n + " px", value: n }))
       current: ShellSettings.textSize
       onPicked: value => ShellSettings.set("textSize", value)
@@ -56,6 +57,7 @@ KitColumn {
     hint: "Applied at once, GTK only"
 
     KitSegments {
+      accessibleName: "GTK application text scale"
       disabled: DisplayService.busy
       model: DisplayService.textScales.map(f => ({ label: Math.round(f * 100) + "%", value: f }))
       current: DisplayService.textFactor
