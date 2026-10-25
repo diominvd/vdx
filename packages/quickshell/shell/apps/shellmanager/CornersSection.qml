@@ -21,6 +21,7 @@ KitColumn {
     hint: "Also windows and toasts; Round rounds the icons"
 
     KitSegments {
+      accessibleName: "Corner shape"
       model: [
         { label: "Sharp", value: "sharp" },
         { label: "Round", value: "round" }
