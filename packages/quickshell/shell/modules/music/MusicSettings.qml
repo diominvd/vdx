@@ -81,6 +81,7 @@ KitColumn {
     hint: "The page it shows first"
 
     KitSegments {
+      accessibleName: "Music window opening page"
       model: [{ label: "Last tab", value: "last" }, { label: "Yandex", value: "yandex" },
               { label: "Files", value: "files" }, { label: "Radio", value: "radio" }]
       current: ModuleSettings.get("music", "opensOn", "last")
