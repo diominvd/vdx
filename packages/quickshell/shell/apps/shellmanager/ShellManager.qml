@@ -312,8 +312,8 @@ Rectangle {
             width: parent.width
             height: 28
             color: section.active ? Theme.background3 : itemArea.containsMouse ? Theme.background1 : Theme.clear
-            border.width: itemArea.activeFocus ? 2 : 0
-            border.color: Theme.foreground0
+            border.width: itemArea.activeFocus ? Theme.focusRingWidth : 0
+            border.color: Theme.focusRing
             Behavior on color { enabled: Motion.pages; ColorAnimation { duration: Motion.quick } }
 
             KitIcon {
