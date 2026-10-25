@@ -17,6 +17,7 @@ KitColumn {
     hint: "Ctrl + G in the window"
 
     KitSegments {
+      accessibleName: "File view"
       model: [{ label: "List", value: "list" }, { label: "Grid", value: "grid" }, { label: "Columns", value: "columns" }]
       current: FilesService.view
       onPicked: value => FilesService.setOption("view", value)
@@ -29,6 +30,7 @@ KitColumn {
     hint: "A row's height in the list"
 
     KitSegments {
+      accessibleName: "File list density"
       model: [{ label: "Compact", value: "compact" }, { label: "Normal", value: "normal" }, { label: "Roomy", value: "roomy" }]
       current: FilesService.density
       onPicked: value => FilesService.setOption("density", value)
@@ -41,6 +43,7 @@ KitColumn {
     hint: "Of the grid"
 
     KitSegments {
+      accessibleName: "File grid card size"
       model: [{ label: "Small", value: "small" }, { label: "Medium", value: "medium" }, { label: "Large", value: "large" }]
       current: FilesService.gridSize
       onPicked: value => FilesService.setOption("gridSize", value)
@@ -55,6 +58,7 @@ KitColumn {
     hint: "Ctrl + L types a path"
 
     KitSegments {
+      accessibleName: "Path bar style"
       model: [{ label: "Crumbs", value: "crumbs" }, { label: "Field", value: "field" }]
       current: FilesService.pathBar
       onPicked: value => FilesService.setOption("pathBar", value)
@@ -70,6 +74,7 @@ KitColumn {
     hint: "Of a text file"
 
     KitSegments {
+      accessibleName: "File preview line count"
       model: [{ label: "20", value: 20 }, { label: "40", value: 40 }, { label: "80", value: 80 }]
       current: FilesService.previewLines
       onPicked: value => FilesService.setOption("previewLines", value)
@@ -96,6 +101,7 @@ KitColumn {
     hint: "Today shows the time only"
 
     KitSegments {
+      accessibleName: "File date format"
       model: [{ label: "Short", value: "short" }, { label: "ISO", value: "iso" }]
       current: FilesService.dateFormat
       onPicked: value => FilesService.setOption("dateFormat", value)
@@ -124,6 +130,7 @@ KitColumn {
     hint: "Trash: the newest first"
 
     KitSegments {
+      accessibleName: "Sort files by"
       model: [{ label: "Name", value: "name" }, { label: "Size", value: "size" }, { label: "Modified", value: "mtime" }]
       current: FilesService.sortBy
       onPicked: value => FilesService.setOption("sortBy", value)
@@ -140,6 +147,7 @@ KitColumn {
     hint: "Type: the kinds in turn"
 
     KitSegments {
+      accessibleName: "Group files by"
       model: [{ label: "None", value: "none" }, { label: "Type", value: "type" }]
       current: FilesService.groupBy
       onPicked: value => FilesService.setOption("groupBy", value)
@@ -156,6 +164,7 @@ KitColumn {
     hint: "Then the search stops"
 
     KitSegments {
+      accessibleName: "Maximum file search results"
       model: [{ label: "100", value: 100 }, { label: "300", value: 300 }, { label: "1000", value: 1000 }]
       current: FilesService.searchLimit
       onPicked: value => FilesService.setOption("searchLimit", value)
@@ -168,6 +177,7 @@ KitColumn {
     hint: "Then the results so far"
 
     KitSegments {
+      accessibleName: "File search time limit"
       model: [{ label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "15 s", value: 15 }]
       current: FilesService.searchSeconds
       onPicked: value => FilesService.setOption("searchSeconds", value)
@@ -188,6 +198,7 @@ KitColumn {
     hint: "Last folder, or a fixed one"
 
     KitSegments {
+      accessibleName: "Starting folder behavior"
       model: [{ label: "Last folder", value: "last" }, { label: "Fixed", value: "fixed" }]
       current: FilesService.startMode
       onPicked: value => FilesService.setOption("startMode", value)
@@ -240,6 +251,7 @@ KitColumn {
     hint: "Custom: sizes below"
 
     KitSegments {
+      accessibleName: "File picker size preset"
       model: [{ label: "Small", value: "small" }, { label: "Medium", value: "medium" },
               { label: "Large", value: "large" }, { label: "Custom", value: "custom" }]
       current: FilesService.pickerSize
@@ -356,6 +368,7 @@ KitColumn {
     hint: "The newest, at most"
 
     KitSegments {
+      accessibleName: "Recent files limit"
       model: [{ label: "20", value: 20 }, { label: "50", value: 50 }, { label: "100", value: 100 }]
       current: FilesService.recentLimit
       onPicked: value => FilesService.setOption("recentLimit", value)
