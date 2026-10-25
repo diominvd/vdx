@@ -185,6 +185,8 @@ QtObject {
   readonly property int windowFrameWidth: material ? 1 : 2    // popup frames, like hypr windows, mako
   readonly property int hairline: 1                           // an outline in either style: wells, previews, cards at rest
   readonly property int ring: 2                               // the picked card's or tile's outline
+  readonly property color focusRing: foreground2              // shared keyboard focus outline
+  readonly property int focusRingWidth: 2
   readonly property int visibleRows: 8
   readonly property int popupStatusMs: 2500       // how long ok / error marks stay
   readonly property string ellipsis: "\u2026"
