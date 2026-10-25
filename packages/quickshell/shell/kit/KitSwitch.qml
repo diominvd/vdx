@@ -54,8 +54,8 @@ Rectangle {
   implicitWidth: m3 ? 44 : 36
   implicitHeight: m3 ? 24 : 20
   radius: Theme.pill(height)
-  border.width: activeFocus ? 2 : m3 ? (checked ? 0 : 2) : hovered ? Theme.frameWidth : 0
-  border.color: activeFocus ? Theme.foreground0 : m3 ? Theme.gray : hovered ? Theme.foreground2 : Theme.gray
+  border.width: activeFocus ? Theme.focusRingWidth : m3 ? (checked ? 0 : 2) : hovered ? Theme.frameWidth : 0
+  border.color: activeFocus ? Theme.focusRing : m3 ? Theme.gray : hovered ? Theme.foreground2 : Theme.gray
   opacity: disabled ? 0.4 : 1
 
   gradient: Gradient {
