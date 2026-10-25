@@ -235,6 +235,7 @@ A visual change is not complete until these combinations are checked; testing on
   - [x] Bar-module entry points for AI, audio, backup, battery, Bluetooth, brightness, capture, chat, cleaner, clipboard, clock, display, folder, Mihomo, mode, music and notifications ignore activation-key auto-repeat.
   - [x] Packages, system monitor, task manager, themes, tray, VirusTotal, wallpapers and Wi-Fi module entry points also guard activation; tray item actions are guarded separately while arrow-key navigation remains repeatable.
 - [ ] Keyboard focus is visible and navigation does not depend on pointer hover.
+  - [x] Added shared `Theme.focusRing` / `Theme.focusRingWidth` tokens and applied them to shared buttons, switches, segments, selects, colour controls, swatches, and Shell Manager navigation; runtime contrast and keyboard-vs-pointer focus behavior remain to be checked.
 - [ ] Search results are actionable, use meaningful labels, and never lead to empty or stale sections.
   - [x] Static review confirms label matches rank before hint/location matches, empty results have a centered state, Enter on zero results is guarded, keyboard selection is clamped, and `install.py check` validates the generated index; runtime and test execution remain pending.
 - [ ] Long settings pages remain scrollable at smaller window sizes and do not hide their last row behind footers.
