@@ -136,8 +136,8 @@ Rectangle {
       visible: chevronArea.activeFocus
       radius: Theme.radiusControl
       color: Theme.clear
-      border.width: 2
-      border.color: Theme.foreground0
+      border.width: Theme.focusRingWidth
+      border.color: Theme.focusRing
     }
 
     MouseArea {
