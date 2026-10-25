@@ -63,8 +63,8 @@ Rectangle {
       z: -1
       radius: Theme.radiusControl
       color: Theme.clear
-      border.width: area.activeFocus ? 1 : 0
-      border.color: Theme.foreground0
+      border.width: area.activeFocus ? Theme.focusRingWidth : 0
+      border.color: Theme.focusRing
     }
 
     MouseArea {
