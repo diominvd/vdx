@@ -156,6 +156,7 @@ KitColumn {
     hint: "Kept for each shape"
 
     KitSegments {
+      accessibleName: "Bar module gap"
       model: [
         { label: "Tight",  value: 2 },
         { label: "Normal", value: 5 },
