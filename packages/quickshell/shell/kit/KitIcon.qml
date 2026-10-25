@@ -143,6 +143,10 @@ Item {
   MultiEffect {
     anchors.fill: parent
     source: image
+    // Normalize monochrome SVGs to white before tinting. SVG currentColor
+    // is resolved by Qt's SVG renderer as black, and colorizing black leaves
+    // it black because there is no luminance to recolor.
+    brightness: 1
     colorization: 1
     colorizationColor: root.tint
   }
