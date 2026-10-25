@@ -29,6 +29,17 @@ KitColumn {
   // a font installed after the shell started can't be drawn until it restarts
   function drawable(f) { return f.installed && Qt.fontFamilies().includes(f.family); }
 
+  function chooseFont(f) {
+    if (f.family === FontService.current || FontService.busy) return;
+    if (!f.installed && armed !== f.family) {
+      armed = f.family;
+      disarm.restart();
+      return;
+    }
+    armed = "";
+    FontService.apply(f);
+  }
+
   onVisibleChanged: if (visible) DisplayService.refresh()
 
   Timer { id: disarm; interval: 3000; onTriggered: root.armed = "" }
@@ -95,8 +106,8 @@ KitColumn {
         height: 112
         radius: Theme.radiusCard
         color: area.containsMouse && !active ? Theme.background2 : Theme.background1
-        border.width: active ? Theme.ring : Theme.hairline
-        border.color: active ? Theme.foreground0 : Theme.background2
+        border.width: active ? Theme.ring : area.activeFocus ? Theme.focusRingWidth : Theme.hairline
+        border.color: active ? Theme.foreground0 : area.activeFocus ? Theme.focusRing : Theme.background2
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
         // the specimen: a large Aa, the name, a line of code
@@ -161,17 +172,16 @@ KitColumn {
           id: area
           anchors.fill: parent
           hoverEnabled: true
+          activeFocusOnTab: !FontService.busy
+          Accessible.role: Accessible.Button
+          Accessible.name: card.modelData.family.replace(" Nerd Font", "")
+          Accessible.description: card.active ? "Currently in use"
+            : card.modelData.installed ? "Select this font" : "Not installed; select twice to install"
           cursorShape: card.active || FontService.busy ? Qt.ArrowCursor : Qt.PointingHandCursor
-          onClicked: {
-            if (card.active || FontService.busy) return;
-            if (!card.modelData.installed && root.armed !== card.modelData.family) {
-              root.armed = card.modelData.family;
-              disarm.restart();
-              return;
-            }
-            root.armed = "";
-            FontService.apply(card.modelData);
-          }
+          onClicked: { forceActiveFocus(); root.chooseFont(card.modelData); }
+          Keys.onReturnPressed: event => { if (!event.isAutoRepeat) root.chooseFont(card.modelData); event.accepted = true; }
+          Keys.onEnterPressed: event => { if (!event.isAutoRepeat) root.chooseFont(card.modelData); event.accepted = true; }
+          Keys.onSpacePressed: event => { if (!event.isAutoRepeat) root.chooseFont(card.modelData); event.accepted = true; }
         }
       }
     }
