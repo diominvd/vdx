@@ -150,8 +150,8 @@ All in Shell Manager › Appearance.
   frame, via `~/.local/state/dotfiles/accent.lua`). A gradient runs across
   fills; text and outlines take the first colour.
 - **Shape › Corners**: sharp, or round with one radius — popups, controls,
-  the island, Hyprland's windows and mako follow, and the icons switch to
-  Material Symbols Rounded.
+  the island, Hyprland's windows and mako follow. Icons use Phosphor's
+  Regular / Fill weights independently of corner shape.
 - **Typed characters**: dots or squares in every password field.
 
 ## Settings
