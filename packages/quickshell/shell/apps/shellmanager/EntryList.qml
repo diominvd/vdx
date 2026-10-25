@@ -146,5 +146,17 @@ Column {
         }
       }
     }
+
+    KitText {
+      anchors.centerIn: parent
+      width: parent.width - 2 * Theme.gapWide
+      visible: root.matches.length === 0
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.WordWrap
+      color: Theme.muted
+      text: root.query.trim() === ""
+        ? "No entries available."
+        : "No entries found. Try another name or clear the search."
+    }
   }
 }
