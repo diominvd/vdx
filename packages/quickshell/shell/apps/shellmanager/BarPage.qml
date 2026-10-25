@@ -139,6 +139,7 @@ KitColumn {
     hint: "Bar icons; kept for each shape"
 
     KitSegments {
+      accessibleName: "Bar icon size"
       model: [
         { label: "Small",  value: 0 },
         { label: "Normal", value: 2 },
