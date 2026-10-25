@@ -65,8 +65,8 @@ Rectangle {
   property bool boxed: false
   Component.onCompleted: boxed = Theme.boxed(parent)
   color: pressed ? (selected ? Theme.background2 : Theme.background3) : selected ? Theme.background3 : hovered ? Theme.hoverOn(boxed) : Theme.fillOn(boxed)
-  border.width: activeFocus ? Math.max(2, Theme.frameWidth) : Theme.frameWidth
-  border.color: activeFocus ? Theme.foreground0
+  border.width: activeFocus ? Math.max(Theme.focusRingWidth, Theme.frameWidth) : Theme.frameWidth
+  border.color: activeFocus ? Theme.focusRing
     : pressed || selected || hovered ? Theme.foreground2 : Theme.gray
   opacity: disabled ? 0.4 : 1
 
