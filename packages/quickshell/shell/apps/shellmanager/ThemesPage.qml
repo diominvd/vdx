@@ -65,6 +65,8 @@ Row {
       id: search
       width: parent.width
       placeholder: "Search…"
+      accessibleName: "Search themes"
+      accessibleDescription: "Filter themes. Up and Down preview a theme, Enter applies, Escape clears the search or restores the active theme."
       text: root.query
       onTextEdited: {
         root.query = text;
