@@ -323,6 +323,7 @@ KitColumn {
                place: "Place", trash: "Trash" })[modelData.kind] ?? ""
 
       KitSwitch {
+        accessibleName: "Show sidebar item " + modelData.name
         checked: !modelData.hidden
         onToggled: FilesService.setHidden(modelData.path, checked)
       }
@@ -346,6 +347,7 @@ KitColumn {
       hint: modelData.path
 
       KitSwitch {
+        accessibleName: "Show pinned folder " + modelData.name
         checked: !modelData.hidden
         onToggled: FilesService.setHidden(modelData.path, checked)
       }
@@ -404,6 +406,7 @@ KitColumn {
       hint: modelData.command
 
       KitButton {
+        accessibleName: "Remove action " + modelData.label
         icon: "x"
         onClicked: FilesService.removeAction(index)
       }
