@@ -109,6 +109,8 @@ Row {
           width: themeList.width
           height: 56
           radius: Theme.radiusControl
+          border.width: area.activeFocus ? Theme.focusRingWidth : 0
+          border.color: Theme.focusRing
           color: picked ? Theme.background3 : area.containsMouse ? Theme.background2 : Theme.clear
           Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
