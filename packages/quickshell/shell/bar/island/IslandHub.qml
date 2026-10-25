@@ -166,8 +166,8 @@ Item {
             anchors.fill: parent
             radius: parent.radius
             color: "transparent"
-            border.width: appChip.activeFocus ? 2 : 0
-            border.color: Theme.foreground0
+            border.width: appChip.activeFocus ? Theme.focusRingWidth : 0
+            border.color: Theme.focusRing
           }
 
           activeFocusOnTab: true
