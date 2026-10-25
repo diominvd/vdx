@@ -15,6 +15,12 @@ This status separates source-level fixes from a completed visual redesign. A cha
 
 **Important:** These are mostly interaction consistency, accessibility, asset migration, and defensive-layout improvements. They do not, by themselves, amount to a full visual redesign.
 
+## 1.1 Focused fixes made during the ongoing pass
+
+- Added shared focus-ring tokens and applied them across common controls and Shell Manager navigation.
+- Improved the settings search's accessible description so the idle, no-results, and results states are distinct; the empty state now suggests trying another name or keyword.
+- Corrected Shell Manager group-jump target calculations to include the page content's top inset, avoiding a consistent scroll offset. This is source-level reasoning and still needs runtime confirmation.
+
 ## 2. Partially done
 
 - **Icon system:** asset/alias coverage is statically complete, but actual tinting, visual weight, alignment, and dynamic-state choices have not been verified in a live session. The alias map still needs a semantic review, not only a filename check.
