@@ -21,6 +21,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Improved the settings search's accessible description so the idle, no-results, and results states are distinct; the empty state now suggests trying another name or keyword.
 - Corrected Shell Manager group-jump target calculations to include the page content's top inset, avoiding a consistent scroll offset. This is source-level reasoning and still needs runtime confirmation.
 - Made the currently selected settings group visibly distinct from hover-only group links, and removed a duplicate text-alignment assignment in the search empty state.
+- Applied the shared focus-ring token to Island icon buttons, notification cards, and the notification overflow action so those keyboard targets follow the same focus styling as Shell Manager controls.
 
 ## 2. Partially done
 
