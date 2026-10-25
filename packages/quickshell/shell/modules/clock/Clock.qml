@@ -27,8 +27,8 @@ Item {
     anchors.fill: parent
     radius: Theme.radiusControl
     color: "transparent"
-    border.width: root.activeFocus ? 2 : 0
-    border.color: Theme.foreground0
+    border.width: root.activeFocus ? Theme.focusRingWidth : 0
+    border.color: Theme.focusRing
   }
 
   Keys.onPressed: event => {
