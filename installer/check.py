@@ -325,6 +325,13 @@ def shell_problems() -> list[str]:
     kit_text = kit_icon.read_text() if kit_icon.is_file() else ""
     phosphor = icons / "phosphor"
     aliases = dict(re.findall(r'"([a-z0-9-]+)"\s*:\s*"([a-z0-9-]+)"', kit_text))
+    # The runtime renderer must never silently load legacy Material SVGs.
+    if 'Qt.resolvedUrl("icons/"' in kit_text or 'Theme.round ? "round/"' in kit_text:
+        out.append("kit/KitIcon.qml: legacy Material runtime fallback remains")
+    if "icons/phosphor/" not in kit_text:
+        out.append("kit/KitIcon.qml: Phosphor asset path is missing")
+    if not re.search(r"\\bbrightness\\s*:\\s*1\\b", kit_text) or not re.search(r"\\bcolorization\\s*:\\s*1\\b", kit_text) or not re.search(r"\\bcolorizationColor\\s*:\\s*root\\.tint\\b", kit_text):
+        out.append("kit/KitIcon.qml: SVG tint normalization is incomplete")
     for key, glyph in sorted(aliases.items()):
         for suffix in ("", "-fill"):
             asset = phosphor / f"{glyph}{suffix}.svg"
