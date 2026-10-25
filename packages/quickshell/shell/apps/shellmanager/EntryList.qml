@@ -22,6 +22,13 @@ Column {
     const i = matches.findIndex(p => p.id === selected);
     if (matches.length > 0) picked(matches[Math.max(0, Math.min(matches.length - 1, i < 0 ? 0 : i + delta))].id);
   }
+
+  function ensureVisible(item) {
+    const top = item.mapToItem(scroller.contentItem, 0, 0).y;
+    if (top < scroller.contentY) scroller.contentY = top;
+    else if (top + item.height > scroller.contentY + scroller.height)
+      scroller.contentY = top + item.height - scroller.height;
+  }
   width: Theme.sideWidth
   height: parent.height
   spacing: Theme.gapMedium
@@ -30,6 +37,8 @@ Column {
   KitInput {
     width: parent.width
     placeholder: "Search…"
+    accessibleName: "Search entries"
+    accessibleDescription: "Filter entries by name. Use Up and Down to change the selected entry."
     text: root.query
     onTextEdited: {
       root.query = text;
@@ -49,6 +58,7 @@ Column {
     border.color: Theme.background2
 
     Flickable {
+      id: scroller
       anchors { fill: parent; margins: Theme.gapSmall }
       contentHeight: rows.implicitHeight
       interactive: contentHeight > height
