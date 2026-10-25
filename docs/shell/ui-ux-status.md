@@ -29,6 +29,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Added a clear no-results message to the theme picker and described its search field and keyboard shortcuts for assistive technology. Theme cards are also keyboard reachable, announce their theme/selection state, support Space to preview and Enter to apply, and show the shared focus ring.
 - Clarified the saved-Wi-Fi empty state and named the dynamic sidebar visibility and custom-action removal controls in Files settings.
 - Made the shared app/module entry list keyboard navigable and accessible, with a visible focus ring and automatic scrolling to the selected entry. Added a helpful empty state when filtering returns no entries.
+- Improved the Launcher result list: selected results have a visible focus outline, and assistive technology can hear the result count, current selection, item labels and navigation hints.
 
 ## 2. Partially done
 
