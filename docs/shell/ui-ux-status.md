@@ -17,9 +17,10 @@ This status separates source-level fixes from a completed visual redesign. A cha
 
 ## 1.1 Focused fixes made during the ongoing pass
 
-- Added shared focus-ring tokens and applied them across common controls and Shell Manager navigation.
+- Added shared focus-ring tokens and applied them across common controls, Shell Manager navigation, and text inputs. Text fields now retain a visible 2 px focus outline in Material style, where their resting frame is normally absent.
 - Improved the settings search's accessible description so the idle, no-results, and results states are distinct; the empty state now suggests trying another name or keyword.
 - Corrected Shell Manager group-jump target calculations to include the page content's top inset, avoiding a consistent scroll offset. This is source-level reasoning and still needs runtime confirmation.
+- Made the currently selected settings group visibly distinct from hover-only group links, and removed a duplicate text-alignment assignment in the search empty state.
 
 ## 2. Partially done
 
