@@ -28,7 +28,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Made font and cursor theme cards reachable with Tab, named them for assistive technology, added Enter/Space activation, and applied the shared focus-ring styling to their keyboard focus state.
 - Added a clear no-results message to the theme picker and described its search field and keyboard shortcuts for assistive technology. Theme cards are also keyboard reachable, announce their theme/selection state, support Space to preview and Enter to apply, and show the shared focus ring.
 - Clarified the saved-Wi-Fi empty state and named the dynamic sidebar visibility and custom-action removal controls in Files settings.
-- Made the shared app/module entry list keyboard navigable and accessible, with a visible focus ring and automatic scrolling to the selected entry.
+- Made the shared app/module entry list keyboard navigable and accessible, with a visible focus ring and automatic scrolling to the selected entry. Added a helpful empty state when filtering returns no entries.
 
 ## 2. Partially done
 
