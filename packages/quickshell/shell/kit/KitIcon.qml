@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Effects
 import qs.config
 
-// Shared icon renderer. Phosphor is the default for mapped names; legacy
-// Material Symbols remain as a compatibility fallback for unmapped names.
-// Icon weight is independent of window corner geometry.
+// Shared icon renderer. All shell icons use the bundled Phosphor set; no
+// runtime fallback to the legacy Material assets. Icon weight is independent
+// of window corner geometry.
 Item {
   id: root
 
@@ -126,13 +126,16 @@ Item {
   implicitWidth: size * optical
   implicitHeight: size
 
+  Component.onCompleted: {
+    if (name !== "" && !phosphorAvailable)
+      console.warn("KitIcon: no Phosphor mapping for icon key:", name)
+  }
+
   Image {
     id: image
     anchors.fill: parent
-    source: root.name === "" ? ""
-      : root.phosphorAvailable
-        ? Qt.resolvedUrl("icons/phosphor/" + root.phosphorName + ((root.solid || root.forceFill) ? "-fill" : "") + ".svg")
-        : Qt.resolvedUrl("icons/" + (Theme.round ? "round/" : "") + (root.solid ? "solid/" : "") + root.name + ".svg")
+    source: root.name === "" || !root.phosphorAvailable ? ""
+      : Qt.resolvedUrl("icons/phosphor/" + root.phosphorName + ((root.solid || root.forceFill) ? "-fill" : "") + ".svg")
     sourceSize { width: root.implicitWidth * 2; height: root.implicitHeight * 2 }
     // SVGs can have different viewBox ratios; never stretch a glyph to fill its box.
     fillMode: Image.PreserveAspectFit
