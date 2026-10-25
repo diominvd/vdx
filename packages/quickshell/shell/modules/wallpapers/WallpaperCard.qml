@@ -16,8 +16,8 @@ ClippingRectangle {
 
   radius: Theme.radiusCard
   color: Theme.background1
-  border.width: picked ? 2 : Theme.frameWidth
-  border.color: picked ? Theme.foreground0 : area.containsMouse ? Theme.foreground2 : Theme.background2
+  border.width: area.activeFocus ? Theme.focusRingWidth : picked ? 2 : Theme.frameWidth
+  border.color: area.activeFocus ? Theme.focusRing : picked ? Theme.foreground0 : area.containsMouse ? Theme.foreground2 : Theme.background2
   Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   Image {
@@ -45,7 +45,16 @@ ClippingRectangle {
     id: area
     anchors.fill: parent
     hoverEnabled: true
+    activeFocusOnTab: root.picked
+    Accessible.role: Accessible.Button
+    Accessible.name: root.path.split("/").pop()
+    Accessible.description: root.inUse ? "Currently applied wallpaper" : root.picked ? "Selected wallpaper" : "Preview wallpaper"
     cursorShape: Qt.PointingHandCursor
-    onClicked: root.clicked()
+    onClicked: { forceActiveFocus(); root.clicked(); }
+    Keys.onPressed: event => {
+      if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+      if (!event.isAutoRepeat) root.clicked();
+      event.accepted = true;
+    }
   }
 }
