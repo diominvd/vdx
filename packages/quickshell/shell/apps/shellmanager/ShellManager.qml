@@ -245,9 +245,11 @@ Rectangle {
       width: nav.width
       placeholder: qsTr("Search…")
       accessibleName: qsTr("Search settings")
-      accessibleDescription: root.results.length === 0
-        ? qsTr("No matching settings")
-        : qsTr("%1 results. Use Up and Down to choose, Enter to open.").arg(root.results.length)
+      accessibleDescription: !root.searching
+        ? qsTr("Search settings by name, keyword, or section.")
+        : root.results.length === 0
+          ? qsTr("No matching settings. Try another search term.")
+          : qsTr("%1 results. Use Up and Down to choose, Enter to open.").arg(root.results.length)
       passKeys: [Qt.Key_Up, Qt.Key_Down]
       onAccepted: root.openResult(root.results.length > 0 ? root.results[root.picked] : null)
       onKeyPassed: key => root.moveSearchSelection(key)
@@ -529,8 +531,9 @@ Rectangle {
         anchors.centerIn: parent
         width: Math.max(0, parent.width - 2 * Theme.gapLoose)
         horizontalAlignment: Text.AlignHCenter
-        text: qsTr("No matching settings")
+        text: qsTr("No settings found\nTry another name or keyword")
         color: Theme.muted
+        horizontalAlignment: Text.AlignHCenter
       }
     }
   }
