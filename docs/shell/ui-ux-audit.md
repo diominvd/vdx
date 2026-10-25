@@ -34,7 +34,7 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Clamp Bluetooth and Wi-Fi connected-device name widths when status/battery labels consume the remaining row space.
 - [x] Clamp package-list rows and gradient accent colour fields so subtractive width calculations cannot become negative.
 - [x] Clamp colour-palette tile height when a compact popup cannot fit the normal two-row palette.
-- [x] Make colour-picker saturation/brightness, hue, and palette choices keyboard reachable, accessibly named, and visibly focused; palette tiles expose their selected state.
+- [x] Make colour-picker saturation/brightness, hue, and palette choices keyboard reachable, accessibly named, and visibly focused; announce live saturation/brightness percentages and hue degrees, and expose palette-tile selection.
 - [x] Clamp three-column folder-module tile widths when the popup is narrower than its padding and gutters.
 - [x] Clamp `KitFrame` content width to zero or greater when a popup is temporarily narrower than its padding.
 - [x] Clamp the `KitHeader` title/subtitle column to zero or greater when actions leave insufficient room in a compact popup.
