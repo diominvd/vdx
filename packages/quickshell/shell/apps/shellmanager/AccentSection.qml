@@ -110,6 +110,7 @@ KitColumn {
     label: "Fill"
 
     KitSegments {
+      accessibleName: "Accent fill style"
       model: [
         { label: "Solid", value: false },
         { label: "Gradient", value: true }
