@@ -474,8 +474,8 @@ Rectangle {
       height: hitText.implicitHeight + 2 * Theme.gapTight
       radius: Theme.radiusControl
       color: index === root.picked ? Theme.background3 : hitArea.containsMouse ? Theme.background1 : Theme.clear
-      border.width: hitArea.activeFocus ? 2 : 0
-      border.color: Theme.foreground0
+      border.width: hitArea.activeFocus ? Theme.focusRingWidth : 0
+      border.color: Theme.focusRing
 
       Column {
         id: hitText
