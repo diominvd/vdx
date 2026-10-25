@@ -158,8 +158,8 @@ Rectangle {
           Rectangle {
             anchors.fill: parent
             color: Theme.clear
-            border.width: segment.activeFocus ? 2 : 0
-            border.color: Theme.foreground0
+            border.width: segment.activeFocus ? Theme.focusRingWidth : 0
+            border.color: Theme.focusRing
             z: 1
             radius: 0
           }
