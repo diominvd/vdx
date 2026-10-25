@@ -120,6 +120,7 @@ KitColumn {
         : root.cursorMode === "custom" ? "Your colour, outlined to stand out" : "As the cursor theme draws it"
 
     KitSegments {
+      accessibleName: "Cursor colour mode"
       model: [
         { label: "Original", value: "original" },
         { label: "Theme",    value: "theme" },
@@ -143,6 +144,7 @@ KitColumn {
     hint: "Pixels at scale 1, applied at once"
 
     KitSegments {
+      accessibleName: "Cursor size"
       model: [20, 24, 28, 32, 40].map(n => ({ label: String(n), value: n }))
       current: CursorService.size
       onPicked: value => CursorService.setSize(value)
