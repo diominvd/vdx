@@ -122,7 +122,7 @@ Item {
           activeFocusOnTab: true
           Accessible.role: Accessible.Slider
           Accessible.name: qsTr("Colour saturation and brightness")
-          Accessible.description: qsTr("Use arrow keys to adjust saturation and brightness. Enter or Space commits the colour.")
+          Accessible.description: qsTr("Saturation %1 percent, brightness %2 percent. Use arrow keys to adjust both values. Enter or Space commits the colour.").arg(Math.round(root.sat * 100)).arg(Math.round(root.val * 100))
           function pick(m, done) {
             if (width <= 0 || height <= 0) return;
             root.sat = root.clamp(m.x / width);
@@ -186,7 +186,7 @@ Item {
           activeFocusOnTab: true
           Accessible.role: Accessible.Slider
           Accessible.name: qsTr("Colour hue")
-          Accessible.description: qsTr("Use Up and Down arrows to adjust hue. Enter or Space commits the colour.")
+          Accessible.description: qsTr("Hue %1 degrees. Use Up and Down arrows to adjust hue. Enter or Space commits the colour.").arg(Math.round(root.hue * 360) % 360)
           function pick(m, done) {
             if (width <= 0 || height <= 0) return;
             root.hue = root.clamp(m.y / height);
