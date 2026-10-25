@@ -205,7 +205,7 @@ KitColumn {
     KitText {
       visible: root.scope === "range" && root.inRange.length === 0 && ws.saved.length > 0
       width: parent.width
-      text: "None in range. All lists " + ws.saved.length + " saved."
+      text: "No saved networks are in range. Choose All to see all " + ws.saved.length + " saved networks."
       color: Theme.muted
       wrapMode: Text.WordWrap
     }
