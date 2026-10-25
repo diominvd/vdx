@@ -49,6 +49,7 @@ Column {
     hint: "How long every move takes"
 
     KitSegments {
+      accessibleName: "Animation speed"
       disabled: !ShellSettings.motion
       model: [{ label: "Slow", value: "slow" }, { label: "Normal", value: "normal" }, { label: "Fast", value: "fast" }]
       current: ShellSettings.motionSpeed
