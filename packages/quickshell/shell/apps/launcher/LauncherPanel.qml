@@ -64,6 +64,10 @@ KitFrame {
     id: field
     width: parent.width
     placeholder: root.tab === "files" ? "File name in ~" : "Search " + root.tabs.find(t => t.value === root.tab).label.toLowerCase() + "…"
+    accessibleName: "Launcher search"
+    accessibleDescription: root.items.length === 0
+      ? "No results in " + root.tabs.find(t => t.value === root.tab).label + ". " + (root.tab === "files" ? "Enter at least two letters to search files." : "Try another search.")
+      : root.items.length + " results. Selected: " + (root.items[root.current]?.title ?? "none") + ". Use Up and Down to select, Enter to open, Tab to switch lists."
 
     input.Keys.onPressed: event => {
       const k = event.key;
@@ -123,6 +127,8 @@ KitFrame {
         width: list.width
         height: 44
         color: selected ? Theme.background3 : Theme.clear
+        border.width: selected ? Theme.focusRingWidth : 0
+        border.color: Theme.focusRing
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
         IconImage {
@@ -178,6 +184,10 @@ KitFrame {
         MouseArea {
           anchors.fill: parent
           hoverEnabled: true
+          Accessible.role: Accessible.ListItem
+          Accessible.name: row.modelData.title
+          Accessible.description: row.modelData.hint ?? ""
+          Accessible.selected: row.selected
           cursorShape: Qt.PointingHandCursor
           onEntered: root.current = row.index
           onClicked: root.runAt(row.index)
