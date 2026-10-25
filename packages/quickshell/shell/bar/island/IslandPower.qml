@@ -53,8 +53,8 @@ Item {
         height: 64
         radius: Theme.radiusCard
         color: armed ? Theme.background3 : lit ? Theme.background2 : Theme.background1
-        border.width: tile.activeFocus ? Math.max(2, Theme.frameWidth) : root.current === index ? Theme.frameWidth : 0
-        border.color: tile.activeFocus ? Theme.foreground0 : Theme.gray
+        border.width: tile.activeFocus ? Math.max(Theme.focusRingWidth, Theme.frameWidth) : root.current === index ? Theme.frameWidth : 0
+        border.color: tile.activeFocus ? Theme.focusRing : Theme.gray
 
         activeFocusOnTab: true
         Accessible.role: Accessible.Button
