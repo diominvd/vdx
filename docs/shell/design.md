@@ -174,9 +174,7 @@ Pages by the user's area; the look follows macOS System Settings.
   wrapped, `Theme.fontSize - 1`; it clears on the next success.
 - MUST — pending: an apply that runs (install, reload) shows `busy` on its
   button or a `KitSpinner`; the rest of the page stays usable.
-- IN PROGRESS — focus and keyboard access: `KitButton`, `KitSwitch`, `KitSegments` and `KitSelect` now have keyboard handling and/or visible focus indication plus accessibility metadata. Continue auditing standalone controls and unify the focus-ring token/style; verify behavior at runtime. The intended behavior is that Space toggles a switch, arrows navigate choices, Enter activates, and `Accessible.name` comes from the row's label. Current design details follow: one token `Theme.focusRing`, a 2 px `foreground2`
-  outline at `radiusControl`, on keyboard focus only; Space toggles a switch,
-  arrows move Choices, Enter activates; `Accessible.name` = the row's label.
+- IN PROGRESS — focus and keyboard access: shared buttons, switches, segments, selects, colour controls, swatches and Shell Manager navigation use `Theme.focusRing` / `Theme.focusRingWidth` for a consistent 2 px `foreground2` outline. The ring is currently tied to Qt active focus (including pointer focus); keyboard-only focus differentiation and runtime contrast checks remain open. Space toggles a switch, arrows navigate choices, Enter activates; `Accessible.name` comes from the row's label.
 - SHOULD — no "Advanced" fold: rarely used groups go last on their page.
 - SHOULD — a page header's subtitle holds at most three parts; group labels
   carry their own values.
