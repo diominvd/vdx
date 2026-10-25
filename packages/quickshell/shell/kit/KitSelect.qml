@@ -149,8 +149,8 @@ Column {
       height: Theme.controlHeight
       radius: Theme.radiusControl
       color: boxArea.containsMouse && !root.disabled ? Theme.hoverOn(root.boxed) : Theme.fillOn(root.boxed)
-      border.width: activeFocus ? 2 : Theme.frameWidth
-      border.color: activeFocus ? Theme.foreground0 : root.expanded ? Theme.accentFor("selects", Theme.foreground2)
+      border.width: activeFocus ? Theme.focusRingWidth : Theme.frameWidth
+      border.color: activeFocus ? Theme.focusRing : root.expanded ? Theme.accentFor("selects", Theme.foreground2)
         : boxArea.containsMouse ? Theme.foreground2 : Theme.gray
       opacity: root.disabled ? 0.4 : 1
 
