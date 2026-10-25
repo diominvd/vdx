@@ -50,8 +50,8 @@ Rectangle {
     color: root.valid ? root.colour : "transparent"
     scale: chipArea.pressed || chipArea.keyboardPressed ? 0.92 : 1
     Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
-    border.width: chipArea.activeFocus ? 2 : Theme.frameWidth
-    border.color: chipArea.activeFocus ? Theme.foreground0 : Theme.gray
+    border.width: chipArea.activeFocus ? Theme.focusRingWidth : Theme.frameWidth
+    border.color: chipArea.activeFocus ? Theme.focusRing : Theme.gray
 
     MouseArea {
       id: chipArea
