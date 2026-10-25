@@ -123,6 +123,7 @@ KitColumn {
     hint: "Strip, or a morphing pill"
 
     KitSegments {
+      accessibleName: "Bar shape"
       model: [
         { label: "Solid",  value: "solid" },
         { label: "Island", value: "island" }
