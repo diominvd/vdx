@@ -122,7 +122,7 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Prevent select option labels from colliding with long notes in compact lists: labels and notes now elide within separate width budgets, and the inner list viewport never receives a negative width.
 - [ ] Finish the inventory of standalone switches and test focus behavior in both control styles.
   - [x] Static inventory of the 87 changed QML files found all `KitSwitch` uses named explicitly or inheriting the visible `KitRow` label; the focus matrix still needs runtime testing.
-- [x] Bundle local Phosphor Regular/Fill SVG pairs for all 95 legacy icon keys and add an explicit alias map.
+- [x] Bundle local Phosphor Regular/Fill SVG pairs for all 96 legacy SVG keys and add an explicit alias map.
 - [x] Preserve explicitly filled semantic state icons (`heart-filled`) when the global Phosphor weight is Regular; verify its music-player and liked-track callers.
 - [x] Keep battery level glyphs distinct across the available Phosphor levels: `battery-4` uses Medium and `battery-5` uses Full, preserving a visible change between those adjacent levels instead of collapsing both into Medium. The Phosphor set has fewer battery levels than Material, so the upper levels share Full.
 - [x] Add an installer check that verifies both Phosphor variants exist for every declared alias.
@@ -209,7 +209,7 @@ A visual change is not complete until these combinations are checked; testing on
 
 ### Icon system
 
-- [x] All 95 legacy icon keys have explicit Phosphor aliases, with local Regular and Fill variants.
+- [x] All 96 legacy SVG keys have explicit Phosphor aliases, with local Regular and Fill variants.
 - [ ] Verify no missing icons at runtime and check the visual result across themes/styles.
 - [x] Phosphor weights are independent of theme corners, bar style and control style in the shared renderer's source.
 - [x] Weight selection has a clear Regular default and preserves the existing `solidIcons` boolean preference without a settings migration.
@@ -220,7 +220,7 @@ A visual change is not complete until these combinations are checked; testing on
 - [ ] Asset sizes and aspect ratios are respected; no layout shifts when an icon changes.
   - [x] `KitIcon` now uses `Image.PreserveAspectFit` so local SVG glyphs are not stretched to fill the icon box; runtime layout and tint checks remain pending.
 - [x] The installer checks every alias has Regular/Fill assets and that every legacy catalogue key is mapped.
-- [x] Static inventory of the PR branch confirms all 95 aliases resolve to both local Phosphor weights (89 distinct glyphs, 178 SVG assets; no missing pairs).
+- [x] Static inventory of the PR branch confirms all 96 aliases resolve to both local Phosphor weights (90 distinct glyphs, 180 SVG assets; no missing pairs).
 - [x] Phosphor MIT license is included with the bundled assets.
 
 ### UX consistency
