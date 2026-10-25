@@ -27,8 +27,9 @@ Rectangle {
   // set once: whether it sits in a Settings box (a walk up, not a binding)
   property bool boxed: false
   color: input.activeFocus || hover.hovered ? Theme.hoverOn(boxed) : Theme.fillOn(boxed)
-  border.width: Theme.frameWidth
-  border.color: input.activeFocus || hover.hovered ? Theme.foreground2 : Theme.gray
+  // Keep keyboard focus visible on the entire colour field, not only its chip.
+  border.width: input.activeFocus ? Math.max(Theme.focusRingWidth, Theme.frameWidth) : Theme.frameWidth
+  border.color: input.activeFocus ? Theme.focusRing : hover.hovered ? Theme.foreground2 : Theme.gray
   Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   KitFieldLine { active: input.activeFocus }
