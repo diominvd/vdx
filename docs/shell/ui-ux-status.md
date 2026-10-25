@@ -36,7 +36,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 
 ## 2. Partially done
 
-- **Icon system:** asset/alias coverage is statically complete, but actual tinting, visual weight, alignment, and dynamic-state choices have not been verified in a live session. The alias map still needs a semantic review, not only a filename check.
+- **Icon system:** the alias audit found and fixed a real gap: the legacy `image` key had no Phosphor mapping. Added matching outline/filled local SVGs and mapped the key. The current alias-to-asset check passes, but actual tinting, visual weight, alignment, and dynamic-state choices have not been verified in a live session; semantic review remains.
 - **Responsive behavior:** many negative-size and overflow cases have been guarded in code, but minimum supported window sizes and narrow popup layouts need visual checks.
 - **Keyboard navigation:** many controls have source-level support, but the focus path and focus-ring contrast need to be exercised in Quickshell across both control styles.
 - **Shell Manager:** source already has a grouped sidebar, searchable settings index, page headers, jump links, and reset affordances. The remaining task is to assess and improve the actual information architecture, page-level hierarchy, search/no-result behavior, and compact-window usability—not merely add more defensive width calculations.
