@@ -83,6 +83,8 @@ Column {
 
             width: rows.width
             height: 34
+            border.width: rowArea.activeFocus ? Theme.focusRingWidth : 0
+            border.color: Theme.focusRing
             color: active ? Theme.background3 : rowArea.containsMouse ? Theme.background2 : Theme.clear
             Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
@@ -116,8 +118,20 @@ Column {
               id: rowArea
               anchors.fill: parent
               hoverEnabled: true
+              activeFocusOnTab: true
+              Accessible.role: Accessible.RadioButton
+              Accessible.name: row.modelData.label
+              Accessible.description: row.modelData.link ? "Opens a linked settings page"
+                : row.modelData.off ? "Currently unavailable" : row.active ? "Selected" : "Select this entry"
+              Accessible.checked: row.active
               cursorShape: row.active ? Qt.ArrowCursor : Qt.PointingHandCursor
-              onClicked: root.picked(row.modelData.id)
+              onActiveFocusChanged: if (activeFocus) root.ensureVisible(row)
+              onClicked: { forceActiveFocus(); root.picked(row.modelData.id); }
+              Keys.onPressed: event => {
+                if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
+                if (!event.isAutoRepeat) root.picked(row.modelData.id);
+                event.accepted = true;
+              }
             }
           }
         }
