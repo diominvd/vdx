@@ -12,6 +12,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Phosphor Regular/Fill assets and explicit aliases are bundled for all 96 legacy SVG keys (90 distinct glyphs, 180 SVG assets).
 - Several dynamic-state and navigation edge cases have been guarded.
 - The detailed per-control checklist remains in [ui-ux-audit.md](ui-ux-audit.md).
+- Added installer-check regression tests ensuring a legacy icon key cannot lose its Phosphor alias and each alias must retain both Regular and Fill assets. These tests are committed but have not been executed in this environment.
 
 **Important:** These are mostly interaction consistency, accessibility, asset migration, and defensive-layout improvements. They do not, by themselves, amount to a full visual redesign.
 
