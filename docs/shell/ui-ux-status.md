@@ -22,6 +22,8 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Corrected Shell Manager group-jump target calculations to include the page content's top inset, avoiding a consistent scroll offset. This is source-level reasoning and still needs runtime confirmation.
 - Made the currently selected settings group visibly distinct from hover-only group links, and removed a duplicate text-alignment assignment in the search empty state.
 - Applied the shared focus-ring token to Island icon buttons, notification cards, and the notification overflow action so those keyboard targets follow the same focus styling as Shell Manager controls. Extended the same token to hub chips, the clock, media slider, and power-menu tiles.
+- Made the Island clock keyboard-focusable when configured for hover-to-open as well as click-to-open; Enter/Space can now open the hub regardless of the pointer interaction preference.
+- Added an explicit accessible group name to the Bar shape and icon-size segmented controls, and to the Animation speed selector.
 
 ## 2. Partially done
 
