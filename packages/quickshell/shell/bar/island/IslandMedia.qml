@@ -88,8 +88,8 @@ Item {
         anchors.fill: parent
         radius: Theme.pill(height)
         color: "transparent"
-        border.width: drag.activeFocus ? 2 : 0
-        border.color: Theme.foreground0
+        border.width: drag.activeFocus ? Theme.focusRingWidth : 0
+        border.color: Theme.focusRing
       }
 
       MouseArea {
