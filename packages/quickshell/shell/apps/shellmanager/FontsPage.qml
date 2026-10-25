@@ -106,8 +106,8 @@ KitColumn {
         height: 112
         radius: Theme.radiusCard
         color: area.containsMouse && !active ? Theme.background2 : Theme.background1
-        border.width: active ? Theme.ring : area.activeFocus ? Theme.focusRingWidth : Theme.hairline
-        border.color: active ? Theme.foreground0 : area.activeFocus ? Theme.focusRing : Theme.background2
+        border.width: area.activeFocus ? Theme.focusRingWidth : active ? Theme.ring : Theme.hairline
+        border.color: area.activeFocus ? Theme.focusRing : active ? Theme.foreground0 : Theme.background2
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
         // the specimen: a large Aa, the name, a line of code
