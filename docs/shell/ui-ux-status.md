@@ -26,6 +26,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Added explicit accessible group names to the Bar shape, icon-size, module-gap, and Island hub-opening controls; Animation speed, popup animation, and underline animation controls; shell/GTK text-size controls; icon weight; and cursor colour/size controls.
 - Added accessible names to the segmented controls in Files settings, including view, density, sorting, search limits, opening behavior, picker sizing, and recent-file limits.
 - Made font and cursor theme cards reachable with Tab, named them for assistive technology, added Enter/Space activation, and applied the shared focus-ring styling to their keyboard focus state.
+- Added a clear no-results message to the theme picker and described its search field and keyboard shortcuts for assistive technology.
 
 ## 2. Partially done
 
