@@ -98,7 +98,6 @@ Row {
         boundsBehavior: Flickable.StopAtBounds
         model: root.shown
 
-
         delegate: Rectangle {
           id: item
           required property string modelData
@@ -167,6 +166,18 @@ Row {
             onDoubleClicked: root.apply()
           }
         }
+      }
+
+      KitText {
+        anchors.centerIn: parent
+        width: parent.width - 2 * Theme.gapWide
+        visible: root.shown.length === 0
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+        color: Theme.muted
+        text: root.query.trim() === ""
+          ? "No themes available in this appearance."
+          : "No themes found. Try another name or clear the search."
       }
     }
 
