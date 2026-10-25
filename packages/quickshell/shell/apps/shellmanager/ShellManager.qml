@@ -400,8 +400,8 @@ Rectangle {
                   width: subs.width
                   height: 26
                   color: subArea.containsMouse ? Theme.background1 : Theme.clear
-                  border.width: subArea.activeFocus ? 2 : 0
-                  border.color: Theme.foreground0
+                  border.width: subArea.activeFocus ? Theme.focusRingWidth : 0
+                  border.color: Theme.focusRing
                   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
                   // where the page is, as a thin line beside the name
