@@ -68,6 +68,8 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Keep settings-search keyboard selection valid with zero matches, guard Enter on an empty result list, and center the no-match message.
 - [x] Reset settings-search result scrolling on each query update and position the empty state in the ListView's content coordinates.
 - [x] Expose the settings-search field's purpose and dynamic result-count/keyboard guidance to assistive technology through the shared input component.
+- [x] Make the active Shell Manager group visually distinct from hover-only group links.
+- [x] Apply the shared focus-ring token to `KitInput`, including a visible focus outline in the normally frameless Material style.
 - [x] Keep keyboard focus on sidebar sections and group links scrolled into the visible navigation viewport.
 - [x] Make colour swatches and cross-page settings links keyboard accessible, with selected-state semantics and visible focus.
 - [x] Give colour swatches roving Tab focus and left/right arrow-key selection in their visual direction, respecting left-to-right and right-to-left layout.
