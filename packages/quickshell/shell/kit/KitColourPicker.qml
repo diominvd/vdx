@@ -107,16 +107,36 @@ Item {
           border.color: Qt.rgba(1, 1, 1, 1)
         }
 
+        Rectangle {
+          anchors.fill: parent
+          radius: square.radius
+          color: "transparent"
+          border.width: squareArea.activeFocus ? Theme.focusRingWidth : 0
+          border.color: Theme.focusRing
+        }
+
         MouseArea {
+          id: squareArea
           anchors.fill: parent
           cursorShape: Qt.CrossCursor
+          activeFocusOnTab: true
+          Accessible.role: Accessible.Slider
+          Accessible.name: qsTr("Colour saturation and brightness")
+          Accessible.description: qsTr("Use arrow keys to adjust saturation and brightness. Enter or Space commits the colour.")
           function pick(m, done) {
             if (width <= 0 || height <= 0) return;
             root.sat = root.clamp(m.x / width);
             root.val = 1 - root.clamp(m.y / height);
             root.emitColour(done);
           }
-          onPressed: m => pick(m, false)
+          Keys.onLeftPressed: event => { root.sat = root.clamp(root.sat - 0.02); root.emitColour(false); event.accepted = true; }
+          Keys.onRightPressed: event => { root.sat = root.clamp(root.sat + 0.02); root.emitColour(false); event.accepted = true; }
+          Keys.onUpPressed: event => { root.val = root.clamp(root.val + 0.02); root.emitColour(false); event.accepted = true; }
+          Keys.onDownPressed: event => { root.val = root.clamp(root.val - 0.02); root.emitColour(false); event.accepted = true; }
+          Keys.onReturnPressed: event => { root.emitColour(true); event.accepted = true; }
+          Keys.onEnterPressed: event => { root.emitColour(true); event.accepted = true; }
+          Keys.onSpacePressed: event => { root.emitColour(true); event.accepted = true; }
+          onPressed: m => { forceActiveFocus(); pick(m, false); }
           onPositionChanged: m => { if (pressed) pick(m, false); }
           onReleased: m => pick(m, true)
         }
@@ -149,15 +169,35 @@ Item {
           border.color: Qt.rgba(1, 1, 1, 1)
         }
 
+        Rectangle {
+          anchors.fill: parent
+          anchors.leftMargin: -6
+          anchors.rightMargin: -6
+          radius: Theme.pill(width)
+          color: "transparent"
+          border.width: hueArea.activeFocus ? Theme.focusRingWidth : 0
+          border.color: Theme.focusRing
+        }
+
         MouseArea {
+          id: hueArea
           anchors { fill: parent; leftMargin: -6; rightMargin: -6 }
           cursorShape: Qt.PointingHandCursor
+          activeFocusOnTab: true
+          Accessible.role: Accessible.Slider
+          Accessible.name: qsTr("Colour hue")
+          Accessible.description: qsTr("Use Up and Down arrows to adjust hue. Enter or Space commits the colour.")
           function pick(m, done) {
             if (width <= 0 || height <= 0) return;
             root.hue = root.clamp(m.y / height);
             root.emitColour(done);
           }
-          onPressed: m => pick(m, false)
+          Keys.onUpPressed: event => { root.hue = root.clamp(root.hue - 0.01); root.emitColour(false); event.accepted = true; }
+          Keys.onDownPressed: event => { root.hue = root.clamp(root.hue + 0.01); root.emitColour(false); event.accepted = true; }
+          Keys.onReturnPressed: event => { root.emitColour(true); event.accepted = true; }
+          Keys.onEnterPressed: event => { root.emitColour(true); event.accepted = true; }
+          Keys.onSpacePressed: event => { root.emitColour(true); event.accepted = true; }
+          onPressed: m => { forceActiveFocus(); pick(m, false); }
           onPositionChanged: m => { if (pressed) pick(m, false); }
           onReleased: m => pick(m, true)
         }
