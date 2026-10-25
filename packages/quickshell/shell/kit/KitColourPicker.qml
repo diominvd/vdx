@@ -226,8 +226,8 @@ Item {
             height: root.paletteRows > 1 ? Math.max(0, (square.height - Theme.gapSmall) / 2) : Math.max(0, square.height)
             radius: Math.min(6, Theme.radiusControl + 2)
             readonly property color ink: Colour.hsvOf(String(pair[0]))?.v > 0.6 ? Qt.rgba(0, 0, 0, 1) : Qt.rgba(1, 1, 1, 1)
-            border.width: chosen ? Theme.ring : tileArea.containsMouse ? Theme.hairline : 0
-            border.color: chosen ? Theme.foreground0 : Theme.foreground2
+            border.width: tileArea.activeFocus ? Theme.focusRingWidth : chosen ? Theme.ring : tileArea.containsMouse ? Theme.hairline : 0
+            border.color: tileArea.activeFocus ? Theme.focusRing : chosen ? Theme.foreground0 : Theme.foreground2
             gradient: Gradient {
               orientation: Gradient.Horizontal
               GradientStop { position: 0; color: tile.pair[0] }
@@ -248,6 +248,15 @@ Item {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
+              activeFocusOnTab: true
+              Accessible.role: Accessible.Button
+              Accessible.name: tile.modelData
+              Accessible.description: tile.chosen ? qsTr("Selected colour") : qsTr("Choose this colour")
+              Accessible.checked: tile.chosen
+              Keys.onReturnPressed: event => { if (!event.isAutoRepeat) root.chosen(tile.modelData); event.accepted = true; }
+              Keys.onEnterPressed: event => { if (!event.isAutoRepeat) root.chosen(tile.modelData); event.accepted = true; }
+              Keys.onSpacePressed: event => { if (!event.isAutoRepeat) root.chosen(tile.modelData); event.accepted = true; }
+              onPressed: forceActiveFocus()
               onClicked: root.chosen(tile.modelData)
             }
           }
