@@ -273,8 +273,8 @@ Item {
           anchors.fill: parent
           radius: Theme.radiusCard
           color: "transparent"
-          border.width: moreArea.activeFocus ? 2 : 0
-          border.color: Theme.foreground0
+          border.width: moreArea.activeFocus ? Theme.focusRingWidth : 0
+          border.color: Theme.focusRing
         }
 
         MouseArea {
