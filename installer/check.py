@@ -330,7 +330,7 @@ def shell_problems() -> list[str]:
         out.append("kit/KitIcon.qml: legacy Material runtime fallback remains")
     if "icons/phosphor/" not in kit_text:
         out.append("kit/KitIcon.qml: Phosphor asset path is missing")
-    if not re.search(r"\\bbrightness\\s*:\\s*1\\b", kit_text) or not re.search(r"\\bcolorization\\s*:\\s*1\\b", kit_text) or not re.search(r"\\bcolorizationColor\\s*:\\s*root\\.tint\\b", kit_text):
+    if "brightness: 1" not in kit_text or "colorization: 1" not in kit_text or "colorizationColor: root.tint" not in kit_text:
         out.append("kit/KitIcon.qml: SVG tint normalization is incomplete")
     for key, glyph in sorted(aliases.items()):
         for suffix in ("", "-fill"):
