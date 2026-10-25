@@ -74,6 +74,7 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Keep keyboard focus on sidebar sections and group links scrolled into the visible navigation viewport.
 - [x] Make colour swatches and cross-page settings links keyboard accessible, with selected-state semantics and visible focus.
 - [x] Give colour swatches roving Tab focus and left/right arrow-key selection in their visual direction, respecting left-to-right and right-to-left layout.
+- [x] Make font and cursor theme cards keyboard reachable, named for assistive technology, and visibly focused without hiding the focus ring on the currently selected card.
 - [x] Guard swatch arrow navigation when a repeater delegate is temporarily unavailable during dynamic model updates.
 - [x] Add keyboard activation and accessible labels to app sidebar rows and their separate action buttons.
 - [x] Give settings cross-page links and app sidebar rows/actions distinct pressed feedback for pointer and keyboard activation.
@@ -82,7 +83,7 @@ This document is the working checklist for the shell-wide UI/UX pass. It deliber
 - [x] Make the Island hub's Launcher and Keys chips keyboard reachable, focus-visible, and exposed as named buttons.
 - [x] Give the Island hub's Launcher and Keys chips a pressed state for pointer and keyboard activation.
 - [x] Make shared Island icon buttons keyboard reachable, focus-visible, and exposed as named buttons (including media, power, Shell Manager, and notification dismissal).
-- [x] Make the Island clock keyboard accessible when configured to open the hub on click, with button semantics and visible focus.
+- [x] Make the Island clock keyboard accessible in both hover-to-open and click-to-open modes, with button semantics and visible focus.
 - [x] Add matching pressed feedback to the Island clock when it is configured as a click target.
 - [x] Make notification cards keyboard reachable with button semantics, an accessible name/description, visible focus, and Enter/Space activation while preserving the separate dismiss button.
 - [x] Add hover and pressed feedback to Island notification cards without covering their content or merging the separate dismiss action.
