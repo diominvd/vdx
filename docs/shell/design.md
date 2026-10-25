@@ -97,9 +97,9 @@ Minimal, monospace, near-monochrome. Reference: the Wi-Fi popup.
 - Key hints: `Super + S`; footers `key action · key action`, lowercase.
 - Icons: Phosphor SVGs are the preferred local set in `kit/icons/phosphor/`.
   `KitIcon.solid` selects the matching `-fill.svg` variant; icon weight is
-  independent of corner shape. Existing Material-era icon keys remain supported
-  by the alias map in `KitIcon.qml`; unmapped keys use the legacy Material
-  assets. The vendored Phosphor icons are MIT-licensed (see
+  independent of corner shape. The alias map in `KitIcon.qml` translates
+  all legacy keys to Phosphor glyphs; the renderer never falls back to Material
+  assets, and logs any unmapped key. The vendored Phosphor icons are MIT-licensed (see
   `kit/icons/phosphor/LICENSE`). `icons/material.txt` documents the legacy set.
 - Refactors keep the look; a new look is prototyped on one popup first.
 - Motion: every animation goes through `config/Motion.qml` — a Behavior takes
