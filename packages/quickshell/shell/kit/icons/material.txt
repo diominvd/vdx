@@ -1,5 +1,6 @@
-# Legacy fallback: kit icon -> Material Symbols name. Used only when KitIcon has no Phosphor alias.
-# Sharp: icons/, Rounded: icons/round/; filled twins in solid/ and round/solid/.
+# Legacy catalogue: KitIcon API key -> original Material Symbols name.
+# Retained for compatibility checks and migration mapping only; KitIcon renders Phosphor.
+# The old Material assets are not used by the runtime icon renderer.
 # https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/<name>/{default,fill1}/24px.svg
 activity monitor_heart
 app-window web_asset
