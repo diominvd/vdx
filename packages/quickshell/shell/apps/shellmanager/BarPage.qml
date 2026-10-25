@@ -190,6 +190,7 @@ KitColumn {
     hint: "Hover or click the clock"
 
     KitSegments {
+      accessibleName: "Island hub opening behavior"
       model: [
         { label: "Hover", value: "hover" },
         { label: "Click", value: "click" }
