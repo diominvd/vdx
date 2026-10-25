@@ -36,8 +36,8 @@ Rectangle {
     anchors.fill: parent
     radius: root.radius
     color: "transparent"
-    border.width: area.activeFocus ? 2 : 0
-    border.color: Theme.foreground0
+    border.width: area.activeFocus ? Theme.focusRingWidth : 0
+    border.color: Theme.focusRing
   }
 
   KitIcon {
