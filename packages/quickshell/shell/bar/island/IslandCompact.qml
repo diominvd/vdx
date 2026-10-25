@@ -95,8 +95,8 @@ Item {
       anchors.fill: parent
       radius: Theme.radiusControl
       color: "transparent"
-      border.width: parent.activeFocus ? 2 : 0
-      border.color: Theme.foreground0
+      border.width: parent.activeFocus ? Theme.focusRingWidth : 0
+      border.color: Theme.focusRing
     }
     Keys.onPressed: event => {
       if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
