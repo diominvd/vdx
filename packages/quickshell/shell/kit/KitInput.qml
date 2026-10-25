@@ -33,8 +33,10 @@ Rectangle {
   Component.onCompleted: boxed = Theme.boxed(parent)
   color: Theme.material ? (textInput.activeFocus || hover.hovered ? Theme.hoverOn(boxed) : Theme.fillOn(boxed)) : Theme.clear
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
-  border.width: Theme.frameWidth
-  border.color: textInput.activeFocus || hover.hovered ? Theme.foreground2 : Theme.gray
+  // Keep keyboard focus visible in both control styles, including Material's
+  // normally frameless fields.
+  border.width: textInput.activeFocus ? Math.max(Theme.focusRingWidth, Theme.frameWidth) : Theme.frameWidth
+  border.color: textInput.activeFocus ? Theme.focusRing : hover.hovered ? Theme.foreground2 : Theme.gray
   Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   KitFieldLine { active: textInput.activeFocus }
