@@ -13,6 +13,7 @@ Column {
     hint: "Phosphor weight · Regular or Fill"
 
     KitSegments {
+      accessibleName: "Icon weight"
       model: [
         { label: "Regular", value: false },
         { label: "Fill",    value: true }
