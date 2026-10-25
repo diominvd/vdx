@@ -61,6 +61,7 @@ Item {
     "history": "clock-counter-clockwise",
     "home": "house",
     "info": "info",
+    "image": "image",
     "keyboard": "keyboard",
     "laptop": "laptop",
     "layout": "squares-four",
