@@ -181,7 +181,8 @@ Rectangle {
   function jumpTo(j) {
     if (typeof currentPage.jump === "function") currentPage.jump(j.key);   // e.g. unfold it
     const max = Math.max(0, page.contentHeight - page.height);
-    scroll.to = Math.min(max, Math.max(0, j.y));
+    // `j.y` is relative to `pages`; include its top inset when scrolling the page.
+    scroll.to = Math.min(max, Math.max(0, pages.y + j.y));
     scroll.restart();
     pinnedJump = j.key;
     lastJump = j;
@@ -196,8 +197,9 @@ Rectangle {
     interval: Motion.normal + 120
     onTriggered: {
       const j = root.currentPage.jumps.find(x => x.key === root.lastJump?.key);
-      if (j && root.pinnedJump === j.key && Math.abs(page.contentY - j.y) > 2) {
-        scroll.to = Math.min(Math.max(0, page.contentHeight - page.height), Math.max(0, j.y));
+      const targetY = j ? pages.y + j.y : 0;
+      if (j && root.pinnedJump === j.key && Math.abs(page.contentY - targetY) > 2) {
+        scroll.to = Math.min(Math.max(0, page.contentHeight - page.height), Math.max(0, targetY));
         scroll.restart();
       }
     }
