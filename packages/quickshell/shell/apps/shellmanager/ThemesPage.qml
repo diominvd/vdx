@@ -163,9 +163,26 @@ Row {
             id: area
             anchors.fill: parent
             hoverEnabled: true
+            activeFocusOnTab: true
+            Accessible.role: Accessible.RadioButton
+            Accessible.name: ThemeService.baseOf(item.modelData) + ", " + root.character(item.modelData)
+            Accessible.description: item.active ? "Currently applied theme" : item.picked ? "Preview selected" : "Select to preview; press Enter to apply"
+            Accessible.checked: item.picked
             cursorShape: Qt.PointingHandCursor
-            onClicked: { root.selected = item.modelData; search.input.forceActiveFocus(); }
+            onClicked: { forceActiveFocus(); root.selected = item.modelData; }
             onDoubleClicked: root.apply()
+            Keys.onSpacePressed: event => {
+              if (!event.isAutoRepeat) root.selected = item.modelData;
+              event.accepted = true;
+            }
+            Keys.onReturnPressed: event => {
+              if (!event.isAutoRepeat) { root.selected = item.modelData; root.apply(); }
+              event.accepted = true;
+            }
+            Keys.onEnterPressed: event => {
+              if (!event.isAutoRepeat) { root.selected = item.modelData; root.apply(); }
+              event.accepted = true;
+            }
           }
         }
       }
