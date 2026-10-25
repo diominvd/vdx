@@ -9,7 +9,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 
 - Shared controls have received extensive keyboard/accessibility work: focus indication, Enter/Space activation, repeat-key guards, accessible names/state, and disabled/busy handling.
 - Many compact layouts now clamp widths/heights and adapt to narrow windows, including Shell Manager, Files, Packages, Task Manager, Launcher, popups, and module views.
-- Phosphor Regular/Fill assets and explicit aliases are bundled for the 95 legacy icon keys.
+- Phosphor Regular/Fill assets and explicit aliases are bundled for all 96 legacy SVG keys (90 distinct glyphs, 180 SVG assets).
 - Several dynamic-state and navigation edge cases have been guarded.
 - The detailed per-control checklist remains in [ui-ux-audit.md](ui-ux-audit.md).
 
@@ -31,7 +31,7 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Made the shared app/module entry list keyboard navigable and accessible, with a visible focus ring and automatic scrolling to the selected entry. Added a helpful empty state when filtering returns no entries.
 - Improved the Launcher result list: selected results have a visible focus outline, and assistive technology can hear the result count, current selection, item labels and navigation hints.
 - Standardized the Task Manager table-header focus outline to use the shared focus-ring colour and width.
-- Made the custom colour picker's saturation/brightness square and hue strip keyboard-focusable sliders with accessible names, arrow-key adjustment, Enter/Space commit, and shared focus rings. This is source-level coverage; screen-reader announcements and focus appearance still need live testing.
+- Made the custom colour picker's saturation/brightness square and hue strip keyboard-focusable sliders with accessible names, arrow-key adjustment, Enter/Space commit, and shared focus rings. Palette tiles are also keyboard-focusable buttons with names, selected state, and a visible focus ring. This is source-level coverage; screen-reader announcements and focus appearance still need live testing.
 - Made the selected theme and wallpaper cards keyboard activatable and screen-reader labelled, with a shared focus outline.
 
 ## 2. Partially done
