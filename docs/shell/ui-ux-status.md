@@ -21,9 +21,11 @@ This status separates source-level fixes from a completed visual redesign. A cha
 - Improved the settings search's accessible description so the idle, no-results, and results states are distinct; the empty state now suggests trying another name or keyword.
 - Corrected Shell Manager group-jump target calculations to include the page content's top inset, avoiding a consistent scroll offset. This is source-level reasoning and still needs runtime confirmation.
 - Made the currently selected settings group visibly distinct from hover-only group links, and removed a duplicate text-alignment assignment in the search empty state.
-- Applied the shared focus-ring token to Island icon buttons, notification cards, and the notification overflow action so those keyboard targets follow the same focus styling as Shell Manager controls. Extended the same token to hub chips, the clock, media slider, and power-menu tiles.
+- Applied the shared focus-ring token to notification cards and the notification overflow action, plus hub chips, the clock, media slider, and power-menu tiles. The shared Island icon-button component still needs its own verification/fix if it does not inherit this styling.
 - Made the Island clock keyboard-focusable when configured for hover-to-open as well as click-to-open; Enter/Space can now open the hub regardless of the pointer interaction preference.
-- Added an explicit accessible group name to the Bar shape and icon-size segmented controls, and to the Animation speed selector.
+- Added explicit accessible group names to the Bar shape, icon-size, module-gap, and Island hub-opening controls; Animation speed, popup animation, and underline animation controls; shell/GTK text-size controls; icon weight; and cursor colour/size controls.
+- Added accessible names to the segmented controls in Files settings, including view, density, sorting, search limits, opening behavior, picker sizing, and recent-file limits.
+- Made font and cursor theme cards reachable with Tab, named them for assistive technology, added Enter/Space activation, and applied the shared focus-ring styling to their keyboard focus state.
 
 ## 2. Partially done
 
