@@ -118,7 +118,7 @@ Column {
         color: Theme.clear
         radius: Theme.radiusControl
         border.width: 2
-        border.color: Theme.foreground0
+        border.color: Theme.focusRing
         z: 2
       }
     }
@@ -135,6 +135,7 @@ Column {
     hint: "How a popup comes in under the bar"
 
     KitSegments {
+      accessibleName: "Bar popup animation"
       disabled: !ShellSettings.motion
       model: [{ label: "None", value: "none" }, { label: "Fade", value: "fade" },
               { label: "Slide", value: "slide" }, { label: "Grow", value: "grow" }]
@@ -149,6 +150,7 @@ Column {
     hint: "The line under an open module"
 
     KitSegments {
+      accessibleName: "Bar underline animation"
       disabled: !ShellSettings.motion || !ShellSettings.motionBar
       model: [{ label: "None", value: "none" }, { label: "Grow", value: "grow" }, { label: "Slide", value: "slide" }]
       current: ShellSettings.underlineAnimation
