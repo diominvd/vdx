@@ -29,6 +29,14 @@ Column {
     else if (top + item.height > scroller.contentY + scroller.height)
       scroller.contentY = top + item.height - scroller.height;
   }
+
+  function revealSelected() {
+    const index = matches.findIndex(p => p.id === selected);
+    const item = index >= 0 ? rowRepeater.itemAt(index) : null;
+    if (item) ensureVisible(item);
+  }
+
+  onSelectedChanged: Qt.callLater(root.revealSelected)
   width: Theme.sideWidth
   height: parent.height
   spacing: Theme.gapMedium
@@ -71,6 +79,7 @@ Column {
         spacing: Theme.gapTight
 
         Repeater {
+          id: rowRepeater
           model: root.matches
 
           Rectangle {
