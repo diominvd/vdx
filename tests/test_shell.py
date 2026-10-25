@@ -85,6 +85,42 @@ class ShellProblems(unittest.TestCase):
         tree = dict(self.TREE, **{"bar/ModuleFaces.qml": ""})
         self.assertEqual(self.problems(tree), ["bar/ModuleFaces.qml: no Component for module clock"])
 
+    def phosphor_tree(self):
+        tree = dict(self.TREE)
+        tree.update({
+            "kit/KitIcon.qml": '''
+readonly property string phosphorName: ({ "clock": "clock" }[name] ?? "")
+source: Qt.resolvedUrl("icons/phosphor/" + phosphorName + ".svg")
+brightness: 1
+colorization: 1
+colorizationColor: root.tint
+''',
+            "kit/icons/material.txt": "clock\\n",
+            "kit/icons/phosphor/clock.svg": self.SVG,
+            "kit/icons/phosphor/clock-fill.svg": self.SVG,
+        })
+        return tree
+
+    def test_phosphor_alias_requires_both_weights(self):
+        tree = self.phosphor_tree()
+        del tree["kit/icons/phosphor/clock-fill.svg"]
+        self.assertEqual(self.problems(tree), [
+            "kit/KitIcon.qml: 'clock' maps to missing Phosphor asset clock-fill.svg"
+        ])
+
+    def test_legacy_catalogue_key_requires_phosphor_alias(self):
+        tree = self.phosphor_tree()
+        tree["kit/KitIcon.qml"] = '''
+readonly property string phosphorName: ({ }[name] ?? "")
+source: Qt.resolvedUrl("icons/phosphor/" + phosphorName + ".svg")
+brightness: 1
+colorization: 1
+colorizationColor: root.tint
+'''
+        self.assertEqual(self.problems(tree), [
+            "kit/KitIcon.qml: missing Phosphor alias for legacy key 'clock'"
+        ])
+
 
 if __name__ == "__main__":
     unittest.main()
