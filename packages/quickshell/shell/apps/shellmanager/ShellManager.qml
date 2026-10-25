@@ -403,7 +403,7 @@ Rectangle {
 
                   width: subs.width
                   height: 26
-                  color: subArea.containsMouse ? Theme.background1 : Theme.clear
+                  color: sub.here ? Theme.background2 : subArea.containsMouse ? Theme.background1 : Theme.clear
                   border.width: subArea.activeFocus ? Theme.focusRingWidth : 0
                   border.color: Theme.focusRing
                   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
@@ -535,7 +535,6 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         text: qsTr("No settings found\nTry another name or keyword")
         color: Theme.muted
-        horizontalAlignment: Text.AlignHCenter
       }
     }
   }
