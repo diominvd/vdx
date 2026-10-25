@@ -86,8 +86,8 @@ Item {
 
     HoverHandler { id: clockHover }
 
-    // When configured for click-to-open, the clock is a real keyboard button too.
-    activeFocusOnTab: root.clockOn && ShellSettings.clockOpens === "click"
+    // The clock opens the hub by hover or click; keep it keyboard-accessible in either mode.
+    activeFocusOnTab: root.clockOn
     Accessible.role: Accessible.Button
     Accessible.name: "Open Island hub"
     Accessible.description: "Open the Island hub"
@@ -100,7 +100,7 @@ Item {
     }
     Keys.onPressed: event => {
       if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
-      if (!event.isAutoRepeat && activeFocusOnTab) {
+      if (!event.isAutoRepeat && root.clockOn) {
         keyboardPressed = true;
         root.clockClicked();
       }
