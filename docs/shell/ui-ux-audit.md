@@ -284,4 +284,4 @@ A visual change is not complete until these combinations are checked; testing on
 - [x] Keep the Network page's Ethernet controls hidden when the adapter is either `null` or `undefined`.
 - [x] Fix segmented-control arrow/Home/End navigation to focus the actual Repeater delegate, not the containing Row's child list.
 - [x] Make theme cards keyboard reachable with radio semantics, a visible focus ring, Space-to-preview and Enter-to-apply.
-- [x] Make the shared Apps / Bar modules entry list keyboard accessible, expose selected/unavailable/link states, and scroll the selected entry into view.
+- [x] Make the shared Apps / Bar modules entry list keyboard accessible, expose selected/unavailable/link states, and scroll the selected entry into view. Show a helpful empty state when no entries match.
