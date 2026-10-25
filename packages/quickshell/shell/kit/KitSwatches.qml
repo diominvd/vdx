@@ -46,8 +46,8 @@ Row {
       width: 18
       height: 18
       radius: Theme.pill(height)
-      border.width: swatchArea.activeFocus ? 2 : picked ? Theme.ring : hollow ? Theme.hairline : 0
-      border.color: swatchArea.activeFocus || picked ? Theme.foreground0 : Theme.gray
+      border.width: swatchArea.activeFocus ? Theme.focusRingWidth : picked ? Theme.ring : hollow ? Theme.hairline : 0
+      border.color: swatchArea.activeFocus ? Theme.focusRing : picked ? Theme.foreground0 : Theme.gray
       // Use roving Tab focus: arrow keys move through the radio choices.
       readonly property bool tabStop: !root.disabled && (picked || (index === 0 && !root.model.filter(name => root.exclude.indexOf(name) < 0).includes(root.picked)))
       gradient: Gradient {
