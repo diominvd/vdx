@@ -75,13 +75,15 @@ Item {
   activeFocusOnTab: enabled
   Accessible.role: Accessible.Slider
   Accessible.name: accessibleName !== "" ? accessibleName : qsTr("Slider")
-  Accessible.value: Math.round(shown * 100)
+  Accessible.description: Math.round(shown * 100) + "%"
   Keys.onLeftPressed: event => { keyboardStep(-1); event.accepted = true; }
   Keys.onDownPressed: event => { keyboardStep(-1); event.accepted = true; }
   Keys.onRightPressed: event => { keyboardStep(1); event.accepted = true; }
   Keys.onUpPressed: event => { keyboardStep(1); event.accepted = true; }
-  Keys.onHomePressed: event => { if (enabled) { send(0); letGo(dragValue); } event.accepted = true; }
-  Keys.onEndPressed: event => { if (enabled) { send(1); letGo(dragValue); } event.accepted = true; }
+  Keys.onPressed: event => {
+    if (event.key === Qt.Key_Home) { if (enabled) { send(0); letGo(dragValue); } event.accepted = true; }
+    else if (event.key === Qt.Key_End) { if (enabled) { send(1); letGo(dragValue); } event.accepted = true; }
+  }
 
   implicitWidth: 120
   implicitHeight: m3 ? 28 : 18

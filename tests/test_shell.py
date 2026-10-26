@@ -72,6 +72,16 @@ class ShellProblems(unittest.TestCase):
         "kit/icons/round/clock.svg": SVG, "kit/icons/round/solid/clock.svg": SVG,
         "bar/BarLayout.qml": '{ id: "clock", label: "Clock" }\n',
         "bar/ModuleFaces.qml": "Component { id: clock; Clock {} }\n",
+        "kit/KitIcon.qml": '''
+readonly property string phosphorName: ({ "clock": "clock" }[name] ?? "")
+source: Qt.resolvedUrl("icons/phosphor/" + phosphorName + ".svg")
+brightness: 1
+colorization: 1
+colorizationColor: root.tint
+''',
+        "kit/icons/material.txt": "clock\n",
+        "kit/icons/phosphor/clock.svg": SVG,
+        "kit/icons/phosphor/clock-fill.svg": SVG,
     }
 
     def test_a_whole_tree_is_clean(self):
@@ -86,20 +96,7 @@ class ShellProblems(unittest.TestCase):
         self.assertEqual(self.problems(tree), ["bar/ModuleFaces.qml: no Component for module clock"])
 
     def phosphor_tree(self):
-        tree = dict(self.TREE)
-        tree.update({
-            "kit/KitIcon.qml": '''
-readonly property string phosphorName: ({ "clock": "clock" }[name] ?? "")
-source: Qt.resolvedUrl("icons/phosphor/" + phosphorName + ".svg")
-brightness: 1
-colorization: 1
-colorizationColor: root.tint
-''',
-            "kit/icons/material.txt": "clock\\n",
-            "kit/icons/phosphor/clock.svg": self.SVG,
-            "kit/icons/phosphor/clock-fill.svg": self.SVG,
-        })
-        return tree
+        return dict(self.TREE)
 
     def test_phosphor_alias_requires_both_weights(self):
         tree = self.phosphor_tree()

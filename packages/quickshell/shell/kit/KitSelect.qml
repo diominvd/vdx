@@ -200,22 +200,24 @@ Column {
         else root.moveHighlight(-1);
         event.accepted = true;
       }
-      Keys.onHomePressed: event => {
-        if (!root.disabled && !root.busy && root.expanded && root.model.length > 0) {
-          root.highlightedIndex = 0;
-          scroller.contentY = 0;
-        }
-        event.accepted = true;
-      }
-      Keys.onEndPressed: event => {
-        if (!root.disabled && !root.busy && root.expanded && root.model.length > 0) {
-          root.highlightedIndex = root.model.length - 1;
-          scroller.contentY = Math.max(0, scroller.contentHeight - scroller.height);
-        }
-        event.accepted = true;
-      }
       // Activation keys must not reopen/close the menu repeatedly when held.
       Keys.onPressed: event => {
+        if (event.key === Qt.Key_Home) {
+          if (!root.disabled && !root.busy && root.expanded && root.model.length > 0) {
+            root.highlightedIndex = 0;
+            scroller.contentY = 0;
+          }
+          event.accepted = true;
+          return;
+        }
+        if (event.key === Qt.Key_End) {
+          if (!root.disabled && !root.busy && root.expanded && root.model.length > 0) {
+            root.highlightedIndex = root.model.length - 1;
+            scroller.contentY = Math.max(0, scroller.contentHeight - scroller.height);
+          }
+          event.accepted = true;
+          return;
+        }
         if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;
         if (!event.isAutoRepeat && !root.disabled && !root.busy) {
           if (root.expanded) root.chooseHighlighted();

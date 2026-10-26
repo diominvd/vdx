@@ -121,12 +121,10 @@ Item {
           IslandService.seek(Math.max(0, IslandService.position - 5) / IslandService.length)
           event.accepted = true
         }
-        Keys.onHomePressed: event => {
-          IslandService.seek(0)
-          event.accepted = true
-        }
-        Keys.onEndPressed: event => {
-          IslandService.seek(1)
+        Keys.onPressed: event => {
+          if (event.key === Qt.Key_Home) IslandService.seek(0)
+          else if (event.key === Qt.Key_End) IslandService.seek(1)
+          else return
           event.accepted = true
         }
       }

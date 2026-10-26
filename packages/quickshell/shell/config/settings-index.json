@@ -955,7 +955,7 @@
  },
  {
   "label": "Icons",
-  "hint": "Bar, popups and windows",
+  "hint": "Phosphor weight · Regular or Fill",
   "where": "Appearance",
   "target": "appearance:shape"
  },

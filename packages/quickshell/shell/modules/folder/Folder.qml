@@ -37,7 +37,7 @@ Item {
   activeFocusOnTab: true
   Accessible.role: Accessible.Button
   Accessible.name: BarLayout.label("folder")
-  Accessible.description: Open overflow and tucked bar modules
+  Accessible.description: "Open overflow and tucked bar modules"
 
   Keys.onPressed: event => {
     if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space) return;

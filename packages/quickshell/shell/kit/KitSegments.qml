@@ -81,20 +81,21 @@ Rectangle {
             if (!event.isAutoRepeat && !root.disabled && !selected) root.picked(modelData.value);
             event.accepted = true;
           }
-          Keys.onHomePressed: event => {
-            if (!root.disabled && root.model.length > 0) {
-              if (root.model[0].value !== root.current) root.picked(root.model[0].value);
-              Qt.callLater(() => root.focusIndex(0));
+          Keys.onPressed: event => {
+            if (event.key === Qt.Key_Home) {
+              if (!root.disabled && root.model.length > 0) {
+                if (root.model[0].value !== root.current) root.picked(root.model[0].value);
+                Qt.callLater(() => root.focusIndex(0));
+              }
+              event.accepted = true;
+            } else if (event.key === Qt.Key_End) {
+              if (!root.disabled && root.model.length > 0) {
+                const last = root.model.length - 1;
+                if (root.model[last].value !== root.current) root.picked(root.model[last].value);
+                Qt.callLater(() => root.focusIndex(last));
+              }
+              event.accepted = true;
             }
-            event.accepted = true;
-          }
-          Keys.onEndPressed: event => {
-            if (!root.disabled && root.model.length > 0) {
-              const last = root.model.length - 1;
-              if (root.model[last].value !== root.current) root.picked(root.model[last].value);
-              Qt.callLater(() => root.focusIndex(last));
-            }
-            event.accepted = true;
           }
           Keys.onLeftPressed: event => {
             if (!root.disabled && root.model.length > 0) {
