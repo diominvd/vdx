@@ -135,6 +135,7 @@ Rectangle {
 
       KitSlider {
         id: timeline
+        line: true
         anchors { left: elapsed.right; right: total.left; leftMargin: Theme.gapMedium; rightMargin: Theme.gapMedium
                   verticalCenter: parent.verticalCenter }
         enabled: PlayerService.canSeek

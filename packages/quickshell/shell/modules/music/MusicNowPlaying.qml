@@ -157,6 +157,7 @@ Column {
 
       KitSlider {
         id: slider
+        line: true
         width: parent.width
         enabled: root.player.canSeek
         value: root.player.length > 0 ? root.player.position / root.player.length : 0

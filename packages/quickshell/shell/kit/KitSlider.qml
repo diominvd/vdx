@@ -20,6 +20,7 @@ Item {
   property bool ticks: true              // false: the stops still snap, no marks
   property var spectrum: []              // colours laid along the track as a smooth ramp, instead of the fill
   property bool plate: false             // Strict: two tonal segments with a mark between them
+  property bool line: false               // a plain progress line, without a knob or material track
   property string text: ""               // a plate carries its reading inside, at the right
 
   // the default tint takes the accent (Appearance › Colours › Sliders); a
@@ -35,9 +36,9 @@ Item {
   onValueChanged: held = -1
   Timer { id: holdTimer; interval: 2000; onTriggered: root.held = -1 }
   function letGo(v) { held = v; holdTimer.restart(); released(v); }
-  readonly property real knobSize: m3 ? 4 : 12
-  readonly property bool m3: Theme.material && spectrum.length === 0
-  readonly property bool splitPlate: !m3 && spectrum.length === 0 && ShellSettings.segmentedSliders
+  readonly property real knobSize: line ? 0 : m3 ? 4 : 12
+  readonly property bool m3: !line && Theme.material && spectrum.length === 0
+  readonly property bool splitPlate: !line && !m3 && spectrum.length === 0 && ShellSettings.segmentedSliders
   readonly property bool flat: splitPlate || (plate && !m3)           // Strict plates; colour ramps stay thin
   readonly property real plateGap: splitPlate && shown > 0 && shown < 1 ? 8 : 0
   readonly property real plateEdge: shown * (width - plateGap)
@@ -92,7 +93,7 @@ Item {
   Component.onCompleted: boxed = Theme.boxed(parent)
 
   implicitWidth: 120
-  implicitHeight: m3 ? 28 : flat ? 36 : 18
+  implicitHeight: line ? 18 : m3 ? 28 : flat ? 36 : 18
   opacity: enabled ? 1 : 0.4
 
   KitGlow {
@@ -161,7 +162,7 @@ Item {
 
     Rectangle {
       required property real modelData
-      visible: !root.m3 && !root.flat
+      visible: !root.line && !root.m3 && !root.flat
       x: modelData * (root.width - root.knobSize) + root.knobSize / 2 - 1
       anchors.verticalCenter: parent.verticalCenter
       width: 2
@@ -225,7 +226,7 @@ Item {
   }
 
   Rectangle {
-    visible: !root.m3 && !root.flat
+    visible: !root.line && !root.m3 && !root.flat
     readonly property int size: area.containsMouse || root.pressed ? 14 : 12
     width: size
     height: size
