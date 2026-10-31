@@ -33,7 +33,7 @@ Singleton {
   property bool portBusy: false
   property string portError: ""
   property string portErrorTarget: ""
-  readonly property bool headphones: (ports[sink?.name]?.type ?? "").startsWith("Head")
+  readonly property bool headphones: jackIn || (ports[sink?.name]?.type ?? "").startsWith("Head")
 
   // Device lists for the popup: one entry per port, so the built-in card shows
   // both "Speakers" and "Headphones". The speakers are hidden while the codec
