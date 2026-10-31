@@ -50,7 +50,7 @@ local mouseBinds = {
 	bind("Windows", mainMod .. " + mouse:273", hl.dsp.window.resize(), "Resize", { mouse = true }),
 }
 
--- The overview (apps/overview) drags windows with Super + the left button itself. The
+-- The overview (apps/overview) drags windows with the left button itself. The
 -- binds above are the compositor's and would act on the windows under it, so they are off
 -- while it is open (it switches them: MouseBinds(false), back on closing and at start).
 function MouseBinds(on)

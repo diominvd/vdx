@@ -35,11 +35,23 @@ Window mode: `windowmode set tiling|floating|scrolling`.
 
 Overview is a function of the shell, not an app (no registry entry): Super+Tab in
 every window mode, `overview toggle|open|close`; its options are in Shell Manager › Windows ›
-Overview. Every workspace with windows is a row on the dimmed wallpaper. The wheel
-held down pans, the wheel turned scrolls (Shift: sideways, Ctrl: zoom). Super + left
-drag takes a window to another workspace; near an edge the canvas scrolls by itself.
+Overview. Workspaces are rows on the dimmed wallpaper, including empty workspaces
+between occupied ones. The wheel held down pans, the wheel turned scrolls (Shift:
+sideways, Ctrl: zoom). Drag a window with the left button to another workspace;
+near an edge the canvas scrolls by itself. In scrolling mode, a slot to the right
+of each occupied workspace creates a new column and preserves the windows' widths.
+Dropping inside a workspace with one tiled window shares its space between both
+windows. The carried picture keeps its size until the drop is confirmed.
 Floating has a task view instead (the workspaces as a strip, the chosen one's windows
 in a grid).
+
+Overview implementation: `apps/overview/Overview.qml` owns the session, stable
+window cards, capture lifecycle and drag phases; `overview.js` calculates drop
+geometry and builds the compositor transaction. Hovering never changes compositor
+geometry. During a commit the overview releases its exclusive keyboard focus before
+dispatching: scrolling layout commands act on the focused column, and Hyprland
+rejects window focus while an exclusive layer holds the keyboard. Geometry polling
+and auto-pan run only during their respective drag phases; cards unload on close.
 
 ### Files
 

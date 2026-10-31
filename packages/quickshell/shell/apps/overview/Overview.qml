@@ -8,26 +8,28 @@ import qs.config
 import qs.kit
 import qs.modules.windows
 import Quickshell.Widgets
+import "overview.js" as OverviewLogic
 
 // Floating mode: TaskView (the workspaces as a strip, the chosen one's windows
 // in a grid). The other modes:
 // Niri's overview as one canvas: every workspace of the focused
 // monitor is a row, and each window sits where it really is, so a scrolling
-// workspace runs on sideways past the screen. Only the workspaces with
-// windows (and the one in use) are rows, on the dimmed wallpaper. The wheel
+// workspace runs sideways past the screen. Rows include empty workspace gaps
+// and a spare workspace at each end, on the dimmed wallpaper. The wheel
 // held down pans, the wheel turned scrolls (shift: sideways, Ctrl: zoom),
 // arrows or hjkl step a row. A click on a window focuses it, on a workspace goes
-// there; a window dragged with Super held onto another workspace moves there,
+// there; a window dragged with the left button onto another workspace moves there,
 // the canvas scrolling by itself near the edges. Enter goes to
 // the workspace in the middle, Escape or a click on the dimmed screen closes.
 ScrimWindow {
   id: root
 
-  readonly property var monitor: Hyprland.focusedMonitor
+  property var sessionMonitor: null
+  readonly property var monitor: sessionMonitor ?? Hyprland.focusedMonitor
   readonly property real mw: (monitor?.width ?? 1920) / (monitor?.scale ?? 1)
   readonly property real mh: (monitor?.height ?? 1080) / (monitor?.scale ?? 1)
 
-  // canvas units are logical pixels; a row is one monitor and the gap is 80 of them
+  // Canvas units are logical pixels; each row is one monitor high.
   readonly property real gap: 90
   readonly property real pitch: mh + gap
   // floating windows overlap, so that mode gets the task view instead of the canvas
@@ -52,19 +54,10 @@ ScrimWindow {
   // first; and, like Niri, an empty one past each end that holds windows (the next
   // workspace to move a window to; ten at most)
   readonly property int activeId: monitor?.activeWorkspace?.id ?? 1
-  readonly property var rowIds: {
-    const ids = {};
-    ids[activeId] = true;
-    for (const t of Hyprland.toplevels.values) {
-      const w = t.workspace;
-      if (w && w.id > 0 && w.monitor === root.monitor) ids[w.id] = true;
-    }
-    const list = Object.keys(ids).map(Number).sort((x, y) => x - y);
-    const busy = id => Hyprland.toplevels.values.some(t => t.workspace?.id === id);
-    if (list[0] > 1 && busy(list[0])) list.unshift(list[0] - 1);
-    if (list[list.length - 1] < 10 && busy(list[list.length - 1])) list.push(list[list.length - 1] + 1);
-    return list;
-  }
+  // Freeze row identities for one overview session. If a move empties a workspace,
+  // removing that row can reset the Repeater and recreate every remaining preview.
+  property var sessionRows: []
+  readonly property var rowIds: sessionRows.length ? sessionRows : [activeId]
   readonly property int rowCount: rowIds.length
   // the view: the canvas point in the middle of the screen
   property real camX: 0
@@ -78,112 +71,301 @@ ScrimWindow {
   Behavior on camY { enabled: Motion.panels && root.glide; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
 
   function rowTop(i) { return i * pitch; }
-  function pan(dx, dy) { camX = Math.max(extent[0], Math.min(extent[1], camX + dx)); camY = Math.max(mh / 2 - pitch / 2, Math.min((rowCount - 1) * pitch + mh / 2 + pitch / 2, camY + dy)); }
+  function pan(dx, dy) {
+    camX = Math.max(extent[0], Math.min(extent[1], camX + dx));
+    const firstRowCentre = mh / 2;
+    const lastRowCentre = (rowCount - 1) * pitch + mh / 2;
+    camY = Math.max(firstRowCentre - pitch / 2, Math.min(lastRowCentre + pitch / 2, camY + dy));
+  }
   function step(dx, dy) { touched = true; glide = true; pan(dx, dy); }
   function drag(dx, dy) { touched = true; glide = false; pan(dx, dy); }
   // the wheel: Ctrl zooms; a touchpad gives pixels on both axes, a wheel notches
   // (Shift turns them sideways)
   function scroll(e) {
     if (taskView) return;
-    if (e.modifiers & Qt.ControlModifier) { zoomBy(e.angleDelta.y > 0 ? 1.1 : 1 / 1.1); return; }
+    if (e.modifiers & Qt.ControlModifier) {
+      zoomBy(e.angleDelta.y > 0 ? 1.1 : 1 / 1.1);
+      return;
+    }
     const smooth = e.pixelDelta.x !== 0 || e.pixelDelta.y !== 0;
     // a notch is 120 units: three of them carry a row across the screen's height
     const k = (smooth ? 1.5 : 3) * wheelSpeed;
     let dx = k * (smooth ? e.pixelDelta.x : e.angleDelta.x);
     let dy = k * (smooth ? e.pixelDelta.y : e.angleDelta.y);
-    if ((e.modifiers & Qt.ShiftModifier) && dx === 0) { dx = dy; dy = 0; }
+    if ((e.modifiers & Qt.ShiftModifier) && dx === 0) {
+      dx = dy;
+      dy = 0;
+    }
     touched = true;
     glide = !smooth;
     pan(-dx / zoom, -dy / zoom);
   }
-  function zoomBy(f) { touched = true; zoomLevel = Math.max(0.1, Math.min(1.6, zoomLevel * f)); }
+  function zoomBy(factor) {
+    touched = true;
+    zoomLevel = Math.max(0.1, Math.min(1.6, zoomLevel * factor));
+  }
 
-  // the widest stretch any row runs over (monitor coordinates): a scrolling row goes on
-  // past the screen, and the view is first set so that all of it shows
+  // ---- viewport geometry ----
+  // The full horizontal stretch of the overview, including a possible append slot.
   property bool touched: false
   readonly property var extent: {
     let lo = 0, hi = mw;
-    for (const t of Hyprland.toplevels.values) {
-      const ipc = t.lastIpcObject;
-      if (!ipc?.at || !ipc?.size || rowIds.indexOf(t.workspace?.id) < 0) continue;
-      const x = ipc.at[0] - (monitor?.x ?? 0);
-      lo = Math.min(lo, x);
-      hi = Math.max(hi, x + ipc.size[0]);
+    for (const w of displayWindows) {
+      lo = Math.min(lo, w.x); hi = Math.max(hi, w.x + w.width);
+    }
+    if (dragPhase === "dragging" && WindowsService.mode === "scrolling" && carriedWindow) {
+      for (const id of rowIds) {
+        const slot = OverviewLogic.appendSlot(displayWindows, id, carriedWindow, mw, mh, columnGap);
+        if (slot) hi = Math.max(hi, slot.x + slot.width);
+      }
     }
     return [lo, hi];
   }
   function fit() {
     const span = extent[1] - extent[0];
-    zoomLevel = Math.max(0.1, Math.min(1, width * 0.9 / (span * height * 0.42 / mh)));
     camX = (extent[0] + extent[1]) / 2;
+    if (width > 0 && height > 0) zoomLevel = Math.max(0.1, Math.min(1, width * 0.9 / (span * height * 0.42 / mh)));
   }
+  onWidthChanged: if (open && !touched) fit()
+  onHeightChanged: if (open && !touched) fit()
   // the windows' places arrive just after it opens: fit again until the view is touched
   onExtentChanged: if (open && !touched) fit();
-  function goTo(id) { open = false; Hypr.call("hl.dispatch(hl.dsp.focus({ workspace = " + id + " }))"); }
-  function focus(t) { open = false; Hypr.call("hl.dispatch(hl.dsp.focus({ window = \"" + Hypr.target(t) + "\" }))"); }
-  function moveTo(t, id) {
-    Hypr.call("hl.dispatch(hl.dsp.window.move({ workspace = " + id + ", window = \"" + Hypr.target(t) + "\", follow = false }))");
-    settle.restart();
+  function goTo(id) {
+    open = false;
+    Hypr.call("hl.dispatch(hl.dsp.focus({ workspace = " + id + " }))");
   }
-  // the layout settles a moment after a move, in two steps (the windows' places come from
-  // Hyprland, and the first reading can be the half-way one)
-  // Quickshell does not re-read a window's place when the layout moves it, so Hyprland's
-  // events about windows start the same settling as a drop does
+  function focus(t) {
+    if (!t) return;
+    open = false;
+    Hypr.call("hl.dispatch(hl.dsp.focus({ window = \"" + Hypr.target(t) + "\" }))");
+  }
+
+  // ---- window geometry snapshot ----
+  // One geometry snapshot drives both hit testing and the visible cards. During
+  // a drop it stays frozen until the compositor has finished its transaction.
+  property var displayWindows: []
+  ListModel { id: windowModel }
+  readonly property var displayRects: OverviewLogic.rectMap(displayWindows)
+  readonly property real columnGap: Math.max(2, WindowsService.opts.gapsIn * 2 + (WindowsService.opts.borders ? 4 : 0))
+  property string moveError: ""
+  function readWindows() {
+    const result = [];
+    for (const t of Hyprland.toplevels.values) {
+      const ipc = t.lastIpcObject;
+      if (t.workspace?.monitor !== monitor || t.workspace.id < 1 || !ipc?.at || !ipc?.size) continue;
+      result.push({ address: t.address, workspace: t.workspace.id,
+        x: ipc.at[0] - monitor.x, y: ipc.at[1] - monitor.y,
+        width: Math.max(1, ipc.size[0]), height: Math.max(1, ipc.size[1]), floating: ipc.floating === true });
+    }
+    return result;
+  }
+  function acceptGeometry(windows) {
+    displayWindows = windows;
+    const addresses = windows.map(w => w.address);
+    for (let i = windowModel.count - 1; i >= 0; i--) {
+      if (!addresses.includes(windowModel.get(i).address)) windowModel.remove(i);
+    }
+    const present = new Set();
+    for (let i = 0; i < windowModel.count; i++) present.add(windowModel.get(i).address);
+    for (const w of windows) if (!present.has(w.address)) windowModel.append({ address: w.address });
+    // Add newly needed rows at the ends, preserving existing row identities.
+    const next = OverviewLogic.rows(windows, activeId);
+    if (!sessionRows.length) sessionRows = next;
+    else {
+      const first = Math.min(sessionRows[0], next[0]);
+      const last = Math.max(sessionRows[sessionRows.length - 1], next[next.length - 1]);
+      const ids = [];
+      for (let id = first; id <= last; id++) ids.push(id);
+      if (ids.join() !== sessionRows.join()) sessionRows = ids;
+    }
+  }
+  signal settled()
+  Timer { id: captureTimer; interval: 120; onTriggered: root.settled() }
+  Timer {
+    id: geometryRefresh
+    interval: 45
+    onTriggered: { Hyprland.refreshToplevels(); geometryRead.restart(); }
+  }
+  Timer {
+    id: geometryRead
+    interval: 80
+    onTriggered: if (root.open && root.dragPhase === "") {
+      root.acceptGeometry(root.readWindows()); captureTimer.restart();
+    }
+  }
   Connections {
-    target: Hyprland
+    target: root.open ? Hyprland : null
     function onRawEvent(event) {
-      if (root.open && ["movewindowv2", "openwindow", "closewindow", "changefloatingmode", "fullscreen"].includes(event.name)) settle.restart();
+      if (root.dragPhase === "" && ["movewindowv2", "openwindow", "closewindow", "changefloatingmode", "fullscreen", "configreloaded"].includes(event.name)) geometryRefresh.restart();
     }
   }
 
-  // `settled` tells the windows' pictures to be taken again
-  signal settled()
-  Timer { id: settle; interval: 250; onTriggered: { Hyprland.refreshToplevels(); root.settled(); settleLate.restart(); } }
-  Timer { id: settleLate; interval: 500; onTriggered: { Hyprland.refreshToplevels(); root.settled(); } }
+  // ---- drag transaction ----
+  // idle -> dragging -> committing -> landing -> capturing -> releasing.
+  // Cancellation returns the same frozen picture to its source card.
+  property string dragPhase: ""
+  // Hyprland refuses focus(window) while an exclusive layer is present. The
+  // scrolling width dispatchers operate on the focused column, so release the
+  // keyboard until the compositor transaction has finished. Keep the pointer
+  // surface and the overview itself in place throughout.
+  WlrLayershell.keyboardFocus: open && dragPhase !== "committing"
+    ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+  property string carriedAddress: ""
+  property var carriedCard: null
+  property var carriedWindow: null
+  property point dragPos: Qt.point(0, 0)
+  property point dragGrab: Qt.point(0, 0)
+  property size dragTextureSize: Qt.size(1, 1)
+  readonly property point dragWorld: Qt.point((dragPos.x - world.x) / zoom, (dragPos.y - world.y) / zoom)
+  readonly property var dropIntent: dragPhase === "dragging"
+    ? OverviewLogic.intent(displayWindows, rowIds, carriedWindow, dragWorld, mw, mh, pitch, columnGap,
+        WindowsService.mode === "scrolling", WindowsService.opts.mfact, WindowsService.opts.newStatus === "master") : null
+  property var pendingDrop: null
+  property real phaseStarted: 0
+  property string lastGeometryKey: ""
+  property int stableSamples: 0
+  readonly property bool dropping: ["landing", "capturing", "releasing", "returning"].includes(dragPhase)
+  readonly property var landingRect: displayRects[carriedAddress] ?? carriedWindow
 
-  // Super + left drag of a window: it follows the pointer, and the canvas scrolls
-  // by itself when the pointer is near an edge, so a far workspace can be reached
-  property var dragged: null
-  property point dragPos: Qt.point(0, 0)   // the pointer, in the canvas's own coordinates
-  function placeDragged() {
-    const w = dragged;
-    if (!w) return;
-    w.x = (dragPos.x - world.x) / zoom - w.width / 2;
-    w.y = (dragPos.y - world.y) / zoom - w.parent.y - w.height / 2;
+  function beginDrag(card, x, y) {
+    if (!card || dragPhase !== "" || moveProcess.running || !displayRects[card.address]) return false;
+    touched = true; glide = false; moveError = "";
+    geometryRefresh.stop(); geometryRead.stop(); captureTimer.stop();
+    carriedWindow = Object.assign({}, displayRects[card.address]);
+    carriedCard = card; carriedAddress = card.address;
+    dragGrab = Qt.point(x, y);
+    dragPos = card.mapToItem(canvas, x, y);
+    dragTextureSize = Qt.size(Math.max(1, Math.ceil(card.width * zoom)), Math.max(1, Math.ceil(card.height * zoom)));
+    dragPhase = "dragging";
+    dragImage.scheduleUpdate();
+    return true;
   }
-
-  // near an edge the canvas scrolls towards it, faster the closer the pointer is
+  function resetDrag() {
+    dragPhase = ""; carriedAddress = ""; carriedCard = null; carriedWindow = null; pendingDrop = null;
+    lastGeometryKey = ""; stableSamples = 0;
+  }
+  function stopSessionTimers() {
+    geometryRefresh.stop(); geometryRead.stop(); captureTimer.stop();
+    dispatchTimer.stop(); landingTimer.stop(); releaseTimer.stop();
+  }
+  function cancelDrag() {
+    if (dragPhase !== "dragging") return;
+    dragPhase = "returning";
+    landingTimer.restart();
+  }
+  function releaseDrag() {
+    if (dragPhase !== "dragging") return;
+    if (!dropIntent) { cancelDrag(); return; }
+    pendingDrop = Object.assign({}, dropIntent);
+    dragPhase = "committing"; phaseStarted = Date.now();
+    lastGeometryKey = ""; stableSamples = 0;
+    moveProcess.command = ["hyprctl", "eval", OverviewLogic.moveCommand(carriedWindow, pendingDrop, displayWindows, WindowsService.mode === "scrolling")];
+    // Give the layer-surface commit a turn to reach the compositor before its
+    // focus dispatchers run. moveCommand also checks that focus really changed.
+    dispatchTimer.restart();
+  }
+  function sampleCommitGeometry() {
+    Hyprland.refreshToplevels();
+    const windows = readWindows();
+    const moved = windows.find(window => window.address === carriedAddress);
+    const key = OverviewLogic.geometryKey(windows);
+    stableSamples = key === lastGeometryKey ? stableSamples + 1 : 0;
+    lastGeometryKey = key;
+    if (dispatchTimer.running || moveProcess.running) return;
+    if (moved?.workspace === pendingDrop.workspace && (stableSamples >= 2 || Date.now() - phaseStarted > 1600)) {
+      acceptGeometry(windows);
+      dragPhase = "landing";
+      landingTimer.restart();
+    } else if (Date.now() - phaseStarted > 2000) {
+      moveError = "Could not move window";
+      acceptGeometry(windows);
+      dragPhase = "returning";
+      landingTimer.restart();
+    }
+  }
+  function finishPreviewCaptureIfReady() {
+    if (Date.now() - phaseStarted <= 80
+      || !(carriedCard?.previewReady || Date.now() - phaseStarted > 800)) return;
+    dragPhase = "releasing";
+    releaseTimer.restart();
+  }
+  Timer {
+    id: dispatchTimer
+    interval: 50
+    onTriggered: if (root.open && root.dragPhase === "committing") moveProcess.running = true
+  }
+  Process {
+    id: moveProcess
+    stdout: StdioCollector { id: moveOutput }
+    stderr: StdioCollector { id: moveErrors }
+    onExited: (code, exitStatus) => {
+      if (root.dragPhase !== "committing") return;
+      if (code !== 0) {
+        root.moveError = "Could not move window";
+        console.warn("Overview move:", moveOutput.text, moveErrors.text);
+        root.dragPhase = "returning"; landingTimer.restart();
+      }
+    }
+  }
+  Timer {
+    interval: 60
+    repeat: true
+    running: root.open && root.dragPhase === "committing"
+    onTriggered: root.sampleCommitGeometry()
+  }
+  Timer {
+    id: landingTimer
+    interval: (Motion.panels ? Motion.normal : 0) + 30
+    onTriggered: {
+      if (root.dragPhase === "returning") { root.resetDrag(); geometryRefresh.restart(); return; }
+      if (root.dragPhase !== "landing") return;
+      root.settled(); root.phaseStarted = Date.now(); root.dragPhase = "capturing";
+    }
+  }
+  Timer {
+    interval: 40
+    repeat: true
+    running: root.open && root.dragPhase === "capturing"
+    onTriggered: root.finishPreviewCaptureIfReady()
+  }
+  Timer { id: releaseTimer; interval: Motion.panels ? Motion.quick : 0; onTriggered: root.resetDrag() }
+  // Time-based auto-pan: no permanent frame timer and no speed change with FPS.
   Timer {
     interval: 16
     repeat: true
-    running: root.dragged !== null
+    running: root.open && root.dragPhase === "dragging"
+    property real lastTick: 0
+    onRunningChanged: lastTick = Date.now()
     onTriggered: {
-      const m = Math.min(canvas.width, canvas.height) * 0.14;
-      const edge = (v, size) => v < m ? -Math.min(1, 1 - v / m) : v > size - m ? Math.min(1, (v - (size - m)) / m) : 0;
-      const ex = edge(root.dragPos.x, canvas.width), ey = edge(root.dragPos.y, canvas.height);
-      if (ex === 0 && ey === 0) return;
-      root.drag(ex * 32 / root.zoom, ey * 32 / root.zoom);
-      root.placeDragged();
+      if (!root.carriedCard || !root.carriedCard.modelData) { root.resetDrag(); return; }
+      const now = Date.now(), dt = Math.min(0.05, (now - lastTick) / 1000); lastTick = now;
+      const margin = Math.min(canvas.width, canvas.height) * 0.12;
+      const edge = (v, size) => v < margin ? -Math.min(1, 1 - v / margin) : v > size - margin ? Math.min(1, (v - size + margin) / margin) : 0;
+      const dx = edge(root.dragPos.x, canvas.width), dy = edge(root.dragPos.y, canvas.height);
+      if (dx || dy) root.drag(dx * 900 * dt / root.zoom, dy * 900 * dt / root.zoom);
     }
   }
 
-  // Hyprland's Super + mouse binds (drag, resize a window) stand down while this is
-  // open: they would reach the windows under it (hypr/components/keybinds.lua)
   onOpenChanged: {
     Hypr.call("MouseBinds(" + !open + ")");
-    if (!open) return;
+    if (!open) {
+      resetDrag();
+      stopSessionTimers();
+      return;
+    }
+    sessionMonitor = Hyprland.focusedMonitor;
+    sessionRows = [];
+    acceptGeometry(readWindows());
     intro = Motion.panels ? 0 : 1;
     if (Motion.panels) introAnim.restart();
     const active = Math.max(0, rowIds.indexOf(activeId));
-    glide = false;
-    touched = false;
-    fit();
-    camY = mh / 2 + active * pitch;
-    tasks.reset();
-    Hyprland.refreshToplevels();
+    glide = false; touched = false; moveError = "";
+    fit(); camY = mh / 2 + active * pitch;
+    Qt.callLater(() => { if (tasksLoader.item) tasksLoader.item.reset(); });
+    geometryRefresh.restart();
     canvas.forceActiveFocus();
   }
-  // a shell that died with it open leaves them off: back on at start
+  onVisibleChanged: if (!visible) { windowModel.clear(); displayWindows = []; sessionRows = []; sessionMonitor = null; }
   Component.onCompleted: Hypr.call("MouseBinds(true)")
 
   // the wallpaper awww draws under the windows: this monitor's own picture or the theme's
@@ -209,16 +391,16 @@ ScrimWindow {
     id: canvas
     anchors.fill: parent
     focus: true
-    Keys.onUpPressed: root.taskView ? tasks.moveWin(0, -1) : root.step(0, -root.pitch)
-    Keys.onDownPressed: root.taskView ? tasks.moveWin(0, 1) : root.step(0, root.pitch)
-    Keys.onLeftPressed: root.taskView ? tasks.moveDesk(-1) : root.step(-root.mw / 2, 0)
-    Keys.onRightPressed: root.taskView ? tasks.moveDesk(1) : root.step(root.mw / 2, 0)
+    Keys.onUpPressed: root.taskView ? tasksLoader.item?.moveWin(0, -1) : root.step(0, -root.pitch)
+    Keys.onDownPressed: root.taskView ? tasksLoader.item?.moveWin(0, 1) : root.step(0, root.pitch)
+    Keys.onLeftPressed: root.taskView ? tasksLoader.item?.moveDesk(-1) : root.step(-root.mw / 2, 0)
+    Keys.onRightPressed: root.taskView ? tasksLoader.item?.moveDesk(1) : root.step(root.mw / 2, 0)
     Keys.onPressed: event => {
       if (root.taskView) {
-        if (event.key === Qt.Key_H) tasks.moveWin(-1, 0);
-        else if (event.key === Qt.Key_L) tasks.moveWin(1, 0);
-        else if (event.key === Qt.Key_K) tasks.moveWin(0, -1);
-        else if (event.key === Qt.Key_J) tasks.moveWin(0, 1);
+        if (event.key === Qt.Key_H) tasksLoader.item?.moveWin(-1, 0);
+        else if (event.key === Qt.Key_L) tasksLoader.item?.moveWin(1, 0);
+        else if (event.key === Qt.Key_K) tasksLoader.item?.moveWin(0, -1);
+        else if (event.key === Qt.Key_J) tasksLoader.item?.moveWin(0, 1);
         else return;
         event.accepted = true;
         return;
@@ -232,8 +414,8 @@ ScrimWindow {
       else return;
       event.accepted = true;
     }
-    Keys.onReturnPressed: root.taskView ? tasks.pick() : root.goTo(root.centreId)
-    Keys.onEscapePressed: root.open = false
+    Keys.onReturnPressed: root.taskView ? tasksLoader.item?.pick() : root.goTo(root.centreId)
+    Keys.onEscapePressed: root.dragPhase === "dragging" ? root.cancelDrag() : root.open = false
 
 
     // the wallpaper, dimmed: it hides the windows behind, so only the overview shows.
@@ -321,19 +503,20 @@ ScrimWindow {
       KitText {
         id: hints
         anchors.centerIn: parent
-        text: root.taskView ? "←→ workspace  ·  ↑↓ hjkl window  ·  Enter open  ·  Esc close"
-                            : "Hold the wheel to pan  ·  Super + drag a window to a workspace  ·  ↑↓ workspaces  ·  + − zoom  ·  Enter open  ·  Esc close"
+        text: root.moveError !== "" ? root.moveError : root.taskView ? "←→ workspace  ·  ↑↓ hjkl window  ·  Enter open  ·  Esc close"
+                            : "Hold the wheel to pan  ·  Drag a window to a workspace  ·  ↑↓ workspaces  ·  + − zoom  ·  Enter open  ·  Esc close"
         color: Theme.muted
         font.pixelSize: Theme.fontSize - 2
       }
     }
 
-    TaskView {
-      id: tasks
+    Loader {
+      id: tasksLoader
       z: 1
       anchors.fill: parent
-      visible: root.taskView
-      overview: root
+      active: root.visible && root.taskView
+      sourceComponent: Component { TaskView { overview: root } }
+      onLoaded: item.reset()
     }
 
     // the canvas: rows of workspaces and the windows on them, panned and zoomed
@@ -346,194 +529,187 @@ ScrimWindow {
       y: canvas.height / 2 - root.camY * root.zoom
 
       Repeater {
-        model: root.rowCount
-
+        model: root.visible && !root.taskView ? root.rowCount : 0
         Item {
           id: space
           required property int index
           readonly property int wsId: root.rowIds[index]
-          readonly property bool active: root.monitor?.activeWorkspace?.id === wsId
-          // the row's windows: the list is replaced only when the set changes, not at every
-          // change of a title or a place, which would remake each window and its picture
-          property var wins: []
-          readonly property string winKey: Hyprland.toplevels.values.filter(t => t.workspace?.id === wsId).map(t => t.address).join(",")
-          onWinKeyChanged: wins = Hyprland.toplevels.values.filter(t => t.workspace?.id === wsId)
-          Component.onCompleted: wins = Hyprland.toplevels.values.filter(t => t.workspace?.id === wsId)
-
-          // comes in with the opening: later the further it is from the row in the middle
+          readonly property var windows: OverviewLogic.members(root.displayWindows, wsId, "")
+          readonly property var append: root.dragPhase === "dragging" && WindowsService.mode === "scrolling" && root.carriedWindow
+            ? OverviewLogic.appendSlot(root.displayWindows, wsId, root.carriedWindow, root.mw, root.mh, root.columnGap) : null
+          readonly property bool targetRow: root.dropIntent?.workspace === wsId
           readonly property real appear: Math.max(0, Math.min(1, root.intro * 1.8 - Math.abs(index - root.centreIndex) * 0.25))
-          property real dimLevel: !root.dimOthers || wsId === root.centreId ? 1 : 0.45
-          Behavior on dimLevel { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
-
           y: root.rowTop(index) + (1 - appear) * 80
-          // the row of the window being dragged stays above the others
-          z: root.dragged && root.dragged.parent === space ? 1 : 0
           width: root.mw
           height: root.mh
-          // the row in the middle is the one Enter opens; the others step back
-          opacity: dimLevel * appear
-
-          // the workspace's own area: a click goes there, a drop moves a window
-          // no tile: the windows lie on the dimmed screen. An empty workspace is drawn as
-          // a screen, so it can be seen and dropped on; any row lights under a dragged window
+          opacity: appear
           Rectangle {
-            readonly property bool empty: space.wins.length === 0
-            radius: Theme.radiusCard / root.zoom
             anchors.fill: parent
-            color: drop.containsDrag ? Theme.background2 : empty ? Theme.background1 : "transparent"
-            border.width: (drop.containsDrag ? Theme.ring : empty ? Theme.hairline : 0) / root.zoom
-            border.color: drop.containsDrag ? Theme.foreground0 : Theme.gray
-            Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
+            radius: Theme.radiusCard / root.zoom
+            color: space.windows.length ? Theme.clear : Theme.background1
+            border.width: space.targetRow && root.dropIntent.kind === "join" ? Theme.ring / root.zoom : space.windows.length ? 0 : Theme.hairline / root.zoom
+            border.color: space.targetRow ? Theme.foreground0 : Theme.gray
           }
-
-          // above the row: its number and what is on it
           KitText {
-            x: 8
-            y: -root.gap * 0.7
-            text: space.wsId + "   ·   " + (space.wins.length === 0 ? "Empty" : space.wins.length + (space.wins.length === 1 ? " window" : " windows"))
-            color: space.wsId === root.centreId ? Theme.foreground0 : Theme.muted
+            x: 8; y: -root.gap * 0.7
+            text: space.wsId + "   ·   " + (space.windows.length ? space.windows.length + (space.windows.length === 1 ? " window" : " windows") : "Empty")
+            color: space.targetRow || space.wsId === root.centreId ? Theme.foreground0 : Theme.muted
             font.pixelSize: 36
             font.letterSpacing: 2
-            Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal } }
           }
+          MouseArea { anchors.fill: parent; onClicked: root.goTo(space.wsId) }
+          Rectangle {
+            visible: space.append !== null
+            x: space.append?.x ?? 0; y: space.append?.y ?? 0
+            width: space.append?.width ?? 0; height: space.append?.height ?? 0
+            radius: Theme.radiusControl
+            color: Theme.background1
+            opacity: space.targetRow && root.dropIntent?.kind === "append" ? 0.9 : 0.45
+            border.width: Theme.ring / root.zoom
+            border.color: space.targetRow && root.dropIntent?.kind === "append" ? Theme.foreground0 : Theme.gray
+            Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+            KitText { anchors.centerIn: parent; text: "New column"; color: Theme.muted; font.pixelSize: 30 }
+          }
+        }
+      }
 
-          MouseArea {
+      // A single model owns every card. Changing workspaces never destroys a
+      // card, its mouse grab or its captured frame.
+      Repeater {
+        model: root.visible && !root.taskView ? windowModel : null
+        ClippingRectangle {
+          id: win
+          required property string address
+          readonly property var modelData: Hyprland.toplevels.values.find(t => t.address === address) ?? null
+          readonly property var geometry: root.displayRects[address]
+          readonly property int row: root.rowIds.indexOf(geometry?.workspace ?? -1)
+          readonly property bool carried: root.carriedAddress === address
+          readonly property real appear: Math.max(0, Math.min(1, root.intro * 1.8 - Math.abs(row - root.centreIndex) * 0.25))
+          readonly property bool previewReady: !root.previews || (shot.hasContent && Math.abs(shot.sourceSize.width / Math.max(1, shot.sourceSize.height) - width / Math.max(1, height)) < 0.02)
+          property alias picture: picture
+          z: 2
+          visible: row >= 0 && geometry !== undefined
+          // Hovering a destination only highlights its slot. Reflow starts once
+          // the drop is confirmed, so passing across a row cannot squeeze it.
+          x: geometry?.x ?? 0
+          y: root.rowTop(Math.max(0, row)) + (geometry?.y ?? 0) + (1 - appear) * 80
+          width: geometry?.width ?? 1
+          height: geometry?.height ?? 1
+          radius: Theme.radiusControl
+          opacity: carried && root.dragPhase !== "releasing" ? 0 : appear * (root.dimOthers && geometry?.workspace !== root.centreId && root.dropIntent?.workspace !== geometry?.workspace ? 0.45 : 1)
+          color: Theme.background2
+          border.width: (Hyprland.activeToplevel === modelData || hover.containsMouse ? Theme.ring : Theme.hairline) / root.zoom
+          border.color: Hyprland.activeToplevel === modelData || hover.containsMouse ? Theme.foreground0 : Theme.gray
+          Behavior on x { enabled: Motion.panels && root.intro === 1; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+          Behavior on y { enabled: Motion.panels && root.intro === 1; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+          Behavior on width { enabled: Motion.panels; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+          Behavior on height { enabled: Motion.panels; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+          Behavior on opacity { enabled: Motion.controls && (!win.carried || root.dragPhase === "releasing"); NumberAnimation { duration: Motion.quick } }
+
+          Item {
+            id: picture
             anchors.fill: parent
-            onClicked: root.goTo(space.wsId)
-          }
-
-          DropArea {
-            id: drop
-            anchors.fill: parent
-            onDropped: drag => { if (drag.source.homeId !== space.wsId) root.moveTo(drag.source.toplevel, space.wsId); }
-          }
-
-          // windows at their real place: a scrolling column may run past the edge
-          Repeater {
-            model: space.wins
-
-            ClippingRectangle {
-              radius: Theme.radiusControl
-              id: win
-              required property var modelData
-              readonly property var toplevel: modelData
-              readonly property int homeId: space.wsId
-              readonly property var ipc: modelData.lastIpcObject ?? {}
-              readonly property real wx: (ipc.at?.[0] ?? 0) - (root.monitor?.x ?? 0)
-              readonly property real wy: (ipc.at?.[1] ?? 0) - (root.monitor?.y ?? 0)
-
-              x: wx
-              y: wy
-              width: ipc.size?.[0] ?? 0
-              height: ipc.size?.[1] ?? 0
-              color: Theme.background2
-              readonly property bool focused: Hyprland.activeToplevel === modelData
-              border.width: (focused ? Theme.ring : Theme.hairline) / root.zoom
-              border.color: focused || hover.containsMouse ? Theme.foreground0 : Theme.gray
-              Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
-              Drag.active: root.dragged === win
-              Drag.source: win
-              Drag.hotSpot.x: width / 2
-              Drag.hotSpot.y: height / 2
-
-              // a little forward under the pointer, more while carried; its place glides
-              // when the layout changes or when it is let go
-              scale: root.dragged === win ? 1.03 : hover.containsMouse ? 1.012 : 1
-              Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
-              Behavior on x { enabled: Motion.controls && root.dragged !== win; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
-              Behavior on y { enabled: Motion.controls && root.dragged !== win; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
-
-              ScreencopyView {
-                id: shot
-                anchors.fill: parent
-                anchors.margins: 1
-                // asked for a moment after the window appears here, not in the same frame (a
-                // picture requested at once, for a window just made, never comes); kept while
-                // the screen fades out: the picture would give way to the icon
-                property bool armed: false
-                Timer { interval: 120; running: true; onTriggered: shot.armed = true }
-                captureSource: armed && root.visible && root.previews ? win.modelData.wayland : null
-                live: false
-
-                // after a move settles the picture is taken again, at the window's new size
-                Connections { target: root; function onSettled() { if (root.previews && shot.armed) shot.captureFrame(); } }
-              }
-
-              // a window past the screen's edge is not drawn, so it has no picture:
-              // its icon and title stand in
-              Column {
-                anchors.centerIn: parent
-                width: parent.width - 80
-                spacing: 24
-                visible: root.open && !shot.hasContent
-
-                Image {
-                  anchors.horizontalCenter: parent.horizontalCenter
-                  width: 200
-                  height: 200
-                  sourceSize: Qt.size(200, 200)
-                  source: Hypr.iconOf(win.modelData)
-                  asynchronous: true
-                }
-                KitText {
-                  width: parent.width
-                  horizontalAlignment: Text.AlignHCenter
-                  text: win.modelData.title
-                  color: Theme.muted
-                  font.pixelSize: 34
-                  elide: Text.ElideRight
-                }
-              }
-
-              // the app's name, like a title bar
-              Rectangle {
-                x: 16
-                y: 16
-                width: cap.implicitWidth + 24
-                height: cap.implicitHeight + 12
-                radius: Theme.pill(height)
-                color: Theme.scrim
-                visible: root.names && Hypr.classOf(win.modelData) !== ""
-
-                KitText {
-                  id: cap
-                  anchors.centerIn: parent
-                  text: Hypr.classOf(win.modelData)
-                  color: win.focused ? Theme.foreground0 : Theme.muted
-                  font.pixelSize: 26
-                  font.letterSpacing: 1
-                }
-              }
-
-              MouseArea {
-                id: hover
-                anchors.fill: parent
-                hoverEnabled: true
-                // a click opens the window; with Super held the left button carries it
-                property bool moving: false
-                // set once the window is carried: letting go is not a click on it
-                property bool carried: false
-                cursorShape: moving ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-                onPressed: mouse => { moving = (mouse.modifiers & Qt.MetaModifier) !== 0; carried = false; }
-                onClicked: if (!moving && !carried) root.focus(win.toplevel)
-                onPositionChanged: mouse => {
-                  if (!moving || !pressed) return;
-                  carried = true;
-                  root.dragPos = hover.mapToItem(canvas, mouse.x, mouse.y);
-                  root.dragged = win;
-                  root.placeDragged();
-                }
-                onReleased: {
-                  if (root.dragged === win) {
-                    win.Drag.drop();
-                    root.dragged = null;
-                    win.x = Qt.binding(() => win.wx);
-                    win.y = Qt.binding(() => win.wy);
-                  }
-                  moving = false;
-                }
-              }
+            anchors.margins: 1
+            clip: true
+            ScreencopyView {
+              id: shot
+              anchors.left: parent.left
+              anchors.top: parent.top
+              // Crop a frozen frame while its tile changes shape, rather than
+              // stretching the application. Its next frame has the new layout.
+              readonly property real aspect: sourceSize.width / Math.max(1, sourceSize.height)
+              width: hasContent ? Math.max(parent.width, parent.height * aspect) : parent.width
+              height: hasContent ? width / Math.max(0.01, aspect) : parent.height
+              captureSource: root.visible && root.previews && win.visible ? win.modelData?.wayland ?? null : null
+              live: false
+              Connections { target: root; function onSettled() { if (root.previews && win.visible) shot.captureFrame(); } }
             }
+            Column {
+              anchors.centerIn: parent
+              width: Math.max(1, parent.width - 80)
+              spacing: 24
+              visible: !shot.hasContent
+              Image { anchors.horizontalCenter: parent.horizontalCenter; width: 160; height: 160; sourceSize: Qt.size(160, 160); source: win.modelData ? Hypr.iconOf(win.modelData) : ""; asynchronous: true }
+              KitText { width: parent.width; horizontalAlignment: Text.AlignHCenter; text: win.modelData?.title ?? ""; color: Theme.muted; font.pixelSize: 34; elide: Text.ElideRight }
+            }
+          }
+          Rectangle {
+            x: 16; y: 16
+            width: Math.min(cap.implicitWidth + 28, win.width - 32)
+            height: cap.implicitHeight + 12
+            radius: Theme.pill(height)
+            color: Theme.scrim
+            visible: root.names && win.modelData !== null && Hypr.classOf(win.modelData) !== ""
+            KitText { id: cap; anchors.centerIn: parent; width: parent.width - 28; text: win.modelData ? Hypr.classOf(win.modelData) : ""; color: Theme.muted; font.pixelSize: 26; elide: Text.ElideRight }
+          }
+          MouseArea {
+            id: hover
+            anchors.fill: parent
+            hoverEnabled: true
+            enabled: root.open && (root.dragPhase === "" || win.carried && root.dragPhase === "dragging")
+            cursorShape: win.carried ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+            property point pressPos: Qt.point(0, 0)
+            property bool carried: false
+            onPressed: mouse => { pressPos = Qt.point(mouse.x, mouse.y); carried = false; }
+            onClicked: if (!carried) root.focus(win.modelData)
+            onPositionChanged: mouse => {
+              if (!pressed) return;
+              if (!carried) {
+                const dx = mouse.x - pressPos.x, dy = mouse.y - pressPos.y;
+                if (dx * dx + dy * dy < Qt.styleHints.startDragDistance ** 2) return;
+                carried = root.beginDrag(win, pressPos.x, pressPos.y);
+              }
+              if (carried) root.dragPos = hover.mapToItem(canvas, mouse.x, mouse.y);
+            }
+            onReleased: if (carried) root.releaseDrag()
+            onCanceled: if (carried) root.cancelDrag()
+          }
+        }
+      }
+
+      Rectangle {
+        z: 1
+        visible: root.dropIntent?.kind === "join" && root.dropIntent.existing !== undefined
+        x: root.dropIntent?.x ?? 0
+        y: root.rowTop(root.rowIds.indexOf(root.dropIntent?.workspace ?? -1)) + (root.dropIntent?.y ?? 0)
+        width: root.dropIntent?.width ?? 0; height: root.dropIntent?.height ?? 0
+        radius: Theme.radiusControl
+        color: Theme.background1
+        border.width: Theme.ring / root.zoom
+        border.color: Theme.foreground0
+      }
+
+      ClippingRectangle {
+        z: 10
+        visible: root.carriedWindow !== null
+        x: root.dropping && root.landingRect ? root.landingRect.x : root.dragWorld.x - root.dragGrab.x
+        y: root.dropping && root.landingRect ? root.rowTop(root.rowIds.indexOf(root.landingRect.workspace)) + root.landingRect.y : root.dragWorld.y - root.dragGrab.y
+        width: root.dropping && root.landingRect ? root.landingRect.width : root.carriedWindow?.width ?? 1
+        height: root.dropping && root.landingRect ? root.landingRect.height : root.carriedWindow?.height ?? 1
+        radius: Theme.radiusControl
+        opacity: root.dragPhase === "releasing" ? 0 : 1
+        color: Theme.background2
+        border.width: Theme.ring / root.zoom
+        border.color: Theme.foreground0
+        Behavior on x { enabled: Motion.panels && root.dropping; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+        Behavior on y { enabled: Motion.panels && root.dropping; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+        Behavior on width { enabled: Motion.panels && root.dropping; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+        Behavior on height { enabled: Motion.panels && root.dropping; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
+        Behavior on opacity { enabled: Motion.panels; NumberAnimation { duration: Motion.quick } }
+        Item {
+          anchors.fill: parent
+          anchors.margins: 1
+          clip: true
+          ShaderEffectSource {
+            id: dragImage
+            anchors.left: parent.left
+            anchors.top: parent.top
+            readonly property real aspect: (root.carriedWindow?.width ?? 1) / Math.max(1, root.carriedWindow?.height ?? 1)
+            width: Math.max(parent.width, parent.height * aspect)
+            height: width / aspect
+            sourceItem: root.carriedCard?.picture ?? null
+            textureSize: root.dragTextureSize
+            live: false
           }
         }
       }

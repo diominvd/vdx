@@ -15,6 +15,7 @@ commit", "Before a push"): [repo/commits.md](../repo/commits.md) — not repeate
 | `./install.py check components` | the catalog against the repo and pacman |
 | `ruff check` | Python lint (`ruff.toml`) |
 | `python tests/check_shell_ui.py` | offscreen QML behaviour: shared controls, keyboard, disabled/busy states, inline selects, grouping, layout copies and backend reply parsing |
+| `python -m unittest tests.test_overview` | Overview: workspace gaps, wide/narrow insertion slots, shared placement, Lua width policy and focus restoration, production QML drag/cancel/drop/failure and card lifetime with an isolated compositor stub |
 | `python -m unittest tests.test_files_actions` | production FilesActions with real Quickshell child processes, an isolated runtime and a fake backend: FIFO, reply isolation, failure, cancellation and completion reentrancy |
 | `python -m unittest tests.test_capture_recorder` | production recorder lifecycle offscreen, with a fake recorder: delayed cancellation, request snapshots, overlap guards, output verification, pause/resume and restart |
 | `python -m unittest tests.test_capture_save tests.test_capture_saver tests.test_capture_clipboard` | Save as backend, production model and clipboard phase: retry, replacement confirmation, queued requests, discard, cross-filesystem copies and partial-output cleanup, all in temporary directories |
