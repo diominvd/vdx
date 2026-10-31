@@ -1358,7 +1358,7 @@
  },
  {
   "label": "Background",
-  "hint": "Wallpaper: as in Appearance. Blurred: the desktop",
+  "hint": "Appearance wallpaper or desktop blur",
   "where": "Lock screen › LOOK",
   "target": "lockscreen"
  },
@@ -2305,6 +2305,18 @@
   "label": "Timer",
   "hint": "Countdown and stopwatch",
   "where": "Bar modules",
+  "target": "modules:timer"
+ },
+ {
+  "label": "Countdown presets",
+  "hint": "",
+  "where": "Bar modules › Timer",
+  "target": "modules:timer"
+ },
+ {
+  "label": "Add a preset",
+  "hint": "Enter a duration in minutes (1–1440)",
+  "where": "Bar modules › Timer › COUNTDOWN PRESETS",
   "target": "modules:timer"
  },
  {

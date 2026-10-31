@@ -20,8 +20,9 @@ KitColumn {
   KitLabel { text: "LOOK" }
 
   KitOptionRow {
+    wide: false
     module: "lock"; key: "background"; fallback: "solid"
-    label: "Background"; hint: "Wallpaper: as in Appearance. Blurred: the desktop"
+    label: "Background"; hint: "Appearance wallpaper or desktop blur"
     model: [{ label: "Solid", value: "solid" }, { label: "Wallpaper", value: "wallpaper" }, { label: "Blurred", value: "blur" }]
   }
 

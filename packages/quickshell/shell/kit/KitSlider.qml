@@ -270,7 +270,7 @@ Item {
     width: Math.max(0, parent.width - x)
     height: parent.height
     radius: Theme.radiusControl
-    color: Theme.background3
+    color: Theme.fillOn(root.boxed)
   }
 
   Rectangle {

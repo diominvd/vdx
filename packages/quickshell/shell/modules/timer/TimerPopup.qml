@@ -13,6 +13,12 @@ KitFrame {
   readonly property string shown: TimerService.active ? TimerService.kind : tab
   readonly property color tone: Theme.accentFor("modules", Theme.orange)
 
+  function presetText(minutes) {
+    if (minutes < 60) return minutes + " min";
+    const hours = Math.floor(minutes / 60), rest = minutes % 60;
+    return hours + " h" + (rest > 0 ? " " + rest + " min" : "");
+  }
+
   implicitWidth: 320
 
   // ---- header ----
@@ -66,13 +72,14 @@ KitFrame {
       }
     }
     Flow {
+      visible: TimerService.presets.length > 0
       width: parent.width
       spacing: Theme.gapSmall
       Repeater {
         model: TimerService.presets
         KitButton {
           required property int modelData
-          text: modelData + " min"
+          text: root.presetText(modelData)
           selected: root.minutes === modelData
           onClicked: root.minutes = modelData
         }

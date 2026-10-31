@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 
 // Timer: one countdown or one stopwatch at a time. The bar module, the hub's
 // tile and the island's live slot read it; `now` ticks only while it runs.
@@ -13,8 +14,9 @@ Singleton {
   // ---- tuning ----
   readonly property int countdownTickMs: 250
   readonly property int stopwatchTickMs: 50
-  readonly property var presets: [1, 5, 10, 15, 25, 45]     // minutes
-  readonly property int maxMinutes: 60                      // the ruler's span
+  readonly property var presets: (ModuleSettings.get("timer", "presets", []) ?? [])
+    .filter(minutes => Number.isInteger(minutes) && minutes > 0 && minutes <= maxMinutes)
+  readonly property int maxMinutes: 1440                    // 24 hours
 
   // ---- state ----
   property string kind: ""                    // "" | countdown | stopwatch

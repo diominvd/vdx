@@ -159,8 +159,8 @@ Column {
           visible: root.module !== null && BarLayout.installed(root.selected) && root.selected !== "folder"
           readonly property string place: BarLayout.placeOf(root.selected, BarLayout.mainScreen())
           label: place !== "" ? "On the bar" : "Not on the bar"
-          hint: place !== "" ? place : "Its options apply once you place it"
-          KitButton { text: placeRow.place !== "" ? "Move…" : "Place it"; onClicked: root.navigate("bar", "layout") }
+          hint: place !== "" ? (place === "In the hub, as a chip" ? "Hub chip" : place) : "Place to use its options"
+          KitButton { width: Theme.controlWidth; text: placeRow.place !== "" ? "Move…" : "Place it"; onClicked: root.navigate("bar", "layout") }
         }
 
         // its components are off on this machine: nothing to set until installed

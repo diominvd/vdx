@@ -11,6 +11,7 @@ Rectangle {
   property string icon: ""             // kit/icons name, before the text
   property alias text: textInput.text
   property alias input: textInput
+  property alias validator: textInput.validator
   // the field's own mode; a password has an eye at its right end that shows the text as typed
   // (the layout stays that of a password while it shows)
   property int echoMode: TextInput.Normal
