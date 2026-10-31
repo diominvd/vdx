@@ -9,7 +9,7 @@ import qs.kit
 // The saved screenshots and recordings: a searchable, sortable file list on the
 // left; the selected file on the right with a preview and what to do with it.
 // A row's click selects it; the buttons of the preview act on it. It fills
-// the window: the label, the search and the heads stay, only the rows scroll.
+// the window: the label, the search and the heads stay; the list and preview scroll.
 Item {
   id: root
 
@@ -128,6 +128,7 @@ Item {
     const item = items.find(i => i.path === path);
     if (item && item.video) probe.path = path;
   }
+  onSelectedPathChanged: preview.contentY = 0
 
   Timer {
     id: confirmTimer
@@ -317,15 +318,20 @@ Item {
     anchors { top: parent.top; right: parent.right; bottom: parent.bottom }
     width: Math.min(root.previewWidth, root.width)
     contentWidth: width
-    contentHeight: previewColumn.implicitHeight
+    // Keep a little scroll room after the last action. This also keeps the
+    // button clear of the library footer when the window is short.
+    contentHeight: previewColumn.height + Theme.gapWide
     clip: true
     boundsBehavior: Flickable.StopAtBounds
     flickableDirection: Flickable.VerticalFlick
-    Controls.ScrollBar.vertical: KitScrollBar {}
+    Controls.ScrollBar.vertical: KitScrollBar {
+      opacity: size < 1 ? 0.6 : 0
+    }
 
     Column {
       id: previewColumn
       width: preview.width - Theme.gapMedium
+      height: implicitHeight
       spacing: Theme.gapMedium
 
       Rectangle {

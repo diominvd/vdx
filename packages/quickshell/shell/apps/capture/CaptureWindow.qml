@@ -12,8 +12,8 @@ FloatingWindow {
 
   title: "Capture"
   visible: false
-  implicitWidth: 760
-  implicitHeight: 600
+  implicitWidth: 900
+  implicitHeight: 680
   color: Theme.background0
 
   // Hyprland closing the window hides it but leaves FloatingWindow's own
