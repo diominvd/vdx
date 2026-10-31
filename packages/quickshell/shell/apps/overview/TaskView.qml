@@ -257,6 +257,11 @@ Item {
             y: tv.barH
             width: card.areaW
             height: card.areaH
+            // A floating window's screencopy can include pixels outside the
+            // compositor-reported client size (for example its decoration).
+            // Keep those pixels inside the preview so they cannot look like a
+            // second, overlapping window in the gaps between cards.
+            clip: true
 
             ScreencopyView {
               id: shot
