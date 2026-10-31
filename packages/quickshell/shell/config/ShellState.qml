@@ -29,6 +29,7 @@ JsonAdapter {
   property var looks: ({})
   property string corners: "sharp"
   property bool material: false
+  property bool segmentedSliders: true
   property bool accent: false
   property var accentStops: ["blue", "purple"]
   property bool accentGradient: false

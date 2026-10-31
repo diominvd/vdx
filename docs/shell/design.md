@@ -188,13 +188,13 @@ Pages by the user's area; the look follows macOS System Settings.
   in Windows › Look.
 - A caption over a slider (an app's name, a device) sits `gapMedium` above it;
   never `gapTight`.
-- Sliders in a box use the row layout (label left, value right). A snapped slider
+- Sliders in a box use the row layout (label left, value right). Strict can choose
+  the classic plate or the split two-segment plate in Appearance › Interface. A snapped slider
   always shows its stops, at most 11 (every n-th of a long run). Controls ›
   Material draws Material 3's slider (thick track split by a bar handle, stops as
-  dots); Strict the thin one — except in a Settings box, where it is a plate: a
-  tonal bar (`controlFill`) with the fill a step lighter (`pickFill`), a mark inside
-  the fill's end, the stops to come as dots, the reading inside at the right, the
-  label at the left of the row (`KitSlider.plate`; a colour ramp stays thin).
+  dots); Strict can use the classic thin track or the split plate with rounded
+  active and remainder segments. A captioned Settings slider keeps its label
+  beside the track; colour ramps stay thin.
 
 - MUST: one pattern for a setting that waits for something (`KitRow.needs`). The row
   stays in sight, its control is out of reach, and the phrase where the hint was says

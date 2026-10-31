@@ -31,6 +31,7 @@ Singleton {
   readonly property bool barFolderDot: state.barFolderDot         // a dot on the Folder for unseen notices
   readonly property string barDotColor: state.barDotColor         // theme | red | orange | yellow | green | aqua | blue | purple: that dot's colour
   readonly property bool material: state.material                 // controls filled, no frames (Appearance › Controls)
+  readonly property bool segmentedSliders: state.segmentedSliders   // Strict: split fill and remainder into two pills
   // the accent (Appearance › Colours): two stops, the first the colour, the second
   // the gradient's end when accentGradient is on. A stop is a colour name (theme =
   // the theme's frame colour | red | … | purple) or "custom", its colour in

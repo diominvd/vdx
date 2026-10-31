@@ -24,6 +24,12 @@
   "target": "appearance"
  },
  {
+  "label": "Slider style",
+  "hint": "",
+  "where": "Appearance › APPEARANCE",
+  "target": "appearance"
+ },
+ {
   "label": "Themes",
   "hint": "",
   "where": "",

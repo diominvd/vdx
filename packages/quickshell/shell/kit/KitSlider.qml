@@ -19,7 +19,7 @@ Item {
   property var snaps: []
   property bool ticks: true              // false: the stops still snap, no marks
   property var spectrum: []              // colours laid along the track as a smooth ramp, instead of the fill
-  property bool plate: false             // Strict, in a Settings row: a tonal bar, a mark at the end of the fill
+  property bool plate: false             // Strict: two tonal segments with a mark between them
   property string text: ""               // a plate carries its reading inside, at the right
 
   // the default tint takes the accent (Appearance › Colours › Sliders); a
@@ -37,8 +37,10 @@ Item {
   function letGo(v) { held = v; holdTimer.restart(); released(v); }
   readonly property real knobSize: m3 ? 4 : 12
   readonly property bool m3: Theme.material && spectrum.length === 0
-  readonly property bool flat: plate && !m3                          // the plate is drawn (a spectrum lights its fill)
-  readonly property real plateEdge: shown * width
+  readonly property bool splitPlate: !m3 && spectrum.length === 0 && ShellSettings.segmentedSliders
+  readonly property bool flat: splitPlate || (plate && !m3)           // Strict plates; colour ramps stay thin
+  readonly property real plateGap: splitPlate && shown > 0 && shown < 1 ? 8 : 0
+  readonly property real plateEdge: shown * (width - plateGap)
   readonly property real track: 12            // Material: the track's height
   readonly property real gap: 5               // Material: the space on each side of the handle
   readonly property real handleX: shown * (width - knobSize)
@@ -104,7 +106,7 @@ Item {
     radius: Theme.pill(height)
   }
 
-  Rectangle {
+  ClippingRectangle {
     visible: !root.m3 && !root.flat
     anchors.verticalCenter: parent.verticalCenter
     width: parent.width
@@ -237,29 +239,69 @@ Item {
     border.color: Theme.background0
   }
 
-  // ---- Strict plate: a tonal track, the fill a step lighter, a mark inside the fill's end ----
-  ClippingRectangle {
-    visible: root.flat
+  // ---- Strict plate: choose the split style or the original continuous track ----
+  Rectangle {
+    visible: root.flat && !root.splitPlate
     anchors.fill: parent
     radius: Theme.radiusControl
-    // the track is a control plate with its frame (it sat on the box's own tone and
-    // vanished in a Settings row); the fill is a step brighter than a picked segment
     color: Theme.fillOn(root.boxed)
+  }
+
+  Rectangle {
+    visible: root.flat && !root.splitPlate
+    width: root.plateEdge
+    height: parent.height
+    radius: Math.min(Theme.radiusControl, width / 2)
+    color: root.dimmed ? Theme.controlHover : Theme.mix(Theme.pickFill, Theme.foreground0, 0.14)
+  }
+
+  Rectangle {
+    visible: root.flat && !root.splitPlate && Theme.frameWidth > 0
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: Theme.clear
     border.width: Theme.frameWidth
     border.color: Theme.controlLineRest
+  }
 
-    // square: the track's corners cut it, so the left end is rounded, the right is flat
-    Rectangle {
-      visible: root.spectrum.length === 0
-      width: Math.max(root.plateEdge, 0)
-      height: parent.height
-      color: root.dimmed ? Theme.controlHover : Theme.mix(Theme.pickFill, Theme.foreground0, 0.14)
-    }
+  Rectangle {
+    visible: root.splitPlate
+    x: root.plateEdge + root.plateGap
+    width: Math.max(0, parent.width - x)
+    height: parent.height
+    radius: Theme.radiusControl
+    color: Theme.background3
+  }
 
-    // a spectrum lights the fill: the ramp lies over the whole plate, the fill shows its left part
+  Rectangle {
+    visible: root.splitPlate
+    width: root.plateEdge
+    height: parent.height
+    radius: Theme.radiusControl
+    color: root.dimmed ? Theme.controlHover
+      : root.accented ? Theme.mix(Theme.background0, Theme.accent, 0.28)
+      : Theme.mix(Theme.pickFill, Theme.foreground0, 0.14)
+  }
+
+  // The short white mark sits in the gap between the two independent segments.
+  Rectangle {
+    visible: root.splitPlate && root.plateGap > 0
+    x: root.plateEdge + (root.plateGap - width) / 2
+    anchors.verticalCenter: parent.verticalCenter
+    width: 3
+    height: Math.min(28, parent.height - 12)
+    radius: Theme.pill(width)
+    color: Theme.foreground0
+  }
+
+  // A spectrum keeps its continuous colour ramp and lights only the part before the knob.
+  Item {
+    visible: root.splitPlate && root.spectrum.length > 0
+    anchors.fill: parent
+    clip: true
+
     Item {
-      visible: root.spectrum.length > 0
-      width: Math.max(root.plateEdge, 0)
+      width: root.plateEdge
       height: parent.height
       clip: true
 
@@ -283,11 +325,53 @@ Item {
         }
       }
     }
+  }
 
-    // the stops still to come: a dot each, none under the fill
+  Item {
+    visible: root.splitPlate
+    anchors.fill: parent
+
+    // stop marks are tucked into the inactive segment, past its rounded end
     Repeater {
       model: root.flat ? stops.model : []
 
+      Rectangle {
+        required property real modelData
+        readonly property real cx: modelData * (root.width - root.plateGap)
+        visible: cx > root.plateEdge + root.plateGap + 8 && cx < root.width - 56
+        x: cx - 1.5
+        anchors.verticalCenter: parent.verticalCenter
+        width: 3
+        height: 3
+        radius: Theme.pill(height)
+        color: Theme.muted
+      }
+    }
+
+    KitText {
+      anchors { right: parent.right; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
+      text: root.text
+      color: root.dimmed ? Theme.gray : Theme.foreground2
+      font.pixelSize: Theme.fontSize - 1
+    }
+  }
+
+  Rectangle {
+    visible: root.flat && !root.splitPlate && root.plateEdge > 18
+    x: root.plateEdge - 10
+    anchors.verticalCenter: parent.verticalCenter
+    width: 2
+    height: 16
+    radius: Theme.pill(height)
+    color: root.dimmed ? Theme.gray : root.accented ? Theme.accent : Theme.foreground0
+  }
+
+  Item {
+    visible: root.flat && !root.splitPlate
+    anchors.fill: parent
+
+    Repeater {
+      model: root.ticks ? stops.model : []
       Rectangle {
         required property real modelData
         readonly property real cx: modelData * root.width
@@ -299,16 +383,6 @@ Item {
         radius: Theme.pill(height)
         color: Theme.muted
       }
-    }
-
-    Rectangle {
-      visible: root.plateEdge > 18
-      x: root.plateEdge - 10
-      anchors.verticalCenter: parent.verticalCenter
-      width: 2
-      height: 16
-      radius: Theme.pill(height)
-      color: root.dimmed ? Theme.gray : root.accented ? Theme.accent : Theme.foreground0
     }
 
     KitText {

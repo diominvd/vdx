@@ -21,7 +21,7 @@ KitSettingsWorkspace {
   function jump(key) {
     tab = key === "accent" || key === "glow" ? key : "style";
   }
-  readonly property var resetKeys: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "accent", "accentStops", "accentGradient", "accentCustom", "customColours", "shareColours", "customColoursMax", "accentWhere", "glow", "glowStrength", "glowWhere"]
+  readonly property var resetKeys: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "accent", "accentStops", "accentGradient", "accentCustom", "customColours", "shareColours", "customColoursMax", "accentWhere", "glow", "glowStrength", "glowWhere"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
@@ -46,6 +46,17 @@ KitSettingsWorkspace {
             model: [{label: "Strict", value: false}, {label: "Material 3", value: true}]
             current: ShellSettings.material
             onPicked: value => ShellSettings.set("material", value)
+          }
+        }
+        KitRow {
+          visible: !ShellSettings.material
+          label: "Slider style"
+          hint: ShellSettings.segmentedSliders ? "Split fill and remainder" : "Classic filled track"
+          wide: true
+          KitSegments {
+            model: [{label: "Segmented", value: true}, {label: "Classic", value: false}]
+            current: ShellSettings.segmentedSliders
+            onPicked: value => ShellSettings.set("segmentedSliders", value)
           }
         }
         KitLine {}
