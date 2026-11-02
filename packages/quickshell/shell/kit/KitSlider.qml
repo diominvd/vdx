@@ -39,7 +39,7 @@ Item {
   readonly property real knobSize: line ? 0 : m3 ? 4 : 12
   readonly property bool m3: !line && Theme.material && spectrum.length === 0
   readonly property bool splitPlate: !line && !m3 && spectrum.length === 0 && ShellSettings.segmentedSliders
-  readonly property bool flat: splitPlate || (plate && !m3)           // Strict plates; colour ramps stay thin
+  readonly property bool flat: spectrum.length === 0 && (splitPlate || (plate && !m3))
   readonly property real plateGap: splitPlate && shown > 0 && shown < 1 ? 8 : 0
   readonly property real plateEdge: shown * (width - plateGap)
   readonly property real track: 12            // Material: the track's height
