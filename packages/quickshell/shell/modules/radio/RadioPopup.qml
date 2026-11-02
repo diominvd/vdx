@@ -12,7 +12,7 @@ KitFrame {
   readonly property string key: RadioService.resumeKey
   readonly property int index: Math.max(0, stations.findIndex(s => s.key === key))
   readonly property var station: stations[index] ?? null
-  readonly property color tone: Theme.accentFor("modules", Theme.yellow)
+  readonly property color tone: Theme.yellow
   readonly property bool onAir: RadioService.active
 
   signal closeRequested()                      // Modules › Radio › Close after stop

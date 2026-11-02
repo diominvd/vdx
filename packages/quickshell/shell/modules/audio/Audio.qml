@@ -20,7 +20,7 @@ Item {
   KitBarItem {
     id: label
     icon: AudioService.muted ? "volume-x" : AudioService.headphones ? "headphones" : "volume"
-    text: BarLayout.faceText("audio", !ModuleSettings.get("audio", "percent", true) ? "" : AudioService.muted || !AudioService.sink ? "--" : String(Math.min(AudioService.maxPercent, AudioService.volume)))
+    text: BarLayout.faceText("audio", AudioService.muted || !AudioService.sink ? "--" : String(Math.min(AudioService.maxPercent, AudioService.volume)))
     tint: AudioService.muted ? Theme.red : AudioService.volume > 100 ? Theme.orange : Theme.foreground0
   }
 

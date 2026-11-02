@@ -22,7 +22,7 @@ Item {
     id: face
     icon: "clock"
     text: BarLayout.faceText("timer", TimerService.text)
-    tint: TimerService.active ? Theme.accentFor("modules", Theme.orange) : Theme.foreground0
+    tint: TimerService.active ? Theme.orange : Theme.foreground0
     opacity: TimerService.paused ? 0.6 : 1
   }
 

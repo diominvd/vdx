@@ -14,7 +14,7 @@ QML keeps reading the old shapes too (a live reload runs without this)."""
 import hashlib, json, os, sys
 from pathlib import Path
 
-VERSION = 10
+VERSION = 11
 FILES = ("settings.json", "modules.json", "layout.json")
 RENAMED = {"claude": "ai", "plugins": "shell", "player": "music", "yandex": "music", "radio": "music"}   # module ids that changed (BarLayout.renamed)
 
@@ -203,7 +203,16 @@ def to_10(name: str, data: dict) -> None:
         island["hub"] = [i for i in island["hub"] if i not in HUB_TILES]
 
 
-MIGRATIONS = {0: to_1, 1: to_2, 2: to_3, 3: to_4, 4: to_5, 5: to_6, 6: to_7, 7: to_8, 8: to_9, 9: to_10}          # n -> the step from version n to n + 1
+def to_11(name: str, data: dict) -> None:
+    """Version 11: the global accent no longer targets bar modules."""
+    if name != "settings.json":
+        return
+    where = data.get("accentWhere")
+    if isinstance(where, dict):
+        where.pop("modules", None)
+
+
+MIGRATIONS = {0: to_1, 1: to_2, 2: to_3, 3: to_4, 4: to_5, 5: to_6, 6: to_7, 7: to_8, 8: to_9, 9: to_10, 10: to_11}          # n -> the step from version n to n + 1
 
 
 def migrate(name: str, data: dict) -> dict:

@@ -21,16 +21,18 @@ Item {
 
   Flickable {
     id: controls
-    anchors.fill: parent
-    contentHeight: Math.max(height, settingsLoader.height)
+    anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
+    width: root.width + Theme.windowPadding
+    contentHeight: settingsLoader.height
+    bottomMargin: Theme.windowPadding
     flickableDirection: Flickable.VerticalFlick
-    interactive: contentHeight > height + 1
+    interactive: contentHeight + bottomMargin > height + 1
     clip: true
     boundsBehavior: Flickable.StopAtBounds
     Controls.ScrollBar.vertical: KitScrollBar { visible: root.showScrollBar }
     Loader {
       id: settingsLoader
-      width: controls.width - Theme.gapMedium
+      width: root.width - Theme.gapMedium
       sourceComponent: root.settings
       opacity: sectionIn.shown
       height: item ? item.implicitHeight : 0

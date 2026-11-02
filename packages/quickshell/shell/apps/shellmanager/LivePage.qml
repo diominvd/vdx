@@ -20,7 +20,7 @@ Column {
   spacing: Theme.sectionGap
 
   KitNotice {
-    visible: !Theme.island
+    shown: !Theme.island
     title: "Live activities belong to the Island style"
     text: "The island is one pill with a hub and live activities. The strip has neither: these settings wait until you switch."
     action: "Use Island"

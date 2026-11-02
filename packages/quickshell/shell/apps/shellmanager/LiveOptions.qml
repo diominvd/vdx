@@ -76,11 +76,29 @@ Column {
     KitSwitch { checked: ShellSettings.liveMusicPaused; onToggled: ShellSettings.setLook("liveMusicPaused", !checked, "island") }
   }
 
+  Rectangle { visible: root.kind === "music"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+  KitRow {
+    visible: root.kind === "music"
+    label: "Show album cover"
+    hint: "The cover in the live activity"
+    KitSwitch { checked: ShellSettings.liveMusicCover; onToggled: ShellSettings.setLook("liveMusicCover", !checked, "island") }
+  }
+
   KitRow {
     visible: root.kind === "media"
     label: "Show on pause"
     hint: "The app's track stays in the slot while paused"
     KitSwitch { checked: ShellSettings.liveMediaPaused; onToggled: ShellSettings.setLook("liveMediaPaused", !checked, "island") }
+  }
+
+  Rectangle { visible: root.kind === "media"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+  KitRow {
+    visible: root.kind === "media"
+    label: "Show cover"
+    hint: "The app's artwork in the live activity"
+    KitSwitch { checked: ShellSettings.liveMediaCover; onToggled: ShellSettings.setLook("liveMediaCover", !checked, "island") }
   }
 
   KitRow {

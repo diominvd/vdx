@@ -5,7 +5,7 @@ import qs.kit
 
 // The sound as thin bars (EqualizerService.levels): live while it plays, a
 // flat dim row when paused. While visible it keeps the service running. The
-// colour is Modules › Equalizer's: one, or a gradient from the left bar to the right.
+// colour is Modules › Equalizer's solid choice.
 Row {
   id: root
 
@@ -17,7 +17,7 @@ Row {
   property string glowTarget: ""                 // a Glow target; the live activity's bars: "live"
   property var tone: null                       // one colour for all, over the module's own
 
-  // the colour of bar i: the gradient's step at its place
+  // Module colours are solid.
   function colourAt(i) {
     if (tone) return tone;
     const [a, b] = colours;

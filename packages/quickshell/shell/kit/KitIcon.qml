@@ -17,7 +17,9 @@ Item {
   property color tint: Theme.foreground0
   property int size: Theme.fontSize + 3
   property bool solid: ShellSettings.solidIcons
+  property bool filled: false              // force filled pause / play / stop glyphs
   property string glowTarget: ""          // a Glow target (Appearance › Glow): the icon gets a halo
+  readonly property bool filledGlyph: filled && ["pause", "play", "square"].includes(name)
 
   // 0..1: the halo fades in and out with Glow, as KitGlow's does
   property real glowAmount: glowTarget !== "" && Theme.glowOn(glowTarget) ? 1 : 0
@@ -45,6 +47,7 @@ Item {
   MultiEffect {
     anchors.fill: parent
     source: image
+    visible: !root.filledGlyph
     colorization: 1
     colorizationColor: root.tint
     autoPaddingEnabled: root.glowTarget !== ""
@@ -53,5 +56,53 @@ Item {
     shadowBlur: 0.4
     shadowOpacity: Theme.glowLevel * 0.6 * root.glowAmount
     shadowScale: 1
+  }
+
+  Row {
+    visible: root.filledGlyph && root.name === "pause"
+    anchors.centerIn: parent
+    spacing: root.size * 0.2
+    Repeater {
+      model: 2
+      Rectangle {
+        width: root.size * 0.22
+        height: root.size * 0.72
+        radius: root.size * 0.04
+        anchors.verticalCenter: parent.verticalCenter
+        color: root.tint
+      }
+    }
+  }
+
+  Rectangle {
+    visible: root.filledGlyph && root.name === "square"
+    anchors.centerIn: parent
+    width: root.size * 0.64
+    height: width
+    radius: root.size * 0.08
+    color: root.tint
+  }
+
+  Canvas {
+    id: play
+    visible: root.filledGlyph && root.name === "play"
+    anchors.fill: parent
+    onPaint: {
+      const ctx = getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = root.tint;
+      ctx.beginPath();
+      ctx.moveTo(width * 0.25, height * 0.12);
+      ctx.lineTo(width * 0.82, height * 0.5);
+      ctx.lineTo(width * 0.25, height * 0.88);
+      ctx.closePath();
+      ctx.fill();
+    }
+    onWidthChanged: requestPaint()
+    onHeightChanged: requestPaint()
+    Connections {
+      target: root
+      function onTintChanged() { play.requestPaint(); }
+    }
   }
 }

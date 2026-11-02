@@ -25,7 +25,7 @@ Column {
   spacing: Theme.sectionGap
 
   KitNotice {
-    visible: !Theme.island
+    shown: !Theme.island
     title: "The hub belongs to the Island style"
     text: "The island is one pill with a hub and live activities. The strip has neither: these settings wait until you switch."
     action: "Use Island"
@@ -33,7 +33,7 @@ Column {
   }
 
   KitNotice {
-    visible: Theme.island && HubBlocks.shown("tiles") && root.tileCount === 0
+    shown: Theme.island && HubBlocks.shown("tiles") && root.tileCount === 0
     title: "No tile in the Hub row"
     text: "Put Wi-Fi, Bluetooth, VPN, Focus or Dark mode there."
     action: "Arrange"

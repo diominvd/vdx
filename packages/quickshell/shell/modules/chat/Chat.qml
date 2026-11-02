@@ -20,7 +20,7 @@ Item {
     id: face
     icon: "message"
     text: BarLayout.faceText("chat", BarLayout.label("chat"))
-    tint: ChatService.busy ? Theme.accentFor("modules", Theme.yellow) : Theme.foreground0
+    tint: ChatService.busy ? Theme.yellow : Theme.foreground0
   }
 
   MouseArea {

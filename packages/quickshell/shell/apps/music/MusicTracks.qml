@@ -183,7 +183,7 @@ Item {
             visible: row.current
             name: MpdService.playing ? "volume" : "pause"
             size: Theme.iconSmall
-            tint: Theme.accentFor("modules", Theme.foreground0)
+            tint: Theme.foreground0
           }
         }
 

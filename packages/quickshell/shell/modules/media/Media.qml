@@ -26,7 +26,7 @@ Item {
     id: face
     icon: "play"
     text: BarLayout.faceText("media", root.media.playing ? root.media.title : "")
-    tint: root.media.playing ? Theme.accentFor("modules", Theme.foreground0) : Theme.gray
+    tint: root.media.playing ? Theme.foreground0 : Theme.gray
   }
 
   MouseArea {

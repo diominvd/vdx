@@ -33,14 +33,16 @@ Item {
   readonly property int chipRadius: Math.max(0, Math.min(Theme.barRadiusFor(Theme.islandHeight), Theme.islandRadius) - edge)
   readonly property int coverSize: chipHeight - 2 * inset
   readonly property int badgeRadius: Math.max(0, chipRadius - inset)
-  // one rule for every activity: a badge (cover, avatar) starts at the inset, text and marks a little further in
-  readonly property bool badged: (sliding ? backFace : frontFace).badged
-  readonly property int padLeft: badged ? inset : Theme.gapLoose
+  // Keep the activity content equally inset from both sides, including covers
+  // and avatars. The badge's own size and the inter-item gap set its position.
+  readonly property int padLeft: Theme.gapLoose
   readonly property int padRight: Theme.gapLoose
   // the slot's width is moving: the island follows it as it goes, without a glide of its own
   readonly property bool moving: targetAnim.running
   implicitWidth: kind === "" ? 0 : target + padLeft + padRight
   implicitHeight: Theme.islandHeight
+  width: implicitWidth
+  height: implicitHeight
   visible: kind !== "" || opacity > 0
   opacity: kind === "" ? 0 : 1
   Behavior on opacity { enabled: Motion.island; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
@@ -60,7 +62,6 @@ Item {
     backFace.anchors.verticalCenterOffset = dir * travel * (1 - t); backFace.opacity = t;
   }
   onTChanged: place()
-  onPadLeftChanged: place()
 
   onKindChanged: {
     slide.stop();
@@ -113,6 +114,8 @@ Item {
   // opens the activity's own options in the Shell Manager (as on a bar module)
   readonly property bool clickable: kind === "notice" || kind === "volume" || kind === "focus" && ShellSettings.liveFocusClick || IslandService.liveTarget[kind] !== undefined
   MouseArea {
+    // Let the task face's pause and stop controls receive their own clicks.
+    z: -1
     anchors.fill: parent
     acceptedButtons: Qt.RightButton | (root.clickable ? Qt.LeftButton | Qt.MiddleButton : Qt.NoButton)
     cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor

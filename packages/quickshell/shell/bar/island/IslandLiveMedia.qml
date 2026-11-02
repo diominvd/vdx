@@ -12,15 +12,16 @@ Row {
 
   property string kind: ""
   readonly property bool track: kind === "music" || kind === "media"
+  property bool showCover: true
   readonly property var player: kind === "media" ? PlayerService.media : PlayerService.music
   property int coverSize: 18
   property int badgeRadius: 4
-  spacing: 8
+  spacing: Theme.gapMedium
   visible: kind !== ""
 
   // music and media: the cover, the track and the sound
   ClippingRectangle {
-    visible: face.track
+    visible: face.track && face.showCover
     anchors.verticalCenter: parent.verticalCenter
     width: face.coverSize
     height: face.coverSize
@@ -48,7 +49,7 @@ Row {
     barCount: 4
     tone: face.kind === "media" ? Theme.foreground2 : Theme.green
     glowTarget: "live"
-    height: 14
+    height: 16
     active: face.player.playing      // its own player: the radio or another app playing does not move it
     flatWhenIdle: true
   }

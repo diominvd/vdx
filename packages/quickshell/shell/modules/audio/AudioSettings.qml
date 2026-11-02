@@ -11,7 +11,5 @@ KitColumn {
   KitLabel { text: "BAR" }
   BarTextRow { module: "audio" }
 
-  KitToggleRow { visible: ModuleSettings.get("audio", "text", "content") === "content"; module: "audio"; key: "percent"; label: "Show volume"; hint: "Off: icon only" }
-
   KitGrouper {}
 }

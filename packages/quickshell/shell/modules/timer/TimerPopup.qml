@@ -11,7 +11,7 @@ KitFrame {
   property string tab: "countdown"
   property int minutes: TimerService.lastMinutes
   readonly property string shown: TimerService.active ? TimerService.kind : tab
-  readonly property color tone: Theme.accentFor("modules", Theme.orange)
+  readonly property color tone: Theme.orange
 
   function presetText(minutes) {
     if (minutes < 60) return minutes + " min";

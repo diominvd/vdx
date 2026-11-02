@@ -11,6 +11,7 @@ Rectangle {
 
   implicitWidth: 70
   implicitHeight: 4
+  width: implicitWidth
   height: implicitHeight
   radius: Theme.pill(height)
   color: Theme.background3

@@ -20,7 +20,15 @@ Item {
   implicitHeight: row.implicitHeight
 
   Rectangle {
-    anchors { fill: parent; margins: -Theme.gapWide }   // the whole row of its KitGrouper box
+    // Match the exact insets KitGrouper uses for this row, so the hover fill
+    // lands on the card's edge instead of poking past it.
+    anchors {
+      fill: parent
+      leftMargin: -Theme.groupInset
+      rightMargin: -Theme.groupInset
+      topMargin: -Theme.settingsRowInset
+      bottomMargin: -Theme.settingsRowInset
+    }
     radius: Theme.radiusCard
     color: area.containsMouse ? Theme.background2 : Theme.clear
 

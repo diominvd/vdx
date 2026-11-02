@@ -60,7 +60,13 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: 18; height: 18; radius: Theme.pill(height)
         color: modelData.stop ? Theme.red : Theme.background3
-        KitIcon { anchors.centerIn: parent; name: parent.modelData.stop ? "square" : "pause"; size: 10; tint: parent.modelData.stop ? Theme.background0 : Theme.foreground1 }
+        KitIcon {
+          anchors.centerIn: parent
+          name: parent.modelData.stop ? "square" : "pause"
+          size: 10
+          filled: true
+          tint: parent.modelData.stop ? Theme.background0 : Theme.foreground1
+        }
       }
     }
 
@@ -102,7 +108,7 @@ Rectangle {
     KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "focus"; text: "Focus"; font.pixelSize: Theme.fontSize - 1 }
 
     // music: the cover, the name, the sound
-    Rectangle { visible: root.kind === "music"; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
+    Rectangle { visible: root.kind === "music" && ShellSettings.liveMusicCover; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
       KitIcon { anchors.centerIn: parent; name: "music"; size: 9; tint: Theme.foreground2 } }
     KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "music"; text: "Survivor"; font.pixelSize: Theme.fontSize - 1; width: Math.min(implicitWidth, 64); elide: Text.ElideRight }
     Row {
@@ -113,7 +119,7 @@ Rectangle {
     }
 
     // media: another app's sound — the app's icon, the title, the sound
-    Rectangle { visible: root.kind === "media"; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
+    Rectangle { visible: root.kind === "media" && ShellSettings.liveMediaCover; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
       KitIcon { anchors.centerIn: parent; name: "play"; size: 9; tint: Theme.foreground2 } }
     KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "media"; text: "Lo-fi stream"; font.pixelSize: Theme.fontSize - 1; width: Math.min(implicitWidth, 80); elide: Text.ElideRight }
     Row {
@@ -143,13 +149,13 @@ Rectangle {
     KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "layout"; text: "RU"; font.pixelSize: Theme.fontSize - 1; font.weight: Font.Medium }
 
     // the cable
-    KitIcon { visible: root.kind === "plugged"; glowTarget: "live"; name: "zap"; size: 12; tint: Theme.purple; anchors.verticalCenter: parent.verticalCenter }
+    KitIcon { visible: root.kind === "plugged"; glowTarget: "live"; name: "zap"; size: 12; tint: Theme.green; anchors.verticalCenter: parent.verticalCenter }
     Rectangle {
       visible: root.kind === "plugged"
       anchors.verticalCenter: parent.verticalCenter
       width: 70; height: 3; radius: Theme.pill(height); color: Theme.background3
-      Rectangle { width: parent.width * 0.52; height: parent.height; radius: Theme.pill(height); color: Theme.purple; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
+      Rectangle { width: parent.width * 0.52; height: parent.height; radius: Theme.pill(height); color: Theme.green; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
     }
-    KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "plugged"; text: "52"; color: Theme.purple; font.pixelSize: Theme.fontSize - 1 }
+    KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "plugged"; text: "52"; color: Theme.green; font.pixelSize: Theme.fontSize - 1 }
   }
 }

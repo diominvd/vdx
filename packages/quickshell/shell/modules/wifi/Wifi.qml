@@ -5,7 +5,7 @@ import qs.components
 import qs.config
 import qs.kit
 
-// Bar module: the network's name (or the icon alone), green while connected.
+// Bar module: the network's name (or the icon alone), blue while connected.
 Item {
   id: root
 
@@ -25,7 +25,7 @@ Item {
     id: label
     icon: WifiService.radioOn ? "wifi" : "wifi-off"
     text: BarLayout.faceText("wifi", WifiService.connected ? root.name : "--")
-    tint: WifiService.connected ? Theme.accentFor("modules", Theme.green) : Theme.gray
+    tint: WifiService.connected ? Theme.blue : Theme.gray
   }
 
   MouseArea {

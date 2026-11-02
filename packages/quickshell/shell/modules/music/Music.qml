@@ -38,7 +38,7 @@ Item {
     icon: PlayerService.music.playing && !root.iconOnly ? "" : "music"
     text: root.iconOnly ? "" : root.maxLength > 0 && root.text.length > root.maxLength
       ? root.text.slice(0, root.maxLength - 1) + Theme.ellipsis : root.text
-    tint: PlayerService.music.playing ? Theme.accentFor("modules", Theme.foreground0) : Theme.gray
+    tint: PlayerService.music.playing ? Theme.foreground0 : Theme.gray
   }
 
   MouseArea {

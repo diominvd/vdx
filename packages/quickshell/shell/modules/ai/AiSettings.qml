@@ -15,7 +15,7 @@ KitColumn {
     width: parent.width
     visible: ModuleSettings.get("ai", "text", "content") === "content"
     label: "Limit"
-    hint: "Its percent is shown in the bar"
+    hint: "Choose the limit shown in the bar"
     model: [
       { label: "Claude · 5 h", value: "session" },
       { label: "Claude · week", value: "weekly_all" },
@@ -33,7 +33,7 @@ KitColumn {
 
   KitToggleRow {
     module: "ai"; key: "compact"; fallback: false
-    label: "Compact popup"; hint: "Hides today's tokens and the sessions: the limits only"
+    label: "Compact popup"; hint: "Limits only; hide tokens and sessions"
   }
 
   KitGrouper {}

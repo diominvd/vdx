@@ -9,16 +9,21 @@ Rectangle {
 
   property string icon: ""               // kit/icons name
   property color iconTint: Theme.foreground0
+  property bool iconFilled: false
+  property bool iconWithText: false       // show the icon beside the label
+  property bool iconSolid: ShellSettings.solidIcons
   property string text: ""
+  readonly property string displayText: text.replace(/(?:…|\.\.\.)$/, "")
   property bool selected: false
   property bool busy: false
   property bool disabled: false
+  property bool compact: false             // short toolbar choices keep their content width
 
   readonly property bool hovered: area.containsMouse && !disabled
   activeFocusOnTab: true
   enabled: !disabled && !busy
   Accessible.role: Accessible.Button
-  Accessible.name: text || icon
+  Accessible.name: displayText || icon
   Accessible.description: busy ? "Working" : ""
   Accessible.onPressAction: if (!disabled && !busy) clicked()
   Keys.onSpacePressed: event => { if (!disabled && !busy && !event.isAutoRepeat) clicked(); }
@@ -28,7 +33,8 @@ Rectangle {
   signal clicked()
 
   // an icon alone is a square of the control height
-  implicitWidth: text !== "" ? content.implicitWidth + (Theme.material ? 32 : 24) : Theme.controlHeight
+  implicitWidth: displayText !== "" ? Math.max(compact ? 0 : Theme.buttonWidth,
+    content.implicitWidth + (Theme.material ? 32 : 24)) : Theme.controlHeight
   implicitHeight: Theme.controlHeight
   radius: Theme.radiusControl
   // set once: whether it sits in a Settings box (a walk up, not a binding)
@@ -49,9 +55,11 @@ Rectangle {
 
     KitIcon {
       anchors.verticalCenter: parent.verticalCenter
-      visible: root.icon !== "" && !root.busy
+      visible: root.icon !== "" && (root.displayText === "" || root.iconWithText) && !root.busy
       name: root.icon
       tint: root.iconTint
+      solid: root.iconSolid
+      filled: root.iconFilled
       size: Theme.fontSize + 1
     }
 
@@ -61,8 +69,8 @@ Rectangle {
     }
 
     KitText {
-      visible: root.text !== ""
-      text: root.text
+      visible: root.displayText !== ""
+      text: root.displayText
       color: root.selected ? Theme.accentFor("choices", Theme.foreground0) : Theme.foreground0
       font.weight: Font.Medium
     }

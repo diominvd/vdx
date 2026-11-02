@@ -104,7 +104,8 @@ Column {
         width: parent.width
         visible: root.hint !== ""
         text: root.hint
-        elide: Text.ElideRight
+        wrapMode: Text.WordWrap
+        elide: Text.ElideNone
         color: root.hintColor
         font.pixelSize: Theme.fontSize - 1
       }

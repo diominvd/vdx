@@ -26,7 +26,7 @@ Item {
     id: label
     icon: BluetoothService.powered ? "bluetooth" : "bluetooth-off"
     text: BarLayout.faceText("bluetooth", BluetoothService.mainDevice ? root.name : "--")
-    tint: BluetoothService.mainDevice ? Theme.accentFor("modules", Theme.green) : Theme.gray
+    tint: BluetoothService.mainDevice ? Theme.green : Theme.gray
   }
 
   MouseArea {

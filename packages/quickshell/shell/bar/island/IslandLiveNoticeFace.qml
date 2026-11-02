@@ -10,7 +10,7 @@ Row {
   property string kind: ""
   property int coverSize: 18
   property int badgeRadius: 4
-  spacing: 8
+  spacing: Theme.gapMedium
   visible: kind !== ""
 
   // a notification, as a line: the app's initial, "app: summary"
@@ -40,6 +40,7 @@ Row {
   }
   KitText {
     visible: face.kind === "notice"
+    anchors.verticalCenter: parent.verticalCenter
     width: Math.min(implicitWidth, 300)
     elide: Text.ElideRight
     textFormat: Text.PlainText

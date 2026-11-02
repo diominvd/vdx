@@ -24,10 +24,9 @@ KitColumn {
 
   property string selected: FontService.current
   property string query: ""
-  property string scope: "all"
   property string armed: ""
   readonly property var chosen: FontService.fonts.find(f => f.family === selected) ?? null
-  readonly property var shown: FontService.fonts.filter(f => (scope !== "installed" || f.installed)
+  readonly property var shown: FontService.fonts.filter(f => f.installed
     && f.family.toLowerCase().includes(query.trim().toLowerCase()))
   onShownChanged: if (shown.length && !shown.some(f => f.family === selected)) selected = shown[0].family
   readonly property bool drawable: chosen !== null && chosen.installed && Qt.fontFamilies().includes(chosen.family)
@@ -82,22 +81,11 @@ KitColumn {
   }
   KitText { visible: FontService.error !== ""; width: parent.width; text: FontService.error; color: Theme.red; wrapMode: Text.WordWrap }
   KitLine {}
-  KitLabel { id: familiesLabel; text: "FAMILIES"; value: root.shown.length + " SHOWN" }
+  KitLabel { id: familiesLabel; text: "FAMILIES"; value: FontService.fonts.filter(f => f.installed).length + " INSTALLED" }
   Row {
     property bool kitUnboxed: true
     width: parent.width
-    spacing: Theme.gapMedium
-    KitInput { width: Math.max(100, parent.width - fontFilter.width - parent.spacing); icon: "search"; placeholder: "Search fonts"; onTextEdited: root.query = text }
-    KitButton {
-      id: fontFilter
-      width: 156
-      text: root.scope === "installed" ? "Installed" : "All fonts"
-      icon: root.scope === "installed" ? "check" : "list"
-      selected: root.scope === "installed"
-      Accessible.name: text
-      Accessible.description: root.scope === "installed" ? "Click to show all" : "Click to show installed only"
-      onClicked: root.scope = root.scope === "all" ? "installed" : "all"
-    }
+    KitInput { width: parent.width; icon: "search"; placeholder: "Search installed fonts"; onTextEdited: root.query = text }
   }
   Column {
     property bool kitUnboxed: true
@@ -143,7 +131,7 @@ KitColumn {
       }
     }
   }
-  KitEmptyState { visible: root.shown.length === 0; icon: "text"; title: "No matching fonts"; hint: "Try another name or show all fonts" }
+  KitEmptyState { visible: root.shown.length === 0; icon: "text"; title: "No installed fonts match"; hint: "Try a shorter search" }
   KitLine {}
     KitGrouper {}
   }

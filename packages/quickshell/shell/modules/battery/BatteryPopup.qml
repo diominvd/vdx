@@ -22,7 +22,9 @@ KitFrame {
     : BatteryService.plugged ? "PLUGGED IN" + (BatteryService.limitSupported ? " · LIMIT " + BatteryService.threshold + "%" : "")
     : "IDLE"
   readonly property color levelColor: BatteryService.capacity <= BatteryService.critical ? Theme.red
-    : BatteryService.capacity <= BatteryService.warning ? Theme.yellow : Theme.green
+    : BatteryService.charging ? Theme.green
+    : BatteryService.saver ? Theme.yellow
+    : Theme.green
   // ---- header ----
   KitHeader {
     icon: !BatteryService.present ? "battery-full" : BatteryService.saver ? "battery-saver" : BatteryService.charging ? "battery-bolt"
@@ -43,8 +45,11 @@ KitFrame {
       visible: BatteryService.profiles.length > 0
       accessibleName: "Power saver"
       checked: BatteryService.saver
-      disabled: BatteryService.busy !== null
-      onToggled: BatteryService.setSaver(!BatteryService.saver)
+      disabled: BatteryService.busy !== null || (BatteryService.plugged && !BatteryService.saver)
+      onToggled: {
+        if (BatteryService.plugged && !BatteryService.saver) return;
+        BatteryService.setSaver(!BatteryService.saver);
+      }
     }
   }
 
@@ -112,7 +117,7 @@ KitFrame {
     font.pixelSize: Theme.fontSize - 1
   }
 
-  KitLine {}
+  KitLine { visible: BatteryService.error !== "" }
 
   KitButton {
     width: parent.width

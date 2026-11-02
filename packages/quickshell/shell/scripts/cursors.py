@@ -227,9 +227,9 @@ def build_tinted(base, fill, outline):
     tint = tinter(fill, outline)
     for f in (src / "cursors").iterdir():
         target = dst / "cursors" / f.name
-        if f.is_symlink():
-            target.symlink_to(f.readlink())
-        elif f.is_file():
+        # Cursor themes commonly alias shapes with symlinks. Copy and tint the
+        # resolved image too, otherwise those shapes keep the original colour.
+        if f.is_file():
             target.write_bytes(tint_file(f.read_bytes(), tint))
     (dst / "index.theme").write_text(f"[Icon Theme]\nName={name}\nComment={base} tinted by the Shell Manager\nInherits={base}\n")
     return name

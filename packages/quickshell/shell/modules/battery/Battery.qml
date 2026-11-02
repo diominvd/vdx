@@ -29,10 +29,9 @@ Item {
     // Charge only: a plus while charging (Plus while charging)
     text: BarLayout.faceText("battery", String(BatteryService.capacity)
       + (!root.showIcon && BatteryService.charging && ModuleSettings.get("battery", "plus", true) ? "+" : ""))
-    tint: BatteryService.saver ? Theme.accentFor("modules", Theme.green)
-         : BatteryService.charging ? Theme.accentFor("modules", Theme.green)
-         : BatteryService.capacity <= BatteryService.critical ? Theme.red
-         : BatteryService.capacity <= BatteryService.warning ? Theme.yellow
+    tint: BatteryService.capacity <= BatteryService.critical ? Theme.red
+         : BatteryService.charging ? Theme.green
+         : BatteryService.saver ? Theme.yellow
          : Theme.foreground0
   }
 

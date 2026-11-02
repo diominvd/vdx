@@ -21,7 +21,7 @@ Column {
 
   // hardware that cannot change: said once, the rows stay away
   KitNotice {
-    visible: BatteryService.ready && !BatteryService.present && BatteryService.profiles.length === 0
+    shown: BatteryService.ready && !BatteryService.present && BatteryService.profiles.length === 0
     icon: "info"
     title: "This computer has nothing to set here"
     text: "No battery and no power profiles were found: the charge limit and the profile are hidden."

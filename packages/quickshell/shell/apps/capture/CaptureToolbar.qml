@@ -20,6 +20,7 @@ Rectangle {
   // a choice: an icon (and a label), lit while it is the current one
   component Chip: KitButton {
     id: chip
+    compact: true
     property string tipTitle: ""
     property string tipText: ""
     onHoveredChanged: {

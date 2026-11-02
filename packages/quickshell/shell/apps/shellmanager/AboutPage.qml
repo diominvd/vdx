@@ -36,6 +36,10 @@ Column {
   property var healthItems: []
   property var resourceMetrics: []
 
+  QtObject { id: sectionIn; property real shown: 1 }
+  NumberAnimation { id: sectionAnim; target: sectionIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
+  onTabChanged: if (Motion.tabs) sectionAnim.restart()
+
   function setHealthReport(raw) {
     healthReport = raw;
     healthItems = raw.replace(/\x1b\[[0-9;]*m/g, "").split("\n")
@@ -68,12 +72,12 @@ Column {
     const fields = raw.trim().split(/\s+/);
     if (fields.length < 6 || fields.some(value => value === "")) { resourceMetrics = []; return; }
     resourceMetrics = [
-      { label: "MEMORY", value: formatMemory(fields[1]) },
-      { label: "VIRTUAL", value: formatMemory(fields[2]) },
+      { label: "Memory", value: formatMemory(fields[1]) },
+      { label: "Virtual memory", value: formatMemory(fields[2]) },
       { label: "CPU", value: fields[4] + "%" },
-      { label: "RUNTIME", value: formatElapsed(fields[3]) },
-      { label: "THREADS", value: fields[5] },
-      { label: "PROCESS", value: fields[0] }
+      { label: "Runtime", value: formatElapsed(fields[3]) },
+      { label: "Threads", value: fields[5] },
+      { label: "Process", value: fields[0] }
     ];
   }
 
@@ -86,7 +90,6 @@ Column {
   }
   function measureShell() {
     resourceReport = "Measuring…";
-    resourceMetrics = [];
     measureProc.running = false;
     measureProc.command = ["ps", "-p", String(Quickshell.processId), "-o", "pid=,rss=,vsz=,etime=,%cpu=,nlwp="];
     measureProc.running = true;
@@ -148,7 +151,6 @@ Column {
   }
 
   component Paragraph: KitText {
-    property bool kitUnboxed: true    // text of the page, not a row
     width: parent.width
     wrapMode: Text.WordWrap
     color: Theme.foreground2
@@ -159,6 +161,7 @@ Column {
   spacing: Theme.sectionGap
 
     width: parent.width; visible: root.tab === "about"
+    opacity: sectionIn.shown
   // ---- philosophy ----
   KitLabel { id: philosophy; text: "PHILOSOPHY" }
 
@@ -219,6 +222,7 @@ Column {
   spacing: Theme.sectionGap
 
     width: parent.width; visible: root.tab === "settings"
+    opacity: sectionIn.shown
   // ---- system ----
   KitLabel { id: settings; text: "SETTINGS"; value: root.ioStatus.toUpperCase() }
 
@@ -274,6 +278,7 @@ Column {
   }
   Column {
     width: parent.width; visible: root.tab === "system"
+  opacity: sectionIn.shown
   KitLabel { id: system; text: "SYSTEM"; value: (root.versions.commit ?? "").toUpperCase() }
 
   KitInfo { width: parent.width; label: "Theme"; value: root.versions.theme ?? "--" }
@@ -290,21 +295,15 @@ Column {
     KitButton { width: Theme.buttonWidth; icon: "activity"; text: "Run check"; busy: doctorProc.running; onClicked: root.checkHealth() }
   }
   Column {
-    visible: root.healthReport !== ""
+    visible: root.healthItems.length > 0
     width: parent.width
     spacing: Theme.gapTight
 
-    KitText {
-      visible: root.healthReport === "Checking…"
-      text: "Checking system health…"
-      color: Theme.muted
-      font.pixelSize: Theme.fontSize - 1
-    }
-
     KitNotice {
-      visible: root.healthItems.length === 1 && root.healthItems[0].level === "ok"
+      shown: root.healthItems.length === 1 && root.healthItems[0].level === "ok"
       width: parent.width
       icon: "check"
+      tone: Theme.green
       title: "System healthy"
       text: "Managed files, services and desktop checks passed."
     }
@@ -324,45 +323,17 @@ Column {
   KitRow {
     label: "Shell resources"
     hint: "A one-time snapshot of the running Quickshell process"
-    KitButton { width: Theme.buttonWidth; icon: "cpu"; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
+    KitButton { width: Theme.buttonWidth; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
   }
-  KitText {
-    visible: root.resourceReport !== "" && root.resourceMetrics.length === 0
+  KitNotice {
+    shown: root.resourceMetrics.length > 0 || (!measureProc.running && root.resourceReport !== "")
     width: parent.width
-    text: root.resourceReport === "Measuring…" ? "Measuring process…" : root.resourceReport
-    color: Theme.muted
-    wrapMode: Text.WordWrap
-    font.pixelSize: Theme.fontSize - 1
-  }
-  Grid {
-    property bool kitUnboxed: true
-    visible: root.resourceMetrics.length > 0
-    width: parent.width
-    columns: 3
-    columnSpacing: Theme.gapSmall
-    rowSpacing: Theme.gapSmall
-    height: childrenRect.height
-
-    Repeater {
-      model: root.resourceMetrics
-      Rectangle {
-        required property var modelData
-        width: Math.floor((parent.width - 2 * parent.columnSpacing) / 3)
-        height: Theme.controlHeight + Theme.gapSmall
-        radius: Theme.radiusControl
-        color: Theme.fillOn(false)
-        border.width: Theme.frameWidth
-        border.color: Theme.controlLineRest
-
-        Column {
-          anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Theme.gapMedium; rightMargin: Theme.gapMedium }
-          height: implicitHeight
-          spacing: Theme.gapTight
-          KitText { text: modelData.label; color: Theme.muted; font.pixelSize: Theme.fontSize - 2; font.letterSpacing: 1 }
-          KitText { text: modelData.value; color: Theme.foreground0; font.weight: Font.Medium }
-        }
-      }
-    }
+    icon: root.resourceMetrics.length > 0 ? "activity" : "alert"
+    tone: root.resourceMetrics.length > 0 ? Theme.clear : Theme.red
+    title: root.resourceMetrics.length > 0 ? "Process snapshot" : "Snapshot unavailable"
+    text: root.resourceMetrics.length > 0
+      ? root.resourceMetrics.map(metric => metric.label + " " + metric.value).join(" · ")
+      : root.resourceReport
   }
   KitRow {
     label: "Recovery"

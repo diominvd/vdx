@@ -14,7 +14,7 @@ Row {
   property string kind: ""
   property bool inputEnabled: true
   property int coverSize: 18
-  spacing: 8
+  spacing: Theme.gapMedium
   visible: kind !== ""
 
   // recording: the dot, the time, the sound, pause and stop
@@ -66,6 +66,7 @@ Row {
         anchors.centerIn: parent
         name: btn.stop ? "square" : CaptureService.paused ? "play" : "pause"
         size: 12
+        filled: true
         tint: btn.stop ? Theme.background0 : Theme.foreground1
       }
       MouseArea {
@@ -87,6 +88,7 @@ Row {
   }
   KitText {
     visible: face.kind === "recording" && !CaptureService.recording && CaptureService.recordOutcome !== ""
+    anchors.verticalCenter: parent.verticalCenter
     width: Math.min(implicitWidth, 180)
     elide: Text.ElideRight
     text: CaptureService.recordOutcome === "error" ? "Recording failed" : CaptureService.recordOutcomeText
@@ -94,19 +96,19 @@ Row {
   }
 
   // update: the download's progress, else what runs
-  KitIcon { visible: face.kind === "update"; glowTarget: "live"; name: "download"; tint: Theme.blue; size: 14; anchors.verticalCenter: parent.verticalCenter }
+  KitIcon { visible: face.kind === "update"; glowTarget: "live"; name: "download"; tint: Theme.blue; size: 16; anchors.verticalCenter: parent.verticalCenter }
   readonly property bool updateDone: face.kind === "update" && !PackagesService.busy && !RootService.running && PackagesService.status !== ""
   readonly property bool updateBar: face.kind === "update" && PackagesService.stage === "downloading"
   IslandLiveProgress {
     visible: face.updateBar
     anchors.verticalCenter: parent.verticalCenter
-    width: 90
     value: PackagesService.stagePercent
     tint: Theme.blue
   }
-  KitText { visible: face.updateBar; width: 34; horizontalAlignment: Text.AlignRight; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
+  KitText { visible: face.updateBar; anchors.verticalCenter: parent.verticalCenter; width: 34; horizontalAlignment: Text.AlignLeft; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
     visible: face.kind === "update" && !face.updateBar
+    anchors.verticalCenter: parent.verticalCenter
     width: Math.min(implicitWidth, 180)
     elide: Text.ElideRight
     text: face.updateDone ? (PackagesService.status === "error" ? "Update failed" : "Updates installed")
@@ -115,19 +117,19 @@ Row {
   }
 
   // backup: BKP and its progress
-  KitText { visible: face.kind === "backup"; text: "BKP"; color: Theme.foreground1; font.letterSpacing: 1 }
+  KitText { visible: face.kind === "backup"; anchors.verticalCenter: parent.verticalCenter; text: "BKP"; color: Theme.foreground1; font.letterSpacing: 1 }
   IslandLiveProgress {
     visible: face.kind === "backup" && BackupService.status === ""
     anchors.verticalCenter: parent.verticalCenter
-    width: 70
     value: BackupService.progress / 100
     tint: Theme.green
   }
 
   KitText {
     visible: face.kind === "backup"
+    anchors.verticalCenter: parent.verticalCenter
     width: BackupService.status === "" ? 34 : 50
-    horizontalAlignment: Text.AlignRight
+    horizontalAlignment: Text.AlignLeft
     text: BackupService.status === "error" ? "Failed" : BackupService.status === "ok" ? "Done" : Math.max(0, Math.round(BackupService.progress)) + "%"
     color: BackupService.status === "error" ? Theme.red : BackupService.status === "ok" ? Theme.green : Theme.foreground2
   }

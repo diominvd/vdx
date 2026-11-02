@@ -11,10 +11,9 @@ Row {
   property int coverSize: 18
   property int badgeRadius: 4
   readonly property bool track: kind === "music" || kind === "media"
-  readonly property bool badged: track || kind === "notice" && ShellSettings.liveNoticeMark === "avatar"
   readonly property var faceComponent: ["recording", "update", "backup"].includes(kind) ? taskFace
     : kind === "notice" ? noticeFace
-    : ["music", "media", "radio"].includes(kind) ? mediaFace
+    : ["music", "media"].includes(kind) ? mediaFace
     : statusFace
 
   anchors.verticalCenter: parent.verticalCenter
@@ -28,5 +27,5 @@ Row {
   Component { id: taskFace; IslandLiveTask { kind: face.kind; inputEnabled: face.inputEnabled; coverSize: face.coverSize } }
   Component { id: noticeFace; IslandLiveNoticeFace { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
   Component { id: statusFace; IslandLiveStatus { kind: face.kind } }
-  Component { id: mediaFace; IslandLiveMedia { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
+  Component { id: mediaFace; IslandLiveMedia { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius; showCover: face.kind === "media" ? ShellSettings.liveMediaCover : ShellSettings.liveMusicCover } }
 }

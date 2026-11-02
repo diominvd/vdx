@@ -13,7 +13,6 @@ KitColumn {
     { value: "sliders",    label: "Sliders",       hint: "The filled part" },
     { value: "choices",    label: "Choices",       hint: "The picked one" },
     { value: "selects",    label: "Dropdowns",     hint: "The open one's frame" },
-    { value: "modules",    label: "Bar modules",   hint: "Active states, the equalizer; not warnings" },
     { value: "window",     label: "Window frames", hint: "The focused window's frame" }
   ]
   readonly property string selected: names.includes(ShellSettings.accentStops[0]) || ShellSettings.customColours.includes(ShellSettings.accentStops[0]) ? ShellSettings.accentStops[0] : "theme"

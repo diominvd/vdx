@@ -48,9 +48,7 @@ Row {
       readonly property bool highlighted: modelData.focused || modelData.active
 
       visible: !modelData.name.startsWith("special")
-      readonly property color tone: area.containsMouse
-        ? (highlighted ? Theme.accentFor("modules", Theme.foreground0) : Theme.foreground0)
-        : (highlighted ? Theme.accentFor("modules", Theme.foreground1) : Theme.gray)
+      readonly property color tone: area.containsMouse ? Theme.foreground0 : highlighted ? Theme.foreground1 : Theme.gray
 
       // pills: the focused / visible one stretches into a bar, the rest are dots
       readonly property real shapeWidth: root.style === "dashes" ? 12 : root.style === "pills" ? (highlighted ? 16 : 6) : 8
@@ -73,7 +71,7 @@ Row {
         height: root.style === "dashes" ? 2 : root.style === "pills" ? 6 : 8
         target: "workspaces"
         lit: root.shape && workspace.highlighted
-        tint: Theme.accentFor("modules", Theme.foreground0)
+        tint: Theme.foreground0
         radius: root.style === "dots" ? 4 : root.style === "pills" ? 3 : 0
       }
 

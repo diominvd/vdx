@@ -78,7 +78,7 @@ Rectangle {
       anchors.centerIn: parent
       visible: root.current && !root.busy
       name: "volume"
-      tint: Theme.accentFor("modules", Theme.foreground0)
+      tint: Theme.foreground0
       size: Theme.iconSmall
     }
   }

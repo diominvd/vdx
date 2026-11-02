@@ -20,9 +20,8 @@ Item {
   KitBarItem {
     id: label
     icon: BrightnessService.nightActive ? "moon" : "sun"
-    text: BarLayout.faceText("brightness", !ModuleSettings.get("brightness", "percent", true) ? ""
-      : BrightnessService.available ? String(BrightnessService.brightness) : "--")
-    tint: BrightnessService.nightActive ? Theme.accentFor("modules", Theme.orange) : Theme.foreground0
+    text: BarLayout.faceText("brightness", BrightnessService.available ? String(BrightnessService.brightness) : "--")
+    tint: BrightnessService.nightActive ? Theme.orange : Theme.foreground0
   }
 
   // Wheel events reach a layer-shell surface only through a MouseArea.

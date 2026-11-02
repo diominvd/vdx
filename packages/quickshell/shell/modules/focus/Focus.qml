@@ -17,7 +17,7 @@ Item {
     id: face
     icon: "moon"
     text: BarLayout.faceText("focus", FocusService.on ? "Focus" : "")
-    tint: FocusService.on ? Theme.accentFor("modules", Theme.purple) : Theme.gray
+    tint: FocusService.on ? Theme.purple : Theme.gray
   }
 
   MouseArea {

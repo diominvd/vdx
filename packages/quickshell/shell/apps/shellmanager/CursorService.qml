@@ -45,7 +45,10 @@ Singleton {
     return ["", ""];
   }
 
-  function hex(color) { return String(color).slice(1, 7); }
+  function hex(color) {
+    const channel = value => Math.round(value * 255).toString(16).padStart(2, "0");
+    return channel(color.r) + channel(color.g) + channel(color.b);
+  }
 
   function refresh() { if (!listProc.running) listProc.running = true; }
 

@@ -60,7 +60,16 @@ Variants {
           + (CaptureService.recordAudio !== "off" ? " · " + CaptureService.recordAudio.toUpperCase() : "")
 
         KitButton {
+          icon: CaptureService.paused ? "play" : "pause"
+          iconFilled: true
+          iconTint: Theme.foreground1
+          onClicked: CaptureService.togglePause()
+        }
+
+        KitButton {
           icon: "square"
+          iconWithText: true
+          iconFilled: true
           text: "Stop"
           onClicked: CaptureService.stopRecording()
         }

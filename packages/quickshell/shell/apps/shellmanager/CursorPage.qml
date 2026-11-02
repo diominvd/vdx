@@ -46,8 +46,8 @@ KitColumn {
     { key: "themes", label: "Cursor themes", y: themesLabel.y }
   ]
   property string query: ""
-  property string scope: "all"
-  readonly property var shown: CursorService.cursors.filter(c => (scope !== "installed" || c.installed) && cursorLabel(c.name).toLowerCase().includes(query.trim().toLowerCase()))
+  readonly property var shown: CursorService.cursors.filter(c => c.installed && cursorLabel(c.name).toLowerCase().includes(query.trim().toLowerCase()))
+  onShownChanged: if (shown.length && !shown.some(c => c.name === cursorSelected)) cursorSelected = shown[0].name
 
   readonly property int columns: width >= 720 ? 3 : width >= 440 ? 2 : 1
   readonly property int gap: Theme.gapGroup
@@ -167,24 +167,13 @@ KitColumn {
   KitLabel {
     id: themesLabel
     text: "CURSOR THEMES"
-    value: CursorService.cursors.filter(c => c.installed).length + " OF " + CursorService.cursors.length + " INSTALLED"
+    value: CursorService.cursors.filter(c => c.installed).length + " INSTALLED"
   }
 
   Row {
     property bool kitUnboxed: true
     width: parent.width
-    spacing: Theme.gapMedium
-    KitInput { width: Math.max(100, parent.width - cursorFilter.width - parent.spacing); icon: "search"; placeholder: "Search cursor themes"; onTextEdited: root.query = text }
-    KitButton {
-      id: cursorFilter
-      width: 156
-      text: root.scope === "installed" ? "Installed" : "All cursors"
-      icon: root.scope === "installed" ? "check" : "list"
-      selected: root.scope === "installed"
-      Accessible.name: text
-      Accessible.description: root.scope === "installed" ? "Click to show all" : "Click to show installed only"
-      onClicked: root.scope = root.scope === "all" ? "installed" : "all"
-    }
+    KitInput { width: parent.width; icon: "search"; placeholder: "Search installed cursor themes"; onTextEdited: root.query = text }
   }
 
   Column {

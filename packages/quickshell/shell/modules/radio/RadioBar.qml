@@ -23,7 +23,7 @@ Item {
     id: face
     icon: "radio"
     text: BarLayout.faceText("tuner", RadioService.active ? (MpdService.player.station ?? "") : "")
-    tint: RadioService.active ? Theme.accentFor("modules", Theme.yellow) : Theme.gray
+    tint: RadioService.active ? Theme.yellow : Theme.gray
     opacity: RadioService.active && !MpdService.playing ? 0.6 : 1
   }
 

@@ -28,7 +28,7 @@ Item {
     id: label
     icon: "public"
     text: BarLayout.faceText("mihomo", MihomoService.serviceOn && MihomoService.current !== "" ? root.shortCurrent() : "--")
-    tint: MihomoService.serviceOn ? Theme.accentFor("modules", Theme.green) : Theme.gray
+    tint: MihomoService.serviceOn ? Theme.green : Theme.gray
   }
 
   MouseArea {

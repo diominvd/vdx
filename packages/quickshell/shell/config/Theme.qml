@@ -89,14 +89,13 @@ QtObject {
     return paletteColour(rule ? rule.colour : autoColourName(name));
   }
 
-  // the equalizer's colours (Modules › Equalizer): one colour, or a [from, to] gradient across its bars
+  // the equalizer's colour (Modules › Equalizer): a solid choice
   function equalizerColours(name) {
-    // Appearance › Colours, APPLIES TO Bar modules: the accent takes the bars whatever the choice
-    if (accentOn("modules")) return [accent, accentEnd];
     if (name.startsWith("#")) return [name, name];   // an own colour
-    const pair = { sea: ["blue", "green"], sunset: ["yellow", "red"] }[name];
-    if (pair) return [notifyDot(pair[0]), notifyDot(pair[1])];
-    const one = name === "theme" ? frame : notifyDot(name);
+    // Older saved settings may still say "sea" or "sunset"; both now fall
+    // back to the theme colour instead of continuing to render a gradient.
+    const solidName = ["sea", "sunset"].includes(name) ? "theme" : name;
+    const one = solidName === "theme" ? frame : notifyDot(solidName);
     return [one, one];
   }
 

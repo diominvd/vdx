@@ -95,7 +95,7 @@ Column {
       id: pane
       visible: list.matches.length > 0
       Controls.ScrollBar.vertical: KitScrollBar {}
-      width: parent.width - list.width - edge.width - 2 * parent.spacing
+      width: parent.width - list.width - edge.width - 2 * parent.spacing + Theme.windowPadding
       height: parent.height
       contentHeight: details.implicitHeight
       bottomMargin: Theme.windowPadding  // the window's edge clips, not a line above it

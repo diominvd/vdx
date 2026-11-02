@@ -2191,12 +2191,6 @@
   "target": "modules:brightness"
  },
  {
-  "label": "Show brightness",
-  "hint": "Off: icon only",
-  "where": "Bar modules › Brightness › BAR",
-  "target": "modules:brightness"
- },
- {
   "label": "Audio",
   "hint": "Devices, volumes, app streams",
   "where": "Bar modules",
@@ -2206,12 +2200,6 @@
   "label": "Bar",
   "hint": "",
   "where": "Bar modules › Audio",
-  "target": "modules:audio"
- },
- {
-  "label": "Show volume",
-  "hint": "Off: icon only",
-  "where": "Bar modules › Audio › BAR",
   "target": "modules:audio"
  },
  {
@@ -2387,7 +2375,7 @@
  },
  {
   "label": "Limit",
-  "hint": "Its percent is shown in the bar",
+  "hint": "Choose the limit shown in the bar",
   "where": "Bar modules › AI › BAR",
   "target": "modules:ai"
  },
@@ -2399,7 +2387,7 @@
  },
  {
   "label": "Compact popup",
-  "hint": "Hides today's tokens and the sessions: the limits only",
+  "hint": "Limits only; hide tokens and sessions",
   "where": "Bar modules › AI › BAR",
   "target": "modules:ai"
  },

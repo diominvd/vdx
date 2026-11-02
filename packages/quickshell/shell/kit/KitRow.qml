@@ -6,8 +6,9 @@ import qs.config
 //
 // `wide`: the control is a set of choices or a field — it gets the standard
 // width (Theme.controlWidth, so the right edges line up down a page); in a narrow
-// place (under Theme.rowStackBelow, or with no room for the label) it goes under the
-// label, full width; the hint wraps, never cut. Give a wide KitChoices `stretch: true`.
+// place (under Theme.rowStackBelow, or when the label and hint need the space) it goes
+// under the text. Wide controls keep the same width in either layout. Give a wide
+// KitChoices `stretch: true`.
 //
 // `needs`: what this row waits for, in one phrase ("Island style only", "Needs Live
 // activities on"): the row stays in sight, its control out of reach, the phrase where the
@@ -28,18 +29,18 @@ Item {
   property string needsAction: ""   // the button that fixes it ("Use Island")
   signal needsActed()
 
-  // a wide row beside its label: the hint wraps to a second line rather than being cut;
-  // when the label itself has no room, the control goes under them
+  // Keep enough room for both the label and the hint. Moving the control below
+  // the text is preferable to wrapping short hints into several lines.
   readonly property bool stacked: wide && (width < Theme.rowStackBelow
-    || width - controlW - 12 < labelItem.implicitWidth)
+    || width - controlW - 12 < labelItem.implicitWidth
+    || (hintItem.visible && width - controlW - 12 < hintItem.implicitWidth))
 
-  // the control's width: the standard one, less what a long hint needs to stay on one line,
-  // never under what the control itself needs (`minWidth`; a control without one keeps the standard)
+  // Wide controls share one width so their edges line up across the page. Clamp
+  // it only when the whole settings column is narrower than the standard width.
   readonly property real controlW: {
     const c = slot.children.length > 0 ? slot.children[0] : null;
     const least = c && c.minWidth !== undefined ? c.minWidth : Theme.controlWidth;
-    const room = width - 12 - Math.max(labelItem.implicitWidth, hintItem.visible ? hintItem.implicitWidth : 0);
-    return Math.max(least, Math.min(Theme.controlWidth, room));
+    return Math.min(width, Math.max(least, Math.min(Theme.controlWidth, width - 12)));
   }
 
   default property alias trailing: slot.data
@@ -115,6 +116,6 @@ Item {
     when: root.wide && slot.children.length > 0
     target: slot.children.length > 0 ? slot.children[0] : null
     property: "width"
-    value: root.stacked ? root.width : root.controlW
+    value: root.controlW
   }
 }
