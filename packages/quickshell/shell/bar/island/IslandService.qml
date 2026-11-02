@@ -132,8 +132,10 @@ Singleton {
   function liveDirection(screen) { return liveViews[screen]?.direction ?? 1; }
   readonly property string live: liveFor("")
   function pruneLiveViews() {
-    const connected = new Set(Quickshell.screens.map(s => s.name).concat([""]));
-    const kept = Object.fromEntries(Object.entries(liveViews).filter(([screen]) => connected.has(screen)));
+    const connected = Quickshell.screens.map(s => s.name).concat([""]);
+    const kept = {};
+    for (const screen of Object.keys(liveViews))
+      if (connected.includes(screen)) kept[screen] = liveViews[screen];
     if (Object.keys(kept).length !== Object.keys(liveViews).length) liveViews = kept;
   }
   Connections {
@@ -256,8 +258,10 @@ Singleton {
       if (!root.ready) return;
       const now = Date.now();
       const items = NotificationsService.items;
-      const keys = new Set(items.map(n => n.key));
-      const seen = Object.fromEntries(Object.entries(root.noticeSeen).filter(([key]) => keys.has(key)));
+      const keys = items.map(n => n.key);
+      const seen = {};
+      for (const key of Object.keys(root.noticeSeen))
+        if (keys.includes(key)) seen[key] = root.noticeSeen[key];
       const fresh = items.filter(n => n.time > (seen[n.key] ?? 0) && now - n.time <= 10000);
       if (fresh.length === 0) return;
       for (const n of fresh) seen[n.key] = n.time;
