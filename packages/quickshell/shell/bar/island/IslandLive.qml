@@ -114,10 +114,12 @@ Item {
   readonly property bool clickable: kind === "notice" || kind === "volume" || kind === "focus" && ShellSettings.liveFocusClick || IslandService.liveTarget[kind] !== undefined
   MouseArea {
     anchors.fill: parent
-    enabled: !root.sliding && !root.moving
     acceptedButtons: Qt.RightButton | (root.clickable ? Qt.LeftButton | Qt.MiddleButton : Qt.NoButton)
     cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
     onClicked: mouse => {
+      // Keep wheel paging live while the face or pill is animating, but don't
+      // let a click land on a face whose identity is still changing.
+      if (root.sliding || root.moving) return;
       if (mouse.button === Qt.RightButton) {
         if (ShellSettings.liveRightSettings) ShellIpc.call("shell", "open", ["live:" + root.kind]);
       } else if (root.kind === "notice") {
