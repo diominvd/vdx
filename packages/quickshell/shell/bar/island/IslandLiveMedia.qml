@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Widgets
 import qs.config
 import qs.kit
 import qs.modules.equalizer
