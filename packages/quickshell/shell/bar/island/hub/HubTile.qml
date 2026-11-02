@@ -33,12 +33,14 @@ Rectangle {
     width: root.compact ? 34 : 40
     height: width
     radius: Theme.pill(height)
-    color: discArea.containsMouse ? (root.on ? Theme.foreground0 : Theme.background3) : root.on ? Theme.foreground1 : Theme.pickFill
+    color: discArea.containsMouse
+      ? (root.on ? Theme.accentFor("switches", Theme.foreground0) : Theme.background3)
+      : root.on ? Theme.accentFor("switches", Theme.foreground1) : Theme.pickFill
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }
     scale: discArea.pressed ? 0.94 : 1
     Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
 
-    KitIcon { anchors.centerIn: parent; name: root.icon; size: root.compact ? 16 : 18; tint: root.on ? Theme.background0 : Theme.foreground2 }
+    KitIcon { anchors.centerIn: parent; name: root.icon; size: root.compact ? 16 : 18; tint: root.on ? Theme.inkOn(disc.color) : Theme.foreground2 }
     MouseArea { id: discArea; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.toggled() }
   }
 

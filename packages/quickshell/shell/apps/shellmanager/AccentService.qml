@@ -15,10 +15,8 @@ Singleton {
   readonly property string stateFile: Quickshell.env("HOME") + "/.local/state/dotfiles/accent.lua"
 
   readonly property bool border: Theme.accentOn("window")
-  // Hyprland's config: 0xAARRGGBB, or a gradient table {colors, angle} for two stops
-  readonly property bool gradient: border && Theme.accentGradient
+  // Hyprland's config: 0xAARRGGBB
   readonly property string colour: !border ? argb(Theme.frame)
-    : gradient ? "{ colors = { " + argb(Theme.accent) + ", " + argb(Theme.accentEnd) + " }, angle = 45 }"
     : argb(Theme.accent)
   onColourChanged: apply()
 

@@ -145,7 +145,7 @@ Item {
       gradient: Gradient {
         orientation: Gradient.Horizontal
         GradientStop { position: 0; color: root.fill }
-        GradientStop { position: 1; color: root.accented ? Theme.accentEnd : root.fill }
+        GradientStop { position: 1; color: root.accented ? Theme.accent : root.fill }
       }
     }
   }
@@ -219,7 +219,7 @@ Item {
     gradient: Gradient {
       orientation: Gradient.Horizontal
       GradientStop { position: 0; color: root.fill }
-      GradientStop { position: 1; color: root.accented ? Theme.accentEnd : root.fill }
+        GradientStop { position: 1; color: root.accented ? Theme.accent : root.fill }
     }
   }
 

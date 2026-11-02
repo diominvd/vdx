@@ -3,7 +3,7 @@
 # battery.sh — battery, power profile and GPU mode backend for modules/battery.
 #
 #   --status          {present, capacity, status, plugged, energy, energyFull, energyDesign,
-#                      power, cycles, threshold, limit, profile, profiles}   Wh / W / %;
+#                      power, voltage, cycles, threshold, limit, profile, profiles}   Wh / W / V / %;
 #                      limit: the kernel takes a charge limit
 #   --threshold N     {ok, error}   charge limit, %
 #   --profile NAME    {ok, error}   platform profile
@@ -57,6 +57,7 @@ cmd_status() {
         --argjson energyFull "$(uwh full)" \
         --argjson energyDesign "$(uwh full_design)" \
         --argjson power "$watts" \
+        --argjson voltage "$(num voltage_now)" \
         --argjson cycles "$cycles" \
         --argjson threshold "$(cat "$b/charge_control_end_threshold" 2>/dev/null || echo 100)" \
         --argjson limit "$([[ -e "$b/charge_control_end_threshold" ]] && echo true || echo false)" \
@@ -64,7 +65,7 @@ cmd_status() {
         --arg profiles "$(cat "$PROFILE"_choices 2>/dev/null)" \
         '{present: true, status: $status, capacity: $capacity, plugged: $plugged,
           energy: ($energy / 1e6), energyFull: ($energyFull / 1e6), energyDesign: ($energyDesign / 1e6),
-          power: ($power / 1e6), cycles: $cycles, threshold: $threshold, limit: $limit,
+          power: ($power / 1e6), voltage: ($voltage / 1e6), cycles: $cycles, threshold: $threshold, limit: $limit,
           profile: $profile, profiles: ($profiles | split(" ") | map(select(. != "")))}'
 }
 

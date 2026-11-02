@@ -133,7 +133,7 @@ KitFrame {
             width: list.width
             height: 30
             radius: Theme.radiusControl
-            color: picked ? Theme.background3 : area.containsMouse ? Theme.background1 : Theme.clear
+            color: picked ? Theme.selectedFill : area.containsMouse ? Theme.background1 : Theme.clear
             Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
             KitText {
@@ -148,7 +148,7 @@ KitFrame {
               anchors { left: number.right; leftMargin: Theme.gapSmall; right: genre.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
               text: station.modelData.name
               elide: Text.ElideRight
-              color: station.picked || area.containsMouse ? Theme.foreground0 : Theme.foreground2
+              color: station.picked ? Theme.selectedText : area.containsMouse ? Theme.foreground0 : Theme.foreground2
               font.weight: station.picked ? Font.ExtraBold : Font.DemiBold
             }
             KitText {

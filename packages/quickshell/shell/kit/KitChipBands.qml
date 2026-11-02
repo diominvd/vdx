@@ -243,7 +243,7 @@ Column {
               Accessible.onPressAction: board.inspected(modelData)
               Keys.onReturnPressed: board.inspected(modelData)
               Keys.onSpacePressed: board.inspected(modelData)
-              color: board.selectedId === modelData ? Theme.pickFill : hovered ? Theme.hoverOn(true) : Theme.fillOn(true)
+              color: board.selectedId === modelData ? Theme.selectedFill : hovered ? Theme.hoverOn(true) : Theme.fillOn(true)
               border.width: activeFocus || board.selectedId === modelData ? Theme.hairline : Theme.frameWidth
               border.color: activeFocus ? Theme.focusRing : board.selectedId === modelData ? Theme.controlLineHover : Theme.controlLine
               property real grown: 1

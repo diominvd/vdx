@@ -259,13 +259,13 @@ Column {
             width: options.width
             height: root.rowHeight
             radius: Math.max(0, Theme.radiusControl - 2)
-            color: active ? Theme.pickFill : optionArea.containsMouse || (box.activeFocus && index === root.highlighted) ? Theme.controlHover : Theme.clear
+            color: active ? Theme.selectedFill : optionArea.containsMouse || (box.activeFocus && index === root.highlighted) ? Theme.controlHover : Theme.clear
             Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
             KitText {
               anchors { left: parent.left; leftMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
               text: option.modelData.label
-              color: option.active || optionArea.containsMouse ? Theme.foreground0 : Theme.foreground2
+              color: option.active ? Theme.selectedText : optionArea.containsMouse ? Theme.foreground0 : Theme.foreground2
               Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
               font.weight: option.active ? Theme.pickWeight : Font.DemiBold
             }

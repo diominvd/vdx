@@ -19,7 +19,7 @@ KitFrame {
     return hours + " h" + (rest > 0 ? " " + rest + " min" : "");
   }
 
-  implicitWidth: 320
+  implicitWidth: Theme.popupWidth
 
   // ---- header ----
   KitHeader {

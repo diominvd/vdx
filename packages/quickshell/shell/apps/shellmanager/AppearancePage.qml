@@ -21,7 +21,7 @@ KitSettingsWorkspace {
   function jump(key) {
     tab = key === "accent" || key === "glow" ? key : "style";
   }
-  readonly property var resetKeys: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "accent", "accentStops", "accentGradient", "accentCustom", "customColours", "shareColours", "customColoursMax", "accentWhere", "glow", "glowStrength", "glowWhere"]
+  readonly property var resetKeys: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere", "glow", "glowStrength", "glowWhere"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 

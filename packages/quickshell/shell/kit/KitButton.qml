@@ -40,7 +40,7 @@ Rectangle {
   // set once: whether it sits in a Settings box (a walk up, not a binding)
   property bool boxed: false
   Component.onCompleted: boxed = Theme.boxed(parent)
-  color: area.pressed && !disabled && !busy ? Theme.pickFill : selected ? Theme.pickFill : hovered ? Theme.hoverOn(boxed) : Theme.fillOn(boxed)
+  color: area.pressed && !disabled && !busy ? Theme.pickFill : selected ? Theme.selectedFill : hovered ? Theme.hoverOn(boxed) : Theme.fillOn(boxed)
   border.width: activeFocus ? Theme.focusWidth : Theme.frameWidth
   border.color: activeFocus ? Theme.focusRing : selected || hovered ? Theme.controlLineHover : Theme.controlLineRest
   opacity: disabled ? 0.4 : 1
@@ -57,7 +57,7 @@ Rectangle {
       anchors.verticalCenter: parent.verticalCenter
       visible: root.icon !== "" && (root.displayText === "" || root.iconWithText) && !root.busy
       name: root.icon
-      tint: root.iconTint
+      tint: root.selected && root.iconTint === Theme.foreground0 ? Theme.selectedText : root.iconTint
       solid: root.iconSolid
       filled: root.iconFilled
       size: Theme.fontSize + 1
@@ -71,7 +71,7 @@ Rectangle {
     KitText {
       visible: root.displayText !== ""
       text: root.displayText
-      color: root.selected ? Theme.accentFor("choices", Theme.foreground0) : Theme.foreground0
+      color: root.selected ? Theme.selectedText : Theme.foreground0
       font.weight: Font.Medium
     }
   }

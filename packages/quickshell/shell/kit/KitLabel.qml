@@ -24,8 +24,10 @@ Item {
     y: -root.trimTop
     text: root.text
     color: Theme.muted
-    font.pixelSize: Theme.fontSize - 2
-    font.letterSpacing: 1
+    font.family: Theme.fontFamily
+    font.pixelSize: Theme.sectionCaptionSize
+    font.weight: Theme.fontWeight
+    font.letterSpacing: Theme.sectionCaptionTracking
   }
 
   // what the block does: an info mark after the caption, the text in its tooltip
@@ -43,7 +45,9 @@ Item {
     elide: Text.ElideRight
     text: root.value
     color: root.valueColor
-    font.pixelSize: Theme.fontSize - 2
-    font.letterSpacing: 1
+    font.family: Theme.fontFamily
+    font.pixelSize: Theme.sectionCaptionSize
+    font.weight: Theme.fontWeight
+    font.letterSpacing: Theme.sectionCaptionTracking
   }
 }

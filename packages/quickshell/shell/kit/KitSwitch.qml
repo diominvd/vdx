@@ -52,7 +52,7 @@ Rectangle {
     }
     GradientStop {
       position: 1
-      color: root.accented ? Theme.accentEnd : root.checked ? Theme.foreground0 : root.m3 ? root.trackColor : Theme.fillOn(root.boxed)
+      color: root.accented ? Theme.accent : root.checked ? Theme.foreground0 : root.m3 ? root.trackColor : Theme.fillOn(root.boxed)
       Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
     }
   }
@@ -101,7 +101,7 @@ Rectangle {
     anchors.verticalCenter: parent.verticalCenter
     x: root.m3 ? (root.checked ? root.width - root.height / 2 : root.height / 2) - size / 2
                : root.checked ? root.width - width - edge : edge
-    color: root.accented ? Theme.inkOnGradient(Theme.accent, Theme.accentEnd)
+    color: root.accented ? Theme.inkOn(Theme.accent)
          : root.m3 ? (root.checked ? Theme.background0 : root.hovered ? Theme.foreground2 : Theme.gray)
          : root.checked ? Theme.background0 : root.hovered ? Theme.foreground2 : Theme.gray
 

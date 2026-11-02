@@ -28,7 +28,7 @@ Rectangle {
   }
 
   height: 30
-  color: current ? Theme.background3 : hover.hovered ? Theme.background1 : Theme.clear
+  color: current ? Theme.selectedFill : hover.hovered ? Theme.background1 : Theme.clear
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   HoverHandler { id: hover }
@@ -49,7 +49,7 @@ Rectangle {
     width: Math.min(implicitWidth, check.x - x - 8 - (lock.visible ? lock.width + 6 : 0))
     text: root.modelData.ssid
     elide: Text.ElideRight
-    color: root.current || hover.hovered ? Theme.foreground0 : Theme.foreground2
+    color: root.current ? Theme.selectedText : hover.hovered ? Theme.foreground0 : Theme.foreground2
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
     font.weight: root.current ? Font.ExtraBold : Font.DemiBold
   }

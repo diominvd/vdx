@@ -165,7 +165,7 @@ Rectangle {
               width: Math.min(implicitWidth, segment.width - Theme.gapMedium - (tick.visible ? tick.width + parent.spacing : 0))
               elide: Text.ElideRight
               text: segment.modelData.label
-              color: segment.selected ? Theme.accentFor("choices", Theme.foreground0) : Theme.foreground2
+              color: segment.selected ? Theme.selectedText : Theme.foreground2
               font.weight: segment.selected ? Theme.pickWeight : Font.Normal
             }
           }

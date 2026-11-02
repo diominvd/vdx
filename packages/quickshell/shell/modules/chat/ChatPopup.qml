@@ -14,7 +14,7 @@ KitFrame {
   function focusInput() { focusLater.restart(); }
   Timer { id: focusLater; interval: 60; onTriggered: field.input.forceActiveFocus() }
 
-  implicitWidth: 440
+  implicitWidth: 400
   focus: true
   onVisibleChanged: if (visible) focusInput()
 

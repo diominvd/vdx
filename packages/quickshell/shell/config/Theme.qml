@@ -103,18 +103,15 @@ QtObject {
   // A stop by name: "theme" is the theme's frame colour (the accent that follows
   // the theme), "custom" the typed one. slot: the stop it is for (0 the colour,
   // 1 the gradient's end): a custom colour has one per stop
-  function accentColour(name, slot) {
+  function accentColour(name) {
     if (name.startsWith("#")) return name; // an own colour (Accent › Colour)
     if (name === "custom") return frame; // Legacy imported colours fall back to the theme.
     if (name === "theme") return frame;
     return { red: red, orange: orange, yellow: yellow, green: green, aqua: aqua, blue: blue, purple: purple }[name] ?? foreground0;
   }
-  readonly property bool accentGradient: false
-  // the gradient's two ends; with one, both are the same colour, so a fill can
-  // always be a Gradient from `accent` to `accentEnd`
-  readonly property color accent: accentColour(ShellSettings.accentStops[0] ?? "theme", 0)
-  readonly property color accentEnd: accentGradient ? accentColour(ShellSettings.accentStops[1] ?? "theme", 1) : accent
-  // what takes the accent: a target key of Appearance › Colours (off by default)
+  // A solid accent is shared by every selected control.
+  readonly property color accent: accentColour(ShellSettings.accentStops[0] ?? "theme")
+  // Each control group can opt in independently (Appearance › Colours).
   function accentOn(key) { return ShellSettings.accent && ShellSettings.accentWhere[key] === true; }
   // the glow: a target glows unless switched off (Appearance › Glow)
   readonly property real glowLevel: ShellSettings.glowStrength / 100
@@ -125,6 +122,8 @@ QtObject {
   readonly property string fontFamily: ShellSettings.font     // the system monospace, Shell Manager › Appearance
   readonly property int fontSize: ShellSettings.textSize      // Appearance › Font › Text size
   readonly property int fontWeight: Font.Normal
+  readonly property int sectionCaptionSize: fontSize - 2
+  readonly property int sectionCaptionTracking: 1
   readonly property int barHeight: material ? 38 : 36
   readonly property int moduleSpacing: 2
   readonly property int edgeMargin: 20
@@ -174,7 +173,7 @@ QtObject {
   readonly property color sideFill: material ? surfaceContainer : mix(background0, foreground0, 0.025)
 
   // Semantic roles: theme palettes remain the source, components use roles.
-  // Neutral containers preserve monochrome; the accent is opt-in per target.
+  // Neutral containers preserve monochrome until Accent is enabled; status colours stay semantic.
   readonly property color surfaceContainer: mix(background0, foreground0, 0.045)
   readonly property color surfaceHigh: mix(background0, foreground0, 0.08)
   readonly property color surfaceHighest: mix(background0, foreground0, 0.12)
@@ -182,6 +181,8 @@ QtObject {
   readonly property color outline: mix(background0, foreground0, 0.42)
   readonly property color outlineVariant: mix(background0, foreground0, 0.12)
   readonly property color secondaryContainer: mix(background0, accentFor("choices", foreground0), 0.16)
+  readonly property color selectedFill: accentOn("choices") ? secondaryContainer : pickFill
+  readonly property color selectedText: accentOn("choices") ? legible(accent, background0) : foreground0
   readonly property color focusRing: legible(accentFor("choices", foreground0), background0)
   readonly property int focusWidth: 2
   readonly property int navigationHeight: material ? 36 : 34
@@ -193,11 +194,6 @@ QtObject {
   function inkOn(fill: color): color {
     return contrast(foreground0, fill) >= contrast(background0, fill) ? foreground0 : background0;
   }
-  function inkOnGradient(first: color, last: color): color {
-    return Math.min(contrast(foreground0, first), contrast(foreground0, last))
-      >= Math.min(contrast(background0, first), contrast(background0, last)) ? foreground0 : background0;
-  }
-
   // ---- corners (Appearance › Corners) ----
   // sharp: all 0. round: one slider (Corners › Radius, R) sets every corner in
   // proportion: a surface takes R, a card 0.6 R, and anything of height h
@@ -247,7 +243,8 @@ QtObject {
   readonly property int iconLarge: 24
   readonly property int sideWidth: 216
   readonly property int popupPadding: 16       // a popup's frame, every side (KitFrame)
-  readonly property int popupWidth: 380
+  readonly property int popupWidth: 380       // larger standalone surfaces such as auth and recording
+  readonly property int modulePopupWidth: 340  // ordinary module popups; wider views opt into their needed width
   // a window's frame: the gap to its edges on every side, and the space the
   // title's line keeps above its capitals (the header draws that far into its box)
   readonly property int windowPadding: 24

@@ -1,12 +1,10 @@
 import QtQuick
 import qs.config
 
-// A slider with its reading. Two layouts:
-//   * `label` set — small-caps "LABEL ......... value" over a full-width slider
-//     (`rowStyle`: the label and value as in a KitRow);
-//   * `label` empty — icon, slider and value on one line (Strict: the icon and the
-//     value sit inside the plate); with `clickable` the
-//     icon is a button (mute and the like).
+// A slider with its reading. Material puts a labelled slider in one row;
+// Strict keeps its label and value in the slider plate. Unlabelled sliders keep
+// the icon, track and reading together on one line in either style.
+// With `clickable` the icon is a button (mute and the like).
 Item {
   id: root
 
@@ -26,6 +24,11 @@ Item {
   readonly property bool plate: !Theme.material && spectrum.length === 0
 
   readonly property bool captioned: label !== ""
+  readonly property bool inlineCaption: captioned && Theme.material
+  // The host column keeps its width across styles; KitGrouper changes the
+  // row inset. Measure here so the track stays the same size in both layouts.
+  readonly property real trackWidth: Math.min(Theme.controlWidth,
+    Math.round((parent ? parent.width : width) * 0.58))
   readonly property bool pressed: slider.pressed
   readonly property real dragValue: slider.dragValue
 
@@ -34,11 +37,11 @@ Item {
   signal iconClicked()
 
   width: parent ? parent.width : 0
-  implicitHeight: plate ? slider.implicitHeight + 4 : captioned ? (rowStyle ? rowCaption.implicitHeight + Theme.gapMedium : caption.implicitHeight + 6) + slider.implicitHeight : Math.max(28, slider.implicitHeight + 4)
+  implicitHeight: inlineCaption ? Math.max(Theme.rowHeight, slider.implicitHeight) : plate ? slider.implicitHeight + 4 : captioned ? (rowStyle ? rowCaption.implicitHeight + Theme.gapMedium : caption.implicitHeight + 6) + slider.implicitHeight : Math.max(28, slider.implicitHeight + 4)
 
   KitLabel {
     id: caption
-    visible: root.captioned && !root.rowStyle && !root.plate
+    visible: root.captioned && !root.inlineCaption && !root.rowStyle && !root.plate
     text: root.label
     value: root.text
     valueColor: root.dimmed ? Theme.gray : Theme.foreground2
@@ -46,14 +49,24 @@ Item {
 
   KitText {
     id: rowCaption
-    visible: root.captioned && (root.rowStyle || root.plate)
-    anchors.verticalCenter: root.plate ? parent.verticalCenter : undefined
+    visible: root.captioned && (root.rowStyle || root.plate || root.inlineCaption)
+    anchors {
+      left: root.inlineCaption ? parent.left : undefined
+      verticalCenter: root.plate || root.inlineCaption ? parent.verticalCenter : undefined
+    }
+    width: root.inlineCaption ? Math.min(implicitWidth, Math.max(0, slider.x - Theme.gapMedium)) : implicitWidth
+    elide: Text.ElideRight
     text: root.label
   }
 
   KitText {
+    id: rowValue
     visible: rowCaption.visible && !root.plate
-    anchors { right: parent.right; baseline: rowCaption.baseline }
+    anchors {
+      right: parent.right
+      verticalCenter: root.inlineCaption ? parent.verticalCenter : undefined
+      baseline: root.inlineCaption ? undefined : rowCaption.baseline
+    }
     text: root.text
     color: root.dimmed ? Theme.gray : Theme.foreground2
   }
@@ -111,14 +124,17 @@ Item {
   KitSlider {
     id: slider
     anchors {
-      left: root.plate && root.captioned ? undefined : root.captioned || root.plate ? parent.left : iconBox.right
-      leftMargin: root.captioned || root.plate ? 0 : 8
-      right: root.captioned || root.plate ? parent.right : inlineValue.left
-      rightMargin: root.captioned || root.plate ? 0 : 10
-      bottom: parent.bottom
+      verticalCenter: root.inlineCaption ? parent.verticalCenter : undefined
+      bottom: root.inlineCaption ? undefined : parent.bottom
       bottomMargin: root.plate ? 2 : root.captioned ? 0 : 4
     }
-    width: root.plate && root.captioned ? Math.min(Theme.controlWidth, Math.round(parent.width * 0.58)) : implicitWidth
+    // Horizontal anchors used to override width when both ends were set.
+    // Position explicitly so a style change never stretches a labelled track.
+    x: root.captioned
+      ? (root.inlineCaption ? rowValue.x - Theme.gapMedium - width : root.width - width)
+      : (root.plate ? 0 : iconBox.x + iconBox.width + 8)
+    width: root.captioned ? root.trackWidth
+      : root.plate ? root.width : Math.max(0, inlineValue.x - x - 10)
     plate: root.plate
     text: root.text
     accessibleName: root.accessibleName

@@ -49,7 +49,7 @@ Rectangle {
   // ---- shape ----
   readonly property real pad: Theme.island ? Theme.gapGroup : Theme.gapLoose
 
-  width: popupShown ? (popupContent?.fitWidth ? popupContent.implicitWidth : Math.max(Theme.popupWidth, popupContent?.implicitWidth ?? 0)) : kids.width + 2 * pad
+  width: popupShown ? (popupContent?.fitWidth ? popupContent.implicitWidth : Math.max(Theme.modulePopupWidth, popupContent?.implicitWidth ?? 0)) : kids.width + 2 * pad
   height: popupShown ? (popupContent?.implicitHeight ?? band) : band
   radius: Theme.island ? Math.min(Theme.barRadiusFor(height), Theme.islandRadius) : Theme.radiusControl
   color: Theme.island ? Theme.background0 : Theme.background1

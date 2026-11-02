@@ -31,7 +31,7 @@ BarPopup {
   KitFrame {
     id: frame
 
-    // as wide as its widest row (KitFrame's default is Theme.popupWidth): each
+    // as wide as its widest row (KitFrame's default is Theme.modulePopupWidth): each
     // row is as wide as its own label, `rows` takes the widest, and a row's
     // body (highlight, line) spans the whole of `rows`
     fitWidth: true

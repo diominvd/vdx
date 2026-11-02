@@ -9,6 +9,7 @@ Rectangle {
 
   property string icon: ""
   property int iconSize: 20
+  property color iconTint: Theme.foreground0
   property var group: null
 
   signal clicked()
@@ -32,6 +33,7 @@ Rectangle {
     name: root.icon
     size: root.iconSize
     solid: true
+    tint: root.iconTint
     scale: area.pressed ? 0.88 : 1
     Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
   }

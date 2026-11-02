@@ -17,7 +17,7 @@ ClippingRectangle {
   radius: Theme.radiusCard
   color: Theme.background1
   border.width: picked ? 2 : Theme.frameWidth
-  border.color: picked ? Theme.foreground0 : area.containsMouse ? Theme.foreground2 : Theme.background2
+  border.color: picked ? Theme.accentFor("choices", Theme.foreground0) : area.containsMouse ? Theme.foreground2 : Theme.background2
   Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   Image {

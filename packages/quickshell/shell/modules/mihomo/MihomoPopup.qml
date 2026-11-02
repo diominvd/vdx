@@ -131,14 +131,14 @@ KitFrame {
 
             width: servers.width
             height: 30
-            color: current ? Theme.background3 : area.containsMouse ? Theme.background1 : Theme.clear
+            color: current ? Theme.selectedFill : area.containsMouse ? Theme.background1 : Theme.clear
             Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
             KitText {
               anchors { left: parent.left; leftMargin: Theme.gapLoose; right: ping.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
               text: server.modelData.name
               elide: Text.ElideRight
-              color: server.current || area.containsMouse ? Theme.foreground0 : Theme.foreground2
+              color: server.current ? Theme.selectedText : area.containsMouse ? Theme.foreground0 : Theme.foreground2
               Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
               font.weight: server.current ? Font.ExtraBold : Font.DemiBold
             }

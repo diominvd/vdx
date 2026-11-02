@@ -15,7 +15,7 @@ Row {
   id: face
 
   property string kind: ""
-  spacing: Theme.gapMedium
+  spacing: kind === "volume" || kind === "timer" ? Theme.gapSmall : Theme.gapMedium
   visible: kind !== ""
 
   // low battery: the level in red, the time left
@@ -115,7 +115,7 @@ Row {
       }
     }
   }
-  KitText { visible: face.kind === "volume"; anchors.verticalCenter: parent.verticalCenter; width: 30; horizontalAlignment: Text.AlignRight; text: Math.round(IslandService.osdLevel * 100); color: IslandService.osdLoud ? Theme.red : Theme.foreground1 }
+  KitText { visible: face.kind === "volume"; anchors.verticalCenter: parent.verticalCenter; text: Math.round(IslandService.osdLevel * 100); color: IslandService.osdLoud ? Theme.red : Theme.foreground1 }
 
   // flashes: the mic, the layout, the cable
   KitIcon { visible: face.kind === "mic"; glowTarget: "live"; name: IslandService.micMuted ? "mic-off" : "mic"; size: 16; tint: IslandService.micMuted ? Theme.red : Theme.green; anchors.verticalCenter: parent.verticalCenter }

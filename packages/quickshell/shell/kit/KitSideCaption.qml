@@ -17,7 +17,9 @@ Item {
     anchors { left: parent.left; leftMargin: Theme.gapLoose; top: parent.top; topMargin: root.lead }
     text: root.text
     color: Theme.muted
-    font.pixelSize: Theme.fontSize - 2
+    font.family: Theme.fontFamily
+    font.pixelSize: Theme.sectionCaptionSize
+    font.letterSpacing: Theme.sectionCaptionTracking
     font.weight: Font.DemiBold
   }
 }

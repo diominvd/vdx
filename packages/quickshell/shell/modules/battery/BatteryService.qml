@@ -34,6 +34,7 @@ Singleton {
   readonly property bool discharging: info.status === "Discharging"
   readonly property string capacityLabel: present ? capacity + "%" : "—"
   readonly property real power: info.power ?? 0                // W
+  readonly property real voltage: info.voltage ?? 0            // V
   readonly property real energy: info.energy ?? 0              // Wh
   readonly property real energyFull: info.energyFull ?? 0      // Wh
   readonly property real energyDesign: info.energyDesign ?? 0  // Wh

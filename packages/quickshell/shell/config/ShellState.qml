@@ -31,9 +31,7 @@ JsonAdapter {
   property bool material: false
   property bool segmentedSliders: true
   property bool accent: false
-  property var accentStops: ["blue", "purple"]
-  property bool accentGradient: false
-  property var accentCustom: ["", ""]
+  property var accentStops: ["blue", "blue"]
   property var customColours: []
   property bool shareColours: false
   property int customColoursMax: 3

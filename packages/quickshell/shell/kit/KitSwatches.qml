@@ -39,7 +39,7 @@ Row {
       height: 18
       radius: Theme.pill(height)
       border.width: picked ? Theme.ring : hollow ? Theme.hairline : 0
-      border.color: picked ? Theme.foreground0 : Theme.gray
+      border.color: picked ? Theme.selectedText : Theme.gray
       gradient: Gradient {
         orientation: Gradient.Horizontal
         GradientStop { position: 0; color: swatch.pair[0] }

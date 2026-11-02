@@ -32,14 +32,9 @@ Singleton {
   readonly property string barDotColor: state.barDotColor         // theme | red | orange | yellow | green | aqua | blue | purple: that dot's colour
   readonly property bool material: state.material                 // controls filled, no frames (Appearance › Controls)
   readonly property bool segmentedSliders: state.segmentedSliders   // Strict: split fill and remainder into two pills
-  // the accent (Appearance › Colours): two stops, the first the colour, the second
-  // the gradient's end when accentGradient is on. A stop is a colour name (theme =
-  // the theme's frame colour | red | … | purple) or "custom", its colour in
-  // accentCustom (one #rrggbb per stop, "" until one is typed)
+  // the accent (Appearance › Colours): one solid palette colour; the pair shape stays for state-file compatibility
   readonly property bool accent: state.accent                     // the accent on at all (off: monochrome)
-  readonly property bool accentGradient: state.accentGradient
   readonly property var accentStops: state.accentStops
-  readonly property var accentCustom: Array.isArray(state.accentCustom) ? state.accentCustom : ["", ""]
   // the user's own colours (#rrggbb, at most customColoursMax): the accent's picker always offers them, the other colour
   // choices only with shareColours (Appearance › Colours › Share own colours)
   readonly property var customColours: Array.isArray(state.customColours) ? state.customColours : []
@@ -49,7 +44,7 @@ Singleton {
     if (customColours.length < customColoursMax && !customColours.includes(hex)) set("customColours", customColours.concat([hex]));
   }
   function removeCustomColour(hex) { set("customColours", customColours.filter(c => c !== hex)); }
-  readonly property var accentWhere: state.accentWhere            // target key -> true: what takes the accent
+  readonly property var accentWhere: state.accentWhere            // independently accented UI targets
   // the glow (Appearance › Glow): a halo behind bright elements; glowWhere: target key -> false when switched off
   readonly property bool glow: state.glow
   readonly property int glowStrength: state.glowStrength          // 0..100

@@ -129,7 +129,7 @@ Item {
     power:   [434, 86],
     looks:   [looks.implicitWidth, looks.implicitHeight],
     root:    [420, rootView.implicitHeight],
-    module:  [popupContent?.fitWidth ? popupContent.implicitWidth : Math.max(Theme.popupWidth, popupContent?.implicitWidth ?? 0), popupContent?.implicitHeight ?? Theme.islandHeight]
+    module:  [popupContent?.fitWidth ? popupContent.implicitWidth : Math.max(Theme.modulePopupWidth, popupContent?.implicitWidth ?? 0), popupContent?.implicitHeight ?? Theme.islandHeight]
   })
   readonly property var size: sizes[shown]
 

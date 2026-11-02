@@ -18,7 +18,7 @@ Rectangle {
   // the same for a window whose last item is text: its line box ends below the ink
   property int bottomInset: 0
   property bool inIsland: false
-  // a menu: as wide as its content, not at least Theme.popupWidth (the island's
+  // a menu: as wide as its content, not at least Theme.modulePopupWidth (the island's
   // popup width follows this too). The content sets implicitWidth itself.
   property bool fitWidth: false
 
@@ -26,7 +26,7 @@ Rectangle {
   // and the stroke looks bent: the frame and the size are whole device pixels
   readonly property real dpr: Screen.devicePixelRatio > 0 ? Screen.devicePixelRatio : 1
 
-  implicitWidth: Math.ceil(Theme.popupWidth * dpr) / dpr
+  implicitWidth: Math.ceil(Theme.modulePopupWidth * dpr) / dpr
   implicitHeight: Math.ceil((column.implicitHeight + 2 * padding - headerInset - bottomInset) * dpr) / dpr
   radius: framed ? Theme.radiusSurface : 0
   color: inIsland ? "transparent" : Theme.background0

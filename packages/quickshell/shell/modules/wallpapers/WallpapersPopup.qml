@@ -65,7 +65,7 @@ KitFrame {
 
   onQueryChanged: pickInUse()
 
-  implicitWidth: cards ? 560 : Theme.popupWidth
+  implicitWidth: cards ? 480 : Theme.modulePopupWidth
 
   // ---- header (the strip's popup) ----
   KitHeader {
@@ -200,7 +200,8 @@ KitFrame {
       width: rows.width
       height: 32
       radius: Theme.radiusControl
-      color: picked ? Theme.background3 : area.containsMouse ? Theme.background1 : Theme.clear
+      color: picked ? Theme.selectedFill
+        : area.containsMouse ? Theme.background1 : Theme.clear
       Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
       // a small picture, cropped, framed like the swatches

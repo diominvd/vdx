@@ -29,7 +29,7 @@ Rectangle {
   width: parent ? parent.width : 0
   height: Theme.navigationHeight
   radius: Theme.radiusControl
-  color: current ? Theme.pickFill : area.containsMouse ? Theme.controlHover : Theme.clear
+  color: current ? Theme.selectedFill : area.containsMouse ? Theme.controlHover : Theme.clear
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
   // the icon is the Shell Manager's (NavRow): bare or framed by Appearance › Icons, or off
@@ -40,7 +40,7 @@ Rectangle {
     name: root.icon
     active: root.current
     hovered: area.containsMouse
-    tint: root.current ? Theme.foreground0 : Theme.foreground2
+    tint: root.current ? Theme.selectedText : Theme.foreground2
     glyph: 16
   }
 
@@ -48,7 +48,7 @@ Rectangle {
     anchors { left: ShellSettings.menuIcons ? glyph.right : parent.left; leftMargin: Theme.gapLoose; right: hintText.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
     text: root.text
     elide: Text.ElideRight
-    color: root.current ? Theme.foreground0 : Theme.foreground2
+    color: root.current ? Theme.selectedText : Theme.foreground2
     font.weight: root.current ? Theme.pickWeight : Font.Normal
   }
 

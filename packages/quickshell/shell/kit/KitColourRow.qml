@@ -210,7 +210,7 @@ Item {
       anchors { right: parent.right; verticalCenter: parent.verticalCenter }
       icon: "check"
       Accessible.name: "Save colour"
-      color: hovered ? Theme.pickFill : Theme.accentFor("choices", Theme.background3)
+      color: hovered ? Theme.pickFill : Theme.selectedFill
       iconTint: Theme.background0
       onClicked: root.save()
     }
