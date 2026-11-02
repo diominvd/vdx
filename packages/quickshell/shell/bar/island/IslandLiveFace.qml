@@ -23,6 +23,7 @@ Row {
   id: face
 
   property string kind: ""
+  property bool inputEnabled: true
   property int coverSize: 18                   // a badge (cover, avatar): the chip's height less its inset on both sides
   property int badgeRadius: 4                  // concentric with the chip
   // an activity that starts with a badge sits it the same inset from the chip's left, top and bottom
@@ -88,6 +89,7 @@ Row {
       MouseArea {
         id: area
         anchors.fill: parent
+        enabled: face.inputEnabled
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: btn.stop ? CaptureService.stopRecording() : CaptureService.togglePause()
@@ -117,6 +119,8 @@ Row {
   KitText { visible: face.updateBar; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
     visible: face.kind === "update" && !face.updateBar
+    width: Math.min(implicitWidth, 180)
+    elide: Text.ElideRight
     text: PackagesService.stage === "installing" ? "Installing packages" : PackagesService.busy ? "Updating packages" : RootService.title
     color: Theme.blue
   }
@@ -191,13 +195,15 @@ Row {
   KitText { visible: face.kind === "battery"; text: BatteryService.capacity + "%"; color: Theme.red }
   KitText {
     visible: face.kind === "battery" && BatteryService.minutesLeft > 0
+    width: Math.min(implicitWidth, 150)
+    elide: Text.ElideRight
     text: "· " + (BatteryService.minutesLeft >= 60 ? Math.floor(BatteryService.minutesLeft / 60) + " h " : "") + BatteryService.minutesLeft % 60 + " min left"
     color: Theme.muted
   }
 
   // a device that connected: its name, the charge
   KitIcon { visible: face.kind === "bluetooth"; glowTarget: "live"; name: "bluetooth"; size: 16; tint: Theme.blue; anchors.verticalCenter: parent.verticalCenter }
-  KitText { visible: face.kind === "bluetooth"; text: BluetoothService.mainDevice?.name ?? ""; color: Theme.foreground1 }
+  KitText { visible: face.kind === "bluetooth"; width: Math.min(implicitWidth, 180); elide: Text.ElideRight; text: BluetoothService.mainDevice?.name ?? ""; color: Theme.foreground1 }
   KitText {
     visible: face.kind === "bluetooth" && BluetoothService.mainDevice?.battery != null
     text: BluetoothService.mainDevice?.battery + "%"

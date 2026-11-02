@@ -192,39 +192,90 @@ Singleton {
   property var notices: []                     // [{key, app, summary, body, urgency, time}]
   property int noticeMore: 0                   // fresh ones past the stack: "N more notifications"
   property real noticeTime: 0                 // the newest one taken: later ones are news
+  property var noticeSeen: ({})                // notification key -> last version shown
+  property var noticeQueue: []                 // live notices wait in arrival order
 
   // Notifications › Delivery › Show as: a card (the island's toast) or a live activity (a line in the slot)
   readonly property string noticeAppear: ModuleSettings.get("notifications", "appear", "card")
   property var noticeItem: null                // the one the live slot shows (appear "live")
+  onLiveNoticeMsChanged: {
+    if (!noticeItem || noticeItem.urgency === "critical") return;
+    if (liveNoticeMs === 0) noticeLiveTimer.stop();
+    else { noticeLiveTimer.interval = liveNoticeMs; noticeLiveTimer.restart(); }
+  }
 
   Connections {
     target: NotificationsService
     function onItemsChanged() {
       if (!root.ready) return;
       const now = Date.now();
-      const fresh = NotificationsService.items.filter(n => n.time > root.noticeTime && now - n.time <= 10000);
+      const items = NotificationsService.items;
+      const keys = new Set(items.map(n => n.key));
+      const seen = Object.fromEntries(Object.entries(root.noticeSeen).filter(([key]) => keys.has(key)));
+      const fresh = items.filter(n => n.time > (seen[n.key] ?? 0) && now - n.time <= 10000);
       if (fresh.length === 0) return;
-      root.noticeTime = fresh[0].time;
+      for (const n of fresh) seen[n.key] = n.time;
+      root.noticeSeen = seen;
+      root.noticeTime = Math.max(root.noticeTime, ...fresh.map(n => n.time));
       // Focus: only the critical ones come through
-      if (FocusService.on && fresh[0].urgency !== "critical") return;
+      const deliver = FocusService.on ? fresh.filter(n => n.urgency === "critical") : fresh;
+      if (deliver.length === 0) return;
       if (root.noticeAppear === "live" && ShellSettings.liveEnabled) {
-        // the newest takes the slot; a critical one, or "Until read", waits until the centre opens or a click
-        root.noticeItem = fresh[0];
-        if (fresh[0].urgency === "critical" || ShellSettings.liveNoticeMs === 0) noticeLiveTimer.stop();
-        else { noticeLiveTimer.interval = ShellSettings.liveNoticeMs; noticeLiveTimer.restart(); }
+        // A live notice holds the slot until its turn ends; critical notices preempt.
+        root.enqueueLiveNotices(deliver.slice().reverse());
         return;
       }
       // a replaced notification (same key) takes its old toast's place
-      root.notices = fresh.concat(root.notices.filter(n => !fresh.some(f => f.key === n.key)))
+      root.notices = deliver.concat(root.notices.filter(n => !deliver.some(f => f.key === n.key)))
                           .slice(0, root.noticeMax);
-      root.noticeMore = Math.max(0, fresh.length - root.noticeMax);
+      root.noticeMore = Math.max(0, deliver.length - root.noticeMax);
       // critical toasts stay until dismissed, as in mako's [urgency=critical]:
       // a plain one stacked with a critical one waits with it
       root.flashed("notice", root.hasCritical() ? 0 : root.noticeMs);
     }
   }
-  Timer { id: noticeLiveTimer; onTriggered: root.noticeItem = null }
-  function dismissLiveNotice() { noticeItem = null; noticeLiveTimer.stop(); NotificationsService.markSeen(); }
+  function sameNotice(a, b) { return a.app === b.app && a.summary === b.summary && a.body === b.body && a.urgency === b.urgency; }
+  function showNextLiveNotice(markRead) {
+    if (noticeQueue.length === 0) {
+      noticeItem = null;
+      noticeLiveTimer.stop();
+      if (markRead) NotificationsService.markSeen();
+      return;
+    }
+    noticeItem = noticeQueue[0];
+    noticeQueue = noticeQueue.slice(1);
+    if (noticeItem.urgency === "critical" || ShellSettings.liveNoticeMs === 0) noticeLiveTimer.stop();
+    else { noticeLiveTimer.interval = ShellSettings.liveNoticeMs; noticeLiveTimer.restart(); }
+  }
+  function enqueueLiveNotices(items) {
+    let queue = noticeQueue.slice();
+    for (const item of items) {
+      if (noticeItem && noticeItem.key === item.key) {
+        noticeItem = Object.assign({}, item, { repeats: noticeItem.repeats ?? 1 });
+        if (noticeItem.urgency === "critical" || ShellSettings.liveNoticeMs === 0) noticeLiveTimer.stop();
+        else { noticeLiveTimer.interval = ShellSettings.liveNoticeMs; noticeLiveTimer.restart(); }
+        continue;
+      }
+      if (noticeItem && sameNotice(noticeItem, item)) {
+        noticeItem = Object.assign({}, noticeItem, { repeats: (noticeItem.repeats ?? 1) + 1 });
+        if (noticeItem.urgency !== "critical" && ShellSettings.liveNoticeMs > 0) noticeLiveTimer.restart();
+        continue;
+      }
+      if (item.urgency === "critical" && noticeItem && noticeItem.urgency !== "critical") {
+        noticeLiveTimer.stop();
+        queue.unshift(noticeItem);
+        noticeItem = Object.assign({ repeats: 1 }, item);
+        continue;
+      }
+      const duplicate = queue.findIndex(n => sameNotice(n, item));
+      if (duplicate >= 0) queue[duplicate] = Object.assign({}, queue[duplicate], { repeats: (queue[duplicate].repeats ?? 1) + 1 });
+      else queue.push(Object.assign({ repeats: 1 }, item));
+    }
+    noticeQueue = queue.slice(0, 32);
+    if (!noticeItem) showNextLiveNotice();
+  }
+  Timer { id: noticeLiveTimer; onTriggered: root.showNextLiveNotice(false) }
+  function dismissLiveNotice() { noticeLiveTimer.stop(); showNextLiveNotice(true); }
 
   function hasCritical() { return root.notices.some(n => n.urgency === "critical"); }
 
@@ -234,6 +285,7 @@ Singleton {
   function clearNotices(keepCritical) {
     root.notices = keepCritical ? root.notices.filter(n => n.urgency === "critical") : [];
     root.noticeMore = 0;
+    root.noticeQueue = keepCritical ? root.noticeQueue.filter(n => n.urgency === "critical") : [];
   }
 
   // a click on a notice: its app's window, else the notifications popup (D-02)
@@ -272,7 +324,7 @@ Singleton {
   // the centre opened (from anywhere): the toasts close, the centre keeps them
   Connections {
     target: NotificationsService
-    function onOpened() { root.clearNotices(); root.noticeItem = null; }
+    function onOpened() { root.clearNotices(); root.noticeItem = null; noticeLiveTimer.stop(); }
   }
 
   function openNotifications() {

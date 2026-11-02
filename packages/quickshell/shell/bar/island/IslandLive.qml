@@ -100,8 +100,8 @@ Item {
     color: Theme.background2
   }
 
-  IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius }
-  IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius }
+  IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; inputEnabled: !root.sliding && !root.moving }
+  IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius; inputEnabled: !root.sliding && !root.moving }
 
   Component.onCompleted: { faceA.kind = kind; place(); }
 
@@ -112,6 +112,7 @@ Item {
   readonly property bool clickable: kind === "notice" || kind === "focus" && ShellSettings.liveFocusClick || IslandService.liveTarget[kind] !== undefined
   MouseArea {
     anchors.fill: parent
+    enabled: !root.sliding && !root.moving
     acceptedButtons: Qt.RightButton | (root.clickable ? Qt.LeftButton | Qt.MiddleButton : Qt.NoButton)
     cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
     onClicked: mouse => {
