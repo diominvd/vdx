@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import qs.config
 import qs.kit
 import qs.modules.equalizer
@@ -14,40 +13,24 @@ Row {
   readonly property bool track: kind === "music" || kind === "media"
   readonly property var player: kind === "media" ? PlayerService.media : PlayerService.music
   property int coverSize: 18
-  property int badgeRadius: 4
   spacing: 8
   visible: kind !== ""
 
   // music and media: the cover, the track and the sound
-  Item {
+  ClippingRectangle {
     visible: face.track
     anchors.verticalCenter: parent.verticalCenter
     width: face.coverSize
     height: face.coverSize
+    radius: Theme.barRadiusFor(face.coverSize)
+    color: Theme.background3
 
     Image {
-      id: cover
       anchors.fill: parent
-      visible: false
       source: face.player.cover
       fillMode: Image.PreserveAspectCrop
       asynchronous: true
     }
-    Item {
-      id: round
-      anchors.fill: parent
-      visible: false
-      layer.enabled: true
-      Rectangle { anchors.fill: parent; radius: face.badgeRadius }
-    }
-    // a circle: the cover's corners cut by the mask
-    MultiEffect {
-      anchors.fill: parent
-      source: cover
-      maskEnabled: true
-      maskSource: round
-    }
-    Rectangle { anchors.fill: parent; radius: face.badgeRadius; color: Theme.background3; z: -1 }
   }
   KitText {
     visible: face.track
