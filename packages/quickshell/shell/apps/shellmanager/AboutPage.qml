@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.apps.files
+import qs.apps.shellmanager
 import qs.config
 import qs.kit
 
@@ -30,6 +31,34 @@ Column {
 
   property var versions: ({})
   property string ioStatus: ""                 // the last export, on the group's label
+  property string healthReport: ""
+  property string resourceReport: ""
+
+  function checkHealth() {
+    healthReport = "Checking…";
+    doctorProc.running = false;
+    doctorProc.command = ["python3", ThemeService.dotfiles + "/install.py", "doctor"];
+    doctorProc.running = true;
+  }
+  function measureShell() {
+    resourceReport = "Measuring…";
+    measureProc.running = false;
+    measureProc.command = ["ps", "-p", String(Quickshell.processId), "-o", "pid=,rss=,vsz=,etime=,%cpu=,nlwp="];
+    measureProc.running = true;
+  }
+
+  Process {
+    id: doctorProc
+    stdout: StdioCollector {
+      onStreamFinished: root.healthReport = text.trim() || "No diagnostic output"
+    }
+  }
+  Process {
+    id: measureProc
+    stdout: StdioCollector {
+      onStreamFinished: root.resourceReport = text.trim() || "No process data"
+    }
+  }
 
   // import and reset stop this shell, write the files and start it again: run
   // outside it, a failure told by a notification
@@ -205,6 +234,50 @@ Column {
   KitInfo { width: parent.width; label: "Hyprland"; value: root.versions.hypr ?? "--" }
   KitInfo { width: parent.width; label: "Quickshell"; value: root.versions.qs ?? "--" }
   KitInfo { width: parent.width; label: "Kernel"; value: root.versions.kernel ?? "--" }
+
+  KitLine {}
+
+  KitLabel { text: "DIAGNOSTICS & RECOVERY" }
+  KitRow {
+    label: "Machine health"
+    hint: "Checks managed files, services and the running desktop"
+    KitButton { width: Theme.buttonWidth; icon: "activity"; text: "Run check"; busy: doctorProc.running; onClicked: root.checkHealth() }
+  }
+  KitText {
+    visible: root.healthReport !== ""
+    width: parent.width
+    text: root.healthReport
+    color: root.healthReport.includes("healthy") ? Theme.green : root.healthReport.includes("✗") ? Theme.red
+         : root.healthReport.includes("⚠") ? Theme.yellow : Theme.foreground2
+    wrapMode: Text.WordWrap
+    font.pixelSize: Theme.fontSize - 1
+    maximumLineCount: 10
+    elide: Text.ElideRight
+  }
+  KitRow {
+    label: "Shell resources"
+    hint: "Sample the running Quickshell process on demand; RSS and VSZ are KiB"
+    KitButton { width: Theme.buttonWidth; icon: "cpu"; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
+  }
+  KitText {
+    visible: root.resourceReport !== ""
+    width: parent.width
+    text: root.resourceReport === "Measuring…" ? root.resourceReport : "PID   RSS   VSZ   TIME   CPU   THREADS\n" + root.resourceReport
+    color: Theme.muted
+    wrapMode: Text.WordWrap
+    font.family: Theme.fontFamily
+    font.pixelSize: Theme.fontSize - 1
+  }
+  KitRow {
+    label: "Recovery"
+    hint: "The supervisor restarts Quickshell after a crash. ./install.py rollback restores backed-up managed files; Settings › Import restores an exported settings set."
+    KitButton {
+      width: Theme.buttonWidth
+      icon: "rotate-ccw"
+      text: "Review backups"
+      onClicked: Quickshell.execDetached(["kitty", "-e", "python3", ThemeService.dotfiles + "/install.py", "rollback"])
+    }
+  }
 
   // a fresh process: this one is killed, Hyprland starts a new one (through
   // the supervisor, as at login: FontService.restartShell)

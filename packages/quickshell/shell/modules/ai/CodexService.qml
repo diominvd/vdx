@@ -17,6 +17,7 @@ Singleton {
 
   property var usage: ({})                   // last good `codex.sh --usage`
   property string error: ""
+  property int barUsers: 0
 
   readonly property string plan: usage.plan ?? ""
   readonly property var limits: usage.limits ?? []
@@ -29,10 +30,12 @@ Singleton {
     proc.command = ["bash", root.script, "--usage"];
     proc.running = true;
   }
+  function attachBar() { barUsers++; if (barUsers === 1) refresh(); }
+  function detachBar() { barUsers = Math.max(0, barUsers - 1); }
 
   Timer {
     interval: root.pollMs
-    running: true
+    running: root.barUsers > 0
     repeat: true
     triggeredOnStart: true
     onTriggered: root.refresh()

@@ -1,6 +1,7 @@
 # shell — rules for agents
 
 Quickshell config, `qs -c shell`. What exists: [README.md](README.md).
+Interaction routes, lifetime budgets, and recovery: [architecture](../../../docs/shell/architecture.md).
 
 ## Layout
 

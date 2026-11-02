@@ -13,6 +13,9 @@ Item {
 
   required property PanelWindow bar
 
+  Component.onCompleted: { ClaudeService.attachBar(); CodexService.attachBar(); }
+  Component.onDestruction: { ClaudeService.detachBar(); CodexService.detachBar(); }
+
   // the Folder opens this module's popup when its tile is clicked
   function openPopup() { popup.toggle(); }
 

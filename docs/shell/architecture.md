@@ -169,7 +169,7 @@ links, secrets, `/etc`, units, services). `link` also writes
 | Bar layout | `layout.json` | `BarLayout` | renames via `BarLayout.renamed` (live fallback); not watched |
 | Notifications history | `notifications.json` (statePath) | `NotificationsService` | — |
 | Schema | `version` in the three files above | `scripts/settings_migrate.py` (`VERSION`, `MIGRATIONS`), run by `supervise.sh` before qs | a file is written only when changed, old one as `.bak`; `tests/test_settings_migrate.py` |
-| Search index | `config/settings-index.json` | `scripts/settings_index.py` (from the pages' QML), the sidebar's search, `shell search <words>` | `check` fails when stale; `tests/test_settings_index.py` (the common tasks found) |
+| Search index | `config/settings-index.json` | `scripts/settings_index.py` (from the pages' QML), the sidebar's search, `shell search <words>` | loaded on demand; normalized once, duplicate destinations collapsed; `check` fails when stale; `tests/test_settings_index.py` |
 | Export / import / reset | one bundle of the three files and the Windows page's (`windows.json`, `window-mode`) | `scripts/settings_io.py`, About › Settings | import migrates; import and reset stop the shell, write (old files `.bak`), start it again; `tests/test_settings_io.py` |
 | Dotfiles state | `~/.local/state/dotfiles/` | installer + shell | `components.json` (modules not installed), `accent.lua`, `window-mode`, `shell-apps.json` |
 
@@ -206,6 +206,7 @@ names still open the new places (`resolve()` in ShellManager.qml).
 | Files (local music) | `scripts/music_files.py`, `music.sh --files-play` | component `mpd`; a music section `files` (`MpdService.needed`) | `MpdService.playFolder`; the folders are `music.folders` |
 | Capture | `apps/capture/`, `modules/capture/` | `grim`, `gpu-screen-recorder`, `wl-copy`, `notify-send` | the only "camera" in the repo: screen capture |
 | Launcher, Keybinds | `apps/launcher/`, `apps/keybinds/` | Hyprland binds | a window (Alt+Space, Super+B) and the island's Launcher / Keys chips: the same panels |
+| Commands palette | `apps/launcher/LauncherService.qml`, `LauncherPanel.qml` | app registry, `BarLayout`, settings index, power actions | Commands is the shared action route; focused Apps, Files and Power tabs remain available |
 
 ## Optional parts
 
@@ -222,6 +223,35 @@ still loads, so it must tolerate missing binaries.
 - Repo-linked files (theme configs) are never written at runtime; runtime state
   goes to the state dirs.
 - `/etc` only via `system/` and `./install.py system install`.
+
+## Interaction, performance and recovery
+
+`PopupManager` owns the one active bar popup and routes its IPC to the bar on
+the focused monitor. `BarPopup` owns outside-click and default Escape closing;
+nested module views may handle Escape first. Island owns its local view stack:
+Escape returns to the Hub when a view came from there, otherwise to compact.
+`BarLayout.openModule(id)` is the shared route to a module popup or its options.
+`KitInput` owns text focus; pages pass navigation keys explicitly so typing,
+selection and parent-level Escape do not compete.
+
+The launcher Commands tab searches shell actions, applications, bar modules,
+settings and safe entry points. It invokes existing services/routes instead
+of implementing module actions again. Settings search data is normalized once
+after its lazy load and duplicate label/target pairs are shown once.
+
+Recurring timers and processes belong to services and should run only while
+their data is needed. UI pages with expensive content are loaded only while
+visible. For performance-sensitive edits, sample the live process from Shell
+Manager › About › System › Shell resources in representative idle and active
+states; RSS/VSZ are KiB and CPU is the process's lifetime average. Do not add
+permanent profiling timers.
+
+Shell Manager › About › System can run `./install.py doctor` on demand. The
+session supervisor restarts crashes and waits for config edits after a failed
+load; inspect `qs log -c shell` before restarting manually. `./install.py
+rollback` restores backed-up managed files without replacing newer files.
+Export settings before risky preference changes; import and Reset everything
+preserve the previous option files as backups.
 
 ## Update rule
 

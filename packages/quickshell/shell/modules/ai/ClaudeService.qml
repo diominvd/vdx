@@ -26,6 +26,7 @@ Singleton {
   property var today: ({})                     // see `claude.sh --today`
   property var sessions: []                    // see `claude.sh --sessions`
   property bool popupOpen: false
+  property int barUsers: 0
 
   readonly property string plan: usage.plan ?? ""
   readonly property var limits: usage.limits ?? []
@@ -43,10 +44,16 @@ Singleton {
   }
 
   function popupHidden() { popupOpen = false; }
+  function attachBar() { barUsers++; if (barUsers === 1) refreshUsage(); }
+  function detachBar() { barUsers = Math.max(0, barUsers - 1); }
 
   // The usage API rate-limits: on open, ask only if the data is a minute old.
-  function refresh() {
+  function refreshUsage() {
     if (Date.now() - fetchedAt > 60000) run(usageProc, ["--usage"]);
+  }
+
+  function refresh() {
+    refreshUsage();
     refreshLocal();
   }
 
@@ -85,9 +92,8 @@ Singleton {
 
   Timer {
     interval: root.usagePollMs
-    running: true
+    running: root.barUsers > 0
     repeat: true
-    triggeredOnStart: true
     onTriggered: root.run(usageProc, ["--usage"])
   }
 
