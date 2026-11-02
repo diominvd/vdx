@@ -12,7 +12,8 @@ import qs.modules.focus
 Item {
   id: root
 
-  readonly property string kind: IslandService.live
+  property string screen: ""
+  readonly property string kind: IslandService.liveFor(screen)
   readonly property real travel: Theme.islandHeight * 0.6
 
   // two faces take turns: `front` is the shown one; `t` runs 0 → 1 while a step slides
@@ -45,7 +46,7 @@ Item {
   Behavior on target { enabled: Motion.island; NumberAnimation { id: targetAnim; duration: Motion.normal; easing.type: Motion.easing } }
 
   function place() {
-    const dir = IslandService.liveDir;
+    const dir = IslandService.liveDirection(root.screen);
     if (!sliding) {
       frontFace.x = padLeft;
       frontFace.anchors.verticalCenterOffset = 0; frontFace.opacity = 1;
@@ -127,6 +128,6 @@ Item {
       } else if (mouse.button === Qt.MiddleButton) { if (root.kind === "music" || root.kind === "media") IslandService.toggleLive(root.kind); }
       else BarLayout.openModule(IslandService.liveTarget[root.kind]);
     }
-    onWheel: w => IslandService.liveStep(w.angleDelta.y < 0 ? 1 : -1)
+    onWheel: w => IslandService.liveStep(w.angleDelta.y < 0 ? 1 : -1, root.screen)
   }
 }

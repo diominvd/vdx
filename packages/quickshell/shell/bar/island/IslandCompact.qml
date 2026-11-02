@@ -95,6 +95,7 @@ Item {
 
   IslandLive {
     id: live
+    screen: root.screen
     anchors.verticalCenter: parent.verticalCenter
   }
 

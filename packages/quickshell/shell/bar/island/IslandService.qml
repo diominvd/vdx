@@ -67,8 +67,8 @@ Singleton {
 
 
   // ---- live activities: what is running, for the pill's live slot ----
-  // Held first (recording, backup, update), then music. `liveIndex` is the one
-  // showing; the wheel steps it (liveStep), a finished one drops out.
+  // Held first (recording, backup, update), then music. Selection uses stable
+  // activity IDs so array reordering cannot move the user's choice.
   readonly property var activities: {
     const on = {
       battery: BatteryService.present && BatteryService.discharging && BatteryService.capacity <= ShellSettings.liveBatteryBelow
@@ -105,17 +105,13 @@ Singleton {
 
   // a flash: a short note about a quick change (the mic, the layout, the cable)
   property string flashKind: ""
-  property string flashBack: ""
   function flash(kind) {
     if (!ready || !ShellSettings.liveOn(kind)) return;
-    if (flashKind === "") flashBack = live;      // what was showing comes back after the flash
     flashKind = kind;
     flashTimer.interval = ShellSettings.liveFlashMs;
     flashTimer.restart();
-    liveIndex = Math.max(0, activities.indexOf(kind));
-    liveDir = 1;
   }
-  Timer { id: flashTimer; onTriggered: { root.flashKind = ""; root.liveIndex = Math.max(0, root.activities.indexOf(root.flashBack)); root.flashBack = ""; } }
+  Timer { id: flashTimer; onTriggered: root.flashKind = "" }
   readonly property bool micMuted: AudioService.source?.audio?.muted ?? false
   onMicMutedChanged: flash("mic")
   readonly property string layoutNow: LanguageService.layout
@@ -126,26 +122,43 @@ Singleton {
   onPluggedNowChanged: if (pluggedNow) flash("plugged")
   // the module a click on an activity opens (BarLayout.openModule)
   readonly property var liveTarget: ({ timer: "timer", radio: "tuner", media: "media", music: "music", vpn: "mihomo", battery: "battery", bluetooth: "bluetooth", update: "packages", backup: "backup" })
-  property int liveIndex: 0
-  // paging with the wheel stays: nothing switches the pill back by itself
-  readonly property string live: activities[Math.min(liveIndex, activities.length - 1)] ?? ""
+  property var liveViews: ({})             // screen name -> { selected: activity ID, manual: bool }
+  function liveFor(screen) {
+    if (flashKind !== "" && activities.includes(flashKind)) return flashKind;
+    const view = liveViews[screen] ?? {};
+    return activities.includes(view.selected) ? view.selected : activities[0] ?? "";
+  }
+  function liveDirection(screen) { return liveViews[screen]?.direction ?? 1; }
+  readonly property string live: liveFor("")
   // a new activity takes the pill (Bar › Live › New one comes forward); paging goes on from there
   property var seenKinds: []
   onActivitiesChanged: {
     const added = activities.filter(k => !seenKinds.includes(k));
     seenKinds = activities;
-    if (ready && ShellSettings.liveFront && added.length > 0 && !added.includes(flashKind)) {
-      liveIndex = activities.indexOf(added[added.length - 1]);
-      liveDir = 1;
+    const views = Object.assign({}, liveViews);
+    const screens = Quickshell.screens.map(s => s.name).concat([""]);
+    for (const screen of screens) {
+      const view = views[screen] ?? { selected: "", manual: false };
+      if (!activities.includes(view.selected)) { view.selected = ""; view.manual = false; }
+      if (ready && ShellSettings.liveFront && !view.manual && added.length > 0 && !added.includes(flashKind)) {
+        view.selected = added[added.length - 1];
+        view.direction = 1;
+      }
+      views[screen] = view;
     }
+    liveViews = views;
   }
-  property int liveDir: 1                      // the last step: 1 next, -1 back (the slide's way)
-
-  function liveStep(delta) {
+  function liveStep(delta, screen) {
     const n = activities.length;
     if (n < 2 || !ShellSettings.liveWheel) return;
-    liveDir = delta;
-    liveIndex = (Math.min(liveIndex, n - 1) + delta + n) % n;
+    const views = Object.assign({}, liveViews);
+    const view = Object.assign({ selected: "", manual: false }, views[screen] ?? {});
+    const current = activities.indexOf(activities.includes(view.selected) ? view.selected : liveFor(screen));
+    view.selected = activities[(Math.max(0, current) + delta + n) % n];
+    view.manual = true;
+    view.direction = delta;
+    views[screen] = view;
+    liveViews = views;
   }
 
   // ---- osd ----
