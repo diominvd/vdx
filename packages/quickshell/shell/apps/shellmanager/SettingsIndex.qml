@@ -11,7 +11,7 @@ import Quickshell.Io
 Singleton {
   id: root
 
-  property var entries: []
+  property var indexed: []
   property bool wanted: false
 
   function load() { wanted = true; }
@@ -19,7 +19,12 @@ Singleton {
   FileView {
     path: root.wanted ? Quickshell.shellDir + "/config/settings-index.json" : ""
     printErrors: false
-    onLoaded: { try { root.entries = JSON.parse(text()); } catch (e) { root.entries = []; } }
+    onLoaded: {
+      let entries = [];
+      try { entries = JSON.parse(text()); } catch (e) { entries = []; }
+      root.indexed = entries.map(e => ({ entry: e, label: root.norm(e.label), aliases: (e.aliases ?? []).map(a => root.norm(a)),
+        hint: root.words(e.hint), where: root.words(e.where) }));
+    }
   }
 
   // letters and digits only, lower case: "wifi" finds "Wi-Fi", "dark mode" finds "Dark  mode"
@@ -27,24 +32,28 @@ Singleton {
   // the words of a text, lower case: a hint matches by whole-word starts ("scan" finds "Scan files",
   // not "…ing a scan…" inside a word), so a hint or a place does not match every row near it
   function words(s) { return (s ?? "").toLowerCase().split(/[^a-z0-9а-яё]+/).filter(w => w !== ""); }
-  function wordsMatch(text, q) {
-    const w = words(text);
-    const tokens = words(q);
-    return tokens.length > 0 && tokens.every(t => w.some(x => x.startsWith(t)));
-  }
-
   // the rows for a typed text: a label match before an alias, a hint or a place one
   function search(raw) {
     const q = norm(raw);
     if (q === "") return [];
-    const index = entries;
-    const aliased = e => (e.aliases ?? []).some(a => norm(a).includes(q));
-    const first = index.filter(e => norm(e.label).includes(q));
-    const second = index.filter(e => !first.includes(e) && aliased(e));
-    const then = index.filter(e => !first.includes(e) && !second.includes(e) && wordsMatch(e.hint, raw));
+    const tokens = words(raw);
+    const matchesWords = list => tokens.length > 0 && tokens.every(t => list.some(w => w.startsWith(t)));
+    const first = indexed.filter(e => e.label.includes(q));
+    const firstSet = new Set(first);
+    const second = indexed.filter(e => !firstSet.has(e) && e.aliases.some(a => a.includes(q)));
+    const secondSet = new Set(second);
+    const then = indexed.filter(e => !firstSet.has(e) && !secondSet.has(e) && matchesWords(e.hint));
     // the page or group named (a place) only when nothing else answers
     const place = first.length + second.length + then.length > 0 ? []
-      : index.filter(e => wordsMatch(e.where, raw));
-    return first.concat(second, then, place).slice(0, 30);
+      : indexed.filter(e => matchesWords(e.where));
+    // A setting can be indexed through its page, group and app/module owner.
+    // Keep the most relevant hit for a destination instead of showing the same row repeatedly.
+    const seen = new Set();
+    return first.concat(second, then, place).filter(hit => {
+      const key = hit.entry.target + "|" + hit.label;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 30).map(hit => hit.entry);
   }
 }

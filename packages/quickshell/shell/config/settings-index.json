@@ -1207,6 +1207,24 @@
   "target": "about:settings"
  },
  {
+  "label": "Machine health",
+  "hint": "Checks managed files, services and the running desktop",
+  "where": "About › SYSTEM",
+  "target": "about:system"
+ },
+ {
+  "label": "Shell resources",
+  "hint": "Sample the running Quickshell process on demand; RSS and VSZ are KiB",
+  "where": "About › SYSTEM",
+  "target": "about:system"
+ },
+ {
+  "label": "Recovery",
+  "hint": "The supervisor restarts Quickshell after a crash. ./install.py rollback restores backed-up managed files; Settings › Import restores an exported settings set.",
+  "where": "About › SYSTEM",
+  "target": "about:system"
+ },
+ {
   "label": "Restart the shell",
   "hint": "Kills Quickshell and starts it anew",
   "where": "About › SYSTEM",
@@ -1659,13 +1677,19 @@
  },
  {
   "label": "Wheel pages through them",
-  "hint": "Scrolling over the pill moves between running activities",
+  "hint": "Scrolling chooses an activity on this monitor until it ends",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Scroll delay",
+  "hint": "",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
  {
   "label": "New one comes forward",
-  "hint": "An activity that starts takes the pill; then scroll to the others",
+  "hint": "A new activity takes the pill unless you have chosen one manually",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },

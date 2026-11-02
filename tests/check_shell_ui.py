@@ -117,7 +117,7 @@ def main():
         (work / "qs/kit/TestIslandLiveSelection.qml").write_text(
             'import QtQuick\nimport qs.config\nItem {\n'
             '  property var activities: []\n  property string flashKind: ""\n'
-            '  property var liveViews: ({})\n'
+            '  property var liveViews: ({})\n  property var liveWheelTimes: ({})\n'
             + qml_function(island_service, "liveFor") + '\n'
             + qml_function(island_service, "liveDirection") + '\n'
             + qml_function(island_service, "liveStep") + '\n}\n')
@@ -130,6 +130,12 @@ def main():
             + qml_function(island_service, "sameNotice") + '\n'
             + qml_function(island_service, "showNextLiveNotice").replace("NotificationsService.markSeen()", "root.markNoticesSeen()") + '\n'
             + qml_function(island_service, "enqueueLiveNotices") + '\n}\n')
+        settings_index = (SHELL / "apps/shellmanager/SettingsIndex.qml").read_text()
+        (work / "qs/kit/TestSettingsIndex.qml").write_text(
+            'import QtQuick\nQtObject {\n  property var indexed: []\n'
+            + qml_function(settings_index, "norm") + '\n'
+            + qml_function(settings_index, "words") + '\n'
+            + qml_function(settings_index, "search") + '\n}\n')
         files = (SHELL / "apps/files/FilesState.qml").read_text()
         (work / "qs/kit/TestFileCreation.qml").write_text(
             'import QtQuick\nQtObject {\nproperty var calls: []\nproperty var history: []\n'

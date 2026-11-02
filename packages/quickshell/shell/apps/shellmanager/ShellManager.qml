@@ -22,6 +22,8 @@ Rectangle {
   id: root
 
   property string tab: "appearance"
+  property var navHistory: []
+  property bool restoringNavigation: false
 
   Component.onCompleted: {
     SettingsIndex.load();
@@ -34,8 +36,10 @@ Rectangle {
   Connections {
     target: ShellSettings
     function onManagerOpenChanged() {
-      if (ShellSettings.managerOpen)
+      if (ShellSettings.managerOpen) {
+        root.navHistory = [];
         root.tab = ShellSettings.managerStart === "last" ? root.resolve(ShellSettings.managerTab).tab : "appearance";
+      }
     }
   }
 
@@ -79,7 +83,12 @@ Rectangle {
   readonly property var navSections: sections.filter(s => !s.foot && groupOf(s.value) === openGroup)
   property string openGroup: "LOOK"
   function openGroupOf(name) {
-    if (groupOf(tab) !== name) tab = sections.find(s => !s.foot && groupOf(s.value) === name).value;
+    if (groupOf(tab) !== name) select(sections.find(s => !s.foot && groupOf(s.value) === name).value);
+  }
+  function select(value) {
+    if (value === tab) return;
+    navHistory = navHistory.concat([{ tab: tab, target: "" }]).slice(-32);
+    tab = value;
   }
 
   // the sidebar group a page sits in (LOOK, DESKTOP, ...): the crumb over its title
@@ -136,6 +145,26 @@ Rectangle {
     navigate(tab, target ?? "");
   }
 
+  function back() {
+    if (!navHistory.length) return;
+    const next = navHistory[navHistory.length - 1];
+    navHistory = navHistory.slice(0, -1);
+    restoringNavigation = true;
+    navigate(next.tab, next.target);
+    restoringNavigation = false;
+  }
+
+  Shortcut {
+    sequences: ["Ctrl+K"]
+    enabled: ShellSettings.managerOpen && !root.dialogOpen
+    onActivated: searchField.input.forceActiveFocus()
+  }
+  Shortcut {
+    sequences: ["Alt+Left"]
+    enabled: ShellSettings.managerOpen && !root.dialogOpen && root.navHistory.length > 0 && !root.searching
+    onActivated: root.back()
+  }
+
   Shortcut {
     sequences: [StandardKey.Cancel]
     enabled: root.searching
@@ -149,7 +178,8 @@ Rectangle {
   function navigate(value, target) {
     const r = resolve(value, target);
     searchField.text = "";
-    tab = r.tab;
+    if (restoringNavigation) tab = r.tab;
+    else select(r.tab);
     const p = pageContent.item;
     if (!p) return;
     const j = p.jumps.find(x => x.key === r.target);
@@ -284,7 +314,7 @@ Rectangle {
             icon: modelData.icon
             label: modelData.label
             active: root.tab === modelData.value
-            onClicked: root.tab = modelData.value
+            onClicked: root.select(modelData.value)
           }
         }
       }
@@ -325,7 +355,7 @@ Rectangle {
             current: root.tab
             width: navColumn.width
             indent: !!modelData.child
-            onPicked: root.tab = modelData.value
+            onPicked: root.select(modelData.value)
           }
         }
       }
@@ -416,6 +446,14 @@ Rectangle {
       title: root.currentPage?.title ?? "Appearance"
       crumb: root.groupOf(root.tab)
       description: root.currentPage?.description ?? ""
+
+      KitButton {
+        visible: root.navHistory.length > 0
+        icon: "arrow-left"
+        text: "Back"
+        Accessible.name: "Back to previous settings page"
+        onClicked: root.back()
+      }
 
       // a page with tabs (Network) lists them: `tabs` [{label, value}], `tab`
       KitChoices {
