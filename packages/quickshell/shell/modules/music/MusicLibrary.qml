@@ -21,7 +21,6 @@ Column {
 
   // a folder's path with ~ as the home folder, and its name
   function home(path) { return path.replace(/^~(?=\/|$)/, Quickshell.env("HOME")); }
-  function nameOf(path) { return path.split("/").filter(s => s !== "").pop() ?? path; }
 
   spacing: Theme.gapWide
 
@@ -83,7 +82,7 @@ Column {
           readonly property string path: root.home(modelData)
           width: root.half
           icon: "folder"
-          text: root.nameOf(path)
+          text: Paths.nameOf(path)
           caption: "Folder"
           current: MpdService.source === "files" && !MpdService.stopped && MpdService.file.startsWith(path + "/")
           busy: MpdService.busy === path

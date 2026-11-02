@@ -123,7 +123,7 @@ KitColumn {
 
     KitRow {
       required property var modelData
-      label: root.nameOf(modelData)
+      label: Paths.nameOf(modelData)
       hint: modelData
 
       KitButton {
@@ -170,7 +170,6 @@ KitColumn {
   // ---- folders ----
   readonly property var folders: ModuleSettings.get("music", "folders", ["~/Music"])
 
-  function nameOf(path) { return path.split("/").filter(s => s !== "").pop() ?? path; }
 
   function setFolders(list) { ModuleSettings.set("music", "folders", list); }
 

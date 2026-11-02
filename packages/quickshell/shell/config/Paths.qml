@@ -6,4 +6,7 @@ import Quickshell
 // `Paths.scriptsDir + "/<name>"` (`install.py check shell` follows that form).
 Singleton {
   readonly property string scriptsDir: Quickshell.shellDir + "/scripts"
+
+  // the last segment of a path: "/home/me/Music/" is "Music"
+  function nameOf(path) { return path.split("/").filter(s => s !== "").pop() ?? path; }
 }

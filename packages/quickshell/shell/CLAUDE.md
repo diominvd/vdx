@@ -126,4 +126,6 @@ How to write a page, a module's options, a service, and the review checklist:
   or a page just taller than the pane does not scroll.
 - No `parent: parent.parent` rebinding — it loops and has frozen the session.
 - `Behavior` on a readonly property is not allowed.
+- A component whose root is `Behavior` does not load (`KitFade is not a type`) and takes the
+  whole config down: a repeated `Behavior` stays written out.
 - A config error drops the whole bar — restart and read the log at once.
