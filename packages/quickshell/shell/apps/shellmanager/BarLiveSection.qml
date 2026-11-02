@@ -52,7 +52,7 @@ Column {
         ? ModuleSettings.set("notifications", "appear", checked ? "card" : "live")
         : ShellSettings.setLook("live" + key.charAt(0).toUpperCase() + key.slice(1), !checked, "island")
 
-      LiveOptions { id: options; kind: row.key }
+      LiveOptions { id: options; kind: row.key; shown: row.unfolded }
     }
   }
 
