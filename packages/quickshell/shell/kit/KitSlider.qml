@@ -37,9 +37,9 @@ Item {
   Timer { id: holdTimer; interval: 2000; onTriggered: root.held = -1 }
   function letGo(v) { held = v; holdTimer.restart(); released(v); }
   readonly property real knobSize: line ? 0 : m3 ? 4 : 12
-  readonly property bool m3: !line && Theme.material && spectrum.length === 0
-  readonly property bool splitPlate: !line && !m3 && spectrum.length === 0 && ShellSettings.segmentedSliders
-  readonly property bool flat: spectrum.length === 0 && (splitPlate || (plate && !m3))
+  readonly property bool m3: !line && Theme.material
+  readonly property bool splitPlate: !line && !m3 && ShellSettings.segmentedSliders
+  readonly property bool flat: splitPlate || (plate && !m3)
   readonly property real plateGap: splitPlate && shown > 0 && shown < 1 ? 8 : 0
   readonly property real plateEdge: shown * (width - plateGap)
   readonly property real track: 12            // Material: the track's height
@@ -173,8 +173,36 @@ Item {
   }
 
   // ---- Material 3: active track | gap | handle | gap | inactive track ----
+  ClippingRectangle {
+    visible: root.m3 && root.spectrum.length > 0
+    anchors.verticalCenter: parent.verticalCenter
+    width: parent.width
+    height: root.track
+    radius: Theme.pill(height)
+    color: Theme.clear
+
+    Row {
+      width: parent.width
+      height: parent.height
+
+      Repeater {
+        model: Math.max(root.spectrum.length - 1, 0)
+
+        Rectangle {
+          required property int index
+          width: parent.width / (root.spectrum.length - 1)
+          height: parent.height
+          gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: 0; color: root.spectrum[index] }
+            GradientStop { position: 1; color: root.spectrum[index + 1] }
+          }
+        }
+      }
+    }
+  }
   Rectangle {
-    visible: root.m3
+    visible: root.m3 && root.spectrum.length === 0
     anchors.verticalCenter: parent.verticalCenter
     width: Math.max(0, root.handleX - root.gap)
     height: root.track
@@ -187,7 +215,7 @@ Item {
   }
 
   Rectangle {
-    visible: root.m3
+    visible: root.m3 && root.spectrum.length === 0
     anchors.verticalCenter: parent.verticalCenter
     x: Math.min(root.width, root.handleX + root.knobSize + root.gap)
     width: Math.max(0, root.width - x)
@@ -198,7 +226,7 @@ Item {
 
   // stops: a dot per shown stop (none under the handle), and one at the end
   Repeater {
-    model: !root.m3 ? [] : root.ticks && root.snaps.length > 0 ? stops.model : [1]
+    model: !root.m3 || root.spectrum.length > 0 ? [] : root.ticks && root.snaps.length > 0 ? stops.model : [1]
 
     Rectangle {
       required property real modelData
@@ -248,8 +276,35 @@ Item {
     color: Theme.fillOn(root.boxed)
   }
 
+  ClippingRectangle {
+    visible: root.flat && !root.splitPlate && root.spectrum.length > 0
+    anchors.fill: parent
+    radius: Theme.radiusControl
+    color: Theme.clear
+
+    Row {
+      width: parent.width
+      height: parent.height
+
+      Repeater {
+        model: Math.max(root.spectrum.length - 1, 0)
+
+        Rectangle {
+          required property int index
+          width: parent.width / (root.spectrum.length - 1)
+          height: parent.height
+          gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: 0; color: root.spectrum[index] }
+            GradientStop { position: 1; color: root.spectrum[index + 1] }
+          }
+        }
+      }
+    }
+  }
+
   Rectangle {
-    visible: root.flat && !root.splitPlate
+    visible: root.flat && !root.splitPlate && root.spectrum.length === 0
     width: root.plateEdge
     height: parent.height
     radius: Math.min(Theme.radiusControl, width / 2)
@@ -287,6 +342,7 @@ Item {
   // The short white mark sits in the gap between the two independent segments.
   Rectangle {
     visible: root.splitPlate && root.plateGap > 0
+    z: 1
     x: root.plateEdge + (root.plateGap - width) / 2
     anchors.verticalCenter: parent.verticalCenter
     width: 3
@@ -301,10 +357,11 @@ Item {
     anchors.fill: parent
     clip: true
 
-    Item {
+    ClippingRectangle {
       width: root.plateEdge
       height: parent.height
-      clip: true
+      radius: Math.min(Theme.radiusControl, width / 2)
+      color: Theme.clear
 
       Row {
         width: root.width
