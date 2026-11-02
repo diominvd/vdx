@@ -26,6 +26,7 @@ and agents. A rule that is in the way is changed in its file.
 | Code rules: modules, apps, settings, restart, QML pitfalls | [packages/quickshell/shell/CLAUDE.md](../packages/quickshell/shell/CLAUDE.md) |
 | How it is built: process, layers, stores, feature map | [shell/architecture.md](shell/architecture.md) |
 | UI rules: tokens, controls, wording, Settings pages | [shell/design.md](shell/design.md) |
+| Recipes: a page, a module's options, a service, review checklist | [shell/writing-code.md](shell/writing-code.md) |
 | Checks, manual scenarios, regressions | [shell/testing.md](shell/testing.md) |
 | What exists, for users | [packages/quickshell/shell/README.md](../packages/quickshell/shell/README.md) |
 

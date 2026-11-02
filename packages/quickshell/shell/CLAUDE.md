@@ -76,6 +76,8 @@ Apps shows a link row to it.
 The design system — tokens, controls, wording, colour, motion, Settings
 pages — is [docs/shell/design.md](../../../docs/shell/design.md).
 Read it before any visual work.
+How to write a page, a module's options, a service, and the review checklist:
+[docs/shell/writing-code.md](../../../docs/shell/writing-code.md).
 
 ## Settings
 
