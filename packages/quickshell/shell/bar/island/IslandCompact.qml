@@ -31,7 +31,7 @@ Item {
   readonly property bool slotMoving: live.moving
   // nothing to show at rest: the island hides (Shell Manager › Bar › Clock)
   readonly property bool empty: !clockOn && !unseen && BarLayout.islandIn("start", screen).length === 0
-                                && BarLayout.islandIn("end", screen).length === 0
+                                && BarLayout.islandIn("end", screen).length === 0 && live.kind === ""
   // the pointer resting on the clock (not on a module) opens the hub
   readonly property bool clockHovered: clockHover.hovered
   implicitWidth: Math.max(110, line.implicitWidth + 2 * Theme.gapGroup)

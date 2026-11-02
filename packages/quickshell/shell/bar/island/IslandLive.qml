@@ -41,7 +41,9 @@ Item {
   readonly property bool moving: targetAnim.running
   implicitWidth: kind === "" ? 0 : target + padLeft + padRight
   implicitHeight: Theme.islandHeight
-  visible: kind !== ""
+  visible: kind !== "" || opacity > 0
+  opacity: kind === "" ? 0 : 1
+  Behavior on opacity { enabled: Motion.island; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
   property real target: (sliding ? backFace : frontFace).implicitWidth
   Behavior on target { enabled: Motion.island; NumberAnimation { id: targetAnim; duration: Motion.normal; easing.type: Motion.easing } }
 
