@@ -9,10 +9,6 @@ import qs.modules.windows
 // Applied at once: Hyprland reloads.
 KitColumn {
   id: root
-  property string tab: "layout"
-  readonly property var tabs: [{ label: "Layout", value: "layout" }, { label: "Look", value: "look" }, { label: "Overview", value: "overview" }]
-  function jump(key) { tab = key === "look" || key === "overview" ? key : "layout"; }
-
   readonly property var ws: WindowsService
   readonly property var o: WindowsService.opts
   readonly property var mode: ws.current
@@ -28,13 +24,12 @@ KitColumn {
     { key: "layout", label: "Layout", y: layoutGroup.y },
     { key: "look",   label: "Look",   y: lookGroup.y },
     { key: "overview", label: "Overview", y: overviewGroup.y }
-  ].filter(j => j.key === tab)
+  ]
 
   function pct(v) { return Math.round(v * 100) + "%"; }
 
   Column {
     width: parent.width
-    visible: root.tab === "layout"
   // ---- layout: the mode, then its own options ----
   KitLabel { id: layoutGroup; text: "LAYOUT" }
 
@@ -154,7 +149,6 @@ KitColumn {
   spacing: Theme.sectionGap
 
     width: parent.width
-    visible: root.tab === "look"
   // ---- look ----
   KitLine {}
 
@@ -223,7 +217,6 @@ KitColumn {
   Column {
     spacing: Theme.sectionGap
     width: parent.width
-    visible: root.tab === "overview"
 
     KitLabel { id: overviewGroup; text: "OVERVIEW" }
 

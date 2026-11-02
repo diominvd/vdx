@@ -64,12 +64,13 @@ KitSettingsWorkspace {
     ShellSettings.looksReset(lookKeys, "island");
     ShellSettings.reset(["barRightSettings"]);
   }
+  // the Layout, Look and Monitors tabs are sidebar pages (Shell Manager `pageTab`): a page lists its own
   readonly property var jumps: [
     { key: "layout", label: "Layout", y: 0 },
     { key: "look", label: "Look", y: 0 },
     { key: "behaviour", label: "Behaviour", y: 0 },
     { key: "monitor", label: "Monitor", y: 0 }
-  ]
+  ].filter(j => j.key === tab || (tab === "appearance" && j.key !== "layout" && j.key !== "monitor"))
   function jump(key) {
     if (key === "hubzone") { tab = "layout"; if (island) chooseZone("hub"); return; }
     tab = ["look", "behaviour", "appearance"].includes(key) ? "appearance" : key === "monitor" ? "monitor" : "layout";

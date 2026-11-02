@@ -50,6 +50,8 @@ Rectangle {
   // `foot`: a button at the rail's foot, outside the groups (the shell's own pages)
   // `child`: a page that belongs to the one above it (the island's Hub and Live activities), a plain row;
   // `island`: only while the island is the bar style
+// `page` + `pageTab`: a section that is one tab of another page (Bar look is the Bar page's Look tab):
+// the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
   readonly property var allSections: [
     { value: "appearance", label: "Appearance", icon: "sliders",    caption: "LOOK" },
     { value: "themes",     label: "Themes",     icon: "brush" },
@@ -58,7 +60,12 @@ Rectangle {
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
     { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "animations", label: "Motion",     icon: "curve" },
-    { value: "bar",        label: "Bar",        icon: "menu",     caption: "BAR" },
+    { value: "bar",        label: "Bar",        icon: "menu",     caption: "BAR",
+      page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
+    { value: "barlook",    label: "Bar look",   icon: "brush",
+      page: "bar", pageTab: "appearance", description: "The bar's style, size and spacing." },
+    { value: "barmonitor", label: "Bar monitors", icon: "monitor",
+      page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
     { value: "hub",        label: "Hub",        icon: "home",    child: true, island: true },
     { value: "live",       label: "Live activities", icon: "activity", child: true, island: true },
     { value: "modules",    label: "Bar modules", icon: "puzzle" },
@@ -74,7 +81,12 @@ Rectangle {
     { value: "apps",       label: "Apps",       icon: "grid" },
     { value: "updates",    label: "Updates",    icon: "download" },
     { value: "profile",    label: "Profile",    icon: "user",       caption: "SHELL", foot: true },
-    { value: "about",      label: "About",      icon: "info",       foot: true }
+    { value: "system",     label: "System",     icon: "cpu",        foot: true,
+      page: "about", pageTab: "system", description: "The machine, the shell's health and its resources." },
+    { value: "settings",   label: "Settings",   icon: "settings",   foot: true,
+      page: "about", pageTab: "settings", description: "Export, import and reset every option; restart the shell." },
+    { value: "about",      label: "About",      icon: "info",       foot: true,
+      page: "about", pageTab: "about", description: "What this shell believes, how it is put together and who made it." }
   ]
   readonly property var sections: allSections.filter(s => (!s.island || Theme.island) && (!s.module || BarLayout.installed(s.module)))
 
@@ -96,6 +108,8 @@ Rectangle {
   }
 
   // the sidebar group a page sits in (LOOK, BAR, ...): the crumb over its title
+  function sectionOf(value) { return allSections.find(s => s.value === value) ?? null; }
+
   function groupOf(tab) {
     let group = "";
     for (const s of sections) {
@@ -120,6 +134,11 @@ Rectangle {
     if (value === "wallpaper") return { tab: "wallpaper", target: "" };
     // the hotspot is a tab of Network
     if (value === "hotspot" || (value === "network" && target === "hotspot")) return { tab: "network", target: "hotspot" };
+    // the Bar page's tabs became pages: Layout, Look, Monitors
+    if (value === "bar" && ["look", "behaviour", "appearance"].includes(target)) return { tab: "barlook", target: "" };
+    if (value === "bar" && target === "monitor") return { tab: "barmonitor", target: "" };
+    // the About page's System and Settings tabs became pages
+    if (value === "about" && ["system", "settings"].includes(target)) return { tab: target, target: "" };
     // the Bar page's Hub and Live tabs became pages of their own
     if (value === "bar" && ["hub", "profile", "sliders"].includes(target)) return { tab: "hub", target: "" };
     if (value === "bar" && target === "live") return { tab: "live", target: "" };
@@ -192,6 +211,14 @@ Rectangle {
   }
 
   readonly property Item currentPage: pageContent.item
+
+  // the tab a section opens its page on ("" for a page of its own); set again when the section
+  // changes, as a page shared by sections (Bar) stays loaded
+  function pageTabOf(value) { return sectionOf(value)?.pageTab ?? ""; }
+  function syncPageTab() {
+    const want = pageTabOf(tab);
+    if (want && currentPage && currentPage.tab !== undefined && currentPage.tab !== want) currentPage.tab = want;
+  }
 
   // the group being read: the last one whose title is within 40px of the
   // view's top (under the fixed header), the last group once the page is
@@ -447,13 +474,13 @@ Rectangle {
       id: pageHead
       page: true
       icon: root.currentPage?.icon ?? "sliders"
-      title: root.currentPage?.title ?? "Appearance"
+      title: root.pageTabOf(root.tab) ? root.sectionOf(root.tab).label : (root.currentPage?.title ?? "Appearance")
       crumb: root.groupOf(root.tab)
-      description: root.currentPage?.description ?? ""
+      description: root.pageTabOf(root.tab) ? root.sectionOf(root.tab).description : (root.currentPage?.description ?? "")
 
       // a page with tabs (Network) lists them: `tabs` [{label, value}], `tab`
       KitChoices {
-        visible: (root.currentPage?.tabs ?? []).length > 0
+        visible: (root.currentPage?.tabs ?? []).length > 0 && !root.pageTabOf(root.tab)
         model: root.currentPage?.tabs ?? []
         current: root.currentPage?.tab ?? ""
         onPicked: value => { if (root.currentPage) root.currentPage.tab = value; }
@@ -543,7 +570,8 @@ Rectangle {
         id: pageContent
         anchors { left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom }
         asynchronous: false
-        sourceComponent: pages.pageComponent(root.tab)
+        sourceComponent: pages.pageComponent(root.sectionOf(root.tab)?.page ?? root.tab)
+        onLoaded: root.syncPageTab()
       }
 
       Connections {
@@ -592,6 +620,7 @@ Rectangle {
   NumberAnimation { id: pageAnim; target: pageIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
 
   onTabChanged: {
+    syncPageTab();
     if (Motion.pages) pageAnim.restart();
     ShellSettings.set("managerTab", tab);   // kept for Shell apps › Shell Manager › Last page
     page.contentY = 0;

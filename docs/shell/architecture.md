@@ -175,9 +175,9 @@ links, secrets, `/etc`, units, services). `link` also writes
 
 Settings UI = **Shell Manager** (`apps/shellmanager/`, Super+S). The sidebar is a rail of group
 buttons (LOOK, BAR, WINDOWS, CONNECT, DEVICES, SYSTEM) with the shell's own pages (`foot: true`: Profile, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after: LOOK Appearance, Themes (also Dark / Light), Fonts, Icons, Cursor, Wallpaper, Motion ·
-BAR Bar (Layout, Look, Monitors; under it, in the Island style only: Hub, Live activities),
+BAR Bar, Bar look, Bar monitors (one page, three sections: `pageTab`; under them, in the Island style only: Hub, Live activities),
 Bar modules · WINDOWS Windows, Lock screen · CONNECT Network (with Hotspot), Bluetooth, VPN · DEVICES Sound,
-Displays (with the night light), Power · SYSTEM Notifications, Apps, Updates · foot: Profile, About.
+Displays (with the night light), Power · SYSTEM Notifications, Apps, Updates · foot: Profile, System, Settings, About (the last three one page, `pageTab`). Windows is one page with groups. A page has no tab strip: a section that shares a page with others sets `page` + `pageTab` in `allSections`.
 A page header has its group, a
 state line and one or two lines on what the page does; a block has an `about` line (`KitLabel`).
 One home per setting; a setting that waits for something (a style, a switch, a module in the Hub

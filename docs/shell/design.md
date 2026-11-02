@@ -76,7 +76,7 @@ uses tonal layers and more spacious controls.
   the header sits at `windowPadding - Theme.headerInset`, a footer at
   `bottomMargin: Theme.windowPadding`. A `KitFrame` window sets `headerInset`
   instead of offsets. Popups keep 16.
-- Header: icon, title in normal case, subtitle in caps joined by ` · `. Tabs are `KitChoices` on its right; a Shell Manager page lists them as `tabs` + `tab`.
+- Header: icon, title in normal case, subtitle in caps joined by ` · `. Tabs are `KitChoices` on its right; a Shell Manager page lists them as `tabs` + `tab` (only Network still does; elsewhere a tab is a sidebar section, `page` + `pageTab`).
 - Group: `KitLabel` in caps (a noun, current value on the right), then rows.
 - Row: `KitRow` — label (capitalised) and hint (sentence case, no full stop)
   left, control right. A hint in a wide row ≤ 29 chars (the Modules page
