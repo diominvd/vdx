@@ -107,7 +107,7 @@ PopupWindow {
     sequences: [StandardKey.Cancel]
     context: Qt.WindowShortcut
     enabled: root.visible && root.closeOnEscape
-    onActivated: root.visible = false
+    onActivated: PopupManager.back()
   }
 
   IpcHandler {

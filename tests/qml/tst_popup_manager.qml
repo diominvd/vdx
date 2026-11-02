@@ -12,6 +12,7 @@ TestCase {
     QtObject {
       id: popup
       property bool visible: false
+      property bool closeOnEscape: true
       property string moduleId: "audio"
       property var bar: ({screen: {name: "one"}})
       onVisibleChanged: {
@@ -107,6 +108,17 @@ TestCase {
     compare(PopupManager.current, next);
     PopupManager.unregister(next);
     compare(PopupManager.current, null);
+  }
+
+  function test_shared_back_closes_popup_or_uses_parent_route() {
+    const item = popup("one");
+    item.visible = true;
+    verify(PopupManager.back());
+    verify(!item.visible);
+    compare(PopupManager.current, null);
+    let returned = false;
+    verify(PopupManager.back(() => returned = true));
+    verify(returned);
   }
 
   Component { id: lifetimeFactory; TestPopupLifetime {} }

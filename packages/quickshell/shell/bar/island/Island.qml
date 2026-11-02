@@ -259,7 +259,7 @@ Item {
       visible: root.shown === "module" && opacity > 0
       opacity: root.shown === "module" ? 1 : 0
       Behavior on opacity { enabled: Motion.island; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
-      Keys.onEscapePressed: root.fromHub ? root.backToHub() : root.collapse()
+      Keys.onEscapePressed: PopupManager.back(() => root.fromHub ? root.backToHub() : root.collapse())
       // the content's children land here (showPopup)
 
       PopupContentHost {
@@ -467,7 +467,7 @@ Item {
     id: keys
     focus: root.grabbing
     Keys.onPressed: event => {
-      if (event.key === Qt.Key_Escape) root.collapse();
+      if (event.key === Qt.Key_Escape) PopupManager.back(() => root.collapse());
       else if (root.view === "root") {
         if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && RootService.pending && !RootService.running) RootService.run();
         else return;

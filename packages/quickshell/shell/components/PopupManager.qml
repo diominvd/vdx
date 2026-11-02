@@ -61,6 +61,17 @@ QtObject {
     if (current === win) current = null;
   }
 
+  // Shared Escape/back entry point. A view may provide its local parent route
+  // (Island → Hub); otherwise the active popup is dismissed if it owns Escape.
+  function back(fallback) {
+    if (fallback) { fallback(); return true; }
+    if (current?.visible && current.closeOnEscape) {
+      current.visible = false;
+      return true;
+    }
+    return false;
+  }
+
   // An app's window opened from its bar module closes that module's popup.
   function closeModule(id) {
     if (current?.moduleId === id && ModuleSettings.get(id, "closeOnOpen", true)) current.visible = false;
