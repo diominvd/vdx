@@ -75,6 +75,7 @@ Singleton {
   readonly property bool liveFocusClick: look("liveFocusClick", "island")  // a click on the Focus activity ends the mode
   readonly property bool liveFront: look("liveFront", "island")    // an activity that starts takes the pill
   readonly property bool liveWheel: look("liveWheel", "island")
+  readonly property int liveWheelDelayMs: look("liveWheelDelayMs", "island")
   readonly property bool liveRightSettings: look("liveRightSettings", "island")  // a right click on an activity opens its options
   readonly property int liveBatteryBelow: look("liveBatteryBelow", "island") // %, low battery interrupts below this
   readonly property string liveBatteryStay: look("liveBatteryStay", "island") // fixed | 5s
@@ -110,7 +111,7 @@ Singleton {
     liveEnabled: true, liveBattery: true, liveBluetooth: true,
     liveRecording: true, liveUpdate: true, liveBackup: true, liveTimer: true, liveRadio: true, liveRadioPaused: true, liveRadioAlways: false, liveMedia: true, liveMediaPaused: false, liveVpn: false, liveFocus: true, liveMusic: true, liveMusicPaused: false, liveMusicAlways: false, liveNoticeMark: "avatar",
     liveVolume: true, liveMic: true, liveLayout: true, livePlugged: true,
-    liveFront: true, liveFocusClick: true, liveFlashMs: 1500, liveNoticeMs: 5000, liveWheel: true, liveRightSettings: true,
+    liveFront: true, liveFocusClick: true, liveFlashMs: 1500, liveNoticeMs: 5000, liveWheel: true, liveWheelDelayMs: 0, liveRightSettings: true,
     liveBatteryBelow: 20, liveBatteryStay: "fixed", liveOrder: ({}) })
   // animations (Shell Manager › Animations; Motion reads them)
   readonly property bool motion: state.motion                     // all of them on / off

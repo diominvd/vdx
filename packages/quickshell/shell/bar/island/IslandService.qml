@@ -123,6 +123,7 @@ Singleton {
   // the module a click on an activity opens (BarLayout.openModule)
   readonly property var liveTarget: ({ recording: "capture", timer: "timer", radio: "tuner", media: "media", music: "music", vpn: "mihomo", battery: "battery", bluetooth: "bluetooth", update: "packages", backup: "backup", mic: "audio", layout: "language", plugged: "battery" })
   property var liveViews: ({})             // screen name -> { selected: activity ID, manual: bool }
+  property var liveWheelTimes: ({})        // screen name -> last accepted wheel step
   property string pendingFrontKind: ""
   function liveFor(screen) {
     if (flashKind !== "" && activities.includes(flashKind)) return flashKind;
@@ -137,6 +138,10 @@ Singleton {
     for (const screen of Object.keys(liveViews))
       if (connected.includes(screen)) kept[screen] = liveViews[screen];
     if (Object.keys(kept).length !== Object.keys(liveViews).length) liveViews = kept;
+    const wheelTimes = {};
+    for (const screen of Object.keys(liveWheelTimes))
+      if (connected.includes(screen)) wheelTimes[screen] = liveWheelTimes[screen];
+    if (Object.keys(wheelTimes).length !== Object.keys(liveWheelTimes).length) liveWheelTimes = wheelTimes;
   }
   Connections {
     target: Quickshell
@@ -182,6 +187,10 @@ Singleton {
     const page = activities.filter(k => k !== flashKind);
     const n = page.length;
     if (n < 2 || !ShellSettings.liveWheel) return;
+    const now = Date.now();
+    const last = liveWheelTimes[screen] ?? 0;
+    if (now - last < ShellSettings.liveWheelDelayMs) return;
+    liveWheelTimes = Object.assign({}, liveWheelTimes, { [screen]: now });
     const views = Object.assign({}, liveViews);
     const view = Object.assign({ selected: "", manual: false }, views[screen] ?? {});
     const current = page.indexOf(page.includes(view.selected) ? view.selected : page[0]);

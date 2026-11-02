@@ -95,6 +95,14 @@ Column {
       hint: "Scrolling chooses an activity on this monitor until it ends"
       KitSwitch { checked: ShellSettings.liveWheel; onToggled: ShellSettings.setLook("liveWheel", !checked, "island") }
     }
+    KitSliderRow {
+      visible: ShellSettings.liveWheel
+      label: "Scroll delay"
+      snaps: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+      value: ShellSettings.liveWheelDelayMs / 500
+      text: ShellSettings.liveWheelDelayMs === 0 ? "Off" : ShellSettings.liveWheelDelayMs + " ms"
+      onMoved: value => ShellSettings.setLook("liveWheelDelayMs", Math.round(value * 10) * 50, "island")
+    }
     KitRow {
       label: "New one comes forward"
       hint: "A new activity takes the pill unless you have chosen one manually"
