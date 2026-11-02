@@ -113,6 +113,14 @@ def main():
             + '\n  property QtObject notifications: QtObject { id: ring; property var command: []; '
             'property int calls: 0; property bool running: false; '
             'onRunningChanged: if (running) { calls++; running = false; } }\n}\n')
+        island_service = (SHELL / "bar/island/IslandService.qml").read_text()
+        (work / "qs/kit/TestIslandLiveSelection.qml").write_text(
+            'import QtQuick\nimport qs.config\nQtObject {\n'
+            '  property var activities: []\n  property string flashKind: ""\n'
+            '  property var liveViews: ({})\n'
+            + qml_function(island_service, "liveFor") + '\n'
+            + qml_function(island_service, "liveDirection") + '\n'
+            + qml_function(island_service, "liveStep") + '\n}\n')
         files = (SHELL / "apps/files/FilesState.qml").read_text()
         (work / "qs/kit/TestFileCreation.qml").write_text(
             'import QtQuick\nQtObject {\nproperty var calls: []\nproperty var history: []\n'

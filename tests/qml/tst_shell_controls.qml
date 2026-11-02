@@ -27,7 +27,7 @@ Item {
     id: setting; y: 520; width: 540; wide: true; label: "Layout"
     KitSegments { model: [{ label: "Compact", value: 1 }, { label: "Comfortable", value: 2 }]; current: 1 }
   }
-  KitColourRow { id: picker; width: 600; y: 600; names: ["theme", "red"]; customs: ["#112233"]; picked: "#112233"; colours: name => "#ff0000" }
+  KitColourRow { id: picker; width: 600; y: 600; names: ["theme", "red"]; picked: "#112233"; colours: name => "#ff0000" }
   KitChipBands { id: board; y: 820; width: 600; zones: ["left", "hidden"]; idsOf: zone => zone === "left" ? ["audio", "wifi"] : []; labelOf: id => id; iconOf: id => id === "audio" ? "volume" : "wifi" }
   SignalSpy { id: inspected; target: board; signalName: "inspected" }
   SignalSpy { id: drops; target: board; signalName: "dropped" }
@@ -46,7 +46,11 @@ Item {
   TestCase {
     name: "ShellControls"
     when: windowShown
-    function init() { ShellSettings.motion = false; }
+    function init() {
+      ShellSettings.motion = false;
+      ShellSettings.set("shareColours", true);
+      ShellSettings.set("customColours", ["#112233"]);
+    }
     function test_popup_content_host_lifecycle() {
       const owner = Qt.createQmlObject('import QtQuick; Item {}', parent);
       const home = Qt.createQmlObject('import QtQuick; Item {}', owner);
@@ -519,8 +523,8 @@ Item {
       picker.editing = false;
     }
     function test_colour_row_resolves_names_and_own() {
-      compare(String(picker.colourOf("red")), "#ff0000");
-      compare(picker.colourOf("#112233"), "#112233");
+      compare(picker.pairOf("red")[0], "#ff0000");
+      compare(picker.pairOf("#112233")[0], "#112233");
     }
     function test_filtered_selection_stays_in_list() {
       entries.query = ""; entries.selected = "ai";
