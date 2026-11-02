@@ -7,9 +7,6 @@ import qs.kit
 // share a compact list; system scaling is a separate group.
 KitColumn {
   id: root
-  property string tab: "family"
-  readonly property var tabs: [{ label: "Family", value: "family" }, { label: "Text size", value: "size" }]
-  function jump(key) { tab = key === "size" ? "size" : "family"; }
   readonly property string icon: "text"
   readonly property string title: "Fonts"
   readonly property string description: "The shell's typeface and text size."
@@ -17,7 +14,7 @@ KitColumn {
     { key: "preview", label: "Preview", y: previewLabel.y },
     { key: "families", label: "Families", y: familiesLabel.y },
     { key: "size", label: "Text size", y: sizeLabel.y }
-  ].filter(j => tab === "size" ? j.key === "size" : j.key !== "size")
+  ]
   readonly property var resetKeys: ["textSize", "inputAlign"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
@@ -44,7 +41,7 @@ KitColumn {
   Column {
   spacing: Theme.sectionGap
 
-    width: parent.width; visible: root.tab === "family"
+    width: parent.width
   KitLabel { id: previewLabel; visible: root.shown.length > 0; text: "PREVIEW"; value: root.drawable ? "SELECTED FAMILY" : "INSTALL TO PREVIEW" }
   Rectangle {
     id: fontSpecimen
@@ -136,7 +133,7 @@ KitColumn {
     KitGrouper {}
   }
   Column {
-    width: parent.width; visible: root.tab === "size"
+    width: parent.width
   KitLabel { id: sizeLabel; text: "TEXT SIZE" }
   KitRow {
     wide: true; label: "Text size"; hint: "Shell text and controls"

@@ -3,16 +3,12 @@ import qs.config
 import qs.kit
 import qs.modules.wifi
 
-// Network, a tab each for Wi-Fi (the radio, the connection in use, the saved
-// networks, a hidden network to join), the wired connection and the hotspot.
+// Network: Wi-Fi (the radio, the connection in use, the saved networks, a hidden
+// network to join), the wired connection and the hotspot, one after another.
 // Each group has the same order: its switch or state first, then the settings,
 // then the facts.
 KitColumn {
   id: root
-
-  property string tab: "wifi"                 // wifi | ethernet | hotspot
-  // the tabs the window's header shows
-  readonly property var tabs: [{ label: "Wi-Fi", value: "wifi" }, { label: "Ethernet", value: "ethernet" }, { label: "Hotspot", value: "hotspot" }]
 
   readonly property var ws: WifiService
   readonly property var eth: ws.ethernet
@@ -41,18 +37,14 @@ KitColumn {
   readonly property string description: "Wi-Fi, wired connections and sharing this computer's connection."
 
   // groups for the Shell Manager's sidebar: a click scrolls to `y`
-  // (only the open tab's: the others are not on the page)
-  readonly property var jumps: tab !== "wifi" ? [] : [
+  readonly property var jumps: [
     { key: "wifi",       label: "Wi-Fi",      y: wifiGroup.y + wifiTab.y },
     { key: "connection", label: "Connection", y: ws.connected ? connectionGroup.y + wifiTab.y : -2 },
     { key: "saved",      label: "Saved",      y: savedGroup.y + wifiTab.y },
-    { key: "new",        label: "Other",      y: newGroup.y + wifiTab.y }
+    { key: "new",        label: "Other",      y: newGroup.y + wifiTab.y },
+    { key: "ethernet",   label: "Ethernet",   y: ethernetPart.y },
+    { key: "hotspot",    label: "Hotspot",    y: hotspotPart.y }
   ].filter(j => j.y > -2)
-
-  // a link from another page (a module's Open) lands on the tab that holds the group
-  function jump(key) {
-    tab = key === "ethernet" || key === "hotspot" ? key : "wifi";
-  }
 
   spacing: Theme.gapGroup
 
@@ -77,11 +69,10 @@ KitColumn {
 
   Timer { id: disarmDisconnect; interval: 3000; onTriggered: root.disconnectArmed = false }
 
-  // ---- wi-fi tab ----
+  // ---- wi-fi ----
   KitColumn {
     id: wifiTab
     width: parent.width
-    visible: root.tab === "wifi"
     spacing: Theme.sectionGap
 
     // ---- wi-fi ----
@@ -364,15 +355,15 @@ KitColumn {
   }
 
   NetworkEthernet {
+    id: ethernetPart
     page: root
     width: parent.width
-    visible: root.tab === "ethernet"
   }
 
   NetworkHotspot {
+    id: hotspotPart
     page: root
     width: parent.width
-    visible: root.tab === "hotspot"
   }
 
   KitGrouper {}

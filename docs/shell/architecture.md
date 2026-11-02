@@ -174,10 +174,10 @@ links, secrets, `/etc`, units, services). `link` also writes
 | Dotfiles state | `~/.local/state/dotfiles/` | installer + shell | `components.json` (modules not installed), `accent.lua`, `window-mode`, `shell-apps.json` |
 
 Settings UI = **Shell Manager** (`apps/shellmanager/`, Super+S). The sidebar is a rail of group
-buttons (LOOK, BAR, WINDOWS, CONNECT, DEVICES, SYSTEM) with the shell's own pages (`foot: true`: Profile, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after: LOOK Appearance, Themes (also Dark / Light), Fonts, Icons, Cursor, Wallpaper, Motion ·
+buttons (LOOK, BAR, WINDOWS, CONNECT, DEVICES, SYSTEM) with the shell's own pages (`foot: true`: Profile, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after: LOOK Interface, Colours (one page with Glow: `pageTab`), Themes (also Dark / Light), Fonts, Icons, Cursor, Wallpaper, Motion, Glow ·
 BAR Bar, Bar look, Bar monitors (one page, three sections: `pageTab`; under them, in the Island style only: Hub, Live activities),
 Bar modules · WINDOWS Windows, Lock screen · CONNECT Network (with Hotspot), Bluetooth, VPN · DEVICES Sound,
-Displays (with the night light), Power · SYSTEM Notifications, Apps, Updates · foot: Profile, System, Settings, About (the last three one page, `pageTab`). Windows is one page with groups. A page has no tab strip: a section that shares a page with others sets `page` + `pageTab` in `allSections`.
+Displays (with the night light), Power · SYSTEM Notifications, Apps, Updates · foot: Profile, System, Settings, About (the last three one page, `pageTab`). Windows, Network (Wi-Fi, Ethernet, Hotspot) and Fonts are each one page with groups. A page has no tab strip: a section that shares a page with others sets `page` + `pageTab` in `allSections`.
 A page header has its group, a
 state line and one or two lines on what the page does; a block has an `about` line (`KitLabel`).
 One home per setting; a setting that waits for something (a style, a switch, a module in the Hub

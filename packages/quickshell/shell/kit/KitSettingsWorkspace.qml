@@ -32,7 +32,7 @@ Item {
     Controls.ScrollBar.vertical: KitScrollBar { visible: root.showScrollBar }
     Loader {
       id: settingsLoader
-      width: root.width - Theme.gapMedium
+      width: root.width            // the scrollbar sits past it, at the window's edge
       sourceComponent: root.settings
       opacity: sectionIn.shown
       height: item ? item.implicitHeight : 0

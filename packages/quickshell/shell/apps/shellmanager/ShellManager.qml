@@ -53,13 +53,18 @@ Rectangle {
 // `page` + `pageTab`: a section that is one tab of another page (Bar look is the Bar page's Look tab):
 // the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
   readonly property var allSections: [
-    { value: "appearance", label: "Appearance", icon: "sliders",    caption: "LOOK" },
+    { value: "appearance", label: "Interface",  icon: "sliders",    caption: "LOOK",
+      page: "appearance", pageTab: "style", description: "Style, corners and controls." },
+    { value: "colours",    label: "Colours",    icon: "palette",
+      page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
     { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "fonts",      label: "Fonts",      icon: "text" },
     { value: "icons",      label: "Icons",      icon: "star" },
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
     { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "animations", label: "Motion",     icon: "curve" },
+    { value: "glow",       label: "Glow",       icon: "star",
+      page: "appearance", pageTab: "glow", description: "A soft halo behind bright elements." },
     { value: "bar",        label: "Bar",        icon: "menu",     caption: "BAR",
       page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
     { value: "barlook",    label: "Bar look",   icon: "brush",
@@ -134,6 +139,9 @@ Rectangle {
     if (value === "wallpaper") return { tab: "wallpaper", target: "" };
     // the hotspot is a tab of Network
     if (value === "hotspot" || (value === "network" && target === "hotspot")) return { tab: "network", target: "hotspot" };
+    // the Appearance page's tabs became pages: Interface, Colours, Glow
+    if (value === "appearance" && target === "accent") return { tab: "colours", target: "" };
+    if (value === "appearance" && target === "glow") return { tab: "glow", target: "" };
     // the Bar page's tabs became pages: Layout, Look, Monitors
     if (value === "bar" && ["look", "behaviour", "appearance"].includes(target)) return { tab: "barlook", target: "" };
     if (value === "bar" && target === "monitor") return { tab: "barmonitor", target: "" };
@@ -473,7 +481,7 @@ Rectangle {
     KitHeader {
       id: pageHead
       page: true
-      icon: root.currentPage?.icon ?? "sliders"
+      icon: root.pageTabOf(root.tab) ? root.sectionOf(root.tab).icon : (root.currentPage?.icon ?? "sliders")
       title: root.pageTabOf(root.tab) ? root.sectionOf(root.tab).label : (root.currentPage?.title ?? "Appearance")
       crumb: root.groupOf(root.tab)
       description: root.pageTabOf(root.tab) ? root.sectionOf(root.tab).description : (root.currentPage?.description ?? "")

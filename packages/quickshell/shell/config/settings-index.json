@@ -672,30 +672,6 @@
  {
   "label": "Wi-Fi",
   "hint": "",
-  "where": "Network",
-  "target": "network"
- },
- {
-  "label": "Connection",
-  "hint": "",
-  "where": "Network",
-  "target": "network"
- },
- {
-  "label": "Saved",
-  "hint": "",
-  "where": "Network",
-  "target": "network"
- },
- {
-  "label": "Other",
-  "hint": "",
-  "where": "Network",
-  "target": "network"
- },
- {
-  "label": "Wi-Fi",
-  "hint": "",
   "where": "Network › WI-FI",
   "target": "network:wifi"
  },
@@ -1697,97 +1673,97 @@
   "label": "Hotspot",
   "hint": "",
   "where": "Network › Hotspot",
-  "target": "network"
+  "target": "network:hotspot"
  },
  {
   "label": "Hotspot",
   "hint": "",
   "where": "Network › Hotspot › HOTSPOT",
-  "target": "network"
+  "target": "network:hotspot"
  },
  {
   "label": "Name",
   "hint": "The network the phones see",
   "where": "Network › Hotspot › HOTSPOT",
-  "target": "network"
+  "target": "network:hotspot"
  },
  {
   "label": "Password",
   "hint": "8 characters or more",
   "where": "Network › Hotspot › HOTSPOT",
-  "target": "network"
+  "target": "network:hotspot"
  },
  {
   "label": "Channel",
   "hint": "Auto picks a free one",
   "where": "Network › Hotspot › HOTSPOT",
-  "target": "network"
+  "target": "network:hotspot"
  },
  {
   "label": "Ethernet",
   "hint": "",
   "where": "Network › Ethernet",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Wired",
   "hint": "Off until you connect again",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Connect automatically",
   "hint": "Joins when the cable is in",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Addressing",
   "hint": "Manual: a fixed address",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Address",
   "hint": "Address and prefix",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Gateway",
   "hint": "Press Enter to apply",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "DNS",
   "hint": "Applies now while connected",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "IPv6",
   "hint": "Off: IPv4 only",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Metered",
   "hint": "Yes: apps save data",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Speed",
   "hint": "",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "MAC",
   "hint": "",
   "where": "Network › Ethernet › ETHERNET",
-  "target": "network"
+  "target": "network:ethernet"
  },
  {
   "label": "Window",

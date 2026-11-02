@@ -17,7 +17,7 @@ KitSettingsWorkspace {
     { key: "accent", label: "Colours", y: 0 },
     { key: "glow", label: "Glow", y: 0 },
     { key: "shape", label: "Shape", y: 0 }
-  ]
+  ].filter(j => tab === "style" ? ["style", "shape"].includes(j.key) : j.key === tab)   // the open tab's: a sidebar page each
   function jump(key) {
     tab = key === "accent" || key === "glow" ? key : "style";
   }
