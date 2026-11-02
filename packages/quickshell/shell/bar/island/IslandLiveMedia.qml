@@ -14,6 +14,7 @@ Row {
   readonly property bool track: kind === "music" || kind === "media"
   readonly property var player: kind === "media" ? PlayerService.media : PlayerService.music
   property int coverSize: 18
+  property int badgeRadius: 4
   spacing: 8
   visible: kind !== ""
 
@@ -23,7 +24,7 @@ Row {
     anchors.verticalCenter: parent.verticalCenter
     width: face.coverSize
     height: face.coverSize
-    radius: Theme.barRadiusFor(face.coverSize)
+    radius: face.badgeRadius
     color: Theme.background3
 
     Image {

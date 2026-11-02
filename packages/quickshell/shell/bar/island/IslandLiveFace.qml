@@ -28,5 +28,5 @@ Row {
   Component { id: taskFace; IslandLiveTask { kind: face.kind; inputEnabled: face.inputEnabled; coverSize: face.coverSize } }
   Component { id: noticeFace; IslandLiveNoticeFace { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
   Component { id: statusFace; IslandLiveStatus { kind: face.kind } }
-  Component { id: mediaFace; IslandLiveMedia { kind: face.kind; coverSize: face.coverSize } }
+  Component { id: mediaFace; IslandLiveMedia { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
 }
