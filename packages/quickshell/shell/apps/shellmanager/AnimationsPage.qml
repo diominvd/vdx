@@ -10,18 +10,17 @@ import qs.kit
 Column {
   id: root
 
-
   // the window's fixed header shows these; the page under it scrolls
   readonly property string icon: "curve"
   readonly property string title: "Motion"
   readonly property string description: "How the shell moves. Off, everything snaps in place."
 
-  // groups for the Shell Manager's sidebar: a click scrolls to `y`
   // the header's Reset: these ShellSettings keys back to their defaults
   readonly property var resetKeys: ["motion", "motionSpeed", "motionPopups", "underlineAnimation", "motionPanels", "motionControls", "motionBar", "motionPages", "motionTabs", "motionIsland", "motionLock"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
+  // groups for the Shell Manager's sidebar: a click scrolls to `y`
   readonly property var jumps: [
     { key: "general", label: "General", y: generalGroup.y },
     { key: "parts",   label: "Parts",   y: partsGroup.y }

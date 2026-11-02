@@ -34,7 +34,7 @@ ClippingRectangle {
   Rectangle {
     radius: Theme.pill(height)
     visible: root.active
-    anchors { right: parent.right; bottom: parent.bottom; margins: 4 }
+    anchors { right: parent.right; bottom: parent.bottom; margins: Theme.gapHair }
     width: 18
     height: 18
     color: Theme.background0

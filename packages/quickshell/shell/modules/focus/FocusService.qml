@@ -25,7 +25,8 @@ Singleton {
     running: true
     stdout: StdioCollector { onStreamFinished: root.on = text.split("\n").includes("do-not-disturb") }
   }
-  Process { id: set }
+  // the flip above is a guess: read the real mode back once makoctl is done
+  Process { id: set; onExited: root.refresh() }
 
   // another tool may flip the mode: look again now and then
   Timer { interval: 15000; running: true; repeat: true; onTriggered: root.refresh() }

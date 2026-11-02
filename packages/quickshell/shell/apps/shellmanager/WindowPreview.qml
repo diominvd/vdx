@@ -111,7 +111,7 @@ Rectangle {
     y: win.y
     width: root.width / 2 - 5
     height: win.height
-    color: "transparent"
+    color: Theme.clear
     border.width: Theme.frameWidth
     border.color: Theme.background3
   }

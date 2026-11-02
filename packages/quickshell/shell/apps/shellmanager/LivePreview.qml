@@ -30,7 +30,7 @@ Rectangle {
   Component {
     id: c_notice
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // messages
       Rectangle {
         visible: root.kind === "notice" && ShellSettings.liveNoticeMark === "avatar"
@@ -47,7 +47,7 @@ Rectangle {
   Component {
     id: c_battery
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // low battery
       Rectangle { visible: root.kind === "battery"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.red; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "battery"; text: "9% · 14m"; font.pixelSize: Theme.fontSize - 1 }
@@ -57,7 +57,7 @@ Rectangle {
   Component {
     id: c_bluetooth
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // a device connected
       Rectangle { visible: root.kind === "bluetooth"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.green; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "bluetooth"; text: "AirPods 80"; font.pixelSize: Theme.fontSize - 1 }
@@ -67,14 +67,14 @@ Rectangle {
   Component {
     id: c_recording
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // recording
       Rectangle { visible: root.kind === "recording"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.red; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "recording"; text: "00:03"; font.pixelSize: Theme.fontSize - 1 }
       Row {
         visible: root.kind === "recording"
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 2
+        spacing: Theme.gapTight
         Repeater { model: root.wave(); Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.red; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } } }
       }
       // the round buttons of the live face: pause (dim) and stop (red)
@@ -100,7 +100,7 @@ Rectangle {
   Component {
     id: c_update
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // updates
       KitIcon { visible: root.kind === "update"; glowTarget: "live"; name: "download"; size: 12; tint: Theme.blue; anchors.verticalCenter: parent.verticalCenter }
       Rectangle {
@@ -116,7 +116,7 @@ Rectangle {
   Component {
     id: c_backup
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // backup
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "backup"; text: "BKP"; font.pixelSize: Theme.fontSize - 3; font.letterSpacing: 1 }
       Rectangle {
@@ -132,7 +132,7 @@ Rectangle {
   Component {
     id: c_vpn
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // vpn
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "vpn"; text: "VPN"; font.pixelSize: Theme.fontSize - 3; font.letterSpacing: 1 }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "vpn"; text: "Finland"; font.pixelSize: Theme.fontSize - 1 }
@@ -143,7 +143,7 @@ Rectangle {
   Component {
     id: c_timer
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // timer
       KitIcon { visible: root.kind === "timer"; glowTarget: "live"; anchors.verticalCenter: parent.verticalCenter; name: "clock"; size: 16; tint: Theme.orange }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "timer"; text: "13:12"; color: Theme.orange; font.pixelSize: Theme.fontSize - 1 }
@@ -153,7 +153,7 @@ Rectangle {
   Component {
     id: c_radio
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // radio
       Rectangle { visible: root.kind === "radio"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.yellow; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "radio"; text: "Love Radio"; font.pixelSize: Theme.fontSize - 1 }
@@ -163,7 +163,7 @@ Rectangle {
   Component {
     id: c_focus
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // focus
       KitIcon { visible: root.kind === "focus"; glowTarget: "live"; anchors.verticalCenter: parent.verticalCenter; name: "moon"; size: 16; tint: Theme.purple }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "focus"; text: "Focus"; font.pixelSize: Theme.fontSize - 1 }
@@ -173,7 +173,7 @@ Rectangle {
   Component {
     id: c_music
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // music: the cover, the name, the sound
       Rectangle { visible: root.kind === "music" && ShellSettings.liveMusicCover; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
         KitIcon { anchors.centerIn: parent; name: "music"; size: 9; tint: Theme.foreground2 } }
@@ -181,7 +181,7 @@ Rectangle {
       Row {
         visible: root.kind === "music"
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 2
+        spacing: Theme.gapTight
         Repeater { model: [0.45, 1, 0.65, 0.85]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.green; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } } }
       }
     }
@@ -190,7 +190,7 @@ Rectangle {
   Component {
     id: c_media
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // media: another app's sound — the app's icon, the title, the sound
       Rectangle { visible: root.kind === "media" && ShellSettings.liveMediaCover; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
         KitIcon { anchors.centerIn: parent; name: "play"; size: 9; tint: Theme.foreground2 } }
@@ -198,7 +198,7 @@ Rectangle {
       Row {
         visible: root.kind === "media"
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 2
+        spacing: Theme.gapTight
         Repeater { model: [0.8, 0.4, 1, 0.55]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.foreground2; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } } }
       }
     }
@@ -207,7 +207,7 @@ Rectangle {
   Component {
     id: c_volume
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // volume and brightness
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "volume"; text: "VOL"; font.pixelSize: Theme.fontSize - 3; font.letterSpacing: 1 }
       Row {
@@ -223,7 +223,7 @@ Rectangle {
   Component {
     id: c_mic
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // microphone
       KitIcon { visible: root.kind === "mic"; glowTarget: "live"; name: "mic-off"; size: 13; tint: Theme.red; anchors.verticalCenter: parent.verticalCenter }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "mic"; text: "Muted"; font.pixelSize: Theme.fontSize - 1 }
@@ -233,7 +233,7 @@ Rectangle {
   Component {
     id: c_layout
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // keyboard layout
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "layout"; text: "EN"; color: Theme.muted; font.pixelSize: Theme.fontSize - 1 }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "layout"; text: "→"; color: Theme.dim; font.pixelSize: Theme.fontSize - 1 }
@@ -244,7 +244,7 @@ Rectangle {
   Component {
     id: c_plugged
     Row {
-      spacing: 8
+      spacing: Theme.gapMedium
       // the cable
       KitIcon { visible: root.kind === "plugged"; glowTarget: "live"; name: "zap"; size: 12; tint: Theme.green; anchors.verticalCenter: parent.verticalCenter }
       Rectangle {

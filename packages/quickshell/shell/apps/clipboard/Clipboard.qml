@@ -187,7 +187,7 @@ KitFrame {
                 Rectangle {
                   radius: Theme.radiusControl
                   anchors.fill: parent
-                  color: "transparent"
+                  color: Theme.clear
                   border.width: Theme.frameWidth
                   border.color: Theme.gray
                 }
