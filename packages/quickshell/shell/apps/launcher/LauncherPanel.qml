@@ -24,7 +24,7 @@ KitFrame {
   readonly property var tabs: ls.tabs
   readonly property var items: tab === "apps" ? ls.apps(query)
                              : tab === "files" ? ls.fileItems()
-                             : tab === "shell" ? ls.filter(ls.shellItems, query).concat(ls.shellSettings(query))
+                             : tab === "shell" ? ls.commands(query)
                              : ls.filter(ls.powerItems, query)
 
   signal back()

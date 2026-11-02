@@ -13,7 +13,7 @@ Registry: `apps/apps.json` (read by the Shell Manager, the launcher,
 | App | Key | IPC |
 |---|---|---|
 | Shell Manager | Super+S | `shell toggle`, `shell open <page>[:<group or app>]`, `shell search <words>` |
-| Launcher (system menu) | Alt+Space | `launcher toggle` |
+| Launcher / Commands palette | Alt+Space | `launcher toggle` |
 | Keybinds | Super+B | `keybinds toggle\|open\|close` |
 | Files | Super+E | `files toggle\|open\|close`, `files go\|reveal\|inspect\|duplicates <path>`, `files choose <json>` |
 | Capture | Super+Shift+S | `capture open\|stop\|close\|library\|shot <region\|window\|screen>` |
@@ -28,6 +28,13 @@ Registry: `apps/apps.json` (read by the Shell Manager, the launcher,
 | Packages | — | `packages toggle` |
 | VirusTotal | — | `virustotal toggle` |
 | Display | — | `display toggle` |
+
+The launcher's **Commands** tab searches shell actions, applications, bar
+modules and settings in one place. Type to filter, use ↑ / ↓ and Enter to run;
+Apps, Files and Power remain available as focused lists. In Shell Manager,
+Ctrl+K focuses settings search and Alt+← returns to the previous settings page.
+Escape closes the current popup; Island Escape returns to the Hub when there is
+a parent view.
 | Taskbar | — | floating mode only |
 | Root prompt | — | the polkit agent: asks before every root action |
 

@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.components
+import qs.bar
 import qs.apps.keybinds
 import qs.apps.shellmanager
 import qs.config
@@ -25,7 +26,7 @@ Singleton {
   readonly property var allTabs: [
     { label: "Apps", value: "apps", icon: "grid" },
     { label: "Files", value: "files", icon: "folder" },
-    { label: "Shell", value: "shell", icon: "sliders" },
+    { label: "Commands", value: "shell", icon: "search" },
     { label: "Power", value: "power", icon: "power" }
   ]
   readonly property var defaultOrder: allTabs.map(t => t.value)
@@ -116,6 +117,27 @@ Singleton {
     const own = shellItems.map(i => i.title);
     return SettingsIndex.search(q).filter(e => !own.includes(e.label)).map(e => ({ icon: "sliders", title: e.label,
       hint: e.where !== "" ? e.where : "Settings", run: () => exec(ipc("shell", "open", e.target)) }));
+  }
+
+  // One searchable palette for shell actions, applications, bar modules,
+  // settings and power. Dedicated tabs remain available for focused browsing.
+  function commands(q) {
+    const term = (q ?? "").trim().toLowerCase();
+    const ownModules = ShellAppsService.entries.filter(e => e.module).map(e => e.module);
+    const quickPower = root.powerItems.filter(i => i.title === "Lock" || i.title === "Suspend");
+    const modules = BarLayout.modules.filter(m => BarLayout.installed(m.id) && !ownModules.includes(m.id)
+      && (term === "" || (m.label + " " + m.about).toLowerCase().includes(term)))
+      .map(m => ({ icon: m.icon, title: m.label, hint: m.about || "Bar module", run: () => BarLayout.openModule(m.id) }));
+    const items = root.filter(root.shellItems, term)
+      .concat(term === "" ? root.shellApps : root.apps(term), modules, root.shellSettings(term), root.filter(quickPower, term))
+      .sort((a, b) => a.title.localeCompare(b.title));
+    const seen = new Set();
+    return items.filter(item => {
+      const key = (item.title + "|" + (item.hint ?? "")).toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
 
   readonly property var modeItems: WindowsService.modes.map(m => ({ icon: m.icon, title: m.label, hint: "Window mode",
