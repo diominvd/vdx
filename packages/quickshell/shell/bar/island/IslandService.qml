@@ -326,8 +326,15 @@ Singleton {
       }
       if (item.urgency === "critical" && noticeItem && noticeItem.urgency !== "critical") {
         noticeLiveTimer.stop();
+        const replaced = queue.findIndex(n => n.key === item.key);
+        if (replaced >= 0) queue.splice(replaced, 1);
         queue.unshift(noticeItem);
         noticeItem = Object.assign({ repeats: 1 }, item);
+        continue;
+      }
+      const replaced = queue.findIndex(n => n.key === item.key);
+      if (replaced >= 0) {
+        queue[replaced] = Object.assign({ repeats: queue[replaced].repeats ?? 1 }, item);
         continue;
       }
       const duplicate = queue.findIndex(n => sameNotice(n, item));
@@ -390,7 +397,12 @@ Singleton {
   // the centre opened (from anywhere): the toasts close, the centre keeps them
   Connections {
     target: NotificationsService
-    function onOpened() { root.clearNotices(); root.noticeItem = null; noticeLiveTimer.stop(); }
+    function onOpened() {
+      root.clearNotices();
+      root.noticeItem = null;
+      root.deferredNotices = [];
+      noticeLiveTimer.stop();
+    }
   }
 
   function openNotifications() {
