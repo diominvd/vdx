@@ -228,6 +228,7 @@ Item {
       anchors { right: preview.left; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
       width: Math.min(110, Math.max(70, (strip.width - 2 * back.width - preview.width - 4 * Theme.gapMedium) * 0.4))
       height: Theme.controlHeight
+      plate: !Theme.material
       accessibleName: "Shade"
       spectrum: root.ramp(12, t => Colour.hexOfHsl(root.hue, root.sat, 0.08 + 0.84 * t))
       value: (root.light - 0.08) / 0.84
@@ -242,6 +243,7 @@ Item {
         verticalCenter: parent.verticalCenter
       }
       height: Theme.controlHeight
+      plate: !Theme.material
       accessibleName: "Hue"
       spectrum: root.ramp(24, t => Colour.hexOfHsl(t, root.sat, root.light))
       value: root.hue
