@@ -328,7 +328,7 @@ Column {
   KitNotice {
     shown: root.resourceMetrics.length > 0 || (!measureProc.running && root.resourceReport !== "")
     width: parent.width
-    icon: root.resourceMetrics.length > 0 ? "activity" : "alert"
+    icon: root.resourceMetrics.length > 0 ? "activity" : "info"
     tone: root.resourceMetrics.length > 0 ? Theme.clear : Theme.red
     title: root.resourceMetrics.length > 0 ? "Process snapshot" : "Snapshot unavailable"
     text: root.resourceMetrics.length > 0

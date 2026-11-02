@@ -155,6 +155,10 @@ class OverviewRuntime(unittest.TestCase):
             source = LOGIC.with_name("Overview.qml").read_text()
             source = "\n".join(line for line in source.splitlines()
                                if not line.startswith("import qs.") and line != "import Quickshell.Hyprland")
+            # the mock window is a plain Item: the layer-shell attached property hangs its creation
+            source = source.replace('''  WlrLayershell.keyboardFocus: open && dragPhase !== "committing"
+    ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+''', '')
             source = source.replace('import QtQuick', 'import QtQuick\nimport "mocks"', 1)
             source = source.replace('TaskView { overview: root }', 'Item { function reset() {} }')
             (root / "Overview.qml").write_text(source)

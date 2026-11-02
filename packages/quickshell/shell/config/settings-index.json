@@ -1214,7 +1214,7 @@
  },
  {
   "label": "Shell resources",
-  "hint": "Sample the running Quickshell process on demand; RSS and VSZ are KiB",
+  "hint": "A one-time snapshot of the running Quickshell process",
   "where": "About › SYSTEM",
   "target": "about:system"
  },
@@ -1231,57 +1231,63 @@
   "target": "about:system"
  },
  {
-  "label": "Own colours",
-  "hint": "",
-  "where": "Appearance",
-  "target": "appearance:accent"
- },
- {
   "label": "Accent",
   "hint": "",
   "where": "Appearance",
   "target": "appearance:accent"
  },
  {
-  "label": "Use accent on",
+  "label": "Accent targets",
+  "hint": "",
+  "where": "Appearance",
+  "target": "appearance:accent"
+ },
+ {
+  "label": "Own colours",
   "hint": "",
   "where": "Appearance",
   "target": "appearance:accent"
  },
  {
   "label": "Switches",
-  "hint": "The ones that are on",
+  "hint": "On switches",
   "where": "Appearance",
   "target": "appearance:accent"
  },
  {
   "label": "Sliders",
-  "hint": "The filled part",
+  "hint": "Filled track",
   "where": "Appearance",
   "target": "appearance:accent"
  },
  {
   "label": "Choices",
-  "hint": "The picked one",
+  "hint": "Selected option",
   "where": "Appearance",
   "target": "appearance:accent"
  },
  {
   "label": "Dropdowns",
-  "hint": "The open one's frame",
-  "where": "Appearance",
-  "target": "appearance:accent"
- },
- {
-  "label": "Bar modules",
-  "hint": "Active states, the equalizer; not warnings",
+  "hint": "Selected field",
   "where": "Appearance",
   "target": "appearance:accent"
  },
  {
   "label": "Window frames",
-  "hint": "The focused window's frame",
+  "hint": "Focused window",
   "where": "Appearance",
+  "target": "appearance:accent"
+ },
+ {
+  "label": "Accent colour",
+  "hint": "Active and selected controls",
+  "where": "Appearance › ACCENT",
+  "target": "appearance:accent"
+ },
+ {
+  "label": "Colour",
+  "hint": "A named one, or your own",
+  "where": "Appearance › ACCENT",
   "target": "appearance:accent"
  },
  {
@@ -1294,18 +1300,6 @@
   "label": "Own colours",
   "hint": "How many can be saved",
   "where": "Appearance › OWN COLOURS",
-  "target": "appearance:accent"
- },
- {
-  "label": "Accent",
-  "hint": "Highlight active controls across the shell",
-  "where": "Appearance › ACCENT",
-  "target": "appearance:accent"
- },
- {
-  "label": "Colour",
-  "hint": "A named one, or your own",
-  "where": "Appearance › ACCENT",
   "target": "appearance:accent"
  },
  {
@@ -2128,13 +2122,7 @@
  },
  {
   "label": "Colour",
-  "hint": "",
-  "where": "Bar modules › Equalizer › BAR",
-  "target": "modules:equalizer"
- },
- {
-  "label": "Accent",
-  "hint": "In Appearance › Colours › Bar modules",
+  "hint": "One colour for all bars",
   "where": "Bar modules › Equalizer › BAR",
   "target": "modules:equalizer"
  },
