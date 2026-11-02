@@ -75,8 +75,8 @@ Singleton {
                && (ShellSettings.liveBatteryStay === "fixed" || batShown),
       bluetooth: btShown && BluetoothService.mainDevice !== null,
       recording: CaptureService.recording,
-      update: PackagesService.busy || RootService.running,
-      backup: BackupService.busy && BackupService.jobKind === "run",
+      update: PackagesService.busy || RootService.running || PackagesService.status !== "",
+      backup: BackupService.jobKind === "run" && (BackupService.busy || BackupService.status !== ""),
       vpn: MihomoService.serviceOn,
       focus: FocusService.on,
       timer: TimerService.active,
@@ -130,6 +130,15 @@ Singleton {
   }
   function liveDirection(screen) { return liveViews[screen]?.direction ?? 1; }
   readonly property string live: liveFor("")
+  function pruneLiveViews() {
+    const connected = new Set(Quickshell.screens.map(s => s.name).concat([""]));
+    const kept = Object.fromEntries(Object.entries(liveViews).filter(([screen]) => connected.has(screen)));
+    if (Object.keys(kept).length !== Object.keys(liveViews).length) liveViews = kept;
+  }
+  Connections {
+    target: Quickshell
+    function onScreensChanged() { root.pruneLiveViews(); }
+  }
   // a new activity takes the pill (Bar › Live › New one comes forward); paging goes on from there
   property var seenKinds: []
   onActivitiesChanged: {
@@ -149,12 +158,13 @@ Singleton {
     liveViews = views;
   }
   function liveStep(delta, screen) {
-    const n = activities.length;
+    const page = activities.filter(k => k !== flashKind);
+    const n = page.length;
     if (n < 2 || !ShellSettings.liveWheel) return;
     const views = Object.assign({}, liveViews);
     const view = Object.assign({ selected: "", manual: false }, views[screen] ?? {});
-    const current = activities.indexOf(activities.includes(view.selected) ? view.selected : liveFor(screen));
-    view.selected = activities[(Math.max(0, current) + delta + n) % n];
+    const current = page.indexOf(page.includes(view.selected) ? view.selected : page[0]);
+    view.selected = page[(Math.max(0, current) + delta + n) % n];
     view.manual = true;
     view.direction = delta;
     views[screen] = view;
@@ -269,7 +279,10 @@ Singleton {
       }
       const duplicate = queue.findIndex(n => sameNotice(n, item));
       if (duplicate >= 0) queue[duplicate] = Object.assign({}, queue[duplicate], { repeats: (queue[duplicate].repeats ?? 1) + 1 });
-      else queue.push(Object.assign({ repeats: 1 }, item));
+      else if (item.urgency === "critical") {
+        const firstOrdinary = queue.findIndex(n => n.urgency !== "critical");
+        queue.splice(firstOrdinary < 0 ? queue.length : firstOrdinary, 0, Object.assign({ repeats: 1 }, item));
+      } else queue.push(Object.assign({ repeats: 1 }, item));
     }
     noticeQueue = queue.slice(0, 32);
     if (!noticeItem) showNextLiveNotice();

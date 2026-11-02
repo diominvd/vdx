@@ -99,55 +99,39 @@ Row {
 
   // update: the download's progress, else what runs
   KitIcon { visible: face.kind === "update"; glowTarget: "live"; name: "download"; tint: Theme.blue; size: 14; anchors.verticalCenter: parent.verticalCenter }
+  readonly property bool updateDone: face.kind === "update" && !PackagesService.busy && !RootService.running && PackagesService.status !== ""
   readonly property bool updateBar: face.kind === "update" && PackagesService.stage === "downloading"
-  Rectangle {
+  IslandLiveProgress {
     visible: face.updateBar
     anchors.verticalCenter: parent.verticalCenter
     width: 90
-    height: 4
-    radius: Theme.pill(height)
-    color: Theme.background3
-    Rectangle {
-      width: parent.width * PackagesService.stagePercent
-      height: parent.height
-      radius: Theme.pill(height)
-      color: Theme.blue
-
-      KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius }
-    }
+    value: PackagesService.stagePercent
+    tint: Theme.blue
   }
   KitText { visible: face.updateBar; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
     visible: face.kind === "update" && !face.updateBar
     width: Math.min(implicitWidth, 180)
     elide: Text.ElideRight
-    text: PackagesService.stage === "installing" ? "Installing packages" : PackagesService.busy ? "Updating packages" : RootService.title
-    color: Theme.blue
+    text: face.updateDone ? (PackagesService.status === "error" ? "Update failed" : "Updates installed")
+      : PackagesService.stage === "installing" ? "Installing packages" : PackagesService.busy ? "Updating packages" : RootService.title
+    color: face.updateDone ? (PackagesService.status === "error" ? Theme.red : Theme.green) : Theme.blue
   }
 
   // backup: BKP and its progress
   KitText { visible: face.kind === "backup"; text: "BKP"; color: Theme.foreground1; font.letterSpacing: 1 }
-  Rectangle {
-    visible: face.kind === "backup"
+  IslandLiveProgress {
+    visible: face.kind === "backup" && BackupService.status === ""
     anchors.verticalCenter: parent.verticalCenter
     width: 70
-    height: 4
-    radius: Theme.pill(height)
-    color: Theme.background3
-    Rectangle {
-      width: parent.width * Math.max(0, BackupService.progress) / 100
-      height: parent.height
-      radius: Theme.pill(height)
-      color: Theme.green
-
-      KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius }
-    }
+    value: BackupService.progress / 100
+    tint: Theme.green
   }
 
   KitText {
     visible: face.kind === "backup"
-    text: Math.max(0, Math.round(BackupService.progress)) + "%"
-    color: Theme.foreground2
+    text: BackupService.status === "error" ? "Failed" : BackupService.status === "ok" ? "Done" : Math.max(0, Math.round(BackupService.progress)) + "%"
+    color: BackupService.status === "error" ? Theme.red : BackupService.status === "ok" ? Theme.green : Theme.foreground2
   }
 
   // a notification, as a line: the app's initial, "app: summary"
@@ -184,7 +168,8 @@ Row {
       const n = IslandService.noticeItem;
       if (!n) return "";
       const head = n.summary !== "" ? n.summary : n.app;
-      return n.body !== "" ? head + ": " + n.body : head;
+      const message = n.body !== "" ? head + ": " + n.body : head;
+      return (n.repeats > 1 ? "(" + n.repeats + ") " : "") + message;
     }
     color: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.foreground1
   }
@@ -293,15 +278,12 @@ Row {
   KitText { visible: face.kind === "layout"; text: "→"; color: Theme.dim }
   KitText { visible: face.kind === "layout"; text: Format.layout(IslandService.layoutNow) || IslandService.layoutNow; color: Theme.foreground1; font.weight: Font.Medium }
   KitIcon { visible: face.kind === "plugged"; glowTarget: "live"; name: "zap"; size: 14; tint: Theme.purple; anchors.verticalCenter: parent.verticalCenter }
-  Rectangle {
+  IslandLiveProgress {
     visible: face.kind === "plugged"
     anchors.verticalCenter: parent.verticalCenter
-    width: 70; height: 4; radius: Theme.pill(height)
-    color: Theme.background3
-    Rectangle {
-      width: parent.width * BatteryService.capacity / 100; height: parent.height; radius: Theme.pill(height); color: Theme.purple
-      KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius }
-    }
+    width: 70
+    value: BatteryService.capacity / 100
+    tint: Theme.purple
   }
   KitText { visible: face.kind === "plugged"; text: String(BatteryService.capacity); color: Theme.purple }
 
