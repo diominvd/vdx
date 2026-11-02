@@ -173,16 +173,25 @@ Item {
   }
 
   // ---- Material 3: active track | gap | handle | gap | inactive track ----
-  ClippingRectangle {
+  Rectangle {
     visible: root.m3 && root.spectrum.length > 0
     anchors.verticalCenter: parent.verticalCenter
     width: parent.width
     height: root.track
     radius: Theme.pill(height)
+    color: Theme.background3
+  }
+
+  ClippingRectangle {
+    visible: root.m3 && root.spectrum.length > 0
+    anchors.verticalCenter: parent.verticalCenter
+    width: Math.max(0, root.handleX - root.gap)
+    height: root.track
+    radius: Theme.pill(height)
     color: Theme.clear
 
     Row {
-      width: parent.width
+      width: root.width
       height: parent.height
 
       Repeater {
@@ -278,12 +287,13 @@ Item {
 
   ClippingRectangle {
     visible: root.flat && !root.splitPlate && root.spectrum.length > 0
-    anchors.fill: parent
-    radius: Theme.radiusControl
+    width: root.plateEdge
+    height: parent.height
+    radius: Math.min(Theme.radiusControl, width / 2)
     color: Theme.clear
 
     Row {
-      width: parent.width
+      width: root.width
       height: parent.height
 
       Repeater {
