@@ -92,12 +92,12 @@ Column {
     }
     KitRow {
       label: "Wheel pages through them"
-      hint: "Scrolling over the pill moves between running activities"
+      hint: "Scrolling chooses an activity on this monitor until it ends"
       KitSwitch { checked: ShellSettings.liveWheel; onToggled: ShellSettings.setLook("liveWheel", !checked, "island") }
     }
     KitRow {
       label: "New one comes forward"
-      hint: "An activity that starts takes the pill; then scroll to the others"
+      hint: "A new activity takes the pill unless you have chosen one manually"
       KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
     }
     KitRow {

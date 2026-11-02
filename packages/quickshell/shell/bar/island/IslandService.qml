@@ -74,7 +74,7 @@ Singleton {
       battery: BatteryService.present && BatteryService.discharging && BatteryService.capacity <= ShellSettings.liveBatteryBelow
                && (ShellSettings.liveBatteryStay === "fixed" || batShown),
       bluetooth: btShown && BluetoothService.mainDevice !== null,
-      recording: CaptureService.recording,
+      recording: CaptureService.recording || CaptureService.recordOutcome !== "",
       update: PackagesService.busy || RootService.running || PackagesService.status !== "",
       backup: BackupService.jobKind === "run" && (BackupService.busy || BackupService.status !== ""),
       vpn: MihomoService.serviceOn,
@@ -121,8 +121,9 @@ Singleton {
   readonly property bool pluggedNow: BatteryService.plugged
   onPluggedNowChanged: if (pluggedNow) flash("plugged")
   // the module a click on an activity opens (BarLayout.openModule)
-  readonly property var liveTarget: ({ timer: "timer", radio: "tuner", media: "media", music: "music", vpn: "mihomo", battery: "battery", bluetooth: "bluetooth", update: "packages", backup: "backup" })
+  readonly property var liveTarget: ({ recording: "capture", timer: "timer", radio: "tuner", media: "media", music: "music", vpn: "mihomo", battery: "battery", bluetooth: "bluetooth", update: "packages", backup: "backup", mic: "audio", layout: "language", plugged: "battery" })
   property var liveViews: ({})             // screen name -> { selected: activity ID, manual: bool }
+  property string pendingFrontKind: ""
   function liveFor(screen) {
     if (flashKind !== "" && activities.includes(flashKind)) return flashKind;
     const view = liveViews[screen] ?? {};
@@ -149,13 +150,31 @@ Singleton {
     for (const screen of screens) {
       const view = views[screen] ?? { selected: "", manual: false };
       if (!activities.includes(view.selected)) { view.selected = ""; view.manual = false; }
-      if (ready && ShellSettings.liveFront && !view.manual && added.length > 0 && !added.includes(flashKind)) {
-        view.selected = added[added.length - 1];
-        view.direction = 1;
-      }
       views[screen] = view;
     }
     liveViews = views;
+    if (ready && ShellSettings.liveFront && added.length > 0 && !added.includes(flashKind)) {
+      pendingFrontKind = added[0];
+      liveFrontTimer.restart();
+    }
+  }
+
+  Timer {
+    id: liveFrontTimer
+    interval: 220
+    onTriggered: {
+      const kind = root.pendingFrontKind;
+      root.pendingFrontKind = "";
+      if (!ShellSettings.liveFront || !root.activities.includes(kind)) return;
+      const views = Object.assign({}, root.liveViews);
+      const screens = Quickshell.screens.map(s => s.name).concat([""]);
+      for (const screen of screens) {
+        const view = views[screen] ?? { selected: "", manual: false };
+        if (!view.manual) { view.selected = kind; view.direction = 1; }
+        views[screen] = view;
+      }
+      root.liveViews = views;
+    }
   }
   function liveStep(delta, screen) {
     const page = activities.filter(k => k !== flashKind);
@@ -208,10 +227,27 @@ Singleton {
   // Notifications › Delivery › Show as: a card (the island's toast) or a live activity (a line in the slot)
   readonly property string noticeAppear: ModuleSettings.get("notifications", "appear", "card")
   property var noticeItem: null                // the one the live slot shows (appear "live")
-  onLiveNoticeMsChanged: {
-    if (!noticeItem || noticeItem.urgency === "critical") return;
-    if (liveNoticeMs === 0) noticeLiveTimer.stop();
-    else { noticeLiveTimer.interval = liveNoticeMs; noticeLiveTimer.restart(); }
+  property var deferredNotices: []              // ordinary notices wait until fullscreen ends
+  readonly property bool fullscreenActive: Number(Hyprland.activeToplevel?.lastIpcObject?.fullscreen ?? 0) > 0
+  onFullscreenActiveChanged: if (!fullscreenActive) drainDeferredNotices()
+  onNoticeAppearChanged: if (noticeAppear !== "live") clearLiveNotices()
+  function clearLiveNotices() { noticeItem = null; noticeQueue = []; noticeLiveTimer.stop(); }
+  Connections {
+    target: ShellSettings
+    function onLiveEnabledChanged() {
+      if (ShellSettings.liveEnabled) return;
+      root.clearLiveNotices();
+      root.flashKind = "";
+      flashTimer.stop();
+    }
+  }
+  Connections {
+    target: ShellSettings
+    function onLiveNoticeMsChanged() {
+      if (!root.noticeItem || root.noticeItem.urgency === "critical") return;
+      if (ShellSettings.liveNoticeMs === 0) noticeLiveTimer.stop();
+      else { noticeLiveTimer.interval = ShellSettings.liveNoticeMs; noticeLiveTimer.restart(); }
+    }
   }
 
   Connections {
@@ -229,20 +265,33 @@ Singleton {
       root.noticeTime = Math.max(root.noticeTime, ...fresh.map(n => n.time));
       // Focus: only the critical ones come through
       const deliver = FocusService.on ? fresh.filter(n => n.urgency === "critical") : fresh;
-      if (deliver.length === 0) return;
-      if (root.noticeAppear === "live" && ShellSettings.liveEnabled) {
-        // A live notice holds the slot until its turn ends; critical notices preempt.
-        root.enqueueLiveNotices(deliver.slice().reverse());
-        return;
-      }
-      // a replaced notification (same key) takes its old toast's place
-      root.notices = deliver.concat(root.notices.filter(n => !deliver.some(f => f.key === n.key)))
-                          .slice(0, root.noticeMax);
-      root.noticeMore = Math.max(0, deliver.length - root.noticeMax);
-      // critical toasts stay until dismissed, as in mako's [urgency=critical]:
-      // a plain one stacked with a critical one waits with it
-      root.flashed("notice", root.hasCritical() ? 0 : root.noticeMs);
+      root.routeNotices(deliver);
     }
+  }
+  function routeNotices(items) {
+    if (items.length === 0) return;
+    const critical = items.filter(n => n.urgency === "critical");
+    if (fullscreenActive) {
+      const ordinary = items.filter(n => n.urgency !== "critical");
+      deferredNotices = ordinary.concat(deferredNotices.filter(n => !ordinary.some(f => f.key === n.key))).slice(-32);
+    }
+    const deliver = fullscreenActive ? critical : items;
+    if (deliver.length === 0) return;
+    if (noticeAppear === "live" && ShellSettings.liveEnabled) {
+      // A live notice holds the slot until its turn ends; critical notices preempt.
+      enqueueLiveNotices(deliver.slice().reverse());
+      return;
+    }
+    // A replaced notification (same key) takes its old toast's place.
+    notices = deliver.concat(notices.filter(n => !deliver.some(f => f.key === n.key))).slice(0, noticeMax);
+    noticeMore = Math.max(0, deliver.length - noticeMax);
+    flashed("notice", hasCritical() ? 0 : noticeMs);
+  }
+  function drainDeferredNotices() {
+    if (fullscreenActive || deferredNotices.length === 0) return;
+    const fresh = deferredNotices.filter(n => Date.now() - n.time <= 30000);
+    deferredNotices = [];
+    routeNotices(fresh);
   }
   function sameNotice(a, b) { return a.app === b.app && a.summary === b.summary && a.body === b.body && a.urgency === b.urgency; }
   function showNextLiveNotice(markRead) {

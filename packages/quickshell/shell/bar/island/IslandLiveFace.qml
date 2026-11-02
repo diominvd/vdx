@@ -37,7 +37,7 @@ Row {
 
   // recording: the dot, the time, the sound, pause and stop
   Rectangle {
-    visible: face.kind === "recording"
+    visible: face.kind === "recording" && CaptureService.recording
     anchors.verticalCenter: parent.verticalCenter
     width: 8
     height: 8
@@ -48,14 +48,14 @@ Row {
     KitGlow { z: -1; anchors.fill: parent; target: "live"; lit: !CaptureService.paused; tint: parent.color; radius: parent.radius }
   }
   KitText {
-    visible: face.kind === "recording"
+    visible: face.kind === "recording" && CaptureService.recording
     anchors.verticalCenter: parent.verticalCenter
     text: CaptureService.elapsedText
     color: Theme.foreground1
     font.weight: Font.Medium
   }
   EqualizerBars {
-    visible: face.kind === "recording"
+    visible: face.kind === "recording" && CaptureService.recording
     anchors.verticalCenter: parent.verticalCenter
     barCount: 7
     tone: Theme.red
@@ -65,7 +65,7 @@ Row {
   }
   // round buttons, the chip's height less its inset: pause (dim) and stop (red)
   Repeater {
-    model: face.kind === "recording" ? [{ stop: false }, { stop: true }] : []
+    model: face.kind === "recording" && CaptureService.recording ? [{ stop: false }, { stop: true }] : []
     Rectangle {
       id: btn
       required property var modelData
@@ -96,6 +96,20 @@ Row {
       }
     }
   }
+  KitIcon {
+    visible: face.kind === "recording" && !CaptureService.recording && CaptureService.recordOutcome !== ""
+    name: CaptureService.recordOutcome === "error" ? "info" : "check"
+    size: 16
+    tint: CaptureService.recordOutcome === "error" ? Theme.red : Theme.green
+    anchors.verticalCenter: parent.verticalCenter
+  }
+  KitText {
+    visible: face.kind === "recording" && !CaptureService.recording && CaptureService.recordOutcome !== ""
+    width: Math.min(implicitWidth, 180)
+    elide: Text.ElideRight
+    text: CaptureService.recordOutcome === "error" ? "Recording failed" : CaptureService.recordOutcomeText
+    color: CaptureService.recordOutcome === "error" ? Theme.red : Theme.green
+  }
 
   // update: the download's progress, else what runs
   KitIcon { visible: face.kind === "update"; glowTarget: "live"; name: "download"; tint: Theme.blue; size: 14; anchors.verticalCenter: parent.verticalCenter }
@@ -108,7 +122,7 @@ Row {
     value: PackagesService.stagePercent
     tint: Theme.blue
   }
-  KitText { visible: face.updateBar; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
+  KitText { visible: face.updateBar; width: 34; horizontalAlignment: Text.AlignRight; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
     visible: face.kind === "update" && !face.updateBar
     width: Math.min(implicitWidth, 180)
@@ -130,6 +144,8 @@ Row {
 
   KitText {
     visible: face.kind === "backup"
+    width: BackupService.status === "" ? 34 : 50
+    horizontalAlignment: Text.AlignRight
     text: BackupService.status === "error" ? "Failed" : BackupService.status === "ok" ? "Done" : Math.max(0, Math.round(BackupService.progress)) + "%"
     color: BackupService.status === "error" ? Theme.red : BackupService.status === "ok" ? Theme.green : Theme.foreground2
   }
@@ -177,7 +193,7 @@ Row {
   // low battery: the level in red, the time left
   KitIcon { visible: face.kind === "battery"; glowTarget: "live"; name: BatteryService.levelIcon; size: 16; tint: Theme.red; anchors.verticalCenter: parent.verticalCenter }
   KitText { visible: face.kind === "battery"; text: "Battery"; color: Theme.foreground1 }
-  KitText { visible: face.kind === "battery"; text: BatteryService.capacity + "%"; color: Theme.red }
+  KitText { visible: face.kind === "battery"; width: 34; horizontalAlignment: Text.AlignRight; text: BatteryService.capacity + "%"; color: Theme.red }
   KitText {
     visible: face.kind === "battery" && BatteryService.minutesLeft > 0
     width: Math.min(implicitWidth, 150)
@@ -269,7 +285,7 @@ Row {
       }
     }
   }
-  KitText { visible: face.kind === "volume"; text: Math.round(IslandService.osdLevel * 100); color: IslandService.osdLoud ? Theme.red : Theme.foreground1 }
+  KitText { visible: face.kind === "volume"; width: 30; horizontalAlignment: Text.AlignRight; text: Math.round(IslandService.osdLevel * 100); color: IslandService.osdLoud ? Theme.red : Theme.foreground1 }
 
   // flashes: the mic, the layout, the cable
   KitIcon { visible: face.kind === "mic"; glowTarget: "live"; name: IslandService.micMuted ? "mic-off" : "mic"; size: 14; tint: IslandService.micMuted ? Theme.red : Theme.green; anchors.verticalCenter: parent.verticalCenter }
@@ -285,7 +301,7 @@ Row {
     value: BatteryService.capacity / 100
     tint: Theme.purple
   }
-  KitText { visible: face.kind === "plugged"; text: String(BatteryService.capacity); color: Theme.purple }
+  KitText { visible: face.kind === "plugged"; width: 25; horizontalAlignment: Text.AlignRight; text: String(BatteryService.capacity); color: Theme.purple }
 
   // music and media: the cover, the track and the sound
   Item {

@@ -92,6 +92,8 @@ Singleton {
 
   // ---- recording ----
   readonly property bool recording: recordSession.recording
+  property string recordOutcome: ""              // briefly stays on the bar after a recording ends
+  property string recordOutcomeText: ""
   readonly property string recordFile: recordSession.request?.file ?? ""
   readonly property real recordStarted: recordSession.started
   readonly property rect recordRect: recordSession.request?.rect ?? Qt.rect(0, 0, 0, 0)
@@ -295,6 +297,17 @@ Singleton {
   function stopRecording() { recordSession.stop(); }
   function togglePause() { recordSession.togglePause(); }
 
+  function recordingDone(ok, text) {
+    recordOutcome = ok ? "ok" : "error";
+    recordOutcomeText = text;
+    recordOutcomeTimer.restart();
+  }
+  Timer {
+    id: recordOutcomeTimer
+    interval: 6000
+    onTriggered: { root.recordOutcome = ""; root.recordOutcomeText = ""; }
+  }
+
   function run(command) { Quickshell.execDetached(command); }
 
   // the library's window (CaptureWindow)
@@ -378,10 +391,11 @@ Singleton {
     startDelay: closeTimer.interval + 60
     onAboutToStart: { root.faceScreens = []; root.facesAsked(); }
     onCompleted: capture => {
+      root.recordingDone(true, capture.ask ? "Recording ready" : "Recording saved");
       if (capture.ask) saveSession.offer({ kind: "video", tmp: capture.file, path: capture.path, notify: capture.notify });
       else if (capture.notify) root.run(["notify-send", "-a", "Capture", "Recording saved", capture.file]);
     }
-    onFailed: (capture, message) => root.fail("Recording failed", message)
+    onFailed: (capture, message) => { root.recordingDone(false, message); root.fail("Recording failed", message); }
   }
 
   // ---- settings ----

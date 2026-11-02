@@ -109,7 +109,7 @@ Item {
   // the module's popup, else its options); on a notification it brings its
   // app up; a middle click plays or pauses the music, dismisses a notification; a right click
   // opens the activity's own options in the Shell Manager (as on a bar module)
-  readonly property bool clickable: kind === "notice" || kind === "focus" && ShellSettings.liveFocusClick || IslandService.liveTarget[kind] !== undefined
+  readonly property bool clickable: kind === "notice" || kind === "volume" || kind === "focus" && ShellSettings.liveFocusClick || IslandService.liveTarget[kind] !== undefined
   MouseArea {
     anchors.fill: parent
     enabled: !root.sliding && !root.moving
@@ -127,6 +127,7 @@ Item {
       } else if (root.kind === "focus") {
         if (ShellSettings.liveFocusClick) FocusService.toggle();     // no popup behind it: a click ends the mode (Bar › Live › Focus)
       } else if (mouse.button === Qt.MiddleButton) { if (root.kind === "music" || root.kind === "media") IslandService.toggleLive(root.kind); }
+      else if (root.kind === "volume") BarLayout.openModule(IslandService.osdKind === "brightness" ? "brightness" : "audio");
       else BarLayout.openModule(IslandService.liveTarget[root.kind]);
     }
     onWheel: w => IslandService.liveStep(w.angleDelta.y < 0 ? 1 : -1, root.screen)
