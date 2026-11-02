@@ -16,7 +16,7 @@ Column {
     KitLabel { text: "LIVE ACTIVITIES" }
     KitRow {
       label: "Live activities"
-      hint: "Off: nothing grows out of the pill, it stays at rest"
+      hint: "Off: the pill stays at rest"
       KitSwitch { checked: ShellSettings.liveEnabled; onToggled: ShellSettings.setLook("liveEnabled", !checked, "island") }
     }
     KitGrouper {}
@@ -31,7 +31,7 @@ Column {
     section: "asks"
     title: "ASKS"
     info: ({
-      notice: { label: "Messages", hint: "A new notification as a line in the slot; off: a card" },
+      notice: { label: "Messages", hint: "A new message as a line; off: a card" },
       battery: { label: "Low battery", hint: "The charge left, when it runs low" },
       bluetooth: { label: "Device connected", hint: "Headphones and other Bluetooth devices" }
     })
@@ -50,12 +50,12 @@ Column {
       recording: { label: "Recording", hint: "A timer while the screen records" },
       update: { label: "Updates", hint: "Progress of an update run" },
       backup: { label: "Backup", hint: "Progress of a backup" },
-      timer: { label: "Timer", hint: "The time left, or the stopwatch; a click opens it" },
+      timer: { label: "Timer", hint: "The time left or the stopwatch; click opens" },
       vpn: { label: "VPN", hint: "Which server and the ping" },
       focus: { label: "Focus", hint: "Do not disturb is on" },
       radio: { label: "Radio", hint: "The station on air; a click opens the dial" },
-      music: { label: "Music", hint: "The playing track of Yandex Music or your files" },
-      media: { label: "Media", hint: "What plays in other apps: a browser, Spotify, mpv" }
+      music: { label: "Music", hint: "The playing track: Yandex Music or files" },
+      media: { label: "Media", hint: "Other apps: a browser, Spotify, mpv" }
     })
   }
 
@@ -92,7 +92,7 @@ Column {
     }
     KitRow {
       label: "Wheel pages through them"
-      hint: "Scrolling chooses an activity on this monitor until it ends"
+      hint: "Scrolling picks one on this monitor"
       KitSwitch { checked: ShellSettings.liveWheel; onToggled: ShellSettings.setLook("liveWheel", !checked, "island") }
     }
     KitSliderRow {
@@ -105,7 +105,7 @@ Column {
     }
     KitRow {
       label: "New one comes forward"
-      hint: "A new activity takes the pill unless you have chosen one manually"
+      hint: "Unless you chose one by hand"
       KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
     }
     KitRow {

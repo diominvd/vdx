@@ -252,7 +252,7 @@ QtObject {
   readonly property int controlHeight: material ? 36 : 34       // buttons, selects, fields: one height side by side
   readonly property int controlWidth: 300        // a setting's choices / field (KitRow wide)
   readonly property int buttonWidth: 120         // a setting's action button (text only, right aligned)
-  readonly property int rowStackBelow: 420       // a wide KitRow narrower than this puts its control under the label
+  readonly property int rowStackBelow: 600       // a wide KitRow (or a KitSelect) narrower than this puts its control under the label
   readonly property int popupGap: 6
   readonly property int frameWidth: material ? 0 : 1          // controls: buttons, selects, fields
   readonly property int windowFrameWidth: 1                   // popup frames, like hypr windows, mako

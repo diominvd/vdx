@@ -6,9 +6,9 @@ import qs.config
 //
 // `wide`: the control is a set of choices or a field — it gets the standard
 // width (Theme.controlWidth, so the right edges line up down a page); in a narrow
-// place (under Theme.rowStackBelow, or when the label and hint need the space) it goes
-// under the text. Wide controls keep the same width in either layout. Give a wide
-// KitChoices `stretch: true`.
+// place (under Theme.rowStackBelow) it goes under the text. Only the row's width decides,
+// never its text: every wide row of a page sits the same way. Wide controls keep the same
+// width in either layout. Give a wide KitChoices `stretch: true`.
 //
 // `needs`: what this row waits for, in one phrase ("Island style only", "Needs Live
 // activities on"): the row stays in sight, its control out of reach, the phrase where the
@@ -29,11 +29,9 @@ Item {
   property string needsAction: ""   // the button that fixes it ("Use Island")
   signal needsActed()
 
-  // Keep enough room for both the label and the hint. Moving the control below
-  // the text is preferable to wrapping short hints into several lines.
-  readonly property bool stacked: wide && (width < Theme.rowStackBelow
-    || width - controlW - 12 < labelItem.implicitWidth
-    || (hintItem.visible && width - controlW - 12 < hintItem.implicitWidth))
+  // The control goes under the text in a narrow row, in every wide row alike (a hint is
+  // written for one line: design.md).
+  readonly property bool stacked: wide && width < Theme.rowStackBelow
 
   // Wide controls share one width so their edges line up across the page. Clamp
   // it only when the whole settings column is narrower than the standard width.

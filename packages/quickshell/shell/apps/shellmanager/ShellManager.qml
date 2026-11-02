@@ -48,7 +48,7 @@ Rectangle {
 
   // `caption` opens a group in the sidebar
   // `foot`: a button at the rail's foot, outside the groups (the shell's own pages)
-  // `child`: a page that belongs to the one above it (the island's Hub and Live activities), a plain row;
+  // `child`: a page that belongs to the one above it, indented (none now: the island's Hub and Live activities are plain rows);
   // `island`: only while the island is the bar style
 // `page` + `pageTab`: a section that is one tab of another page (Bar look is the Bar page's Look tab):
 // the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
@@ -66,8 +66,8 @@ Rectangle {
       page: "bar", pageTab: "appearance", description: "The bar's style, size and spacing." },
     { value: "barmonitor", label: "Bar monitors", icon: "monitor",
       page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
-    { value: "hub",        label: "Hub",        icon: "home",    child: true, island: true },
-    { value: "live",       label: "Live activities", icon: "activity", child: true, island: true },
+    { value: "hub",        label: "Hub",        icon: "home",    island: true },
+    { value: "live",       label: "Live activities", icon: "activity", island: true },
     { value: "modules",    label: "Bar modules", icon: "puzzle" },
     { value: "windows",    label: "Windows",    icon: "app-window", caption: "WINDOWS" },
     { value: "lockscreen", label: "Lock screen", icon: "lock" },

@@ -228,7 +228,7 @@ Column {
 
   KitRow {
     label: "Export"
-    hint: "Options, bar layout and window options in a folder; not the theme or the cursor"
+    hint: "Options, bar layout and windows; no theme"
 
     KitButton {
       width: Theme.buttonWidth
@@ -242,7 +242,7 @@ Column {
 
   KitRow {
     label: "Import"
-    hint: "Replaces the exported options; the shell restarts"
+    hint: "Replaces your options; the shell restarts"
 
     KitButton {
       width: Theme.buttonWidth
@@ -255,7 +255,7 @@ Column {
 
   KitRow {
     label: "Reset everything"
-    hint: "Defaults; the old set kept as settings-before-reset.json"
+    hint: "Defaults; the old set is kept as a file"
 
     KitResetButton {
       width: Theme.buttonWidth
@@ -291,7 +291,7 @@ Column {
   KitLabel { text: "DIAGNOSTICS & RECOVERY" }
   KitRow {
     label: "Machine health"
-    hint: "Checks managed files, services and the running desktop"
+    hint: "Files, services and the running desktop"
     KitButton { width: Theme.buttonWidth; icon: "activity"; text: "Run check"; busy: doctorProc.running; onClicked: root.checkHealth() }
   }
   Column {
@@ -322,7 +322,7 @@ Column {
   }
   KitRow {
     label: "Shell resources"
-    hint: "A one-time snapshot of the running Quickshell process"
+    hint: "A one-time snapshot of the shell process"
     KitButton { width: Theme.buttonWidth; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
   }
   KitNotice {
@@ -337,7 +337,7 @@ Column {
   }
   KitRow {
     label: "Recovery"
-    hint: "The supervisor restarts Quickshell after a crash. ./install.py rollback restores backed-up managed files; Settings › Import restores an exported settings set."
+    hint: "Restores the last backed-up managed files"
     KitButton {
       width: Theme.buttonWidth
       icon: "rotate-ccw"

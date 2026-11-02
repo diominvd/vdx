@@ -20,7 +20,7 @@ Column {
     index: 0
     draggable: false
     label: "Clock and day"
-    hint: "The date, the clock and the settings and power buttons"
+    hint: "Date, clock, settings and power buttons"
     checked: true
     tag: "ALWAYS ON"
   }

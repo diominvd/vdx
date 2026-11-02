@@ -12,7 +12,7 @@ Column {
 
   KitToggleRow {
     module: "wifi"; key: "compact"; fallback: false
-    label: "Compact popup"; hint: "Hides the details: address, signal, traffic, DNS"
+    label: "Compact popup"; hint: "Hides address, signal, traffic and DNS"
   }
 
   KitLine {}

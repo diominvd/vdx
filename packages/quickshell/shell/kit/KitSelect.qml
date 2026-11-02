@@ -42,8 +42,13 @@ Column {
   // The box takes the standard width (KitRow's, so the right edges line up) when
   // the row has room for it; a narrower row gives the label half of it (less the
   // gap). It never grows past the standard width: a long choice elides in the box.
-  property real boxWidth: Math.min(width, Math.max(Math.min(choiceWidth, Theme.controlWidth),
-    Math.min(Theme.controlWidth, (width - Theme.gapWide) / 2)))
+  // In a narrow row (KitRow's rule: Theme.rowStackBelow) the box goes under the text at the
+  // standard width, as a wide KitRow's control does.
+  readonly property bool stacked: width < Theme.rowStackBelow
+  readonly property int stackPad: Math.round((Theme.rowHeight - Theme.controlHeight) / 2)
+  property real boxWidth: stacked ? Math.min(width, Theme.controlWidth)
+    : Math.min(width, Math.max(Math.min(choiceWidth, Theme.controlWidth),
+      Math.min(Theme.controlWidth, (width - Theme.gapWide) / 2)))
   property int maxRows: 6
   readonly property int rowHeight: Theme.navigationHeight
 
@@ -87,11 +92,13 @@ Column {
   Item {
     id: row
     width: parent.width
-    height: Math.max(Theme.rowHeight, box.height, text.implicitHeight)
+    height: root.stacked ? 2 * root.stackPad + text.implicitHeight + Theme.gapSmall + box.height
+                         : Math.max(Theme.rowHeight, box.height, text.implicitHeight)
 
     Column {
       id: text
-      anchors { left: parent.left; right: box.left; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
+      anchors { left: parent.left; right: root.stacked ? parent.right : box.left; rightMargin: root.stacked ? 0 : Theme.gapWide }
+      y: root.stacked ? root.stackPad : (row.height - height) / 2
       spacing: Theme.gapTight
 
       KitText {
@@ -131,7 +138,8 @@ Column {
       property bool byMouse: false
       readonly property bool ring: activeFocus && !byMouse
       onActiveFocusChanged: { if (!activeFocus) { root.expanded = false; if (Window.active) byMouse = false; } }
-      anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+      anchors.right: parent.right
+      y: root.stacked ? root.stackPad + text.height + Theme.gapSmall : (row.height - height) / 2
       width: root.boxWidth
       height: Theme.controlHeight
       radius: Theme.radiusControl

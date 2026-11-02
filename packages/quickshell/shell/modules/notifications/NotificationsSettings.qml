@@ -28,7 +28,7 @@ KitColumn {
     needs: !Theme.island || ModuleSettings.get("notifications", "appear", "card") === "card" || !ShellSettings.liveEnabled
            ? "" : "Cards only: a live line has its own time in Bar › Live"
     module: "notifications"; key: "toastSeconds"; fallback: 5
-    label: "Card stays for"; hint: "Stay: until you close it. Urgent ones always stay"
+    label: "Card stays for"; hint: "Stay: until closed; urgent ones always stay"
     model: [{ label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }, { label: "Stay", value: 0 }]
   }
 
@@ -48,7 +48,7 @@ KitColumn {
 
   KitToggleRow { module: "notifications"; key: "closeOnClear"; fallback: false; label: "Close after Clear all"; hint: "Off: the centre stays open" }
 
-  KitToggleRow { module: "notifications"; key: "removeOnClick"; fallback: false; label: "Remove on click"; hint: "A click on a notification takes it out of the centre" }
+  KitToggleRow { module: "notifications"; key: "removeOnClick"; fallback: false; label: "Remove on click"; hint: "A click takes it out of the centre" }
 
   KitLine {}
 
@@ -56,7 +56,7 @@ KitColumn {
 
   KitRow {
     label: "Dot while tucked away"
-    hint: "On the Folder or the island's pill when the bell is not on the bar"
+    hint: "On the Folder or the pill, bell off the bar"
 
     KitSwitch {
       checked: ShellSettings.barFolderDot
@@ -80,7 +80,7 @@ KitColumn {
 
   KitOptionRow {
     module: "notifications"; key: "badge"; fallback: "off"
-    label: "Unseen mark"; hint: "On the bell while something is unseen. Off: it only lights up"
+    label: "Unseen mark"; hint: "A mark on the bell; off: it only lights"
     model: [{ label: "Off", value: "off" }, { label: "Dot", value: "dot" }, { label: "Count", value: "count" }]
   }
 

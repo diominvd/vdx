@@ -31,7 +31,7 @@ KitColumn {
     visible: eth === null
     icon: "public"
     title: "No Ethernet adapter"
-    hint: "Connect an adapter to configure wired networking"
+    hint: "Plug in an adapter to configure it"
   }
 
   KitRow {

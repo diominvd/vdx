@@ -79,8 +79,10 @@ uses tonal layers and more spacious controls.
 - Header: icon, title in normal case, subtitle in caps joined by ` · `. Tabs are `KitChoices` on its right; a Shell Manager page lists them as `tabs` + `tab` (only Network still does; elsewhere a tab is a sidebar section, `page` + `pageTab`).
 - Group: `KitLabel` in caps (a noun, current value on the right), then rows.
 - Row: `KitRow` — label (capitalised) and hint (sentence case, no full stop)
-  left, control right. A hint in a wide row ≤ 29 chars (the Modules page
-  leaves ~32); elsewhere ≤ ~40. A hint adds something (effect, caveat,
+  left, control right. A hint is one line: ≤ ~40 chars (≤ ~30 beside a button
+  or a wide control). A wide row (`wide`, `KitSelect`) puts its control under
+  the text when its width is under `Theme.rowStackBelow`, whatever the text:
+  every wide row of a page sits one way, never some inline and some under. A hint adds something (effect, caveat,
   off-state) or is left out; it never repeats the label.
 - Control by the job: a feature on/off → `KitSwitch` (one row per item of a
   set, under a caps label with the count: `APPLIES TO` `3 OF 7`). 2–5 named equal

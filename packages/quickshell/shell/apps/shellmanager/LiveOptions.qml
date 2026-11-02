@@ -73,7 +73,7 @@ Column {
     KitRow {
       visible: root.kind === "battery"
       label: "Stays for"
-      hint: "Until fixed: until the charger is back or the charge recovers"
+      hint: "Until fixed: it charges or plugs in"
       wide: true
       KitSegments {
         model: [{label: "5 s", value: "5s"}, {label: "Until fixed", value: "fixed"}]
@@ -101,7 +101,7 @@ Column {
     KitRow {
       visible: root.kind === "media"
       label: "Show on pause"
-      hint: "The app's track stays in the slot while paused"
+      hint: "The app's track stays while paused"
       KitSwitch { checked: ShellSettings.liveMediaPaused; onToggled: ShellSettings.setLook("liveMediaPaused", !checked, "island") }
     }
 
@@ -133,7 +133,7 @@ Column {
     KitRow {
       visible: root.kind === "radio"
       label: "Always show"
-      hint: "The slot keeps the radio even when it is off; a click opens the dial"
+      hint: "Keeps the radio in the slot; click opens it"
       KitSwitch { checked: ShellSettings.liveRadioAlways; onToggled: ShellSettings.setLook("liveRadioAlways", !checked, "island") }
     }
 
@@ -142,7 +142,7 @@ Column {
     KitRow {
       visible: root.kind === "music"
       label: "Always show"
-      hint: "The slot stays even when no player is running"
+      hint: "Stays in the slot with no player running"
       KitSwitch { checked: ShellSettings.liveMusicAlways; onToggled: ShellSettings.setLook("liveMusicAlways", !checked, "island") }
     }
     }

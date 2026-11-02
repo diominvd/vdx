@@ -147,7 +147,7 @@ KitColumn {
     KitSegments { disabled: DisplayService.busy; model: DisplayService.textScales.map(f => ({ label: Math.round(f * 100) + "%", value: f })); current: DisplayService.textFactor; onPicked: value => DisplayService.setText(value) }
   }
   KitRow {
-    wide: true; label: "Input text"; hint: "Where the text stands in a field; Auto: left, a password in the middle"
+    wide: true; label: "Input text"; hint: "Where text stands in a field; Auto: left"
     KitSegments { model: [{ label: "Auto", value: "auto" }, { label: "Left", value: "left" }, { label: "Centre", value: "center" }]; current: ShellSettings.inputAlign; onPicked: value => ShellSettings.set("inputAlign", value) }
   }
     KitGrouper {}

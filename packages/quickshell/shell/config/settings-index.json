@@ -81,7 +81,7 @@
  },
  {
   "label": "Input text",
-  "hint": "Where the text stands in a field; Auto: left, a password in the middle",
+  "hint": "Where text stands in a field; Auto: left",
   "where": "Fonts › TEXT SIZE",
   "target": "fonts:size"
  },
@@ -492,7 +492,7 @@
  },
  {
   "label": "Clock and day",
-  "hint": "The date, the clock and the settings and power buttons",
+  "hint": "Date, clock, settings and power buttons",
   "where": "Hub › BLOCKS",
   "target": "hub"
  },
@@ -617,7 +617,7 @@
  },
  {
   "label": "Window previews",
-  "hint": "Pictures of the windows; off shows their icons",
+  "hint": "Window pictures; off shows their icons",
   "where": "Windows › OVERVIEW",
   "target": "windows:overview"
  },
@@ -796,19 +796,19 @@
  },
  {
   "label": "Music service",
-  "hint": "MPD for the local music and Yandex Music; off stops the playback too",
+  "hint": "MPD and Yandex Music; off stops playback",
   "where": "Sound › MUSIC",
   "target": "sound"
  },
  {
   "label": "One source at a time",
-  "hint": "The music, the radio and an app's media: starting one pauses the rest",
+  "hint": "Starting one source pauses the rest",
   "where": "Sound › MUSIC",
   "target": "sound"
  },
  {
   "label": "Pause on other sound",
-  "hint": "Pauses the local music (MPD) while another app plays",
+  "hint": "Pauses MPD while another app plays",
   "where": "Sound › MUSIC",
   "target": "sound"
  },
@@ -910,7 +910,7 @@
  },
  {
   "label": "Background check",
-  "hint": "How often updates are checked; Off: only when you ask",
+  "hint": "How often to check; Off: only on request",
   "where": "Updates › CHECKING",
   "target": "updates"
  },
@@ -922,7 +922,7 @@
  },
  {
   "label": "Install right after the download",
-  "hint": "Off: the install asks once more, after the download",
+  "hint": "Off: asks again after the download",
   "where": "Updates › INSTALLING",
   "target": "updates"
  },
@@ -1064,7 +1064,7 @@
  },
  {
   "label": "Mihomo",
-  "hint": "The proxy service: off, nothing goes through it",
+  "hint": "The proxy service; off: nothing uses it",
   "where": "VPN › TUNNEL",
   "target": "vpn:tunnel"
  },
@@ -1190,37 +1190,37 @@
  },
  {
   "label": "Export",
-  "hint": "Options, bar layout and window options in a folder; not the theme or the cursor",
+  "hint": "Options, bar layout and windows; no theme",
   "where": "About › SETTINGS",
   "target": "about:settings"
  },
  {
   "label": "Import",
-  "hint": "Replaces the exported options; the shell restarts",
+  "hint": "Replaces your options; the shell restarts",
   "where": "About › SETTINGS",
   "target": "about:settings"
  },
  {
   "label": "Reset everything",
-  "hint": "Defaults; the old set kept as settings-before-reset.json",
+  "hint": "Defaults; the old set is kept as a file",
   "where": "About › SETTINGS",
   "target": "about:settings"
  },
  {
   "label": "Machine health",
-  "hint": "Checks managed files, services and the running desktop",
+  "hint": "Files, services and the running desktop",
   "where": "About › SYSTEM",
   "target": "about:system"
  },
  {
   "label": "Shell resources",
-  "hint": "A one-time snapshot of the running Quickshell process",
+  "hint": "A one-time snapshot of the shell process",
   "where": "About › SYSTEM",
   "target": "about:system"
  },
  {
   "label": "Recovery",
-  "hint": "The supervisor restarts Quickshell after a crash. ./install.py rollback restores backed-up managed files; Settings › Import restores an exported settings set.",
+  "hint": "Restores the last backed-up managed files",
   "where": "About › SYSTEM",
   "target": "about:system"
  },
@@ -1473,7 +1473,7 @@
  },
  {
   "label": "Card stays for",
-  "hint": "Stay: until you close it. Urgent ones always stay",
+  "hint": "Stay: until closed; urgent ones always stay",
   "where": "Notifications › NEW NOTIFICATIONS",
   "target": "notifications",
   "aliases": [
@@ -1496,13 +1496,13 @@
  },
  {
   "label": "Remove on click",
-  "hint": "A click on a notification takes it out of the centre",
+  "hint": "A click takes it out of the centre",
   "where": "Notifications › CENTRE",
   "target": "notifications"
  },
  {
   "label": "Dot while tucked away",
-  "hint": "On the Folder or the island's pill when the bell is not on the bar",
+  "hint": "On the Folder or the pill, bell off the bar",
   "where": "Notifications › UNSEEN",
   "target": "notifications"
  },
@@ -1514,7 +1514,7 @@
  },
  {
   "label": "Unseen mark",
-  "hint": "On the bell while something is unseen. Off: it only lights up",
+  "hint": "A mark on the bell; off: it only lights",
   "where": "Notifications › BELL",
   "target": "notifications"
  },
@@ -1549,13 +1549,13 @@
  },
  {
   "label": "Live activities",
-  "hint": "Off: nothing grows out of the pill, it stays at rest",
+  "hint": "Off: the pill stays at rest",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Messages",
-  "hint": "A new notification as a line in the slot; off: a card",
+  "hint": "A new message as a line; off: a card",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live",
   "aliases": [
@@ -1596,7 +1596,7 @@
  },
  {
   "label": "Timer",
-  "hint": "The time left, or the stopwatch; a click opens it",
+  "hint": "The time left or the stopwatch; click opens",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
@@ -1624,7 +1624,7 @@
  },
  {
   "label": "Music",
-  "hint": "The playing track of Yandex Music or your files",
+  "hint": "The playing track: Yandex Music or files",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live",
   "aliases": [
@@ -1635,7 +1635,7 @@
  },
  {
   "label": "Media",
-  "hint": "What plays in other apps: a browser, Spotify, mpv",
+  "hint": "Other apps: a browser, Spotify, mpv",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
@@ -1671,7 +1671,7 @@
  },
  {
   "label": "Wheel pages through them",
-  "hint": "Scrolling chooses an activity on this monitor until it ends",
+  "hint": "Scrolling picks one on this monitor",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
@@ -1683,7 +1683,7 @@
  },
  {
   "label": "New one comes forward",
-  "hint": "A new activity takes the pill unless you have chosen one manually",
+  "hint": "Unless you chose one by hand",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
@@ -2204,7 +2204,7 @@
  },
  {
   "label": "Compact popup",
-  "hint": "Hides the details: address, signal, traffic, DNS",
+  "hint": "Hides address, signal, traffic and DNS",
   "where": "Bar modules › Wi-Fi › BAR",
   "target": "modules:wifi"
  },
@@ -2680,7 +2680,7 @@
  },
  {
   "label": "Open from the island",
-  "hint": "On: it opens inside the island instead of as a window",
+  "hint": "On: opens inside the island, not a window",
   "where": "Apps › Launcher › ISLAND",
   "target": "apps:launcher"
  },
@@ -2764,7 +2764,7 @@
  },
  {
   "label": "Open from the island",
-  "hint": "On: it opens inside the island instead of as a window",
+  "hint": "On: opens inside the island, not a window",
   "where": "Apps › Keybinds › ISLAND",
   "target": "apps:keybinds"
  },
@@ -3046,7 +3046,7 @@
  },
  {
   "label": "Update without asking",
-  "hint": "Skips the confirmation panel for the download and the install",
+  "hint": "Skips the confirmation panel",
   "where": "Apps › Packages › UPDATING",
   "target": "apps:packages"
  },

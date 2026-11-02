@@ -30,7 +30,7 @@ Column {
     onNeedsActed: ShellSettings.set("barStyle", "island")
     module: "launcher"; key: "island"; fallback: true
     label: "Open from the island"
-    hint: "On: it opens inside the island instead of as a window"
+    hint: "On: opens inside the island, not a window"
   }
 
   // ---- tabs: what each band holds ----

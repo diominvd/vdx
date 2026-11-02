@@ -105,7 +105,8 @@ Column {
 
       Column {
         id: details
-        width: pane.width - Theme.gapMedium
+        // the pane reaches the window's edge (the scrollbar sits there); its content ends where Bar modules' does
+        width: pane.width - Theme.gapMedium - Theme.windowPadding
         spacing: Theme.sectionGap
         opacity: paneIn.shown
 

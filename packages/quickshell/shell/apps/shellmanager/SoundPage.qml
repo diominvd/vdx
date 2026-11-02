@@ -25,7 +25,7 @@ Column {
   KitRow {
     visible: BarLayout.installed("files")
     label: "Music service"
-    hint: "MPD for the local music and Yandex Music; off stops the playback too"
+    hint: "MPD and Yandex Music; off stops playback"
 
     KitSwitch {
       checked: MpdService.service
@@ -35,7 +35,7 @@ Column {
 
   KitRow {
     label: "One source at a time"
-    hint: "The music, the radio and an app's media: starting one pauses the rest"
+    hint: "Starting one source pauses the rest"
 
     KitSwitch {
       checked: ShellSettings.exclusiveSound
@@ -45,7 +45,7 @@ Column {
 
   KitRow {
     label: "Pause on other sound"
-    hint: "Pauses the local music (MPD) while another app plays"
+    hint: "Pauses MPD while another app plays"
 
     KitSwitch {
       checked: ShellSettings.pauseMusic

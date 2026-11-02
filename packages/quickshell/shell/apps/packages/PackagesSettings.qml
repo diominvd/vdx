@@ -22,7 +22,7 @@ Column {
 
   KitToggleRow {
     module: "packages"; key: "noConfirm"; label: "Update without asking"
-    hint: "Skips the confirmation panel for the download and the install"
+    hint: "Skips the confirmation panel"
   }
 
   KitToggleRow {

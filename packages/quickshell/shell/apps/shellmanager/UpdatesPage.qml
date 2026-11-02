@@ -26,7 +26,7 @@ Column {
 
   KitOptionRow {
     module: "packages"; key: "interval"; fallback: 30
-    label: "Background check"; hint: "How often updates are checked; Off: only when you ask"
+    label: "Background check"; hint: "How often to check; Off: only on request"
     model: [{ label: "Off", value: 0 }, { label: "30 min", value: 30 }, { label: "1 h", value: 60 }]
   }
 
@@ -36,7 +36,7 @@ Column {
 
   KitLabel { text: "INSTALLING" }
 
-  KitToggleRow { module: "packages"; key: "autoInstall"; label: "Install right after the download"; hint: "Off: the install asks once more, after the download" }
+  KitToggleRow { module: "packages"; key: "autoInstall"; label: "Install right after the download"; hint: "Off: asks again after the download" }
 
   KitLine {}
 

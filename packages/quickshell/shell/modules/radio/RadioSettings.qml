@@ -16,7 +16,7 @@ Column {
 
   KitToggleRow {
     module: "tuner"; key: "showList"; fallback: true
-    label: "Show the stations"; hint: "A list of them under the dial; off: the dial alone"
+    label: "Show the stations"; hint: "A list under the dial; off: the dial alone"
   }
 
   KitToggleRow {
