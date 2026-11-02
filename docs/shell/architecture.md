@@ -174,10 +174,11 @@ links, secrets, `/etc`, units, services). `link` also writes
 | Dotfiles state | `~/.local/state/dotfiles/` | installer + shell | `components.json` (modules not installed), `accent.lua`, `window-mode`, `shell-apps.json` |
 
 Settings UI = **Shell Manager** (`apps/shellmanager/`, Super+S). The sidebar is a rail of group
-buttons (LOOK, DESKTOP, SYSTEM) with the shell's own pages (`foot: true`: Profile, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after: LOOK Appearance, Themes (also Dark / Light), Fonts, Icons, Cursor, Wallpaper, Motion ·
-DESKTOP Bar (Layout, Look, Monitors; under it, in the Island style only: Hub, Live activities),
-Bar modules, Windows, Lock screen · SYSTEM Network, Hotspot, Bluetooth, VPN, Sound, Displays (with the
-night light), Power, Notifications, Apps, Updates · foot: Profile, About. A page header has its group, a
+buttons (LOOK, BAR, WINDOWS, CONNECT, DEVICES, SYSTEM) with the shell's own pages (`foot: true`: Profile, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after: LOOK Appearance, Themes (also Dark / Light), Fonts, Icons, Cursor, Wallpaper, Motion ·
+BAR Bar (Layout, Look, Monitors; under it, in the Island style only: Hub, Live activities),
+Bar modules · WINDOWS Windows, Lock screen · CONNECT Network (with Hotspot), Bluetooth, VPN · DEVICES Sound,
+Displays (with the night light), Power · SYSTEM Notifications, Apps, Updates · foot: Profile, About.
+A page header has its group, a
 state line and one or two lines on what the page does; a block has an `about` line (`KitLabel`).
 One home per setting; a setting that waits for something (a style, a switch, a module in the Hub
 row) says so with `KitRow.needs` and one fixing button (design.md). An app's or module's options are its

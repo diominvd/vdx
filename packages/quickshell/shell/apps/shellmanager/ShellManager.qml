@@ -13,9 +13,12 @@ import qs.kit
 // The sections come in groups, by what the user is after (a rail button each; the
 // list beside it shows the open group):
 //   LOOK     — how it looks and moves
-//   DESKTOP  — the bar (Bar, Hub, Live activities, Bar modules), Windows, Lock screen
-//   SYSTEM   — the machine and what runs on it: Network, Bluetooth, Sound, Displays,
-//              Power, Notifications, Apps (each app's options and window), Updates
+//   BAR      — Bar, Hub, Live activities, Bar modules
+//   WINDOWS  — Windows, Lock screen
+//   CONNECT  — Network, Bluetooth, VPN
+//   DEVICES  — Sound, Displays, Power
+//   SYSTEM   — what runs on the machine: Notifications, Apps (each app's options and
+//              window), Updates
 //   SHELL    — Profile and About, the rail's foot (`foot`)
 // A page may offer `changed` + `reset()`: Reset (two steps) in the header.
 Rectangle {
@@ -55,19 +58,19 @@ Rectangle {
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
     { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "animations", label: "Motion",     icon: "curve" },
-    { value: "bar",        label: "Bar",        icon: "menu",     caption: "DESKTOP" },
+    { value: "bar",        label: "Bar",        icon: "menu",     caption: "BAR" },
     { value: "hub",        label: "Hub",        icon: "home",    child: true, island: true },
     { value: "live",       label: "Live activities", icon: "activity", child: true, island: true },
     { value: "modules",    label: "Bar modules", icon: "puzzle" },
-    { value: "windows",    label: "Windows",    icon: "app-window" },
+    { value: "windows",    label: "Windows",    icon: "app-window", caption: "WINDOWS" },
     { value: "lockscreen", label: "Lock screen", icon: "lock" },
-    { value: "network",    label: "Network",    icon: "wifi",       caption: "SYSTEM" },
+    { value: "network",    label: "Network",    icon: "wifi",       caption: "CONNECT" },
     { value: "bluetooth",  label: "Bluetooth",  icon: "bluetooth" },
     { value: "vpn",        label: "VPN",        icon: "public", module: "mihomo" },
-    { value: "sound",      label: "Sound",      icon: "volume" },
+    { value: "sound",      label: "Sound",      icon: "volume",     caption: "DEVICES" },
     { value: "displays",   label: "Displays",   icon: "monitor" },
     { value: "power",      label: "Power",      icon: "zap" },
-    { value: "notifications", label: "Notifications", icon: "bell" },
+    { value: "notifications", label: "Notifications", icon: "bell", caption: "SYSTEM" },
     { value: "apps",       label: "Apps",       icon: "grid" },
     { value: "updates",    label: "Updates",    icon: "download" },
     { value: "profile",    label: "Profile",    icon: "user",       caption: "SHELL", foot: true },
@@ -77,7 +80,8 @@ Rectangle {
 
   // the rail's groups: one button each, the list beside it shows the open group's pages
   readonly property var groups: [
-    { name: "LOOK", icon: "palette" }, { name: "DESKTOP", icon: "tiling" }, { name: "SYSTEM", icon: "cpu" }
+    { name: "LOOK", icon: "palette" }, { name: "BAR", icon: "menu" }, { name: "WINDOWS", icon: "app-window" },
+    { name: "CONNECT", icon: "wifi" }, { name: "DEVICES", icon: "monitor" }, { name: "SYSTEM", icon: "cpu" }
   ]
   readonly property var footSections: sections.filter(s => s.foot)
   readonly property var navSections: sections.filter(s => !s.foot && groupOf(s.value) === openGroup)
@@ -91,7 +95,7 @@ Rectangle {
     tab = value;
   }
 
-  // the sidebar group a page sits in (LOOK, DESKTOP, ...): the crumb over its title
+  // the sidebar group a page sits in (LOOK, BAR, ...): the crumb over its title
   function groupOf(tab) {
     let group = "";
     for (const s of sections) {

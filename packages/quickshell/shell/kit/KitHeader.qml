@@ -12,7 +12,7 @@ Item {
   property color iconColor: Theme.foreground0
   property string title: ""
   property string subtitle: ""
-  property string crumb: ""                 // a page: the sidebar group it sits in (DESKTOP)
+  property string crumb: ""                 // a page: the sidebar group it sits in (BAR)
   property string description: ""           // a page: one or two lines on what it is for
   property color subtitleColor: Theme.muted
   property bool page: false
