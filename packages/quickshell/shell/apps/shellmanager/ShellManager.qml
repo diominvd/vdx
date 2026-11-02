@@ -447,14 +447,6 @@ Rectangle {
       crumb: root.groupOf(root.tab)
       description: root.currentPage?.description ?? ""
 
-      KitButton {
-        visible: root.navHistory.length > 0
-        icon: "arrow-left"
-        text: "Back"
-        Accessible.name: "Back to previous settings page"
-        onClicked: root.back()
-      }
-
       // a page with tabs (Network) lists them: `tabs` [{label, value}], `tab`
       KitChoices {
         visible: (root.currentPage?.tabs ?? []).length > 0

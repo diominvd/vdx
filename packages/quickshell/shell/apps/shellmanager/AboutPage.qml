@@ -86,6 +86,7 @@ Column {
 
   spacing: Theme.gapGroup
 
+  Component.onCompleted: if (visible) versionProc.running = true
   onVisibleChanged: if (visible && !versionProc.running) versionProc.running = true
 
   Process {
@@ -274,7 +275,7 @@ Column {
     KitButton {
       width: Theme.buttonWidth
       icon: "rotate-ccw"
-      text: "Review backups"
+      text: "Rollback…"
       onClicked: Quickshell.execDetached(["kitty", "-e", "python3", ThemeService.dotfiles + "/install.py", "rollback"])
     }
   }
