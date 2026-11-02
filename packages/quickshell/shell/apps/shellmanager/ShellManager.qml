@@ -504,7 +504,7 @@ Rectangle {
     anchors { left: sidebar.right; leftMargin: 1; right: parent.right; rightMargin: previewDock.visible ? previewDock.width + Theme.windowPadding + Theme.gapWide : 0; top: header.bottom; bottom: parent.bottom }
     // to the window's edge: the rows scroll out of it, not out of a line above it
     // Apps, Bar modules and Themes fill the window and scroll their panes themselves: the page stays
-    contentHeight: (root.currentPage?.fillsViewport ?? false) || ["apps", "modules", "themes"].includes(root.tab) ? height : pages.implicitHeight + pages.y + Theme.windowPadding
+    contentHeight: (root.currentPage?.fillsViewport ?? false) || ["apps", "modules", "themes"].includes(root.tab) ? height : pages.implicitHeight + pages.y + 2 * Theme.windowPadding
     clip: true
     boundsBehavior: Flickable.StopAtBounds
     interactive: contentHeight > height

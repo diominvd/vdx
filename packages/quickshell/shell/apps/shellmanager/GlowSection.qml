@@ -32,8 +32,8 @@ KitColumn {
     text: Math.round(pressed ? dragValue * 100 : ShellSettings.glowStrength) + "%"
     onMoved: value => ShellSettings.set("glowStrength", Math.round(value * 100))
   }
-  KitLine {}
-  KitLabel { text: "GLOW ON" }
+  KitLine { visible: ShellSettings.glow }
+  KitLabel { text: "GLOW ON"; visible: ShellSettings.glow }
   Repeater {
     model: root.targets
     KitRow {

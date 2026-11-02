@@ -33,15 +33,60 @@ Column {
   property string ioStatus: ""                 // the last export, on the group's label
   property string healthReport: ""
   property string resourceReport: ""
+  property var healthItems: []
+  property var resourceMetrics: []
+
+  function setHealthReport(raw) {
+    healthReport = raw;
+    healthItems = raw.replace(/\x1b\[[0-9;]*m/g, "").split("\n")
+      .map(line => line.trim()).filter(line => line !== "" && !line.startsWith(":: Doctor:"))
+      .map(line => {
+        const match = line.match(/^([✓!✗])\s*(.*)$/);
+        const body = match ? match[2] : line;
+        const parts = body.split(" · ");
+        return { level: match && match[1] === "✗" ? "error" : match && match[1] === "✓" ? "ok" : "warning",
+                 summary: parts[0], fix: parts.slice(1).join(" · ") };
+      });
+  }
+
+  function formatMemory(kib) {
+    const mib = Number(kib) / 1024;
+    return mib >= 1024 ? (mib / 1024).toFixed(1) + " GiB" : Math.round(mib) + " MiB";
+  }
+
+  function formatElapsed(value) {
+    const dayParts = value.split("-");
+    const clock = dayParts[dayParts.length - 1].split(":").map(Number);
+    const days = dayParts.length > 1 ? Number(dayParts[0]) : 0;
+    const minutes = days * 1440 + (clock.length === 3 ? clock[0] * 60 : 0) + clock[clock.length - 2];
+    if (minutes >= 60) return Math.floor(minutes / 60) + "h " + String(minutes % 60).padStart(2, "0") + "m";
+    return minutes + "m " + String(clock[clock.length - 1]).padStart(2, "0") + "s";
+  }
+
+  function setResourceReport(raw) {
+    resourceReport = raw;
+    const fields = raw.trim().split(/\s+/);
+    if (fields.length < 6 || fields.some(value => value === "")) { resourceMetrics = []; return; }
+    resourceMetrics = [
+      { label: "MEMORY", value: formatMemory(fields[1]) },
+      { label: "VIRTUAL", value: formatMemory(fields[2]) },
+      { label: "CPU", value: fields[4] + "%" },
+      { label: "RUNTIME", value: formatElapsed(fields[3]) },
+      { label: "THREADS", value: fields[5] },
+      { label: "PROCESS", value: fields[0] }
+    ];
+  }
 
   function checkHealth() {
     healthReport = "Checking…";
+    healthItems = [];
     doctorProc.running = false;
     doctorProc.command = ["python3", ThemeService.dotfiles + "/install.py", "doctor"];
     doctorProc.running = true;
   }
   function measureShell() {
     resourceReport = "Measuring…";
+    resourceMetrics = [];
     measureProc.running = false;
     measureProc.command = ["ps", "-p", String(Quickshell.processId), "-o", "pid=,rss=,vsz=,etime=,%cpu=,nlwp="];
     measureProc.running = true;
@@ -50,13 +95,13 @@ Column {
   Process {
     id: doctorProc
     stdout: StdioCollector {
-      onStreamFinished: root.healthReport = text.trim() || "No diagnostic output"
+      onStreamFinished: root.setHealthReport(text.trim() || "No diagnostic output")
     }
   }
   Process {
     id: measureProc
     stdout: StdioCollector {
-      onStreamFinished: root.resourceReport = text.trim() || "No process data"
+      onStreamFinished: root.setResourceReport(text.trim() || "No process data")
     }
   }
 
@@ -244,30 +289,80 @@ Column {
     hint: "Checks managed files, services and the running desktop"
     KitButton { width: Theme.buttonWidth; icon: "activity"; text: "Run check"; busy: doctorProc.running; onClicked: root.checkHealth() }
   }
-  KitText {
+  Column {
     visible: root.healthReport !== ""
     width: parent.width
-    text: root.healthReport
-    color: root.healthReport.includes("healthy") ? Theme.green : root.healthReport.includes("✗") ? Theme.red
-         : root.healthReport.includes("⚠") ? Theme.yellow : Theme.foreground2
-    wrapMode: Text.WordWrap
-    font.pixelSize: Theme.fontSize - 1
-    maximumLineCount: 10
-    elide: Text.ElideRight
+    spacing: Theme.gapTight
+
+    KitText {
+      visible: root.healthReport === "Checking…"
+      text: "Checking system health…"
+      color: Theme.muted
+      font.pixelSize: Theme.fontSize - 1
+    }
+
+    KitNotice {
+      visible: root.healthItems.length === 1 && root.healthItems[0].level === "ok"
+      width: parent.width
+      icon: "check"
+      title: "System healthy"
+      text: "Managed files, services and desktop checks passed."
+    }
+
+    Repeater {
+      model: root.healthItems.filter(item => item.level !== "ok")
+      KitRow {
+        required property var modelData
+        label: modelData.summary
+        hint: modelData.fix !== "" ? "Suggested fix: " + modelData.fix : ""
+        labelColor: modelData.level === "error" ? Theme.red : Theme.yellow
+      }
+    }
+
+    KitGrouper {}
   }
   KitRow {
     label: "Shell resources"
-    hint: "Sample the running Quickshell process on demand; RSS and VSZ are KiB"
+    hint: "A one-time snapshot of the running Quickshell process"
     KitButton { width: Theme.buttonWidth; icon: "cpu"; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
   }
   KitText {
-    visible: root.resourceReport !== ""
+    visible: root.resourceReport !== "" && root.resourceMetrics.length === 0
     width: parent.width
-    text: root.resourceReport === "Measuring…" ? root.resourceReport : "PID   RSS   VSZ   TIME   CPU   THREADS\n" + root.resourceReport
+    text: root.resourceReport === "Measuring…" ? "Measuring process…" : root.resourceReport
     color: Theme.muted
     wrapMode: Text.WordWrap
-    font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSize - 1
+  }
+  Grid {
+    property bool kitUnboxed: true
+    visible: root.resourceMetrics.length > 0
+    width: parent.width
+    columns: 3
+    columnSpacing: Theme.gapSmall
+    rowSpacing: Theme.gapSmall
+    height: childrenRect.height
+
+    Repeater {
+      model: root.resourceMetrics
+      Rectangle {
+        required property var modelData
+        width: Math.floor((parent.width - 2 * parent.columnSpacing) / 3)
+        height: Theme.controlHeight + Theme.gapSmall
+        radius: Theme.radiusControl
+        color: Theme.fillOn(false)
+        border.width: Theme.frameWidth
+        border.color: Theme.controlLineRest
+
+        Column {
+          anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Theme.gapMedium; rightMargin: Theme.gapMedium }
+          height: implicitHeight
+          spacing: Theme.gapTight
+          KitText { text: modelData.label; color: Theme.muted; font.pixelSize: Theme.fontSize - 2; font.letterSpacing: 1 }
+          KitText { text: modelData.value; color: Theme.foreground0; font.weight: Font.Medium }
+        }
+      }
+    }
   }
   KitRow {
     label: "Recovery"
