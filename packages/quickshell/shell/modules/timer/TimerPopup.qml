@@ -10,7 +10,7 @@ KitFrame {
   // the tab follows a running one; idle, it is the owner's pick
   property string tab: "countdown"
   property int minutes: TimerService.lastMinutes
-  readonly property string shown: TimerService.active ? TimerService.kind : tab
+  readonly property string shown: TimerService.active ? TimerService.kind : TimerService.ended ? "countdown" : tab
   readonly property color tone: Theme.orange
 
   function presetText(minutes) {
@@ -26,14 +26,26 @@ KitFrame {
     icon: "clock"
     iconColor: TimerService.active ? root.tone : Theme.foreground0
     title: root.shown === "stopwatch" ? "Stopwatch" : "Timer"
-    subtitle: !TimerService.active ? "READY" : (TimerService.paused ? "PAUSED" : "RUNNING")
+    subtitle: TimerService.ended ? "TIME IS UP" : !TimerService.active ? "READY" : (TimerService.paused ? "PAUSED" : "RUNNING")
       + (TimerService.endsText !== "" ? " · ENDS " + TimerService.endsText : "")
   }
 
   KitLine {}
 
+  // ---- a countdown that ran out ----
+  KitRow {
+    visible: TimerService.ended
+    label: TimerService.label !== "" ? TimerService.label : "Time is up"
+    hint: "Finished"
+    Row {
+      spacing: Theme.gapMedium
+      KitButton { icon: "play"; iconTint: root.tone; text: "Restart"; onClicked: TimerService.restart() }
+      KitButton { icon: "x"; iconTint: Theme.red; text: "Stop"; onClicked: TimerService.stop() }
+    }
+  }
+
   KitSegments {
-    visible: !TimerService.active
+    visible: !TimerService.active && !TimerService.ended
     width: parent.width
     model: [{ label: "Timer", value: "countdown" }, { label: "Stopwatch", value: "stopwatch" }]
     current: root.tab
@@ -42,7 +54,7 @@ KitFrame {
 
   // ---- a countdown to set ----
   Column {
-    visible: !TimerService.active && root.tab === "countdown"
+    visible: !TimerService.active && !TimerService.ended && root.tab === "countdown"
     width: parent.width
     spacing: Theme.gapGroup
 

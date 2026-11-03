@@ -2,12 +2,14 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.components
 import qs.config
 
 // Timer: one countdown or one stopwatch at a time. The bar module, the hub's
 // tile and the island's live slot read it; `now` ticks only while it runs.
 // Time is taken from the clock (`since`), not counted by ticks, so a late tick
-// costs nothing. A countdown that reaches zero ends with a notification.
+// costs nothing. A countdown that reaches zero ends with a notification and
+// opens its popup (`ended`) to restart or dismiss it.
 Singleton {
   id: root
 
@@ -27,6 +29,7 @@ Singleton {
   property real since: 0                      // Date.now() at the last resume
   property real now: 0
   property var laps: []                       // stopwatch: lap times, ms, newest first
+  property bool ended: false                  // a countdown just ran out: the popup offers Restart / Stop
   property int lastMinutes: 15                // what the ruler starts at
 
   readonly property bool active: kind !== ""
@@ -45,8 +48,10 @@ Singleton {
     lastMinutes = minutes;
     begin("countdown", minutes * 60000, name ?? "");
   }
+  function restart() { startCountdown(lastMinutes, label); }
   function startStopwatch() { begin("stopwatch", 0, ""); }
   function begin(k, ms, name) {
+    ended = false;
     laps = [];
     total = ms;
     label = name;
@@ -70,7 +75,7 @@ Singleton {
     paused = false;
   }
   function togglePause() { if (paused) resume(); else pause(); }
-  function stop() { kind = ""; paused = false; base = 0; laps = []; }
+  function stop() { ended = false; kind = ""; paused = false; base = 0; laps = []; }
   function lap() {
     if (kind !== "stopwatch" || !running) return;
     now = Date.now();
@@ -102,6 +107,9 @@ Singleton {
     if (kind !== "countdown") return;
     const name = label !== "" ? label : fmt(total, false) + " timer";
     stop();
+    ended = true;
+    const popup = PopupManager.ipcOwner("timer");
+    if (popup && !popup.visible) popup.toggle();
     ring.command = ["notify-send", "-a", "Timer", "-i", "alarm-symbolic", "Time is up", name];
     ring.running = true;
   }

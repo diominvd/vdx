@@ -38,4 +38,15 @@ TestCase {
     compare(timer.notifications.command[6], "sample");
     timer.finish(); compare(timer.notifications.calls, 1);
   }
+
+  function test_finish_keeps_the_ended_state_until_restart_or_stop() {
+    const timer = createTemporaryObject(factory, this);
+    timer.begin("countdown", 60000, "tea");
+    timer.finish();
+    verify(!timer.active); verify(timer.ended);
+    timer.restart();
+    verify(timer.active); verify(!timer.ended); compare(timer.label, "tea");
+    timer.finish(); timer.stop();
+    verify(!timer.ended);
+  }
 }
