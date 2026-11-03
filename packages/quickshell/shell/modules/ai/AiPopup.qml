@@ -47,6 +47,8 @@ KitFrame {
   }
 
   KitChoices {
+    width: parent.width
+    stretch: true
     model: [
       { label: "Claude", value: "claude", icon: "bot" },
       { label: "Codex",  value: "codex",  icon: "zap" },
