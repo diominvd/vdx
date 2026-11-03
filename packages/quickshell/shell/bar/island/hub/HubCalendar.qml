@@ -56,7 +56,7 @@ Item {
           width: todayLabel.implicitWidth + 2 * Theme.gapWide
           height: Theme.controlHeight
           radius: Theme.pill(height)
-          color: todayArea.containsMouse ? Theme.controlHover : Theme.clear
+          color: todayArea.containsMouse ? Theme.controlHover : Theme.material ? Theme.controlFill : Theme.clear
           Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }
           border.width: Theme.frameWidth
           border.color: Theme.controlLine
@@ -73,7 +73,7 @@ Item {
       width: parent.width
       height: grid.implicitHeight + 2 * Theme.gapMedium + heads.height + Theme.gapSmall
       radius: Theme.radiusCard
-      color: Theme.controlFill
+      color: Theme.material ? Theme.sectionFill : Theme.controlFill
       border.width: Theme.frameWidth
       border.color: Theme.controlLine
 
@@ -108,15 +108,16 @@ Item {
             readonly property bool isToday: day.getFullYear() === root.now.getFullYear() && day.getMonth() === root.now.getMonth() && day.getDate() === root.now.getDate()
             width: root.cell
             height: root.cell * 0.8
-            radius: Theme.radiusControl
-            color: isToday ? Theme.pickFill : Theme.clear
+            // Material: today a filled circle
+            radius: Theme.material ? Theme.radiusFor(height) : Theme.radiusControl
+            color: isToday ? (Theme.material ? Theme.primary : Theme.pickFill) : Theme.clear
             border.width: isToday ? Theme.frameWidth : 0
             border.color: Theme.foreground2
 
             KitText {
               anchors.centerIn: parent
               text: day.getDate()
-              color: inMonth ? Theme.foreground0 : Theme.dim
+              color: isToday && Theme.material ? Theme.inkOn(Theme.primary) : inMonth ? Theme.foreground0 : Theme.dim
               font.weight: isToday ? Theme.pickWeight : Theme.fontWeight
             }
           }

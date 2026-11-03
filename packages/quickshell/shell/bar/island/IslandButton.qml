@@ -4,6 +4,7 @@ import qs.kit
 
 // A round icon button of the island's player: solid glyph, a soft disc on hover.
 // In a `group` (an item with `hoverTarget`) the group draws the one disc instead.
+// Material: a tonal disc at rest too (`tonal: false` keeps it bare).
 Rectangle {
   id: root
 
@@ -11,6 +12,9 @@ Rectangle {
   property int iconSize: 20
   property color iconTint: Theme.foreground0
   property var group: null
+  property bool tonal: true
+  property bool filled: false              // Material: the one main control (play), filled with Theme.primary
+  readonly property bool primary: filled && Theme.material && !group
 
   signal clicked()
   activeFocusOnTab: true
@@ -23,7 +27,9 @@ Rectangle {
   implicitWidth: Math.max(Theme.controlHeight, iconSize + 14)
   implicitHeight: implicitWidth
   radius: Theme.pill(width)
-  color: !group && (area.containsMouse || activeFocus) ? Theme.controlHover : Theme.clear
+  color: primary ? (area.containsMouse ? Theme.mix(Theme.primary, Theme.inkOn(Theme.primary), 0.08) : Theme.primary)
+       : !group && (area.containsMouse || activeFocus) ? Theme.controlHover
+       : !group && tonal && Theme.material ? Theme.controlFill : Theme.clear
   border.width: activeFocus ? Theme.focusWidth : 0
   border.color: Theme.focusRing
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
@@ -33,7 +39,7 @@ Rectangle {
     name: root.icon
     size: root.iconSize
     solid: true
-    tint: root.iconTint
+    tint: root.primary ? Theme.inkOn(Theme.primary) : root.iconTint
     scale: area.pressed ? 0.88 : 1
     Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
   }

@@ -10,7 +10,8 @@ import qs.config
 // outer one to look again. A child with `property bool kitUnboxed: true` (a
 // preview, a board of chips) stands on the page; a title that is not a
 // KitLabel says `readonly property bool isKitLabel: true`. Sliders take the
-// row layout (`rowStyle`). Strict: a raised card in a faint line.
+// row layout (`rowStyle`). Strict: a raised card in a faint line, hairlines between rows;
+// Material: a tonal section, no lines.
 // Put it last: it is 1×1 (a Column hides a zero-size child, and its drawing
 // with it), placed at the end and taken back with a negative bottom padding;
 // it draws behind the rows in the column's coordinates.
@@ -196,8 +197,9 @@ Item {
     }
   }
 
+  // Material: a tonal section's rows need no hairlines between them (Strict keeps them)
   Repeater {
-    model: root.lines
+    model: Theme.material ? [] : root.lines
 
     Rectangle {
       required property real modelData

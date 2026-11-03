@@ -64,8 +64,8 @@ KitColumn {
   Repeater {
     model: [
       { part: "windows",  label: "Windows and popups", px: r => r },
-      { part: "cards",    label: "Cards and boxes",    px: r => Math.round(r * 0.6) },
-      { part: "controls", label: "Controls",           px: r => Theme.scaled(Theme.controlHeight, r) },
+      { part: "cards",    label: "Cards and boxes",    px: r => Math.round(r * (Theme.material ? 1 : 0.6)) },
+      { part: "controls", label: "Controls",           px: r => Theme.scaled(Theme.controlHeight, r * Theme.softness) },
       { part: "bar",      label: "Bar",                px: r => Theme.scaled(Theme.islandHeight, r) },
       { part: "hub",      label: "Hub",                px: r => Math.round(r * 1.5) }
     ]

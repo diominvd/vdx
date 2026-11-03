@@ -3,6 +3,7 @@ import qs.config
 import qs.kit
 
 // The week in the hub: Monday to Sunday, today picked. A click opens the month.
+// Material: a tonal section, today a filled pill (Theme.primary).
 Rectangle {
   id: root
 
@@ -11,7 +12,7 @@ Rectangle {
 
   implicitHeight: 64
   radius: Theme.radiusCard
-  color: Theme.controlFill
+  color: Theme.material ? Theme.sectionFill : Theme.controlFill
   border.width: Theme.frameWidth
   border.color: Theme.controlLine
 
@@ -34,8 +35,8 @@ Rectangle {
         readonly property bool today: day.getDate() === root.now.getDate() && day.getMonth() === root.now.getMonth()
         width: parent.width / 7
         height: parent.height
-        radius: Theme.radiusControl
-        color: today ? Theme.pickFill : Theme.clear
+        radius: Theme.material ? Theme.radiusFor(width) : Theme.radiusControl
+        color: today ? (Theme.material ? Theme.primary : Theme.pickFill) : Theme.clear
 
         Column {
           anchors.centerIn: parent
@@ -44,12 +45,13 @@ Rectangle {
           KitText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "MTWTFSS"[index]
-            color: Theme.muted
+            color: today && Theme.material ? Theme.inkOn(Theme.primary) : Theme.muted
             font.pixelSize: Theme.fontSize - 2
           }
           KitText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: day.getDate()
+            color: today && Theme.material ? Theme.inkOn(Theme.primary) : Theme.foreground0
             font.weight: today ? Theme.pickWeight : Theme.fontWeight
           }
         }

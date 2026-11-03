@@ -16,7 +16,8 @@ uses tonal layers and more spacious controls.
   `radiusCard` (tiles, previews, cards), `radiusControl` (buttons, fields,
   rows, checkboxes), `Theme.pill(h)` / `radiusFor(h)` (tracks, knobs, switches, the
   resting island); all 0 when sharp. One slider (R) sets them all in proportion:
-  surface R, card 0.6 R, a thing h high h × R / 48 (pills only at the top stop).
+  surface R, card 0.6 R, a thing h high h × R / 48 (pills only at the top stop;
+  Material: card R, h × R / 24, see Controls).
   Separately: a slider per part (windows, cards, controls, the bar, the hub), each R read the
   same way (`Theme.cornerOf(part)`), so one tick looks alike on every part; the
   one slider hides while they show.
@@ -36,12 +37,36 @@ uses tonal layers and more spacious controls.
   (`KitHeader { page: true }`) is a large title with no icon.
   An outline drawn in either style (a well, a preview, a card at rest) is
   `Theme.hairline`, a picked card's or tile's `Theme.ring`.
-  Material follows Material 3 (primary = `foreground0`, or the accent where it
-  applies). A button is tonal. `KitSegments` is an outlined track split by
-  hairlines, the picked segment filled with a check. `KitSwitch` is an outlined
-  track with a small handle; on: filled with a large handle and a check.
-  A field or select is filled with square lower corners and a bottom line, thick
-  while focused (`KitFieldLine`). The slider is below.
+  Material follows Material 3 (`Theme.primary` = `foreground0`, or the accent where
+  Choices takes it). Only the style changes, never a layout or a flow; Strict reads
+  none of the Material tokens (`Theme.radiusPopup`, `sectionPad`, `sectionMargin`,
+  `radiusSection`, `sectionFill`, `primary`, `tonal(c, t)`, `radiusJoin`, `softness`).
+  Material rounds controls, tracks and chips twice as fast (`Theme.softness`: pills
+  from R 12) and cards take R itself (Strict 0.6 R); sharp stays sharp.
+  A popup is one soft surface (`radiusPopup`, 1.5 × the windows' R; Hyprland's
+  rounding keeps `radiusSurface`). `KitFrame` turns the runs between its `KitLine`s
+  into tonal sections (`sectionFill`, `radiusSection`, concentric with the popup), the
+  lines into the gaps; a titled group (a `KitLabel`, or a Column that starts with one)
+  starts a section of its own; a wrapped overview Column holding the lines is walked
+  into. A header (`KitHeader`), a `kitUnboxed` item and a run of buttons alone
+  (`kitFree`: KitButton, KitChoices, KitSegments, a search bar) stand on the surface;
+  trailing buttons after the last section step out of it (`kitShift`).
+  The header's icon sits in a tonal circle of its colour. A button is a tonal pill;
+  the view's one main action is `KitButton { primary: true }` (filled, `tone` for a
+  module's colour). `KitChoices` and `KitSegments` are connected pills (2 px apart,
+  inner corners `radiusJoin`), the picked one filled with `primary`; a `KitChoices`
+  wider than its parent shares the parent's width (`squeezed`), in either style.
+  `KitSwitch` is 44 × 26: an outlined track with a small handle; on: filled with a
+  large handle and a check. A field or select is filled with square lower corners and
+  a bottom line, thick while focused (`KitFieldLine`); a search field (`icon:
+  "search"`) is a taller pill with no line. A framed list icon (`KitIconTile`) is a
+  tonal chip, the open row's filled with `primary`. Settings boxes have no hairlines
+  between rows. The hub: tonal tiles, an on tile tinted with its colour and its icon
+  filled; the quick sliders share one section; today in the week and the month is a
+  filled `primary` pill; the play button is filled. The island's media: a thicker seek
+  line; power tiles tonal, an armed one tinted red; the launcher's rows pills, the
+  picked one with its icon in a filled chip; notification cards tonal at
+  `radiusSection` on the surface. The slider is below.
 
 - Spacing: the gaps and edge insets are `Theme.gapHair` (4), `gapTight` (2),
   `gapSmall` (6), `gapMedium` (8), `gapLoose` (10), `gapWide` (12) and `gapGroup`
@@ -65,7 +90,7 @@ uses tonal layers and more spacious controls.
   font descender space and taller trailing actions do not count as caption ink. Settings card row insets are separately
   `Theme.settingsRowInset` (6 px); they are not header separator spacing.
 - Popup: `KitHeader` → `KitLine` → groups separated by `KitLine` → footer.
-  No backgrounds under groups.
+  No backgrounds under groups (Material: `KitFrame` draws its tonal sections itself).
 - Sidebar: an app window with several pages (Backups, Cleaner, Packages, Task Manager,
   Files, Music) shows them in a sidebar, not as tabs in the header: `KitSidebar` (brand
   header, a line level with the page header's, rows of `KitSideRow`) at the left, the page
@@ -204,7 +229,7 @@ Pages by the user's area; the look follows macOS System Settings.
 - Sliders in a box use the row layout (label left, value right). Strict can choose
   the classic plate or the split two-segment plate in Appearance › Interface. A snapped slider
   always shows its stops, at most 11 (every n-th of a long run). Controls ›
-  Material draws Material 3's slider (thick track split by a bar handle, stops as
+  Material draws Material 3's slider (a 16 px track split by a bar handle, stops as
   dots); Strict can use the classic thin track or the split plate with rounded
   active and remainder segments. A captioned Settings slider keeps its label
   beside the track; colour ramps stay thin.
@@ -256,7 +281,7 @@ Pages by the user's area; the look follows macOS System Settings.
   hierarchy to existing palettes; it is not a generated HCT tonal palette.
 - MUST — body text uses Normal, action labels Medium, selected items DemiBold.
   Large page titles use Medium. Avoid ExtraBold for routine selection.
-- MUST — shared control height is 34 in Strict, 36 in Material; setting rows
+- MUST — shared control height is 34 in Strict, 36 in Material (a popup's padding 16 / 20); setting rows
   at least 40, navigation 34 / 36. Wide settings stack below `Theme.rowStackBelow` (600 px) of
   available row width. Use `Theme.rowHeight` / `navigationHeight` instead of
   copying these values into pages.

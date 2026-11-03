@@ -45,6 +45,13 @@ Item {
     return id === "tiles" ? tileIds.length > 0 : id === "player" ? hasPlayer : id === "night" ? !ModuleSettings.get("hub", "nightAuto", true) || BrightnessService.nightActive
          : id === "modules" ? ids.length > 0 : true;
   }
+  // Material: the quick sliders next to each other share one tonal section
+  readonly property var sliderIds: ["volume", "microphone", "brightness", "night", "dimming"]
+  readonly property var shownBlocks: HubBlocks.order.filter(id => HubBlocks.shown(id) && wants(id))
+  function inRun(id, step) {
+    const next = shownBlocks[shownBlocks.indexOf(id) + step];
+    return next !== undefined && sliderIds.indexOf(next) >= 0;
+  }
   function blockOf(id) {
     return ({ tiles: tilesBlock, week: weekBlock, player: playerBlock, volume: volumeBlock, microphone: microphoneBlock, brightness: brightnessBlock, night: nightBlock, dimming: dimmingBlock, modules: modulesBlock })[id] ?? null;
   }
@@ -166,7 +173,7 @@ Item {
         width: parent.width
         active: HubBlocks.shown(modelData) && root.wants(modelData)
         visible: active
-        sourceComponent: root.blockOf(modelData)
+        sourceComponent: Theme.material && root.sliderIds.indexOf(modelData) >= 0 ? sliderSection : root.blockOf(modelData)
 
         // a right click on a block: its options on the Hub page (the chips and the tiles
         // answer for themselves: their module's options)
@@ -222,7 +229,7 @@ Item {
         height: compact ? 44 : 60
         visible: root.hasPlayer
         radius: Theme.radiusCard
-        color: Theme.controlFill
+        color: Theme.material ? Theme.sectionFill : Theme.controlFill
         border.width: Theme.frameWidth
         border.color: Theme.controlLine
 
@@ -281,9 +288,11 @@ Item {
             width: track.compact ? 30 : 40
             height: width
             radius: Theme.pill(height)
-            color: playArea.containsMouse ? Theme.foreground0 : Theme.foreground1
+            // Material: the filled primary, a shade lighter under the pointer
+            color: Theme.material ? (playArea.containsMouse ? Theme.mix(Theme.primary, Theme.inkOn(Theme.primary), 0.08) : Theme.primary)
+              : playArea.containsMouse ? Theme.foreground0 : Theme.foreground1
 
-            KitIcon { anchors.centerIn: parent; name: IslandService.playing ? "pause" : "play"; size: 16; solid: true; tint: Theme.background0 }
+            KitIcon { anchors.centerIn: parent; name: IslandService.playing ? "pause" : "play"; size: 16; solid: true; tint: Theme.material ? Theme.inkOn(Theme.primary) : Theme.background0 }
             MouseArea {
               id: playArea
               anchors.fill: parent
@@ -301,6 +310,37 @@ Item {
           }
         }
       }
+  }
+
+  // Material: a slider block in its part of the sliders' section (the section's gaps are its own)
+  Component {
+    id: sliderSection
+    Item {
+      id: section
+      readonly property string block: parent ? parent.modelData : ""
+      readonly property bool first: !root.inRun(block, -1)
+      readonly property bool last: !root.inRun(block, 1)
+      readonly property int pad: Theme.sectionPad
+      implicitHeight: inner.height + (first ? pad : 0) + (last ? pad : 0)
+
+      Rectangle {
+        width: parent.width
+        // down over the column's gap to the next slider: one surface
+        height: parent.height + (section.last ? 0 : column.spacing)
+        topLeftRadius: section.first ? Theme.radiusCard : 0
+        topRightRadius: topLeftRadius
+        bottomLeftRadius: section.last ? Theme.radiusCard : 0
+        bottomRightRadius: bottomLeftRadius
+        color: Theme.sectionFill
+      }
+      Loader {
+        id: inner
+        x: section.pad
+        y: section.first ? section.pad : 0
+        width: parent.width - 2 * section.pad
+        sourceComponent: root.blockOf(section.block)
+      }
+    }
   }
 
   // the quick sliders: each a block of its own
@@ -414,7 +454,7 @@ Item {
             y: chips.places[index]?.y ?? 0
             width: chips.places[index]?.w ?? natural
             height: chips.chipHeight
-            radius: Theme.radiusCard
+            radius: Theme.material ? Theme.radiusFor(height) : Theme.radiusCard
             color: hover.hovered ? Theme.controlHover : Theme.controlFill
             border.width: Theme.frameWidth
             border.color: hover.hovered ? Theme.controlLineHover : Theme.controlLine

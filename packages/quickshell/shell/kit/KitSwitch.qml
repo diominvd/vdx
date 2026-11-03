@@ -37,7 +37,7 @@ Rectangle {
   Component.onCompleted: boxed = Theme.boxed(parent)
 
   implicitWidth: m3 ? 44 : 38
-  implicitHeight: m3 ? 24 : 20
+  implicitHeight: m3 ? 26 : 20
   radius: Theme.pill(height)
   border.width: m3 ? (checked ? 0 : 2) : checked ? 0 : Theme.frameWidth
   border.color: m3 ? Theme.gray : hovered ? Theme.controlLineHover : Theme.controlLine

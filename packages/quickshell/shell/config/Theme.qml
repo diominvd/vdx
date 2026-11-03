@@ -147,8 +147,9 @@ QtObject {
   // Strict: framed controls on the surface. material:
   // no frames — controls are filled one step up, a popup has a quiet hairline
   readonly property bool material: ShellSettings.material
-  readonly property color controlFill: material ? surfaceContainer : mix(background0, foreground0, 0.04)
-  readonly property color controlHover: material ? surfaceHigh : mix(background0, foreground0, 0.075)
+  // material: a control sits one tone above a section (surfaceContainer), so it reads in one
+  readonly property color controlFill: material ? surfaceHigh : mix(background0, foreground0, 0.04)
+  readonly property color controlHover: material ? surfaceHighest : mix(background0, foreground0, 0.075)
   // a control in a Settings box (KitGrouper) sits on background1: its fills go one step up
   function boxed(item) {
     for (let p = item; p; p = p.parent)
@@ -209,15 +210,36 @@ QtObject {
     return ShellSettings.cornerSplit ? (ShellSettings.cornerRadii[part] ?? ShellSettings.cornerRadius) : ShellSettings.cornerRadius;
   }
   function scaled(h, r) { return round ? Math.round(Math.min(h / 2, h * r / 48)) : 0; }
+  // Material rounds the things of a height twice as fast: its controls, tracks and chips are
+  // pills from R 12 on (Strict only at the top stop); sharp stays sharp in both
+  readonly property real softness: material ? 2 : 1
   readonly property int radiusSurface: round ? cornerOf("windows") : 0             // popups, windows, panels
-  readonly property int radiusCard: round ? Math.round(cornerOf("cards") * 0.6) : 0 // tiles, boxes, picked rows
+  // tiles, boxes, picked rows; Material's are rounder (a card takes R itself, not 0.6 R)
+  readonly property int radiusCard: round ? Math.round(cornerOf("cards") * (material ? 1 : 0.6)) : 0
   readonly property int radiusControl: radiusFor(controlHeight)                    // buttons, fields, selects, segments
   // the corner of a control h px high, in proportion to its R; never past a half circle
-  function radiusFor(h) { return scaled(h, cornerOf("controls")); }
+  function radiusFor(h) { return scaled(h, cornerOf("controls") * softness); }
   // the bar's: the island and its child bars
   function barRadiusFor(h) { return scaled(h, cornerOf("bar")); }
   // tracks, knobs, switches: the same proportion (a pill only at the largest radius)
   function pill(h) { return radiusFor(h); }
+
+  // ---- Material 3 (Appearance › Style › Material) ----
+  // what Material draws that Strict does not; Strict reads none of these. A popup is one
+  // soft surface (radiusPopup), its groups tonal sections (KitFrame: the runs between its
+  // KitLines) with concentric corners; the main action is filled (KitButton primary)
+  readonly property int radiusPopup: material ? Math.round(radiusSurface * 1.5) : radiusSurface
+  readonly property int sectionPad: gapWide                    // a section's edge to its content
+  readonly property int sectionMargin: popupPadding - sectionPad   // the popup's edge to a section's
+  readonly property int radiusSection: Math.max(0, radiusPopup - sectionMargin)
+  readonly property color sectionFill: surfaceContainer
+  // the filled colour of the main action, a picked segment, an on tile: the accent where
+  // Choices takes it, else the theme's text colour (M3 primary)
+  readonly property color primary: accentFor("choices", foreground0)
+  // a tonal container of a colour (a header's icon circle, a tinted tile or row)
+  function tonal(c: color, t: real): color { return mix(background0, c, t); }
+  // the inner corner of connected pills (segments, joined buttons)
+  readonly property int radiusJoin: round ? Math.min(radiusControl, gapSmall) : 0
 
   // ---- popups (kit) ----
   // the dimmed screen under the launcher, the keybinds and the overview
@@ -247,7 +269,7 @@ QtObject {
   readonly property int iconSmall: 14
   readonly property int iconLarge: 24
   readonly property int sideWidth: 216
-  readonly property int popupPadding: aired(16)       // a popup's frame, every side (KitFrame)
+  readonly property int popupPadding: aired(material ? 20 : 16)  // a popup's frame, every side (KitFrame)
   readonly property int popupWidth: 380       // larger standalone surfaces such as auth and recording
   readonly property int modulePopupWidth: 340  // ordinary module popups; wider views opt into their needed width
   // a window's frame: the gap to its edges on every side, and the space the

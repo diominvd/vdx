@@ -4,6 +4,8 @@ import qs.config
 // Outlined text field: an optional icon (`icon`: search), the text, a thin
 // blinking cursor. The frame brightens on hover and while focused. The inner TextInput is exposed
 // as `input` for focus handling; `passKeys` go to keyPassed (list arrows).
+// Material: a filled field with a bottom line (KitFieldLine); a search field is Material 3's
+// search bar instead — a taller pill with no line, standing on the surface (KitFrame).
 Rectangle {
   id: root
 
@@ -29,9 +31,11 @@ Rectangle {
   signal accepted()
   signal keyPassed(int key)
 
+  readonly property bool searchBar: Theme.material && icon === "search"
+  readonly property bool kitFree: searchBar
   width: parent ? parent.width : 0
-  implicitHeight: Theme.controlHeight
-  radius: Theme.radiusControl
+  implicitHeight: searchBar ? Theme.controlHeight + Theme.gapMedium : Theme.controlHeight
+  radius: searchBar ? Theme.radiusFor(height) : Theme.radiusControl
   // set once: whether it sits in a Settings box (a walk up, not a binding)
   property bool boxed: false
   Component.onCompleted: boxed = Theme.boxed(parent)
@@ -41,7 +45,7 @@ Rectangle {
   border.color: textInput.activeFocus ? Theme.focusRing : hover.hovered ? Theme.controlLineHover : Theme.controlLineRest
   Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
-  KitFieldLine { active: textInput.activeFocus }
+  KitFieldLine { active: textInput.activeFocus; visible: Theme.material && !root.searchBar }
 
   HoverHandler { id: hover; cursorShape: Qt.IBeamCursor }
 

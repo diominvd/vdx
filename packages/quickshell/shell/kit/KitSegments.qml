@@ -6,8 +6,8 @@ import qs.config
 // `current` is raised (filled, bold), the rest are plain text. Model:
 // [{label, value}]. Takes the width it is given (KitRow wide); a segment is as wide as its label, the spare width shared evenly.
 // Strict: a quiet outlined track, the picked segment a filled plate inset in it that glides to the next one picked.
-// Material (Appearance › Controls): the Material 3 segmented button — an
-// outlined pill split by hairlines, the picked segment filled with a check.
+// Material (Appearance › Controls): Material 3's connected button group — a pill
+// per choice, 2 px apart with barely rounded inner corners, the picked one filled (Theme.primary).
 Rectangle {
   id: root
 
@@ -17,7 +17,11 @@ Rectangle {
   property bool boxed: false
   Component.onCompleted: boxed = Theme.boxed(parent)
   // each label measured in the font it is drawn in (the picked one is bold: the wider)
-  readonly property int edge: m3 ? 1 : inset
+  readonly property int edge: m3 ? 0 : inset
+  readonly property int join: m3 ? Theme.gapTight : 0
+  readonly property bool kitFree: true
+  property real kitShift: 0              // KitFrame: a footer's way down past a section's edge
+  transform: Translate { y: root.kitShift }
   readonly property var natural: {
     const out = [];
     for (let i = 0; i < sizes.count; i++) out.push(Math.ceil(sizes.objectAt(i).advanceWidth) + 2 * Theme.gapLoose);
@@ -25,11 +29,11 @@ Rectangle {
   }
   readonly property real naturalSum: natural.reduce((a, b) => a + b, 0)
   // the narrowest the track can be without cutting a label (a row may give the rest to its hint)
-  readonly property real minWidth: Math.min(Theme.controlWidth, naturalSum + 2 * edge)
+  readonly property real minWidth: Math.min(Theme.controlWidth, naturalSum + 2 * edge + join * Math.max(0, natural.length - 1))
   // equal segments while every label fits its share; else each is as wide as its label needs, the spare width shared evenly, a shortage cut in proportion
   readonly property var widths: {
-    const avail = width - 2 * edge;
     const n = natural.length;
+    const avail = width - 2 * edge - join * Math.max(0, n - 1);
     if (n === 0 || naturalSum <= 0) return [];
     // every label fits an equal share: the segments are equal
     if (avail >= n * Math.max.apply(null, natural)) return natural.map(() => avail / n);
@@ -81,7 +85,7 @@ Rectangle {
   implicitHeight: Theme.controlHeight
   radius: Theme.radiusControl
   color: m3 ? Theme.clear : Theme.fillOn(boxed)
-  border.width: m3 ? 1 : Theme.frameWidth
+  border.width: m3 ? 0 : Theme.frameWidth
   border.color: Theme.controlLineRest
   opacity: disabled ? 0.4 : 1
 
@@ -96,14 +100,14 @@ Rectangle {
 
   // the segments are cut to the outline's inside: material the pill, terminal the rounded frame
   ClippingRectangle {
-    anchors { fill: parent; margins: root.m3 ? 1 : root.inset }
-    radius: Math.max(0, root.radius - (root.m3 ? 1 : root.inset))
+    anchors { fill: parent; margins: root.m3 ? 0 : root.inset }
+    radius: Math.max(0, root.radius - (root.m3 ? 0 : root.inset))
     color: Theme.clear
 
     // the picked segment's plate: it glides to the one picked, behind the labels
     Rectangle {
       readonly property int at: root.model.findIndex(c => c.value === root.current)
-      visible: at >= 0
+      visible: at >= 0 && !root.m3
       x: root.widths.slice(0, Math.max(0, at)).reduce((a, b) => a + b, 0)
       width: root.widths[at] ?? 0
       height: parent.height
@@ -115,6 +119,7 @@ Rectangle {
     Row {
       id: segments
       anchors.fill: parent
+      spacing: root.join
 
       Repeater {
         model: root.model
@@ -130,42 +135,32 @@ Rectangle {
 
           width: root.widths[index] ?? 0
           height: segments.height
-          // Only the enclosing track rounds the outside corners; shared
-          // edges stay straight in selected and hover states in both styles.
+          // Strict: only the enclosing track rounds the outside corners; shared edges stay
+          // straight. Material: each is a pill, its inner corners barely rounded
+          readonly property bool first: index === 0
+          readonly property bool last: index === root.model.length - 1
           radius: 0
-          color: hovered ? Theme.controlHover : Theme.clear
+          topLeftRadius: root.m3 ? (first ? root.radius : Theme.radiusJoin) : 0
+          bottomLeftRadius: topLeftRadius
+          topRightRadius: root.m3 ? (last ? root.radius : Theme.radiusJoin) : 0
+          bottomRightRadius: topRightRadius
+          color: !root.m3 ? (hovered ? Theme.controlHover : Theme.clear)
+               : selected ? Theme.primary : hovered ? Theme.hoverOn(root.boxed) : Theme.fillOn(root.boxed)
 
           Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
-
-          // material: a hairline between two segments
-          Rectangle {
-            visible: root.m3 && segment.index > 0
-            width: Theme.dividerThickness
-            height: parent.height
-            color: Theme.dividerColor
-          }
 
           Row {
             anchors.centerIn: parent
             width: Math.min(implicitWidth, parent.width - Theme.gapMedium)
             spacing: Theme.gapSmall
 
-            KitIcon {
-              id: tick
-              anchors.verticalCenter: parent.verticalCenter
-              visible: root.m3 && segment.selected && segment.width >= label.implicitWidth + 40
-              name: "check"
-              tint: label.color
-              size: Theme.iconSmall
-            }
-
             KitText {
               id: label
               anchors.verticalCenter: parent.verticalCenter
-              width: Math.min(implicitWidth, segment.width - Theme.gapMedium - (tick.visible ? tick.width + parent.spacing : 0))
+              width: Math.min(implicitWidth, segment.width - Theme.gapMedium)
               elide: Text.ElideRight
               text: segment.modelData.label
-              color: segment.selected ? Theme.selectedText : Theme.foreground2
+              color: segment.selected ? (root.m3 ? Theme.inkOn(Theme.primary) : Theme.selectedText) : Theme.foreground2
               font.weight: segment.selected ? Theme.pickWeight : Font.Normal
             }
           }

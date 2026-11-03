@@ -307,6 +307,46 @@ Item {
       sample.destroy();
       ShellSettings.material = previous;
     }
+    // Material: the runs between a popup's lines become tonal sections, the lines their gaps;
+    // a header and a footer of buttons stand outside; Strict keeps the lines and draws none
+    function test_popup_sections_follow_the_style() {
+      const previous = ShellSettings.material;
+      const sample = Qt.createQmlObject([
+        'import QtQuick; import qs.kit;',
+        'KitFrame { property alias first: first; property alias last: last;',
+        'KitHeader { title: "Audio" }',
+        'KitLine { id: first }',
+        'KitRow { label: "Output" }',
+        'Column { width: parent.width; KitLabel { text: "INPUT" } KitRow { label: "Microphone" } }',
+        'KitLine { id: last }',
+        'KitButton { width: parent.width; text: "Open settings" } }'
+      ].join('\n'), parent);
+      ShellSettings.material = true;
+      wait(40);
+      compare(sample.sections.length, 2, "a titled group starts its own section");
+      verify(sample.first.gapHeight >= 0 && sample.last.gapHeight >= 0, "lines turn into gaps");
+      const a = sample.sections[0], b = sample.sections[1];
+      verify(b.y > a.y + a.h, "sections keep a gap between them");
+      ShellSettings.material = false;
+      wait(40);
+      compare(sample.sections.length, 0);
+      compare(sample.first.gapHeight, -1);
+      compare(sample.last.gapHeight, -1);
+      compare(sample.padded.length, 0, "Strict gets each group's own top back");
+      sample.destroy();
+      ShellSettings.material = previous;
+    }
+    function test_choices_fit_their_parent() {
+      const sample = Qt.createQmlObject([
+        'import QtQuick; import qs.kit;',
+        'Item { width: 200; height: 40; property alias row: row;',
+        'KitChoices { id: row; model: [{ label: "Claude", value: 1 }, { label: "Codex", value: 2 }, { label: "Ollama", value: 3 }]; current: 1 } }'
+      ].join('\n'), parent);
+      wait(20);
+      verify(sample.row.squeezed);
+      verify(sample.row.width <= 200 + 0.5, "the row stays inside its parent");
+      sample.destroy();
+    }
     function test_group_separator_keeps_visibility_binding() {
       const sample = Qt.createQmlObject([
         'import QtQuick; import qs.kit;',

@@ -79,8 +79,10 @@ KitFrame {
     font.pixelSize: Theme.fontSize - 1
   }
 
-  // the list; its lower edge fades into the surface while more lies below
+  // the list; its lower edge fades into the surface while more lies below. Material: its
+  // cards stand on the surface (no section round them), tonal and rounder
   Item {
+    readonly property bool kitUnboxed: true
     width: parent.width
     visible: root.shown.length > 0
     height: Math.min(list.contentHeight, ModuleSettings.get("notifications", "rows", 6) * 82)
@@ -162,8 +164,9 @@ KitFrame {
 
               Rectangle {
                 anchors.fill: parent
-                radius: Theme.radiusCard
-                color: hover.hovered ? Theme.controlHover : Theme.controlFill
+                radius: Theme.material ? Theme.radiusSection : Theme.radiusCard
+                color: Theme.material ? (hover.hovered ? Theme.surfaceHigh : Theme.sectionFill)
+                     : hover.hovered ? Theme.controlHover : Theme.controlFill
                 border.width: Theme.frameWidth
                 border.color: hover.hovered ? Theme.controlLineHover : Theme.controlLineRest
                 Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }

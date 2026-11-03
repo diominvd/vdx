@@ -4,7 +4,7 @@ import qs.kit
 import qs.modules.equalizer
 
 // The player: cover, title and artist with the wave, a seek line with the
-// times, and prev / play / next.
+// times, and prev / play / next. Material: a thicker seek line, play filled.
 Item {
   id: root
 
@@ -71,15 +71,15 @@ Item {
       Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
-        height: 4
+        height: Theme.material ? 6 : 4
         radius: Theme.pill(height)
-        color: Theme.background2
+        color: Theme.material ? Theme.surfaceHighest : Theme.background2
 
         Rectangle {
           width: parent.width * (drag.pressed ? drag.at : root.fraction)
           height: parent.height
           radius: Theme.pill(height)
-          color: Theme.foreground0
+          color: Theme.material ? Theme.primary : Theme.foreground0
         }
       }
 
@@ -113,6 +113,7 @@ Item {
     IslandButton {
       icon: IslandService.playing ? "pause" : "play"
       iconSize: 24
+      filled: true
       onClicked: IslandService.togglePlay()
     }
     IslandButton { icon: "skip-forward"; onClicked: IslandService.next() }

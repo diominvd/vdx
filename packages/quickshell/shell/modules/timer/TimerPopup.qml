@@ -39,7 +39,7 @@ KitFrame {
     hint: "Finished"
     Row {
       spacing: Theme.gapMedium
-      KitButton { icon: "play"; iconTint: root.tone; text: "Restart"; onClicked: TimerService.restart() }
+      KitButton { icon: "play"; iconTint: root.tone; primary: true; tone: root.tone; text: "Restart"; onClicked: TimerService.restart() }
       KitButton { icon: "x"; iconTint: Theme.red; text: "Stop"; onClicked: TimerService.stop() }
     }
   }
@@ -72,6 +72,8 @@ KitFrame {
         text: "Start"
         icon: "play"
         iconTint: root.tone
+        primary: true
+        tone: root.tone
         onClicked: TimerService.startCountdown(root.minutes)
       }
       Item { width: parent.width - startButton.width - bigTime.width; height: 1 }
@@ -140,6 +142,8 @@ KitFrame {
         KitButton {
           icon: TimerService.running ? "pause" : "play"
           iconTint: TimerService.running ? Theme.foreground0 : root.tone
+          primary: !TimerService.active
+          tone: root.tone
           text: !TimerService.active ? "Start" : TimerService.paused ? "Resume" : "Pause"
           onClicked: TimerService.active ? TimerService.togglePause() : TimerService.startStopwatch()
         }

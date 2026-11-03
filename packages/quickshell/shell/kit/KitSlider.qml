@@ -42,7 +42,7 @@ Item {
   readonly property bool flat: splitPlate || (plate && !m3)
   readonly property real plateGap: splitPlate && shown > 0 && shown < 1 ? 8 : 0
   readonly property real plateEdge: shown * (width - plateGap)
-  readonly property real track: 12            // Material: the track's height
+  readonly property real track: 16            // Material: the track's height
   readonly property real gap: 5               // Material: the space on each side of the handle
   readonly property real handleX: shown * (width - knobSize)
 

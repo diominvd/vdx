@@ -4,7 +4,7 @@ import qs.kit
 
 // Power off, reboot, lock, hibernate, suspend as tiles. Lock and suspend act
 // at once; the rest ask once — the tile turns to "Sure?" for 3 s.
-// Keys: Left / Right, Enter.
+// Keys: Left / Right, Enter. Material: tonal tiles, an armed one tinted red.
 Item {
   id: root
 
@@ -48,12 +48,14 @@ Item {
 
         readonly property bool armed: root.armed === modelData.id
         readonly property bool lit: armed || area.containsMouse || root.current === index
+        readonly property bool danger: armed && modelData.id !== "lock"
 
         width: 78
         height: 64
         radius: Theme.radiusCard
-        color: armed ? Theme.background3 : lit ? Theme.background2 : Theme.background1
-        border.width: root.current === index ? Theme.frameWidth : 0
+        color: Theme.material ? (danger ? Theme.tonal(Theme.red, 0.24) : armed ? Theme.surfaceHighest : lit ? Theme.surfaceHigh : Theme.sectionFill)
+             : armed ? Theme.background3 : lit ? Theme.background2 : Theme.background1
+        border.width: root.current === index && !Theme.material ? Theme.frameWidth : 0
         border.color: Theme.gray
         Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
@@ -73,7 +75,7 @@ Item {
             text: tile.armed ? "Sure?" : tile.modelData.label
             font.pixelSize: Theme.fontSize - 2
             font.weight: tile.armed ? Font.ExtraBold : Theme.fontWeight
-            color: tile.lit ? Theme.foreground0 : Theme.foreground2
+            color: tile.danger && Theme.material ? Theme.red : tile.lit ? Theme.foreground0 : Theme.foreground2
           }
         }
 

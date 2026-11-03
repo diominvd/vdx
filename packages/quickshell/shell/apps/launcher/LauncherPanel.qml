@@ -115,8 +115,9 @@ KitFrame {
       model: root.items
       boundsBehavior: Flickable.StopAtBounds
 
+      // Material: rows are pills, the picked one tonal with its icon in a filled chip
       delegate: Rectangle {
-        radius: Theme.radiusControl
+        radius: Theme.material ? Theme.radiusFor(height) : Theme.radiusControl
         id: row
         required property var modelData
         required property int index
@@ -136,13 +137,23 @@ KitFrame {
           visible: source != ""
         }
 
+        Rectangle {
+          visible: Theme.material && !image.visible
+          x: 6
+          anchors.verticalCenter: parent.verticalCenter
+          width: 32
+          height: 32
+          radius: Theme.radiusFor(height)
+          color: row.selected ? Theme.primary : Theme.surfaceHighest
+        }
+
         KitIcon {
           x: 12
           anchors.verticalCenter: parent.verticalCenter
           visible: !image.visible
           name: row.modelData.icon ?? "app-window"
           size: 20
-          tint: row.selected ? Theme.foreground0 : Theme.foreground2
+          tint: Theme.material && row.selected ? Theme.inkOn(Theme.primary) : row.selected ? Theme.foreground0 : Theme.foreground2
         }
 
         Column {
@@ -191,6 +202,7 @@ KitFrame {
   KitLine {}
 
   KitText {
+    readonly property bool kitUnboxed: true     // the key hints stand under the list's section
     width: parent.width
     horizontalAlignment: Text.AlignRight
     color: Theme.muted

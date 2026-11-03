@@ -18,34 +18,45 @@ Item {
   property bool page: false
   readonly property bool large: page
   readonly property Item kitCaption: caption
+  readonly property bool isKitHeader: true       // KitFrame: stands on the surface, never in a section
+  // Material: the icon sits in a tonal circle of its colour
+  readonly property bool m3: Theme.material && !large
 
   readonly property bool stackedActions: page && actionRow.implicitWidth + 140 + Theme.gapMedium > width
   default property alias actions: actionRow.data
 
   width: parent ? parent.width : 0
-  implicitHeight: stackedActions ? caption.implicitHeight + Theme.gapMedium + actionRow.height : Math.max(caption.implicitHeight, actionRow.height)
+  implicitHeight: stackedActions ? caption.implicitHeight + Theme.gapMedium + actionRow.height : Math.max(caption.implicitHeight, actionRow.height, m3 && icon.visible ? icon.height : 0)
 
   Item {
     id: icon
     anchors { left: parent.left; verticalCenter: caption.verticalCenter }
     visible: !root.large
-    width: visible ? 30 : 0
-    height: 24
+    width: !visible ? 0 : root.m3 ? Theme.controlHeight : 30
+    height: root.m3 ? Theme.controlHeight : 24
+
+    Rectangle {
+      visible: root.m3
+      anchors.fill: parent
+      radius: Theme.radiusFor(height)
+      color: Theme.tonal(root.iconColor, 0.2)
+    }
 
     KitIcon {
       anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: root.m3 ? parent.horizontalCenter : undefined
       name: root.icon
       tint: root.iconColor
-      size: Theme.iconLarge
+      size: root.m3 ? Theme.iconLarge - 4 : Theme.iconLarge
     }
   }
 
   Column {
     id: caption
     // A shared header height must not leave unused space below the caption.
-    y: root.stackedActions ? 0 : Math.max(0, root.height - height)
+    y: root.stackedActions ? 0 : root.m3 ? (root.height - height) / 2 : Math.max(0, root.height - height)
     anchors {
-      left: icon.right; leftMargin: icon.visible ? Theme.gapMedium : 0
+      left: icon.right; leftMargin: icon.visible ? (root.m3 ? Theme.gapWide : Theme.gapMedium) : 0
       right: root.stackedActions ? parent.right : actionRow.left; rightMargin: !root.stackedActions && actionRow.width > 0 ? 10 : 0
     }
     spacing: root.large ? Theme.gapHair : 3

@@ -5,6 +5,7 @@ import qs.kit
 // One tile of the hub: a round icon (light when on, dark when off), the name, a
 // detail line and a chevron. Compact (four to a row): the icon over the name.
 // A click on the icon switches the thing; a click on the rest opens its popup.
+// Material: a tonal tile, an on one tinted with its colour and its icon filled in it.
 Rectangle {
   id: root
 
@@ -19,9 +20,14 @@ Rectangle {
   signal opened()
   signal context()                             // a right click: the options of what it shows
 
+  readonly property bool m3: Theme.material
+  readonly property color tone: Theme.accentFor("switches", Theme.foreground0)
+  readonly property bool lit: area.containsMouse && !discArea.containsMouse
+
   implicitHeight: compact ? 84 : 64
   radius: Theme.radiusCard
-  color: area.containsMouse && !discArea.containsMouse ? Theme.controlHover : Theme.controlFill
+  color: m3 ? (on ? Theme.tonal(tone, lit ? 0.28 : 0.22) : lit ? Theme.surfaceHigh : Theme.sectionFill)
+     : lit ? Theme.controlHover : Theme.controlFill
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }
   border.width: Theme.frameWidth
   border.color: Theme.controlLine
@@ -33,7 +39,9 @@ Rectangle {
     width: root.compact ? 34 : 40
     height: width
     radius: Theme.pill(height)
-    color: discArea.containsMouse
+    color: root.m3 ? (root.on ? (discArea.containsMouse ? Theme.mix(root.tone, Theme.inkOn(root.tone), 0.1) : root.tone)
+                              : discArea.containsMouse ? Theme.background3 : Theme.surfaceHighest)
+      : discArea.containsMouse
       ? (root.on ? Theme.accentFor("switches", Theme.foreground0) : Theme.background3)
       : root.on ? Theme.accentFor("switches", Theme.foreground1) : Theme.pickFill
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }
