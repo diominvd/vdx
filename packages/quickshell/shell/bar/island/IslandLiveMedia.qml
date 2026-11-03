@@ -27,6 +27,7 @@ Row {
     height: face.coverSize
     radius: face.badgeRadius
     color: Theme.background3
+    readonly property string liveEnd: "badge"      // IslandLiveFace.padFor
 
     Image {
       anchors.fill: parent

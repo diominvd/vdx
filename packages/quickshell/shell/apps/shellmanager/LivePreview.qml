@@ -1,4 +1,5 @@
 import QtQuick
+import qs.bar.island
 import qs.config
 import qs.kit
 
@@ -11,12 +12,18 @@ Rectangle {
   property string kind: ""
 
   implicitWidth: 190
-  implicitHeight: 36
+  implicitHeight: Theme.islandHeight
   radius: Math.min(Theme.barRadiusFor(height), Theme.islandRadius)
   color: Theme.background0
   border.width: Theme.islandFrameWidth
   border.color: Theme.background2
   clip: true
+  // a sample is at most this wide: samples are short on purpose, a longer one is cut
+
+  // the real chip's (IslandLive): its glyphs and capsules, concentric with it
+  readonly property int chipRadius: Math.max(0, Math.min(Theme.barRadiusFor(Theme.islandHeight), Theme.islandRadius) - 4)
+  readonly property int coverSize: Theme.islandHeight - 8 - 6
+  readonly property int badgeRadius: Math.max(0, chipRadius - 3)
 
   function wave(c) { return [0.3, 0.7, 0.45, 1, 0.55, 0.8, 0.35]; }
 
@@ -48,9 +55,9 @@ Rectangle {
     id: c_battery
     Row {
       spacing: Theme.gapMedium
-      // low battery
-      Rectangle { visible: root.kind === "battery"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.red; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "battery"; text: "9% · 14m"; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "battery-2"; tint: Theme.red }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Battery"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
+      LiveCap { text: "9%"; tint: Theme.red; size: root.coverSize; corner: root.badgeRadius; solid: true }
     }
   }
 
@@ -58,9 +65,9 @@ Rectangle {
     id: c_bluetooth
     Row {
       spacing: Theme.gapMedium
-      // a device connected
-      Rectangle { visible: root.kind === "bluetooth"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.green; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "bluetooth"; text: "AirPods 80"; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "bluetooth"; tint: Theme.blue }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "AirPods"; color: Theme.foreground1 }
+      LiveCap { text: "80%"; tint: Theme.blue; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
     }
   }
 
@@ -133,10 +140,10 @@ Rectangle {
     id: c_vpn
     Row {
       spacing: Theme.gapMedium
-      // vpn
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "vpn"; text: "VPN"; font.pixelSize: Theme.fontSize - 3; font.letterSpacing: 1 }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "vpn"; text: "Finland"; font.pixelSize: Theme.fontSize - 1 }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "vpn"; text: "483"; color: Theme.foreground2; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { visible: Theme.material; size: root.coverSize; corner: root.badgeRadius; name: "shield"; tint: Theme.green }
+      KitText { anchors.verticalCenter: parent.verticalCenter; visible: !Theme.material; text: "VPN"; color: Theme.foreground1; font.letterSpacing: 1 }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Finland"; color: Theme.material ? Theme.foreground1 : Theme.foreground2; font.weight: Theme.material ? Font.Medium : Font.Normal }
+      LiveCap { text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48"; plainTint: Theme.muted; plainBold: false }
     }
   }
 
@@ -144,9 +151,9 @@ Rectangle {
     id: c_timer
     Row {
       spacing: Theme.gapMedium
-      // timer
-      KitIcon { visible: root.kind === "timer"; glowTarget: "live"; anchors.verticalCenter: parent.verticalCenter; name: "clock"; size: 16; tint: Theme.orange }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "timer"; text: "13:12"; color: Theme.orange; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "clock"; tint: Theme.orange }
+      KitText { anchors.verticalCenter: parent.verticalCenter; visible: Theme.material; text: "Timer"; color: Theme.foreground1; font.weight: Font.Medium }
+      LiveCap { text: "13:12"; tint: Theme.orange; size: root.coverSize; corner: root.badgeRadius }
     }
   }
 
@@ -154,9 +161,19 @@ Rectangle {
     id: c_radio
     Row {
       spacing: Theme.gapMedium
-      // radio
-      Rectangle { visible: root.kind === "radio"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.yellow; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "radio"; text: "Love Radio"; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "radio"; tint: Theme.yellow }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Love Radio"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
+      LiveCap {
+        text: ""; tint: Theme.yellow; size: root.coverSize; corner: root.badgeRadius; width: Theme.material ? 40 : 0; visible: Theme.material
+        Row { anchors.centerIn: parent; spacing: Theme.gapTight
+          Repeater { model: [0.45, 1, 0.65, 0.85]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.yellow } } }
+      }
+      Row {
+        visible: !Theme.material
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: Theme.gapTight
+        Repeater { model: [0.45, 1, 0.65, 0.85]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.yellow } }
+      }
     }
   }
 
@@ -164,9 +181,8 @@ Rectangle {
     id: c_focus
     Row {
       spacing: Theme.gapMedium
-      // focus
-      KitIcon { visible: root.kind === "focus"; glowTarget: "live"; anchors.verticalCenter: parent.verticalCenter; name: "moon"; size: 16; tint: Theme.purple }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "focus"; text: "Focus"; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "moon"; tint: Theme.purple }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: Theme.material ? "Focus on" : "Focus"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
     }
   }
 
@@ -208,15 +224,16 @@ Rectangle {
     id: c_volume
     Row {
       spacing: Theme.gapMedium
-      // volume and brightness
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "volume"; text: "VOL"; font.pixelSize: Theme.fontSize - 3; font.letterSpacing: 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "volume"; tint: Theme.foreground2 }
+      Rectangle { visible: Theme.material; anchors.verticalCenter: parent.verticalCenter; width: 70; height: 6; radius: Theme.pill(height); color: Theme.background3
+        Rectangle { width: parent.width * 0.62; height: parent.height; radius: parent.radius; color: Theme.foreground1 } }
       Row {
-        visible: root.kind === "volume"
+        visible: !Theme.material
         anchors.verticalCenter: parent.verticalCenter
         spacing: 3
         Repeater { model: 14; Rectangle { required property int index; width: 2; height: 14; radius: Theme.pill(height); color: index < 9 ? Theme.foreground1 : Theme.background3 } }
       }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "volume"; text: "62"; font.pixelSize: Theme.fontSize - 1 }
+      LiveCap { text: "62"; tint: Theme.foreground1; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
     }
   }
 
@@ -224,9 +241,8 @@ Rectangle {
     id: c_mic
     Row {
       spacing: Theme.gapMedium
-      // microphone
-      KitIcon { visible: root.kind === "mic"; glowTarget: "live"; name: "mic-off"; size: 13; tint: Theme.red; anchors.verticalCenter: parent.verticalCenter }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "mic"; text: "Muted"; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "mic-off"; tint: Theme.red }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Muted"; color: Theme.foreground1 }
     }
   }
 
@@ -245,15 +261,10 @@ Rectangle {
     id: c_plugged
     Row {
       spacing: Theme.gapMedium
-      // the cable
-      KitIcon { visible: root.kind === "plugged"; glowTarget: "live"; name: "zap"; size: 12; tint: Theme.green; anchors.verticalCenter: parent.verticalCenter }
-      Rectangle {
-        visible: root.kind === "plugged"
-        anchors.verticalCenter: parent.verticalCenter
-        width: 70; height: 3; radius: Theme.pill(height); color: Theme.background3
-        Rectangle { width: parent.width * 0.52; height: parent.height; radius: Theme.pill(height); color: Theme.green; KitGlow { z: -1; anchors.fill: parent; target: "live"; tint: parent.color; radius: parent.radius } }
-      }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "plugged"; text: "52"; color: Theme.green; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "zap"; tint: Theme.green }
+      Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 70; height: Theme.material ? 6 : 4; radius: Theme.pill(height); color: Theme.background3
+        Rectangle { width: parent.width * 0.52; height: parent.height; radius: parent.radius; color: Theme.green } }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "52"; color: Theme.green }
     }
   }
 }

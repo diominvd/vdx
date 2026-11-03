@@ -26,6 +26,7 @@ Row {
     width: face.coverSize
     height: face.coverSize
     radius: face.badgeRadius
+    readonly property string liveEnd: "badge"      // IslandLiveFace.padFor
     readonly property color tone: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.appColour(IslandService.noticeItem?.app)
     color: Theme.mix(Theme.background0, tone, 0.22)
     readonly property string appIcon: Hypr.iconOfApp(IslandService.noticeItem?.desktop, IslandService.noticeItem?.app)

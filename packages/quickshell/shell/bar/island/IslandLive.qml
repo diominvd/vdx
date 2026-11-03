@@ -33,31 +33,28 @@ Item {
   readonly property int chipRadius: Math.max(0, Math.min(Theme.barRadiusFor(Theme.islandHeight), Theme.islandRadius) - edge)
   readonly property int coverSize: chipHeight - 2 * inset
   readonly property int badgeRadius: Math.max(0, chipRadius - inset)
-  // Keep the activity content equally inset from both sides, including covers
-  // and avatars. The badge's own size and the inter-item gap set its position.
-  readonly property int padLeft: Theme.gapLoose
-  readonly property int padRight: Theme.gapLoose
+  // the chip's side paddings come from the face, by what stands at its ends
+  // (IslandLiveFace.leadPad / trailPad): the same optical gap as above and below
+  readonly property Item sizedFace: sliding ? backFace : frontFace
   // the slot's width is moving: the island follows it as it goes, without a glide of its own
   readonly property bool moving: targetAnim.running
-  implicitWidth: kind === "" ? 0 : target + padLeft + padRight
+  implicitWidth: kind === "" ? 0 : target
   implicitHeight: Theme.islandHeight
   width: implicitWidth
   height: implicitHeight
   visible: kind !== "" || opacity > 0
   opacity: kind === "" ? 0 : 1
   Behavior on opacity { enabled: Motion.island; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
-  property real target: (sliding ? backFace : frontFace).implicitWidth
+  property real target: sizedFace.implicitWidth + sizedFace.leadPad + sizedFace.trailPad
   Behavior on target { enabled: Motion.island; NumberAnimation { id: targetAnim; duration: Motion.normal; easing.type: Motion.easing } }
 
   function place() {
     const dir = IslandService.liveDirection(root.screen);
     if (!sliding) {
-      frontFace.x = padLeft;
       frontFace.anchors.verticalCenterOffset = 0; frontFace.opacity = 1;
       backFace.opacity = 0;
       return;
     }
-    frontFace.x = padLeft; backFace.x = padLeft;
     frontFace.anchors.verticalCenterOffset = -dir * travel * t; frontFace.opacity = 1 - t;
     backFace.anchors.verticalCenterOffset = dir * travel * (1 - t); backFace.opacity = t;
   }
@@ -103,8 +100,8 @@ Item {
     color: Theme.background2
   }
 
-  IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; inputEnabled: !root.sliding && !root.moving }
-  IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius; inputEnabled: !root.sliding && !root.moving }
+  IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; inputEnabled: !root.sliding && !root.moving }
+  IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; inputEnabled: !root.sliding && !root.moving }
 
   Component.onCompleted: { faceA.kind = kind; place(); }
 

@@ -14,6 +14,7 @@ Row {
   property string kind: ""
   property bool inputEnabled: true
   property int coverSize: 18
+  property int badgeRadius: 4
   spacing: Theme.gapMedium
   visible: kind !== ""
 
@@ -45,7 +46,7 @@ Row {
     height: 16
     active: !CaptureService.paused
   }
-  // round buttons, the chip's height less its inset: pause (dim) and stop (red)
+  // buttons, the chip's height less its inset and concentric with it: pause (dim) and stop (red)
   Repeater {
     model: face.kind === "recording" && CaptureService.recording ? [{ stop: false }, { stop: true }] : []
     Rectangle {
@@ -55,7 +56,8 @@ Row {
       anchors.verticalCenter: parent.verticalCenter
       width: face.coverSize
       height: face.coverSize
-      radius: Theme.pill(height)
+      radius: face.badgeRadius
+      readonly property string liveEnd: "badge"    // IslandLiveFace.padFor
       color: stop ? Theme.red : Theme.background3
       opacity: area.containsMouse ? 0.85 : 1
       Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
@@ -105,7 +107,7 @@ Row {
     value: PackagesService.stagePercent
     tint: Theme.blue
   }
-  KitText { visible: face.updateBar; anchors.verticalCenter: parent.verticalCenter; width: 34; horizontalAlignment: Text.AlignLeft; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
+  KitText { visible: face.updateBar; anchors.verticalCenter: parent.verticalCenter; width: 34; horizontalAlignment: Text.AlignRight; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
     visible: face.kind === "update" && !face.updateBar
     anchors.verticalCenter: parent.verticalCenter
@@ -129,7 +131,7 @@ Row {
     visible: face.kind === "backup"
     anchors.verticalCenter: parent.verticalCenter
     width: BackupService.status === "" ? 34 : 50
-    horizontalAlignment: Text.AlignLeft
+    horizontalAlignment: Text.AlignRight   // fixed width against jitter; the ink keeps to the chip's side
     text: BackupService.status === "error" ? "Failed" : BackupService.status === "ok" ? "Done" : Math.max(0, Math.round(BackupService.progress)) + "%"
     color: BackupService.status === "error" ? Theme.red : BackupService.status === "ok" ? Theme.green : Theme.foreground2
   }
