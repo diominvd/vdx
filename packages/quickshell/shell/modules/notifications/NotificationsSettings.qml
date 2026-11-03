@@ -26,7 +26,7 @@ KitColumn {
   // arrives in the strip, in card mode and with the live activities off
   KitOptionRow {
     needs: !Theme.island || ModuleSettings.get("notifications", "appear", "card") === "card" || !ShellSettings.liveEnabled
-           ? "" : "Cards only: a live line has its own time in Bar › Live"
+           ? "" : "Live lines: set in Bar › Live"
     module: "notifications"; key: "toastSeconds"; fallback: 5
     label: "Card stays for"; hint: "Stay: until closed; urgent ones always stay"
     model: [{ label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }, { label: "Stay", value: 0 }]

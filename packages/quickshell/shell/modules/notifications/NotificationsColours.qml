@@ -10,15 +10,23 @@ Column {
   id: root
 
   readonly property var rules: ModuleSettings.get("notifications", "appColours", []) ?? []
-  // apps in the history with no rule yet: a click makes the rule
-  readonly property var seen: {
+  readonly property KitSeen known: KitSeen {}
+
+  // every app that has notified since the shell started: the names a rule has to fit
+  readonly property var heard: {
     const out = [];
     for (const n of NotificationsService.items)
       if (n.app !== "" && !out.includes(n.app)) out.push(n.app);
-    return out.filter(a => !rules.some(r => (r.app ?? "") !== "" && a.toLowerCase().includes(r.app.toLowerCase()))).slice(0, 6);
+    return out;
   }
 
+  // the heard apps no rule covers yet
+  readonly property var unruled: heard.filter(a => !rules.some(r => (r.app ?? "") !== "" && a.toLowerCase().includes(r.app.toLowerCase())))
+
   function save(list) { ModuleSettings.set("notifications", "appColours", list); }
+
+  // a rule left without a name (the window closed while it was typed) is dropped when the page opens
+  Component.onCompleted: if (rules.some(r => (r.app ?? "") === "")) save(rules.filter(r => (r.app ?? "") !== ""))
   function add(app) {
     const next = Theme.autoColourName(app);
     save(rules.concat([{ app: app, colour: app === "" ? Theme.appPalette[rules.length % Theme.appPalette.length] : next }]));
@@ -28,87 +36,134 @@ Column {
 
   KitLabel { text: "APP COLOURS"; about: "Each app's avatar has its own colour; a rule picks yours" }
 
-  KitRow {
-    label: "Add a rule"
-    hint: "A piece of the name; the first match wins"
-    KitButton { icon: "plus"; text: "Add rule"; onClicked: root.add("") }
-  }
+  // one row that unfolds, as in Live activities: the rules and the way to add one are its options
+  KitReorderList {
+    id: fold
+    width: root.width
+    keys: ["colours"]
+    rowHeight: Theme.rowHeight
+    bodyGap: Theme.settingsRowInset
 
-  // the apps seen lately, one click each
-  Item {
-    visible: root.seen.length > 0
-    width: parent.width
-    height: visible ? Math.max(Theme.rowHeight, chips.implicitHeight + 12) : 0
+    delegate: KitFoldRow {
+      id: row
+      label: "Avatar colours"
+      hint: root.rules.length === 0 ? "Every app gets its own colour" : root.rules.length + (root.rules.length === 1 ? " rule" : " rules") + " · give an app's avatar a colour"
+      draggable: false
+      hasSwitch: false
+      flush: true
+      checked: true
+      foldable: true
 
-    KitText {
-      id: fromHistory
-      anchors { left: parent.left; verticalCenter: parent.verticalCenter }
-      text: "From history"
-      color: Theme.foreground2
-      font.pixelSize: Theme.fontSize - 1
-    }
-    Flow {
-      id: chips
-      anchors { left: fromHistory.right; leftMargin: Theme.gapWide; right: parent.right; verticalCenter: parent.verticalCenter }
-      spacing: Theme.gapSmall
       Repeater {
-        model: root.seen
-        KitButton { required property string modelData; text: modelData; onClicked: root.add(modelData) }
-      }
-    }
-  }
+        model: root.rules.length
 
-  // a rule: the app's name (a piece of it), its colour, away
-  Repeater {
-    model: root.rules.length
+        Item {
+          id: rule
+          required property int index
+          readonly property var rl: root.rules[index] ?? ({ app: "", colour: "blue" })
 
-    Item {
-      id: rule
-      required property int index
-      readonly property var rl: root.rules[index] ?? ({ app: "", colour: "blue" })
+          width: parent ? parent.width : 0
+          readonly property int base: Theme.rowHeight
+          // the hairline between two options and the gap under it: the list's gap above is the other half
+          readonly property int lead: index > 0 ? Theme.dividerThickness + Theme.settingsRowInset : 0
+          height: lead + base
+          KitAppear { target: rule; seen: root.known; key: "rule" + rule.index }
 
-      width: root.width
-      height: Theme.rowHeight + 8
+          Rectangle {
+            visible: rule.index > 0
+            width: parent.width
+            height: Theme.dividerThickness
+            color: Theme.dividerColor
+          }
 
-      // the avatar as the rule will draw it
-      Rectangle {
-        id: sample
-        anchors { left: parent.left; verticalCenter: parent.verticalCenter }
-        width: 28
-        height: 28
-        radius: Theme.radiusFor(height)
-        color: Theme.mix(Theme.background0, Theme.paletteColour(rule.rl.colour), 0.22)
-        KitText {
-          anchors.centerIn: parent
-          text: (rule.rl.app || "?").slice(0, 1).toUpperCase()
-          color: Theme.paletteColour(rule.rl.colour)
-          font.weight: Font.Medium
+          Item { id: line; y: rule.lead; width: parent.width; height: rule.base }
+
+          Rectangle {
+            id: sample
+            anchors { left: parent.left; verticalCenter: line.verticalCenter }
+            width: 28
+            height: 28
+            radius: Theme.radiusFor(height)
+            color: Theme.mix(Theme.background0, Theme.paletteColour(rule.rl.colour), 0.22)
+            KitText {
+              anchors.centerIn: parent
+              text: (rule.rl.app || "?").slice(0, 1).toUpperCase()
+              color: Theme.paletteColour(rule.rl.colour)
+              font.weight: Font.Medium
+            }
+          }
+
+          // the name: the app as its notifications call it; a rule for another app is typed once, kept
+          // in the field until Enter or leaving it (a rule saved per letter would swap the field for text)
+          Item {
+            id: field
+            property bool typing: rule.rl.app === ""
+            anchors { left: sample.right; leftMargin: Theme.gapWide; verticalCenter: line.verticalCenter }
+            width: Math.max(110, rule.width * 0.28)
+            height: Theme.controlHeight
+
+            function commit() {
+              if (!typing) return;
+              const name = typer.text.trim();
+              if (name === "") root.remove(rule.index);
+              else { typing = false; root.edit(rule.index, { app: name }); }
+            }
+
+            KitText {
+              visible: !field.typing
+              anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
+              text: rule.rl.app
+              elide: Text.ElideRight
+            }
+            KitInput {
+              id: typer
+              visible: field.typing
+              anchors.fill: parent
+              placeholder: "App name"
+              Component.onCompleted: if (field.typing) input.forceActiveFocus()
+              onAccepted: field.commit()
+              input.onActiveFocusChanged: if (!input.activeFocus) field.commit()
+            }
+          }
+
+          KitButton {
+            id: away
+            anchors { right: parent.right; verticalCenter: line.verticalCenter }
+            icon: "x"
+            Accessible.name: "Remove the rule"
+            onClicked: root.remove(rule.index)
+          }
+
+          KitColourRow {
+            anchors { left: field.right; leftMargin: Theme.gapWide; right: away.left; rightMargin: Theme.gapWide; verticalCenter: line.verticalCenter }
+            always: true
+            names: Theme.colourSet
+            picked: rule.rl.colour
+            colours: name => [Theme.paletteColour(name), Theme.paletteColour(name)]
+            onChosen: value => root.edit(rule.index, { colour: value })
+          }
         }
       }
 
-      KitInput {
-        id: field
-        anchors { left: sample.right; leftMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
-        width: Math.max(120, parent.width * 0.34)
-        placeholder: "App name"
-        text: rule.rl.app
-        onTextEdited: root.edit(rule.index, { app: text })
+      Rectangle { visible: root.rules.length > 0; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+      // an app that has notified (its name is exact), or another one typed by hand; with nobody
+      // to pick from the list would hold one choice, so a button says it
+      KitRow {
+        visible: root.unruled.length === 0
+        label: "Add a rule"
+        hint: "A piece of the name; the first match wins"
+        KitButton { icon: "plus"; text: "Add rule"; onClicked: root.add("") }
       }
 
-      KitButton {
-        id: away
-        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-        icon: "x"
-        Accessible.name: "Remove the rule"
-        onClicked: root.remove(rule.index)
-      }
-
-      KitSwatches {
-        anchors { right: away.left; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
-        model: Theme.colourSet
-        picked: rule.rl.colour
-        colours: name => [Theme.paletteColour(name), Theme.paletteColour(name)]
-        onChosen: name => root.edit(rule.index, { colour: name })
+      KitSelect {
+        visible: root.unruled.length > 0
+        label: "Add a rule"
+        hint: "An app that has notified, or another by name"
+        placeholder: "Choose an app…"
+        model: root.unruled.map(a => ({ label: a, value: a })).concat([{ label: "Another app…", value: "" }])
+        current: "\u0000"
+        onPicked: value => root.add(value)
       }
     }
   }

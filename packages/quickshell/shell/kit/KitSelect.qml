@@ -15,6 +15,7 @@ Column {
 
   property string label: ""
   property string hint: ""
+  property string placeholder: "—"         // shown while no choice is current
   property color hintColor: Theme.muted
   property var model: []
   property var current: null
@@ -44,7 +45,7 @@ Column {
   // gap). It never grows past the standard width: a long choice elides in the box.
   // In a narrow row (KitRow's rule: Theme.rowStackBelow) the box goes under the text at the
   // standard width, as a wide KitRow's control does.
-  readonly property bool stacked: width < Theme.rowStackBelow
+  readonly property bool stacked: width < Theme.rowStackBelow && (label !== "" || hint !== "")   // a box alone has nothing to stack
   readonly property int stackPad: Math.round((Theme.rowHeight - Theme.controlHeight) / 2)
   property real boxWidth: stacked ? Math.min(width, Theme.controlWidth)
     : Math.min(width, Math.max(Math.min(choiceWidth, Theme.controlWidth),
@@ -156,7 +157,7 @@ Column {
 
       KitText {
         anchors { left: parent.left; leftMargin: Theme.gapLoose; right: mark.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
-        text: root.selected?.label ?? "—"
+        text: root.selected?.label ?? root.placeholder
         elide: Text.ElideRight
       }
 

@@ -13,7 +13,8 @@ Item {
 
   property var keys: []
   property Component delegate: null
-  readonly property int rowHeight: 52
+  property int rowHeight: 52                   // Theme.rowHeight for a list of plain rows; 52 holds a 40 px preview
+  property int bodyGap: 0                      // between a row and its unfolded options (a list of plain rows needs its inset)
   readonly property int gap: 2 * Theme.settingsRowInset    // between two rows: a hairline in the middle
   property string open: ""
   property bool settling: false                // a row is gliding to its slot: its y is animated

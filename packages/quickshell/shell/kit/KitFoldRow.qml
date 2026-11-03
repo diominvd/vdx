@@ -20,6 +20,7 @@ Item {
   property bool switchEnabled: true
   property string tag: ""                      // text in place of the switch (a block that cannot be turned off)
   property bool draggable: true
+  property bool hasSwitch: true               // false: a row that only unfolds (an arrow, no switch)
   property bool foldable: false
   property Component leading: null
   signal toggled()
@@ -32,14 +33,16 @@ Item {
     return null;
   }
   readonly property int rowHeight: list ? list.rowHeight : 52
+  readonly property int bodyGap: list ? list.bodyGap : 0
   readonly property bool unfolded: list !== null && list.open === key && foldable && checked
   readonly property bool dragging: grip.held
   property real slotY: 0                       // where the list puts it
   property real dragY: 0                       // where the pointer holds it
-  readonly property real indent: 12 + Theme.gapWide   // the handle's column: the name and the options start here
+  property bool flush: false                   // no handle column: the name and the options start at the left edge
+  readonly property real indent: flush ? 0 : 12 + Theme.gapWide   // the handle's column: the name and the options start here
 
   width: parent ? parent.width : 0
-  height: rowHeight + (unfolded ? fold.bodyHeight : 0)
+  height: rowHeight + (unfolded ? bodyGap + fold.bodyHeight : 0)
   z: dragging ? 5 : 0
   onHeightChanged: if (list) list.relayout()
 
@@ -139,7 +142,7 @@ Item {
   KitIcon {
     id: more
     visible: root.foldable && root.checked && root.list !== null
-    anchors { right: sw.visible ? sw.left : parent.right; rightMargin: Theme.gapWide; top: parent.top; topMargin: (root.rowHeight - height) / 2 }
+    anchors { right: sw.visible ? sw.left : parent.right; rightMargin: sw.visible ? Theme.gapWide : 0; top: parent.top; topMargin: (root.rowHeight - height) / 2 }
     name: "chevron-down"
     size: Theme.iconSmall
     tint: root.unfolded ? Theme.foreground0 : Theme.foreground2
@@ -159,7 +162,7 @@ Item {
 
   KitSwitch {
     id: sw
-    visible: root.tag === ""
+    visible: root.tag === "" && root.hasSwitch
     anchors { right: parent.right; top: parent.top; topMargin: (root.rowHeight - height) / 2 }
     checked: root.checked
     enabled: root.switchEnabled
@@ -172,8 +175,8 @@ Item {
   Item {
     id: fold
     readonly property real bodyHeight: body.implicitHeight
-    anchors { left: parent.left; leftMargin: root.indent; right: parent.right; top: parent.top; topMargin: root.rowHeight }
-    height: Math.max(0, root.height - root.rowHeight)
+    anchors { left: parent.left; leftMargin: root.indent; right: parent.right; top: parent.top; topMargin: root.rowHeight + root.bodyGap }
+    height: Math.max(0, root.height - root.rowHeight - root.bodyGap)
     clip: true
     opacity: root.unfolded ? 1 : 0
     Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }

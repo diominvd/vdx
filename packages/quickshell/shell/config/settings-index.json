@@ -1501,6 +1501,12 @@
   "target": "notifications"
  },
  {
+  "label": "Avatar colours",
+  "hint": "",
+  "where": "Notifications › APP COLOURS",
+  "target": "notifications"
+ },
+ {
   "label": "Add a rule",
   "hint": "A piece of the name; the first match wins",
   "where": "Notifications › APP COLOURS",
