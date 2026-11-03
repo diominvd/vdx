@@ -31,7 +31,7 @@ KitFrame {
   KitHeader {
     icon: "activity"
     title: "Task Manager"
-    subtitle: root.tm.procs.length + " PROCESSES · " + (root.tm.group ? "BY PROGRAM" : "EACH PROCESS")
+    subtitle: Format.count(root.tm.procs.length, "PROCESS", "PROCESSES") + " · " + (root.tm.group ? "BY PROGRAM" : "EACH PROCESS")
 
     KitButton {
       icon: "external"

@@ -105,7 +105,7 @@ KitColumn {
   KitLine {}
 
   // ---- connected devices: one row each ----
-  KitLabel { id: connectedGroup; visible: root.connected.length > 0; text: "CONNECTED"; value: root.connected.length + " DEVICES" }
+  KitLabel { id: connectedGroup; visible: root.connected.length > 0; text: "CONNECTED"; value: Format.count(root.connected.length, "DEVICE") }
 
   Repeater {
     model: root.connected
@@ -129,7 +129,7 @@ KitColumn {
   KitLine { visible: root.connected.length > 0 }
 
   // ---- paired devices ----
-  KitLabel { id: pairedGroup; text: "PAIRED"; value: root.owned.length + " DEVICES" }
+  KitLabel { id: pairedGroup; text: "PAIRED"; value: Format.count(root.owned.length, "DEVICE") }
 
   KitEmptyState {
     visible: root.owned.length === 0

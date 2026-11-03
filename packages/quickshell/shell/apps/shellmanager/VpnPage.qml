@@ -40,7 +40,7 @@ KitColumn {
   KitGrouper {}
 
   // ---- subscription ----
-  KitLabel { id: subscriptionGroup; text: "SUBSCRIPTION"; value: root.listed ? vpn.nodes.length + " SERVERS" : "" }
+  KitLabel { id: subscriptionGroup; text: "SUBSCRIPTION"; value: root.listed ? Format.count(vpn.nodes.length, "SERVER") : "" }
 
   KitText {
     visible: !root.listed

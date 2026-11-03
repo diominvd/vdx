@@ -15,7 +15,7 @@ KitFrame {
   KitHeader {
     icon: "folder"
     title: "Folder"
-    subtitle: root.ids.length + (root.ids.length === 1 ? " MODULE" : " MODULES")
+    subtitle: Format.count(root.ids.length, "MODULE")
   }
 
   KitLine {}

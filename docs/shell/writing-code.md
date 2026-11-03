@@ -33,6 +33,7 @@ This file is the recipes: copy the nearest existing file, then run the checklist
 | `font.pixelSize: 13` | `Theme.fontSize ± n` (display figures excepted, see design.md) |
 | hex colour | a `Theme.*` role; semantic: `Theme.red`, `green`, `muted`, `foreground0` |
 | `duration: 150` | `Motion.quick` / `normal` / `slow`, `enabled: Motion.<part>` |
+| `n + " DEVICES"` | `Format.count(n, "DEVICE")` (one noun, the `s` in its case; `many` for irregular ones) |
 | control height `34` | `Theme.controlHeight`, `rowHeight`, `navigationHeight` |
 
 A value used once, and no one else would want, may stay a literal. A hex that is

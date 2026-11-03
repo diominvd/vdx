@@ -72,7 +72,7 @@ KitFrame {
     visible: !root.bare
     icon: "image"
     title: "Wallpapers"
-    subtitle: (WallpaperService.inUse.split("/").pop() || "—").toUpperCase() + " · " + WallpaperService.pictures.length + " PICTURES"
+    subtitle: (WallpaperService.inUse.split("/").pop() || "—").toUpperCase() + " · " + Format.count(WallpaperService.pictures.length, "PICTURE")
 
     // the view, switched here and kept (Modules › Wallpapers too)
     Row {

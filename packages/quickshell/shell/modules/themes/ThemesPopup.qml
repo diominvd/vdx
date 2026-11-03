@@ -75,7 +75,7 @@ KitFrame {
     visible: !root.bare
     icon: "palette"
     title: "Themes"
-    subtitle: (ThemeService.current || "—").toUpperCase() + " · " + ThemeService.inMode.length + " THEMES"
+    subtitle: (ThemeService.current || "—").toUpperCase() + " · " + Format.count(ThemeService.inMode.length, "THEME")
 
     // the view, switched here and kept (Modules › Themes too)
     Row {

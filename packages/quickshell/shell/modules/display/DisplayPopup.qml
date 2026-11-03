@@ -19,7 +19,7 @@ KitFrame {
   KitHeader {
     icon: "monitor"
     title: "Display"
-    subtitle: ds.monitors.length + (ds.monitors.length === 1 ? " MONITOR" : " MONITORS")
+    subtitle: Format.count(ds.monitors.length, "MONITOR")
         + " · TEXT " + root.pct(ds.textFactor)
   }
 

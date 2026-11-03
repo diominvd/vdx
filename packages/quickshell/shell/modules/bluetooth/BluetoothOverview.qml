@@ -26,7 +26,7 @@ Column {
     KitBadge {
       anchors.verticalCenter: parent.verticalCenter
       visible: BluetoothService.powered
-      text: BluetoothService.devices.length + (BluetoothService.devices.length === 1 ? " DEVICE" : " DEVICES")
+      text: Format.count(BluetoothService.devices.length, "DEVICE")
       tint: Theme.muted
     }
 

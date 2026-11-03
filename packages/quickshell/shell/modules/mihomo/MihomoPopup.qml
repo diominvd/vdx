@@ -28,7 +28,7 @@ KitFrame {
     KitBadge {
       anchors.verticalCenter: parent.verticalCenter
       visible: MihomoService.serviceOn && MihomoService.nodes.length > 0
-      text: MihomoService.nodes.length + " SERVERS"
+      text: Format.count(MihomoService.nodes.length, "SERVER")
     }
 
     KitSwitch {

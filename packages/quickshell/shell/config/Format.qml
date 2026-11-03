@@ -12,6 +12,13 @@ Singleton {
     return (bytes / 1073741824).toFixed(2) + " GB/s";
   }
 
+  // A count with its noun: count(1, "DEVICE") is "1 DEVICE", count(3, "DEVICE") "3 DEVICES"
+  // (an "s" in the noun's case); `many` for an irregular one: count(2, "PROCESS", "PROCESSES").
+  function count(n, one, many) {
+    if (n === 1) return n + " " + one;
+    return n + " " + (many ?? one + (one === one.toUpperCase() ? "S" : "s"));
+  }
+
   // Large counts: 812, 47.1k, 176.9M.
   function humanCount(n) {
     if (n < 1000) return String(Math.round(n));
