@@ -13,6 +13,7 @@ JsonAdapter {
   property string managerTab: "appearance"
   property string font: "JetBrainsMono Nerd Font"
   property int textSize: 13
+  property string density: "compact"
   property string inputAlign: "auto"
   property string underlineAnimation: "none"
   property string wallpaperMode: "theme"

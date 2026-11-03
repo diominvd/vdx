@@ -17,7 +17,7 @@ uses tonal layers and more spacious controls.
   rows, checkboxes), `Theme.pill(h)` / `radiusFor(h)` (tracks, knobs, switches, the
   resting island); all 0 when sharp. One slider (R) sets them all in proportion:
   surface R, card 0.6 R, a thing h high h × R / 48 (pills only at the top stop).
-  Separately: a slider per part (windows, cards, controls, the bar), each R read the
+  Separately: a slider per part (windows, cards, controls, the bar, the hub), each R read the
   same way (`Theme.cornerOf(part)`), so one tick looks alike on every part; the
   one slider hides while they show.
   No literal `height / 2` for a corner.
@@ -45,7 +45,8 @@ uses tonal layers and more spacious controls.
 
 - Spacing: the gaps and edge insets are `Theme.gapHair` (4), `gapTight` (2),
   `gapSmall` (6), `gapMedium` (8), `gapLoose` (10), `gapWide` (12) and `gapGroup`
-  (14); a value that is used once stays a literal.
+  (14), at Regular density; Fonts › Density (Compact 0.8 ×, Regular, Airy 1.2 ×; default Compact)
+  scales them with `rowHeight`, `controlHeight` and the paddings (`Theme.aired`); a value that is used once stays a literal.
 - MUST — dividers: use `KitLine`, horizontally or with `vertical: true`.
   The stroke is `Theme.dividerThickness` (1 px), in `Theme.dividerColor`
   (`outlineVariant`) in both styles. The line owns no margins. A surrounding

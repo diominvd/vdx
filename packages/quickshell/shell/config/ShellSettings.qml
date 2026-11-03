@@ -18,6 +18,7 @@ Singleton {
   readonly property string managerTab: state.managerTab            // the page it was left on
   readonly property string font: state.font                       // family, kept in step with fontconfig
   readonly property int textSize: state.textSize                  // px, the shell's text (Theme.fontSize): 12 | 13 | 14 | 15
+  readonly property string density: state.density                 // compact | regular | airy: the air in gaps, rows and controls (Theme.air)
   readonly property string inputAlign: state.inputAlign           // auto | left | center: where the text stands in a field (auto: left, a password in the middle)
   readonly property string underlineAnimation: state.underlineAnimation  // none | grow | slide
   readonly property string wallpaperMode: state.wallpaperMode     // theme | custom | image
@@ -53,7 +54,7 @@ Singleton {
   readonly property string corners: state.corners                 // sharp | round: the whole shell's corners
   readonly property int cornerRadius: state.cornerRadius          // px, a popup's corner while round (Theme scales the rest)
   readonly property bool cornerSplit: state.cornerSplit            // each part on its own slider (cornerRadii)
-  readonly property var cornerRadii: state.cornerRadii              // part (windows | cards | controls | bar) -> its R, px
+  readonly property var cornerRadii: state.cornerRadii              // part (windows | cards | controls | bar | hub) -> its R, px
   readonly property string barStyle: state.barStyle               // solid | island: one strip, or one live island
   // the look of the bar, kept apart for each shape: switching solid <-> island brings its own back
   readonly property var looks: state.looks                        // shape -> { key: value }

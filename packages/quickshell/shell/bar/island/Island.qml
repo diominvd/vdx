@@ -141,7 +141,8 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     width: root.size[0]
     height: root.size[1]
-    radius: Math.min(Theme.barRadiusFor(height), Theme.islandRadius)
+    radius: root.shown === "hub" ? Math.min(Theme.scaled(height, Theme.cornerOf("hub")), Theme.hubRadius)
+      : Math.min(Theme.barRadiusFor(height), Theme.islandRadius)
     color: Theme.background0
     border.width: Theme.islandFrameWidth
     border.color: Theme.background2

@@ -6,7 +6,7 @@ import qs.kit
 // the whole shell — popups, windows, controls, rows, the island, the icons (the
 // Rounded set). Round sets one radius on a ticked slider; smaller things take a
 // share of it (Theme). Separately: a slider per part (windows, cards, controls,
-// the bar), each read in the same proportion. The group's label lives in AppearancePage.
+// the bar, the hub), each read in the same proportion. The group's label lives in AppearancePage.
 KitColumn {
   id: root
 
@@ -66,7 +66,8 @@ KitColumn {
       { part: "windows",  label: "Windows and popups", px: r => r },
       { part: "cards",    label: "Cards and boxes",    px: r => Math.round(r * 0.6) },
       { part: "controls", label: "Controls",           px: r => Theme.scaled(Theme.controlHeight, r) },
-      { part: "bar",      label: "Bar",                px: r => Theme.scaled(Theme.islandHeight, r) }
+      { part: "bar",      label: "Bar",                px: r => Theme.scaled(Theme.islandHeight, r) },
+      { part: "hub",      label: "Hub",                px: r => Math.round(r * 1.5) }
     ]
 
     KitSliderRow {

@@ -9,13 +9,13 @@ KitColumn {
   id: root
   readonly property string icon: "text"
   readonly property string title: "Fonts"
-  readonly property string description: "The shell's typeface and text size."
+  readonly property string description: "The shell's typeface, text size and density."
   readonly property var jumps: [
     { key: "preview", label: "Preview", y: previewLabel.y },
     { key: "families", label: "Families", y: familiesLabel.y },
     { key: "size", label: "Text size", y: sizeLabel.y }
   ]
-  readonly property var resetKeys: ["textSize", "inputAlign"]
+  readonly property var resetKeys: ["textSize", "density", "inputAlign"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
@@ -140,6 +140,10 @@ KitColumn {
   KitRow {
     wide: true; label: "Text size"; hint: "Shell text and controls"
     KitSegments { model: [12, 13, 14, 15].map(n => ({ label: n + " px", value: n })); current: ShellSettings.textSize; onPicked: value => ShellSettings.set("textSize", value) }
+  }
+  KitRow {
+    wide: true; label: "Density"; hint: "Air between and inside things"
+    KitSegments { model: [{ label: "Compact", value: "compact" }, { label: "Regular", value: "regular" }, { label: "Airy", value: "airy" }]; current: ShellSettings.density; onPicked: value => ShellSettings.set("density", value) }
   }
   KitRow {
     wide: true; label: "GTK apps text"; hint: "Applied at once, GTK only"

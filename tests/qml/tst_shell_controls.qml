@@ -637,7 +637,7 @@ Item {
     }
     function test_styles(data) {
       ShellSettings.material=data.material; ShellSettings.corners=data.corners;
-      compare(Theme.controlHeight, data.material ? 36 : 34);
+      compare(Theme.controlHeight, Theme.aired(data.material ? 36 : 34));
       compare(button.height, Theme.controlHeight);
       verify(Theme.contrast(Theme.onSurfaceVariant, Theme.surfaceHighest) >= 4.5);
       verify(Theme.contrast(Theme.inkOn(Theme.accent), Theme.accent) >= 4.5);
