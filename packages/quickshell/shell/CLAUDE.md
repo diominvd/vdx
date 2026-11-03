@@ -128,4 +128,6 @@ How to write a page, a module's options, a service, and the review checklist:
 - `Behavior` on a readonly property is not allowed.
 - A component whose root is `Behavior` does not load (`KitFade is not a type`) and takes the
   whole config down: a repeated `Behavior` stays written out.
+- A page a `Loader` makes is already visible: `onVisibleChanged` never sees its first show.
+  A page that loads data when shown adds `Component.onCompleted: visibleChanged()`.
 - A config error drops the whole bar — restart and read the log at once.

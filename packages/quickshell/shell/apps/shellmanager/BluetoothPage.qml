@@ -32,6 +32,8 @@ KitColumn {
 
   spacing: Theme.sectionGap
 
+  // the Loader makes the page already visible: the first show is not a change
+  Component.onCompleted: visibleChanged()
   onVisibleChanged: if (visible) bt.popupShown()
 
   // ---- adapter ----

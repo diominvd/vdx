@@ -31,6 +31,8 @@ KitColumn {
   ]
 
   // shown: the monitors as they are now
+  // the Loader makes the page already visible: the first show is not a change
+  Component.onCompleted: visibleChanged()
   onVisibleChanged: if (visible) ds.refresh()
 
   KitLabel { id: arrangeLabel; text: "ARRANGE"; value: "DRAG OR ARROWS" }

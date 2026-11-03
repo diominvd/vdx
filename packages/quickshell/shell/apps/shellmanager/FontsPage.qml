@@ -36,6 +36,8 @@ KitColumn {
   }
   Timer { id: disarm; interval: 3000; onTriggered: root.armed = "" }
   onSelectedChanged: armed = ""
+  // the Loader makes the page already visible: the first show is not a change
+  Component.onCompleted: visibleChanged()
   onVisibleChanged: if (visible) DisplayService.refresh()
 
   Column {

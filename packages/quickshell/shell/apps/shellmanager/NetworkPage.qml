@@ -50,6 +50,8 @@ KitColumn {
 
   // the page opens first, the system is asked a moment later: the replies (and the scan) landing in one
   // burst while the page builds and fades in made it stutter
+  // the Loader makes the page already visible: the first show is not a change
+  Component.onCompleted: visibleChanged()
   onVisibleChanged: {
     if (visible) loadSoon.restart();
     else {
@@ -173,7 +175,7 @@ KitColumn {
     KitLine { visible: ws.connected }
 
     // ---- saved networks ----
-    KitLabel { id: savedGroup; text: "SAVED"; value: root.inRange.length + " IN RANGE · " + ws.saved.length + " SAVED" }
+    KitLabel { id: savedGroup; text: "SAVED"; value: ws.savedLoaded ? root.inRange.length + " IN RANGE · " + ws.saved.length + " SAVED" : "" }
 
     KitText {
       visible: ws.savedError !== ""

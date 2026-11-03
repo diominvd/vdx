@@ -53,6 +53,8 @@ Row {
   spacing: Theme.gapGroup
 
   // shown: the keys go to the list, the preview starts at the active theme
+  // the Loader makes the page already visible: the first show is not a change
+  Component.onCompleted: visibleChanged()
   onVisibleChanged: if (visible) { selected = ThemeService.current; previewLight = ThemeService.light; search.input.forceActiveFocus(); }
 
   Connections {
