@@ -56,7 +56,7 @@ Item {
     visible: root.entry === null
     opacity: indexIn.shown
     transform: Translate { x: -(1 - indexIn.shown) * 18 }
-    anchors.fill: parent
+    anchors { fill: parent; rightMargin: -Theme.windowPadding }   // to the window's edge: the scrollbar sits there, the content ends at the header's line
     Controls.ScrollBar.vertical: KitScrollBar {}
     contentHeight: grid.implicitHeight
     bottomMargin: Theme.windowPadding  // the window's edge clips, not a line above it
@@ -149,7 +149,7 @@ Item {
   Flickable {
     id: pane
     visible: root.entry !== null
-    anchors.fill: parent
+    anchors { fill: parent; rightMargin: -Theme.windowPadding }   // to the window's edge: the scrollbar sits there, the content ends at the header's line
     Controls.ScrollBar.vertical: KitScrollBar {}
     contentHeight: details.implicitHeight
     bottomMargin: Theme.windowPadding
