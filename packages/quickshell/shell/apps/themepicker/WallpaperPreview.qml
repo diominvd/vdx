@@ -4,8 +4,8 @@ import Quickshell.Wayland
 import qs.apps.shellmanager
 import qs.config
 
-// The wallpaper the picker has picked (WallpaperService.previewRel), over every window and
-// under the bar, on every monitor; the new picture fades in over the old one once it is loaded.
+// The wallpaper the picker has picked (WallpaperService.previewRel), on the desktop: above the
+// wallpaper, under every window, on every monitor; the new picture fades in over the old one once it is loaded.
 Variants {
   model: Quickshell.screens
 
@@ -22,7 +22,7 @@ Variants {
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
     mask: Region {}                        // the pointer goes through
-    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "wallpaper-preview"
 
     onWantChanged: {

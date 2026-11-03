@@ -21,7 +21,7 @@ Scope {
   readonly property var outputs: image !== "" ? WallpaperService.outputsFor(ThemeService.current) : ({})
   readonly property string key: image !== "" ? image + JSON.stringify(outputs) : hex
 
-  // the picker's pick (WallpaperService.previewRel) is drawn over the windows by apps/themepicker
+  // the picker's pick (WallpaperService.previewRel) is drawn over the wallpaper, under the windows, by apps/themepicker
 
   function apply() {
     // $1 is the picture ("" for the colour), $2 the colour; a picture that is gone
