@@ -37,6 +37,13 @@ it can be tested independently.
   the instance from `hyprctl instances -j`).
 - Open a surface: `qs -c shell ipc call <target> toggle`.
 - Screenshot: `grim -g "X,Y WxH" out.png`.
+- A Settings page: `qs -c shell ipc call shell open <page>[:<target>]` (`bar:look`,
+  `modules:music`), wait ~3 s for its data, then `grim` the window (`hyprctl clients -j`
+  gives its `at` / `size`). Switch from another page first: a page made by the Loader
+  is where first-show bugs hide. Read `qs -c shell log` after every page.
+- Keys without a mouse: `wtype -k Tab` goes to whatever has focus, which can be the
+  terminal that runs the agent: check `hyprctl activewindow -j` before each key. A
+  mouse or `ydotool` needs `/dev/uinput` (a udev rule for group `input`, then a new login).
 - Notifications: `notify-send -a Test "title" "body"`; mako state `makoctl list -j`, `makoctl history -j`, `makoctl mode`.
 - Audio: `pactl list sources`, `pactl -f json list sinks`.
 - Wallpaper: `awww query`; cache `~/.cache/awww/<version>/`.

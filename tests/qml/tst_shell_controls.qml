@@ -47,6 +47,7 @@ Item {
     name: "ShellControls"
     when: windowShown
     function init() {
+      segments.current = 1;          // an earlier test may have picked another one
       ShellSettings.motion = false;
       ShellSettings.set("shareColours", true);
       ShellSettings.set("customColours", ["#112233"]);
