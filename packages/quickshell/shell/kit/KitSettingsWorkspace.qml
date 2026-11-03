@@ -24,7 +24,7 @@ Item {
     anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
     width: root.width + Theme.windowPadding
     contentHeight: settingsLoader.height
-    bottomMargin: Theme.windowPadding
+    bottomMargin: 0          // the page above already ends a window padding short of the edge
     flickableDirection: Flickable.VerticalFlick
     interactive: contentHeight + bottomMargin > height + 1
     clip: true

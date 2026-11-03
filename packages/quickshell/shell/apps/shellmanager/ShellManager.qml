@@ -55,7 +55,7 @@ Rectangle {
   readonly property var allSections: [
     { value: "appearance", label: "Interface",  icon: "sliders",    caption: "LOOK",
       page: "appearance", pageTab: "style", description: "Style, corners and controls." },
-    { value: "colours",    label: "Colours",    icon: "palette",
+    { value: "colours",    label: "Colours",    icon: "paint-bucket",
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
     { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "fonts",      label: "Fonts",      icon: "text" },
@@ -63,22 +63,22 @@ Rectangle {
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
     { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "animations", label: "Motion",     icon: "curve" },
-    { value: "glow",       label: "Glow",       icon: "star",
+    { value: "glow",       label: "Glow",       icon: "sun",
       page: "appearance", pageTab: "glow", description: "A soft halo behind bright elements." },
-    { value: "bar",        label: "Bar",        icon: "menu",     caption: "BAR",
+    { value: "bar",        label: "Bar",        icon: "columns",     caption: "BAR",
       page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
-    { value: "barlook",    label: "Bar look",   icon: "brush",
+    { value: "barlook",    label: "Bar look",   icon: "layout",
       page: "bar", pageTab: "appearance", description: "The bar's style, size and spacing." },
-    { value: "barmonitor", label: "Bar monitors", icon: "monitor",
+    { value: "barmonitor", label: "Bar monitors", icon: "laptop",
       page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
     { value: "hub",        label: "Hub",        icon: "home",    island: true },
     { value: "live",       label: "Live activities", icon: "activity", island: true },
     { value: "modules",    label: "Bar modules", icon: "puzzle" },
-    { value: "windows",    label: "Windows",    icon: "app-window", caption: "WINDOWS" },
+    { value: "windows",    label: "Windows",    icon: "tiling", caption: "WINDOWS" },
     { value: "lockscreen", label: "Lock screen", icon: "lock" },
-    { value: "network",    label: "Network",    icon: "wifi",       caption: "CONNECT" },
+    { value: "network",    label: "Network",    icon: "public",       caption: "CONNECT" },
     { value: "bluetooth",  label: "Bluetooth",  icon: "bluetooth" },
-    { value: "vpn",        label: "VPN",        icon: "public", module: "mihomo" },
+    { value: "vpn",        label: "VPN",        icon: "shield", module: "mihomo" },
     { value: "sound",      label: "Sound",      icon: "volume",     caption: "DEVICES" },
     { value: "displays",   label: "Displays",   icon: "monitor" },
     { value: "power",      label: "Power",      icon: "zap" },
@@ -86,7 +86,7 @@ Rectangle {
     { value: "apps",       label: "Apps",       icon: "grid" },
     { value: "updates",    label: "Updates",    icon: "download" },
     { value: "profile",    label: "Profile",    icon: "user",       caption: "SHELL", foot: true },
-    { value: "system",     label: "System",     icon: "cpu",        foot: true,
+    { value: "system",     label: "System",     icon: "gauge",        foot: true,
       page: "about", pageTab: "system", description: "The machine, the shell's health and its resources." },
     { value: "settings",   label: "Settings",   icon: "settings",   foot: true,
       page: "about", pageTab: "settings", description: "Export, import and reset every option; restart the shell." },
@@ -98,7 +98,7 @@ Rectangle {
   // the rail's groups: one button each, the list beside it shows the open group's pages
   readonly property var groups: [
     { name: "LOOK", icon: "palette" }, { name: "BAR", icon: "menu" }, { name: "WINDOWS", icon: "app-window" },
-    { name: "CONNECT", icon: "wifi" }, { name: "DEVICES", icon: "monitor" }, { name: "SYSTEM", icon: "cpu" }
+    { name: "CONNECT", icon: "wifi" }, { name: "DEVICES", icon: "usb" }, { name: "SYSTEM", icon: "cpu" }
   ]
   readonly property var footSections: sections.filter(s => s.foot)
   readonly property var navSections: sections.filter(s => !s.foot && groupOf(s.value) === openGroup)
@@ -377,6 +377,9 @@ Rectangle {
         id: navColumn
         width: nav.width - Theme.gapMedium
         spacing: Theme.gapHair
+        // another group is opened: its pages come in, a fade and a short rise
+        opacity: groupIn.shown
+        transform: Translate { y: (1 - groupIn.shown) * 10 }
 
         KitText {
           x: Theme.gapLoose
@@ -543,7 +546,7 @@ Rectangle {
     anchors { left: sidebar.right; leftMargin: 1; right: parent.right; rightMargin: previewDock.visible ? previewDock.width + Theme.windowPadding + Theme.gapWide : 0; top: header.bottom; bottom: parent.bottom }
     // to the window's edge: the rows scroll out of it, not out of a line above it
     // Apps, Bar modules and Themes fill the window and scroll their panes themselves: the page stays
-    contentHeight: (root.currentPage?.fillsViewport ?? false) || ["apps", "modules", "themes"].includes(root.tab) ? height : pages.implicitHeight + pages.y + 2 * Theme.windowPadding
+    contentHeight: (root.currentPage?.fillsViewport ?? false) || ["apps", "modules", "themes"].includes(root.tab) ? height : pages.implicitHeight + pages.y + Theme.windowPadding
     clip: true
     boundsBehavior: Flickable.StopAtBounds
     interactive: contentHeight > height
@@ -569,6 +572,7 @@ Rectangle {
       id: pages
       x: Theme.windowPadding
       opacity: pageIn.shown
+      transform: Translate { x: (1 - pageIn.shown) * 18 }     // a short move in from the right
       y: root.contentGap
       width: page.width - 2 * Theme.windowPadding
       height: Math.max(implicitHeight, page.height - y)
@@ -623,6 +627,10 @@ Rectangle {
       Component { id: modulesComponent; ModulesPage { width: pages.width; height: page.height - pages.y } }
     }
   }
+
+  QtObject { id: groupIn; property real shown: 1 }
+  NumberAnimation { id: groupAnim; target: groupIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(200); easing.type: Motion.easing }
+  onOpenGroupChanged: if (Motion.pages) groupAnim.restart()
 
   QtObject { id: pageIn; property real shown: 1 }
   NumberAnimation { id: pageAnim; target: pageIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
