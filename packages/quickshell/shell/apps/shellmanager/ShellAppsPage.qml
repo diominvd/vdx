@@ -42,6 +42,10 @@ Item {
   }
 
   property string selected: ""
+  // an open entry: the window header's crumb ("‹ All apps / <name>") goes back to the index
+  readonly property string backLabel: selected !== "" ? "All apps" : ""
+  readonly property string here: entries.find(e => e.id === selected)?.label ?? ""
+  function back() { selected = ""; }
   readonly property var entry: listed.find(e => e.id === selected) ?? null
   readonly property bool installed: entry !== null && ShellAppsService.installed(entry)
   // its window's settings (shellapps.py), when it has one
@@ -73,7 +77,6 @@ Item {
       { key: "absent", label: "NOT INSTALLED" }
     ]
     selected: root.selected
-    backLabel: "All apps"
     searchHint: "Search apps…"
     onPicked: id => root.selected = id
 

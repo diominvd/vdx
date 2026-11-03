@@ -179,9 +179,9 @@ Pages by the user's area; the look follows macOS System Settings.
   for Apply.
 - MUST — a page over many entries with options of their own (Apps, Bar modules) is
   an `EntryBrowser`: an index of `EntryCard`s (a search, a titled grid per section:
-  on the bar, off it, not installed) and one entry across the whole pane (back,
-  previous / next, a heading with its icon on a plate, state and Reset, then its
-  options). No third navigation column beside the sidebar: it narrows the options
+  on the bar, off it, not installed) and one entry across the whole pane (a heading with its icon on a plate, state and Reset, then its
+  options); the way back is a crumb on the right of the window's header,
+  `‹ All apps / Backups`, never a row in the pane. No third navigation column beside the sidebar: it narrows the options
   until every wide row stacks. A card says its state in a few words behind a dot
   (green: on); one that is not installed is muted, in its own section.
 - Themes keeps its side list (a picker with a preview, not options): a search
@@ -282,6 +282,9 @@ Pages by the user's area; the look follows macOS System Settings.
   the variant currently shown by its preview, including Light / Dark.
 - Password fields always use dots. The old key remains readable for settings
   import compatibility but is no longer an appearance choice.
+- A small visual of a setting (an app's window on its screen) is the control of a
+  row, at `controlWidth`, its words in the row's hint: never a full-width block
+  over the rows it shows.
 - Scrollbars use a 2 px thumb, hidden at rest, in a separate gutter.
 - A `kitUnboxed` pane is a grouping boundary: a nested KitGrouper owns its own
   boxes rather than joining groups across unrelated columns.

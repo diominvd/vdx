@@ -489,6 +489,34 @@ Rectangle {
       crumb: root.groupOf(root.tab)
       description: root.pageTabOf(root.tab) ? root.sectionOf(root.tab).description : (root.currentPage?.description ?? "")
 
+      // a page with a level under it (Apps, Bar modules), one open: `backLabel` ("" at
+      // the top), `here` (what is open), `back()` — "‹ All apps / Backups"
+      Row {
+        visible: (root.currentPage?.backLabel ?? "") !== "" && !root.pageTabOf(root.tab)
+        spacing: Theme.gapMedium
+
+        KitButton {
+          anchors.verticalCenter: parent.verticalCenter
+          compact: true
+          icon: "chevron-left"
+          iconWithText: true
+          text: root.currentPage?.backLabel ?? ""
+          onClicked: root.currentPage.back()
+        }
+
+        KitText {
+          anchors.verticalCenter: parent.verticalCenter
+          text: "/"
+          color: Theme.muted
+        }
+
+        KitText {
+          anchors.verticalCenter: parent.verticalCenter
+          text: root.currentPage?.here ?? ""
+          font.weight: Font.DemiBold
+        }
+      }
+
       // a page with tabs (Network) lists them: `tabs` [{label, value}], `tab`
       KitChoices {
         visible: (root.currentPage?.tabs ?? []).length > 0 && !root.pageTabOf(root.tab)

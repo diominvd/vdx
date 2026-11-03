@@ -6,9 +6,10 @@ import qs.kit
 // The page of Apps and Bar modules, in two views over the whole pane.
 // Index: a search, then a grid of EntryCards per section (the section's name and count
 // above). Typing filters, Enter opens the first match.
-// Entry: a back button and the previous / next entry, the entry's heading (icon, name,
-// about, state; `trailing` on the right: keys, Reset), then its options (the children,
-// a Column's content that ends with its own KitGrouper).
+// Entry: its heading (icon, name, about, state; `trailing` on the right: keys, Reset),
+// then its options (the children, a Column's content that ends with its own KitGrouper).
+// The way back is the crumb in the window's header (ShellManager reads the page's
+// `backLabel`, `here` and `back()`).
 // Entries: {id, label, icon, about, state (a card's few words), note (the heading's, if it
 // says it otherwise: "" for none), ok (the state is good news), off (not installed: muted),
 // section (a key of `sections`)}. `selected` "" is the index; picked(id)
@@ -19,7 +20,6 @@ Item {
   property var model: []
   property var sections: []          // [{key, label}] in their order
   property string selected: ""
-  property string backLabel: "All"
   property string searchHint: "Search…"
   default property alias content: body.data
   property alias trailing: trailingRow.data
@@ -38,9 +38,6 @@ Item {
     return out;
   }
   readonly property var matches: ordered.filter(e => e.label.toLowerCase().includes(needle))
-  readonly property int at: ordered.findIndex(e => e.id === selected)
-  readonly property var previous: at > 0 ? ordered[at - 1] : null
-  readonly property var next: at >= 0 && at < ordered.length - 1 ? ordered[at + 1] : null
 
   // ---- index ----
   Flickable {
@@ -135,43 +132,6 @@ Item {
       width: pane.width - Theme.windowPadding
       spacing: Theme.sectionGap
       opacity: paneIn.shown
-
-      // back to the index; the neighbours in its order
-      Item {
-        property bool kitUnboxed: true
-        width: parent.width
-        height: back.height
-
-        KitButton {
-          id: back
-          compact: true
-          icon: "arrow-left"
-          iconWithText: true
-          text: root.backLabel
-          onClicked: root.picked("")
-        }
-
-        Row {
-          anchors.right: parent.right
-          spacing: Theme.gapSmall
-
-          KitButton {
-            compact: true
-            icon: "arrow-left"
-            disabled: root.previous === null
-            Accessible.name: "Previous: " + (root.previous?.label ?? "")
-            onClicked: root.picked(root.previous.id)
-          }
-
-          KitButton {
-            compact: true
-            icon: "arrow-right"
-            disabled: root.next === null
-            Accessible.name: "Next: " + (root.next?.label ?? "")
-            onClicked: root.picked(root.next.id)
-          }
-        }
-      }
 
       // heading: icon, name, about and state; `trailing` (keys, Reset) on the right
       Item {

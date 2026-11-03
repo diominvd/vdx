@@ -529,17 +529,14 @@ Item {
       compare(picker.pairOf("red")[0], "#ff0000");
       compare(picker.pairOf("#112233")[0], "#112233");
     }
-    function test_entry_browser_order_search_and_neighbours() {
+    function test_entry_browser_order_and_search() {
       entries.query = ""; entries.selected = "";
       compare(entries.ordered.map(e => e.id), ["audio", "clock", "ai"]);   // section by section, by name
       compare(entries.entry, null);                                        // "" is the index
       entries.query = "CL"; compare(entries.matches.map(e => e.id), ["clock"]);
       entries.query = "nothing"; compare(entries.matches.length, 0);
       entries.query = "";
-      entries.selected = "audio";
-      compare(entries.previous, null); compare(entries.next.id, "clock");
-      entries.selected = "ai";
-      compare(entries.previous.id, "clock"); compare(entries.next, null);
+      entries.selected = "ai"; compare(entries.entry.id, "ai");
       entries.picked(""); compare(entries.selected, "");
     }
     function test_island_copy_preserves_hidden() {

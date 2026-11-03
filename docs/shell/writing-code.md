@@ -144,8 +144,9 @@ Steps:
 
 A page over many entries, each with its own options, is an `EntryBrowser`: an
 index of cards (a search, then a titled grid per section) and, once one is
-picked, that entry across the whole pane (back, previous / next, its heading,
-then its options). Never a third column of navigation beside the sidebar: it
+picked, that entry across the whole pane (its heading, then its options). The
+way back is the crumb in the window's header, `‹ All modules / AI`: the page gives
+`backLabel` ("" on the index), `here` and `back()`. Never a third column of navigation beside the sidebar: it
 leaves the options too narrow and every wide row stacks.
 
 ```qml
@@ -160,6 +161,10 @@ Item {
   function jump(id) { selected = id; }
 
   property string selected: ""                    // "" is the index
+  // the header's crumb: "‹ All modules / AI"
+  readonly property string backLabel: selected !== "" ? "All modules" : ""
+  readonly property string here: entries.find(e => e.id === selected)?.label ?? ""
+  function back() { selected = ""; }
   readonly property var entries: BarLayout.modules.map(p => ({
     id: p.id, label: p.label, icon: p.icon, about: p.about,
     state: "Hub chip",                            // a card's few words
@@ -174,7 +179,6 @@ Item {
     model: root.entries
     sections: [{ key: "on", label: "ON THE BAR" }, { key: "off", label: "OFF THE BAR" }]
     selected: root.selected
-    backLabel: "All modules"
     searchHint: "Search modules…"
     onPicked: id => root.selected = id
     trailing: KitResetButton { /* … */ }          // keys, Reset: right of the heading

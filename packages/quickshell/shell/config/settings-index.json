@@ -1814,6 +1814,12 @@
   "target": "windows"
  },
  {
+  "label": "Preview",
+  "hint": "",
+  "where": "Windows › WINDOW",
+  "target": "windows"
+ },
+ {
   "label": "Bar text",
   "hint": "Content, name or icon only, for each bar module",
   "where": "Bar modules",

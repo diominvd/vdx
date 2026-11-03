@@ -4,11 +4,10 @@ import qs.components
 import qs.config
 import qs.kit
 
-// How one of the shell's windows opens (Shell apps › WINDOW): a small monitor
-// with the window as it will open and a button to open it, then Window
-// (floating / tiled) and, floating, Size (its own, a preset share of the
-// screen, custom pixels) and Position (a screen map, at the pointer, custom
-// x, y). Choices apply at once, numbers on Enter; it shows the next
+// How one of the shell's windows opens (Apps › WINDOW): Window (floating / tiled)
+// and, floating, Size (its own, a preset share of the screen, custom pixels) and
+// Position (a spot on the screen, at the pointer, custom x, y), then Preview: a
+// small screen with the window as it will open (a click on it places the window). Choices apply at once, numbers on Enter; it shows the next
 // time the window opens.
 KitColumn {
   id: root
@@ -36,35 +35,6 @@ KitColumn {
     visible: root.labelled
     text: "WINDOW"
     value: root.floating ? ("FLOATING · " + root.px[0] + " × " + root.px[1]) : "TILED"
-  }
-
-  // the window as it will open, the whole width, its caption under it
-  Column {
-    visible: root.showPreview
-    property bool kitUnboxed: true
-    width: parent.width
-    spacing: Theme.gapMedium
-
-    // a small monitor: a full-width one dwarfs the choices under it
-    WindowPreview {
-      width: Math.min(parent.width, 2 * Theme.controlWidth)
-      anchors.horizontalCenter: parent.horizontalCenter
-      app: root.app
-      settings: root.s
-      pickable: root.floating && root.screenSpot
-      onPicked: spot => root.set({ position: spot })
-    }
-
-    KitText {
-      width: parent.width
-      horizontalAlignment: Text.AlignHCenter
-      text: root.app.id === "shell-manager" ? "Close and reopen this window to see it."
-          : root.floating && root.screenSpot ? "Click the screen to place the window. It shows the next time the window opens."
-          : "Shows the next time the window opens."
-      color: Theme.muted
-      wrapMode: Text.WordWrap
-      font.pixelSize: Theme.fontSize - 2
-    }
   }
 
   KitRow {
@@ -144,6 +114,32 @@ KitColumn {
     second: root.yDraft
     onEdited: (a, b) => { root.xDraft = a; root.yDraft = b; }
     onAccepted: (a, b) => root.set({ position: "custom", x: a, y: b })
+  }
+
+  // the window as it will open, on a small screen at the controls' width: a row like
+  // the rest, its words on the left (a click on the screen places it)
+  KitRow {
+    visible: root.showPreview
+    label: "Preview"
+    hint: root.app.id === "shell-manager" ? "Close and reopen this window to see it"
+        : root.floating && root.screenSpot ? "Click the screen to place it. Shows the next time it opens"
+        : "Shows the next time it opens"
+
+    // the row's own gap above and below it, as a control's in a row of row height
+    Item {
+      width: preview.width
+      height: preview.height + 2 * Theme.gapMedium
+
+      WindowPreview {
+        id: preview
+        anchors.verticalCenter: parent.verticalCenter
+        width: Math.min(Theme.controlWidth, root.width / 2)
+        app: root.app
+        settings: root.s
+        pickable: root.floating && root.screenSpot
+        onPicked: spot => root.set({ position: spot })
+      }
+    }
   }
 
   KitText {

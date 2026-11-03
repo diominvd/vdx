@@ -61,6 +61,10 @@ Item {
   })
 
   property string selected: ""
+  // an open entry: the window header's crumb ("‹ All modules / <name>") goes back to the index
+  readonly property string backLabel: selected !== "" ? "All modules" : ""
+  readonly property string here: entries.find(e => e.id === selected)?.label ?? ""
+  function back() { selected = ""; }
   readonly property var module: BarLayout.modules.find(p => p.id === selected) ?? null
   readonly property bool installed: module !== null && BarLayout.installed(selected)
   readonly property string options: module ? optionsOf(module) : ""
@@ -74,7 +78,6 @@ Item {
       { key: "absent", label: "NOT INSTALLED" }
     ]
     selected: root.selected
-    backLabel: "All modules"
     searchHint: "Search modules…"
     onPicked: id => root.selected = id
 
