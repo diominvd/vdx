@@ -45,8 +45,10 @@ KitColumn {
     width: parent.width
     spacing: Theme.gapMedium
 
+    // a small monitor: a full-width one dwarfs the choices under it
     WindowPreview {
-      width: parent.width
+      width: Math.min(parent.width, 2 * Theme.controlWidth)
+      anchors.horizontalCenter: parent.horizontalCenter
       app: root.app
       settings: root.s
       pickable: root.floating && root.screenSpot

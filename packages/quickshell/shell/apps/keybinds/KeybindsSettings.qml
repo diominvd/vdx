@@ -11,43 +11,8 @@ Column {
 
   spacing: Theme.sectionGap
 
-  // the screen behind the panel: in the window, and behind the island's view
-  KitToggleRow {
-    module: "keybinds"; key: "dim"; fallback: true
-    label: "Dim the background"
-    hint: "Off: the screen behind it stays as it is"
-  }
-
-  // Island style: the window opens from the island, inside it, like a module's popup
-  KitLabel { text: "ISLAND"; visible: ShellSettings.barStyle === "island" }
-  KitToggleRow {
-    needs: ShellSettings.barStyle === "island" ? "" : "Island style only"
-    needsAction: "Use Island"
-    onNeedsActed: ShellSettings.set("barStyle", "island")
-    module: "keybinds"; key: "island"; fallback: true
-    label: "Open from the island"
-    hint: "On: opens inside the island, not a window"
-  }
-
-  KitLabel { text: "LAYOUT" }
-
-  KitOptionRow {
-    module: "keybinds"; key: "rows"; fallback: 8
-    label: "Visible rows"; hint: "The rest scrolls"
-    model: [6, 8, 10, 12].map(v => ({ label: String(v), value: v }))
-  }
-
-  KitOptionRow {
-    module: "keybinds"; key: "size"; fallback: "medium"
-    label: "Width"; hint: ""
-    model: [{ label: "Small", value: "small" }, { label: "Medium", value: "medium" }, { label: "Large", value: "large" }]
-  }
-
-  KitOptionRow {
-    module: "keybinds"; key: "position"; fallback: "top"
-    label: "Position"; hint: ""
-    model: [{ label: "Top", value: "top" }, { label: "Centre", value: "center" }, { label: "Bottom", value: "bottom" }]
-  }
+  // dim, island, layout: as every panel app
+  KitPanelOptions { module: "keybinds" }
 
   KitLine {}
 
@@ -59,9 +24,9 @@ Column {
     model: [{ label: "Mode", value: "mode" }, { label: "Windows", value: "windows" }, { label: "Desktop", value: "desktop" }, { label: "Media", value: "media" }]
   }
 
-  KitToggleRow { module: "keybinds"; key: "clear"; fallback: true; label: "Clear search on close"; hint: "Off: the search stays as it was" }
+  KitClearSearchRow { module: "keybinds" }
 
-  KitToggleRow { module: "keybinds"; key: "english"; fallback: true; label: "English layout on open"; hint: "Switches the keyboard when it opens" }
+  KitEnglishRow { module: "keybinds" }
 
   KitGrouper {}
 }

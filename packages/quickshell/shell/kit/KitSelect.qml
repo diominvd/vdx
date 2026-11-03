@@ -43,11 +43,11 @@ Column {
   // The box takes the standard width (KitRow's, so the right edges line up) when
   // the row has room for it; a narrower row gives the label half of it (less the
   // gap). It never grows past the standard width: a long choice elides in the box.
-  // In a narrow row (KitRow's rule: Theme.rowStackBelow) the box goes under the text at the
-  // standard width, as a wide KitRow's control does.
+  // In a narrow row (KitRow's rule: Theme.rowStackBelow) the box goes under the text across
+  // the whole row, as a wide KitRow's control does (never a diagonal from the label).
   readonly property bool stacked: width < Theme.rowStackBelow && (label !== "" || hint !== "")   // a box alone has nothing to stack
   readonly property int stackPad: Math.round((Theme.rowHeight - Theme.controlHeight) / 2)
-  property real boxWidth: stacked ? Math.min(width, Theme.controlWidth)
+  property real boxWidth: stacked ? width
     : Math.min(width, Math.max(Math.min(choiceWidth, Theme.controlWidth),
       Math.min(Theme.controlWidth, (width - Theme.gapWide) / 2)))
   property int maxRows: 6

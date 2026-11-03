@@ -56,7 +56,7 @@ Column {
     width: parent.width
     height: Math.max(48, previewBars.implicitHeight + 20)
     radius: Theme.radiusCard
-    color: Theme.mix(Theme.background0, "#000000", 0.24)
+    color: Theme.background0   // a well inside a box
     Accessible.role: Accessible.Pane
     Accessible.name: "Bar layout overview"
     Flow {

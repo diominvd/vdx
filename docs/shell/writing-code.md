@@ -21,6 +21,38 @@ This file is the recipes: copy the nearest existing file, then run the checklist
   written back later.
 - A component that is only used by one page lives next to that page, not in `kit/`.
 
+## The kit: use these before writing anything
+
+Every Settings surface is built from these. Read a component's header comment
+before using it; its properties are its whole API.
+
+| Need | Component | Notes |
+|---|---|---|
+| a row: label + hint left, control right | `KitRow` | `wide` for segments / fields; `needs` + `needsAction` for a waiting row; `tip` for an info mark |
+| a switch bound to a module option | `KitToggleRow` | `module`, `key`, `fallback`, `label`, `hint` |
+| choices bound to a module option | `KitOptionRow` | `KitSegments` inside a wide row |
+| a list over 5 / one that changes | `KitSelect` | stacks under its text in a narrow row, as `KitRow` |
+| a size judged by eye | `KitSliderRow` | snapped, its stops shown |
+| text or a number | `KitInput` | applies on Enter; `icon: "search"` for a search |
+| a group caption | `KitLabel` | caps noun, `value` on the right, `about` for an info mark |
+| a group end / a real rule | `KitLine` | `sectionBreak: false` for a header rule that stays visible |
+| the grouping itself | `KitGrouper` | last child of every settings Column |
+| a setting kept on another page | `KitLinkRow` | `target: "<page>:<group>"` |
+| Reset with a confirmation | `KitResetButton` | `changed`, `onReset` |
+| an empty pane | `KitEmptyState` | `title` + `hint` that says the next step |
+| a page that waits for something | `KitNotice` | one line + the fixing button |
+| an icon on a plate (an entry's face) | `KitIconPlate` | `size` is the plate |
+| a list row's icon | `KitIconTile` | follows Appearance › Icons › Framed |
+| a panel app's dim / island / layout | `KitPanelOptions` | `module` |
+| a search panel's two toggles | `KitClearSearchRow`, `KitEnglishRow` | `module` |
+| a picker popup's cards or list | `KitPickerViewRow` | `module` |
+| an index of entries + one entry's page | `EntryBrowser` (`apps/shellmanager`) | Apps and Bar modules; see the recipe below |
+
+A block of rows that two settings files share is a component like the last four:
+a `KitToggleRow` / `KitOptionRow` / `Column` with the fixed parts written in it
+and `module` left to the caller. Its labels are literals, so the search index can
+read them (see "Recipe: a shared option block").
+
 ## Tokens: what to use instead of a literal
 
 | Instead of | Use |
@@ -107,6 +139,89 @@ Steps:
    index (`config/settings-index.json`) must match, `check` fails on a stale one.
 5. `./install.py link`, restart, open the page in both styles (Strict, Material)
    and both corners (sharp, round).
+
+## Recipe: a browser page (Apps, Bar modules)
+
+A page over many entries, each with its own options, is an `EntryBrowser`: an
+index of cards (a search, then a titled grid per section) and, once one is
+picked, that entry across the whole pane (back, previous / next, its heading,
+then its options). Never a third column of navigation beside the sidebar: it
+leaves the options too narrow and every wide row stacks.
+
+```qml
+Item {
+  id: root
+  readonly property string icon: "puzzle"
+  readonly property string title: "Bar modules"
+  readonly property string description: "What each bar module shows and how its popup behaves."
+  readonly property var jumps: []                 // the index does the sidebar's job
+
+  // another page or `shell open modules:<id>` opens one
+  function jump(id) { selected = id; }
+
+  property string selected: ""                    // "" is the index
+  readonly property var entries: BarLayout.modules.map(p => ({
+    id: p.id, label: p.label, icon: p.icon, about: p.about,
+    state: "Hub chip",                            // a card's few words
+    note: "In the hub, as a chip",                // the heading's, when longer; "" for none
+    ok: true,                                     // the state is good news: a green dot
+    off: false,                                   // not installed: muted
+    section: "on"                                 // a key of `sections`
+  }))
+
+  EntryBrowser {
+    anchors.fill: parent
+    model: root.entries
+    sections: [{ key: "on", label: "ON THE BAR" }, { key: "off", label: "OFF THE BAR" }]
+    selected: root.selected
+    backLabel: "All modules"
+    searchHint: "Search modules…"
+    onPicked: id => root.selected = id
+    trailing: KitResetButton { /* … */ }          // keys, Reset: right of the heading
+
+    // the options: rows as on any page, ending with their own grouper
+    KitLinkRow { label: "Move on the bar"; hint: "In Bar › Layout"; target: "bar:layout" }
+    KitLine {}
+    Loader { width: parent.width; source: /* the entry's <Name>Settings.qml */ "" }
+    KitGrouper {}
+  }
+}
+```
+
+- The page is an `Item` (it fills the window; `ShellManager` lists the tab in its
+  full-height pages).
+- Card words are short (`Hub chip`, `Right`); the heading may say them in full (`note`).
+- A state already shown below (the window's size on Apps) is not repeated in the
+  heading: `note: ""`.
+- Keys: Tab reaches each card, Enter / Space open it, Enter in the search opens the
+  first match; the back and arrow buttons are ordinary `KitButton`s.
+
+## Recipe: a shared option block
+
+When two settings files have the same rows, write them once in `kit/` (or next to
+the page that owns them) and give the caller only the module id:
+
+```qml
+// kit/KitEnglishRow.qml
+KitToggleRow {
+  key: "english"; fallback: true
+  label: "English layout on open"
+  hint: "Switches the keyboard when it opens"
+}
+
+// a caller
+KitEnglishRow { module: "launcher" }
+```
+
+The search index reads literal `label:` / `hint:` from the settings files, so the
+block's name goes into `INCLUDES` in `scripts/settings_index.py`: a file that uses
+it is read with the block's text in its place. Use it in one line with no nested
+braces (`Block { module: "x" }`), keep row labels out of its comments, and run the
+script: an unchanged index means no row was lost. `tests/test_settings_index.py`
+checks a block's rows are found under each page that uses it.
+
+A block that is a `Column` ends with its own `KitGrouper {}` and starts with a row
+or a `KitLabel`: KitGrouper walks into it and its rows join the page's groups.
 
 ## Recipe: a module's options (`<Name>Settings.qml`)
 
@@ -214,7 +329,8 @@ guarded before it starts (`if (!p.running)`), so a double click cannot start two
 2. Repeats: the same block twice → component. The same comment twice in a file
    → one of them is misplaced (it happened: a `jumps` comment above `resetKeys`).
 3. Both styles (Strict, Material), both corners, a narrow window (rows stack
-   under `Theme.rowStackBelow`), light and dark theme.
+   under `Theme.rowStackBelow`: the control then spans the row under its text,
+   never a short one at the right edge), light and dark theme.
 4. Keyboard: Tab reaches every control, Space / Enter act, Escape cancels, focus
    ring visible. Accessible names on icon-only buttons and list rows.
 5. States: empty, loading (`busy` / `KitSpinner`), error (red `KitText` under the
@@ -234,3 +350,9 @@ See CLAUDE.md › QML pitfalls. Besides them:
 - `zsh` expands `--include=*.qml` itself: quote the glob when grepping.
 - Editing a file with `sed -i` breaks live reload; use the editor in place.
 - An optimistic UI flip needs a reconcile, or a failed command leaves it lying.
+- A caption that hides while its row stays (a `needs` row) leaves the row in the
+  previous group's box: keep the caption, the row says what it waits for.
+- `qs list --all` prints `Process ID: <n>`: restart with
+  `kill $(qs list --all | awk '/Process ID/{print $3}')`, then the supervisor.
+- A component whose rows the search should find goes in `INCLUDES`
+  (`scripts/settings_index.py`), or its rows vanish from the search.

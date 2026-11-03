@@ -92,6 +92,13 @@ class Index(unittest.TestCase):
         for e in self.index:
             self.assertEqual(e["label"], e["label"].strip(), e)
 
+    def test_shared_blocks_are_read_where_used(self):
+        # a page that uses a shared block (KitPanelOptions) is found by the block's rows
+        for app in ("Launcher", "Keybinds"):
+            where = [e["where"] for e in self.index if e["label"] == "Open from the island"]
+            self.assertIn(f"Apps › {app} › ISLAND", where)
+        self.assertIn("rows", si.keys_of(SCRIPT.parent.parent / "apps/launcher/LauncherSettings.qml"))
+
     def test_journeys(self):
         for q, target in JOURNEYS.items():
             self.assertIn(target, [e["target"] for e in search(self.index, q)], q)

@@ -273,19 +273,7 @@ KitColumn {
       onPicked: value => ws.setSaved(root.chosen.uuid, "dns", root.dnsServers(value) || "auto")
     }
 
-    KitRow {
-      visible: root.chosen !== null
-      wide: true
-      label: "Metered"
-      hint: "Yes: apps save data"
-
-      KitSegments {
-        disabled: ws.savedBusy
-        model: [{ label: "Auto", value: "unknown" }, { label: "Yes", value: "yes" }, { label: "No", value: "no" }]
-        current: root.chosen?.metered ?? "unknown"
-        onPicked: value => ws.setSaved(root.chosen.uuid, "metered", value)
-      }
-    }
+    MeteredRow { connection: root.chosen; service: ws }
 
     KitText {
       visible: ws.saveError !== ""

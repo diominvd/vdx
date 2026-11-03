@@ -133,19 +133,7 @@ KitColumn {
     }
   }
 
-  KitRow {
-    visible: eth !== null
-    wide: true
-    label: "Metered"
-    hint: "Yes: apps save data"
-
-    KitSegments {
-      disabled: ws.savedBusy
-      model: [{ label: "Auto", value: "unknown" }, { label: "Yes", value: "yes" }, { label: "No", value: "no" }]
-      current: eth?.metered ?? "unknown"
-      onPicked: value => ws.setSaved(eth.uuid, "metered", value)
-    }
-  }
+  MeteredRow { connection: eth; service: ws }
 
   KitRow {
     visible: eth !== null

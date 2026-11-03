@@ -1,54 +1,57 @@
 import QtQuick
-import QtQuick.Controls as Controls
 import Quickshell
 import qs.apps.keybinds
 import qs.bar
 import qs.config
 import qs.kit
 
-// Shell apps: the shell's own apps (ShellAppsService.entries) — the list on
-// the left, the chosen one on the right: its name, what it is and the key
-// that opens it; then its own options page (values in ModuleSettings, Reset
-// brings the defaults back), its window options inline and its module in
-// the bar (shown, where, its own options). Each pane scrolls on its own.
-Column {
+// Apps: the shell's own apps (ShellAppsService.entries) as cards (EntryBrowser); a card
+// opens the app across the pane: its key and Reset in the heading, how its window opens
+// (WindowOptions, with its preview), its own options page (values in ModuleSettings) and
+// a link to its bar module's options in Bar modules.
+Item {
   id: root
 
-  // the window's fixed header shows these; the page under it scrolls
+  // the window's fixed header shows these; the page fills the window and scrolls its views
   readonly property string icon: "grid"
   readonly property string title: "Apps"
   readonly property string description: "The shell's own programs: how each one opens and behaves."
 
-  // its own list does the job of the sidebar's group links
+  // its own index does the job of the sidebar's group links
   readonly property var jumps: []
 
   // an app with a page of its own (Lock screen) is set there, not here
-  readonly property var listed: ShellAppsService.entries.filter(e => !e.page && e.listed !== false).sort((a, b) => a.label.localeCompare(b.label))
-  property string selected: listed[0]?.id ?? ""
-  property bool setupOpen: false
+  readonly property var listed: ShellAppsService.entries.filter(e => !e.page && e.listed !== false)
+  readonly property var entries: listed.map(e => {
+    const installed = ShellAppsService.installed(e);
+    const keys = KeybindsService.keysFor(e.bind ?? "");
+    return {
+      id: e.id, label: e.label, icon: e.icon, about: e.about,
+      off: !installed, ok: false,
+      section: installed ? "apps" : "absent",
+      state: !installed ? "Not installed" : keys.length > 0 ? keys.join(" + ") : windowState(e),
+      note: installed ? "" : "Not installed"   // the heading shows its keys, the page its window
+    };
+  })
+
+  // how an app's window opens, in a few words ("" without a window of its own)
+  function windowState(e) {
+    const w = e?.window ? ShellAppsService.windows.find(a => a.id === e.window.id) : null;
+    if (!w) return "";
+    return w.settings.mode === "tiled" ? "Tiled" : "Floating · " + ShellAppsService.sizeOf(w, w.settings).join(" × ");
+  }
+
+  property string selected: ""
   readonly property var entry: listed.find(e => e.id === selected) ?? null
+  readonly property bool installed: entry !== null && ShellAppsService.installed(entry)
   // its window's settings (shellapps.py), when it has one
   readonly property var window: entry?.window ? (ShellAppsService.windows.find(a => a.id === entry.window.id) ?? null) : null
-
-  // the tab: the app or its bar module (an app with a module only)
   readonly property bool hasModule: !!entry?.module
-
-  // where its bar module stands on the main bar: hidden | folder | a zone
-  readonly property string screen: BarLayout.mainScreen()
-  readonly property string place: {
-    const id = entry?.module ?? "";
-    if (id === "" || BarLayout.hidden(screen).includes(id)) return "hidden";
-    if (BarLayout.inFolder(screen).includes(id)) return "folder";
-    const l = BarLayout.layout(screen);
-    return BarLayout.zones.find(z => (l[z] ?? []).includes(id)) ?? "hidden";
-  }
 
   // another page, scrolled to one of its groups (ShellManager.navigate)
   signal navigate(string tab, string target)
-  // another page (or `ipc call shell open apps`) may name an app, or its
-  // bar module's id; a module's id opens the app on its bar-module tab.
-  // "<id>:bar" (Modules' Open) names the bar-module tab even when the module
-  // has the app's id
+  // another page (or `ipc call shell open apps`) may name an app, or its bar module's id.
+  // "<id>:bar" names the app's bar module: its options are in Bar modules
   function jump(key) {
     const bar = key.endsWith(":bar");
     const id = bar ? key.slice(0, -4) : key;
@@ -58,251 +61,89 @@ Column {
     if (e) selected = e.id;
   }
 
-  spacing: Theme.gapGroup
-
   // the Loader makes the page already visible: the first show is not a change
   Component.onCompleted: visibleChanged()
   onVisibleChanged: if (visible) { ShellAppsService.refresh(); KeybindsService.refresh(); }
 
-  Row {
-    width: parent.width
-    height: root.height
-    spacing: Theme.gapGroup
+  EntryBrowser {
+    anchors.fill: parent
+    model: root.entries
+    sections: [
+      { key: "apps", label: "APPS" },
+      { key: "absent", label: "NOT INSTALLED" }
+    ]
+    selected: root.selected
+    backLabel: "All apps"
+    searchHint: "Search apps…"
+    onPicked: id => root.selected = id
 
-    EntryList {
-      id: list
-      compact: true
-      height: parent.height - Theme.windowPadding
-      model: root.listed.map(e => Object.assign({ off: !ShellAppsService.installed(e) }, e))
-      selected: root.selected
-      onPicked: id => root.selected = id
-    }
+    trailing: [
+      Repeater {
+        model: KeybindsService.keysFor(root.entry?.bind ?? "")
 
-    // the list's edge
-    // — as far from the list as the list is from the pane's edge on the other side
-    Item {
-      id: edge
-      width: Math.max(0, Theme.windowPadding - Theme.gapGroup) + Theme.dividerThickness
-      height: parent.height - Theme.windowPadding
-
-      Rectangle {
-        anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
-        width: Theme.dividerThickness
-        color: Theme.dividerColor
+        KeyCap {
+          required property string modelData
+          anchors.verticalCenter: parent.verticalCenter
+          text: modelData
+        }
+      },
+      Item { width: Theme.gapSmall; height: 1; visible: !!root.entry?.settings },
+      KitResetButton {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: !!root.entry?.settings && root.installed
+        // an app with a bar module: every key but the module's (they stay)
+        readonly property var moduleKeys: root.hasModule ? (ModuleSettings.keysOf(root.entry.moduleSettings) ?? []) : []
+        readonly property var keys: root.hasModule
+          ? Object.keys(ModuleSettings.values[root.selected] ?? {}).filter(k => !moduleKeys.includes(k)) : null
+        changed: ModuleSettings.changed(root.selected, keys)
+        onReset: ModuleSettings.reset(root.selected, keys)
       }
+    ]
+
+    // its components are off on this machine: nothing to set until installed
+    KitRow {
+      visible: root.entry !== null && !root.installed
+      label: "Not installed"
+      hint: "./install.py components add " + (BarLayout.notInstalled[root.entry?.module] ?? []).join(" or ")
+      labelColor: Theme.foreground2
     }
 
-    // ---- the chosen app: its name, key, window and options, scrolling on their own ----
-    Flickable {
-      id: pane
-      visible: list.matches.length > 0
-      Controls.ScrollBar.vertical: KitScrollBar {}
-      width: parent.width - list.width - edge.width - 2 * parent.spacing + Theme.windowPadding
-      height: parent.height
-      contentHeight: details.implicitHeight
-      bottomMargin: Theme.windowPadding  // the window's edge clips, not a line above it
-      interactive: contentHeight + bottomMargin > height   // the margin scrolls too
-      clip: true
-      boundsBehavior: Flickable.StopAtBounds
-
-      Column {
-        id: details
-        // the pane reaches the window's edge (the scrollbar sits there); its content ends at the header's line
-        width: pane.width - Theme.windowPadding
-        spacing: Theme.sectionGap
-        opacity: paneIn.shown
-
-        // heading: icon, name and about; the key that opens it; Reset
-        Item {
-          readonly property Item kitCaption: heading
-          property bool kitUnboxed: true    // KitGrouper: the heading stands on the page
-          width: parent.width
-          height: Math.max(heading.implicitHeight, trailing.height)
-
-          Row {
-            id: heading
-            anchors { left: parent.left; right: trailing.left; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
-            spacing: Theme.gapLoose
-
-            KitIcon {
-              id: headingIcon
-              anchors.verticalCenter: parent.verticalCenter
-              name: root.entry?.icon ?? ""
-              size: 18
-            }
-
-            Column {
-              anchors.verticalCenter: parent.verticalCenter
-              width: heading.width - headingIcon.width - heading.spacing
-              spacing: Theme.gapTight
-
-              KitText {
-                width: parent.width
-                elide: Text.ElideRight
-                text: root.entry?.label ?? ""
-                font.weight: Font.DemiBold
-              }
-
-              KitText {
-                width: parent.width
-                text: root.entry?.about ?? ""
-                elide: Text.ElideRight
-                maximumLineCount: 1
-                color: Theme.muted
-                font.pixelSize: Theme.fontSize - 1
-              }
-            }
-          }
-
-          Row {
-            id: trailing
-            anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-            spacing: Theme.gapSmall
-
-            Repeater {
-              model: KeybindsService.keysFor(root.entry?.bind ?? "")
-
-              KeyCap {
-                required property string modelData
-                anchors.verticalCenter: parent.verticalCenter
-                text: modelData
-              }
-            }
-
-            Item { width: 6; height: 1; visible: !!root.entry?.settings }
-
-            KitResetButton {
-              visible: !!root.entry?.settings
-              // an app with a bar module: every key but the module's (they stay)
-              readonly property var moduleKeys: root.hasModule ? (ModuleSettings.keysOf(root.entry.moduleSettings) ?? []) : []
-              readonly property var keys: root.hasModule
-                ? Object.keys(ModuleSettings.values[root.selected] ?? {}).filter(k => !moduleKeys.includes(k)) : null
-              changed: ModuleSettings.changed(root.selected, keys)
-              onReset: ModuleSettings.reset(root.selected, keys)
-            }
-          }
-        }
-
-        KitLine { sectionBreak: false }
-
-        // its components are off on this machine: nothing to set until installed
-        KitRow {
-          visible: root.entry !== null && !ShellAppsService.installed(root.entry)
-          label: "Not installed"
-          hint: "components add " + (BarLayout.notInstalled[root.entry?.module] ?? []).join(" or ")
-          labelColor: Theme.foreground2
-        }
-
-        // ---- the app: how its window opens first, then its own options ----
-        Column {
-          width: parent.width
-          visible: ShellAppsService.installed(root.entry)
-          spacing: Theme.sectionGap
-
-          // One-line summary; expand the full editor here in the app's settings.
-          KitRow {
-            visible: root.window !== null
-            label: "Window"
-            hint: !root.window ? "" : root.window.settings.mode === "tiled" ? "Tiled, in the layout"
-                : "Floating · " + ShellAppsService.sizeOf(root.window, root.window.settings).join(" × ")
-                  + " · " + ShellAppsService.placeName(root.window.settings)
-
-            KitButton {
-              width: Theme.buttonWidth
-              icon: "app-window"
-              text: root.setupOpen ? "Close" : "Set up"
-              selected: root.setupOpen
-              onClicked: root.setupOpen = !root.setupOpen
-            }
-          }
-
-          // opens and closes by revealing: the height and the fade follow `shown`; the options
-          // keep their final layout inside, so the group boxes never stretch
-          Item {
-            id: windowOptions
-            property bool kitUnboxed: true
-            property real shown: 0
-            property bool snapping: false
-            width: parent.width
-            height: Math.round(optionsLoader.height * shown)
-            visible: height > 0
-            opacity: shown
-            clip: true
-
-            Behavior on shown {
-              enabled: Motion.controls && !windowOptions.snapping
-              NumberAnimation { duration: Motion.normal; easing.type: Motion.morph }
-            }
-
-            function snap(value) { snapping = true; shown = value; snapping = false; }
-
-            Connections {
-              target: root
-              function onSetupOpenChanged() { windowOptions.shown = root.setupOpen && root.window !== null ? 1 : 0; }
-              function onSelectedChanged() { windowOptions.snap(0); }
-            }
-
-            Loader {
-              id: optionsLoader
-              width: parent.width
-              active: root.window !== null && (root.setupOpen || windowOptions.shown > 0)
-              sourceComponent: WindowOptions {
-                app: root.window
-                labelled: false
-                showPreview: true
-              }
-            }
-          }
-
-          KitLine { visible: root.window !== null && !!root.entry?.settings }
-
-          Loader {
-            width: parent.width
-            visible: active
-            active: !!root.entry?.settings
-            source: active ? Quickshell.shellPath(root.entry.settings) : ""
-          }
-
-          KitGrouper { id: appOptionsGrouper }
-        }
-
-        // its bar module's options are in Bar modules (05), a group of its own
-        KitLine {}
-
-        KitLinkRow {
-          visible: root.hasModule && ShellAppsService.installed(root.entry)
-          label: "Bar module"
-          hint: "In Bar modules › " + (root.entry?.label ?? "")
-          target: "modules:" + (root.entry?.module ?? "")
-        }
-
-        // an app with nothing to set gets a row in their place, like one
-        KitRow {
-          visible: root.window === null && !root.entry?.settings && !root.entry?.module
-          label: "No options"
-          hint: "Opens with its key or the launcher"
-          labelColor: Theme.foreground2
-        }
-
-        KitGrouper {}
-      }
+    // how its window opens: the preview and its choices, in sight at once
+    Loader {
+      width: parent.width
+      visible: active
+      active: root.installed && root.window !== null
+      sourceComponent: WindowOptions { app: root.window }
     }
-    KitEmptyState {
-      visible: list.matches.length === 0
-      width: parent.width - list.width - edge.width - 2 * parent.spacing
-      icon: "search"
-      title: "No matching items"
-      hint: "Try a shorter search"
+
+    KitLine { visible: root.installed && root.window !== null }
+
+    // its own options
+    Loader {
+      width: parent.width
+      visible: active
+      active: root.installed && !!root.entry?.settings
+      source: active ? Quickshell.shellPath(root.entry.settings) : ""
     }
-  }
 
-  // the chosen app fades in like a page does (ShellManager's pageIn)
-  QtObject { id: paneIn; property real shown: 1 }
-  NumberAnimation { id: paneAnim; target: paneIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
+    KitLine { visible: root.installed && !!root.entry?.settings }
 
-  onSelectedChanged: {
-    setupOpen = false;
-    pane.contentY = 0;
-    if (Motion.pages) paneAnim.restart();
+    // its bar module's options are in Bar modules, as every module's
+    KitLinkRow {
+      visible: root.hasModule && root.installed
+      label: "Bar module"
+      hint: "In Bar modules › " + (root.entry?.label ?? "")
+      target: "modules:" + (root.entry?.module ?? "")
+    }
+
+    // an app with nothing to set gets a row in their place, like one
+    KitRow {
+      visible: root.installed && root.window === null && !root.entry?.settings && !root.entry?.module
+      label: "No options"
+      hint: "Opens with its key or the launcher"
+      labelColor: Theme.foreground2
+    }
+
+    KitGrouper {}
   }
 }

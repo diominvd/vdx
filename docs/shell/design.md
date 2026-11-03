@@ -82,7 +82,9 @@ uses tonal layers and more spacious controls.
   left, control right. A hint is one line: ≤ ~40 chars (≤ ~30 beside a button
   or a wide control). A wide row (`wide`, `KitSelect`) puts its control under
   the text when its width is under `Theme.rowStackBelow`, whatever the text:
-  every wide row of a page sits one way, never some inline and some under. A hint adds something (effect, caveat,
+  every wide row of a page sits one way, never some inline and some under.
+  Stacked, the control spans the row's whole width: a short control at the right
+  edge under a label at the left reads as a diagonal. A hint adds something (effect, caveat,
   off-state) or is left out; it never repeats the label.
 - Control by the job: a feature on/off → `KitSwitch` (one row per item of a
   set, under a caps label with the count: `APPLIES TO` `3 OF 7`). 2–5 named equal
@@ -175,10 +177,17 @@ Pages by the user's area; the look follows macOS System Settings.
   not installed: a second click downloads).
   Cursor: its shapes large, colour and size, a card per cursor theme; a pick waits
   for Apply.
-- MUST — a page's side list (Apps, Bar modules, Themes) is one look: a search
+- MUST — a page over many entries with options of their own (Apps, Bar modules) is
+  an `EntryBrowser`: an index of `EntryCard`s (a search, a titled grid per section:
+  on the bar, off it, not installed) and one entry across the whole pane (back,
+  previous / next, a heading with its icon on a plate, state and Reset, then its
+  options). No third navigation column beside the sidebar: it narrows the options
+  until every wide row stacks. A card says its state in a few words behind a dot
+  (green: on); one that is not installed is muted, in its own section.
+- Themes keeps its side list (a picker with a preview, not options): a search
   field, then the entries in one box (`Theme.groupFill`, `radiusCard`) to the
   pane's foot; rows `radiusControl`, picked `Theme.pickFill` + `Theme.pickWeight`, hover
-  `Theme.controlHover`. Apps and Bar modules use `EntryList`; a new list copies it.
+  `Theme.controlHover`.
 - A pick list longer than a few rows is a page of cards, not a long select; a
   `KitSelect` shows `maxRows` and scrolls, a choice's `note` says its state.
 - MUST — colour: every colour choice starts with `Theme.colourSet` (the theme's
@@ -246,7 +255,7 @@ Pages by the user's area; the look follows macOS System Settings.
 - MUST — body text uses Normal, action labels Medium, selected items DemiBold.
   Large page titles use Medium. Avoid ExtraBold for routine selection.
 - MUST — shared control height is 34 in Strict, 36 in Material; setting rows
-  at least 40, navigation 34 / 36. Wide settings stack below `Theme.rowStackBelow` (420 px) of
+  at least 40, navigation 34 / 36. Wide settings stack below `Theme.rowStackBelow` (600 px) of
   available row width. Use `Theme.rowHeight` / `navigationHeight` instead of
   copying these values into pages.
 - MUST — Material settings groups use `Theme.groupFill` without outlines;

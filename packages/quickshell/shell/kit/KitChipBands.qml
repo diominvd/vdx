@@ -302,7 +302,7 @@ Column {
               // the hub draws it as a tile
               Rectangle {
                 visible: board.tileOf(chip.modelData) && !chip.line
-                anchors { right: parent.right; rightMargin: 4; top: parent.top; topMargin: 4 }
+                anchors { right: parent.right; rightMargin: Theme.gapHair; top: parent.top; topMargin: Theme.gapHair }
                 width: 7
                 height: 7
                 radius: Theme.pill(height)
@@ -383,7 +383,7 @@ Column {
 
         KitText {
           visible: band.ids.length === 0
-          anchors { left: parent.left; leftMargin: 4; verticalCenter: parent.verticalCenter }
+          anchors { left: parent.left; leftMargin: Theme.gapHair; verticalCenter: parent.verticalCenter }
           width: Math.max(0, parent.width - 8)
           wrapMode: Text.WordWrap
           text: board.dragId !== "" ? "Drop here" : board.emptyText(band.zone)

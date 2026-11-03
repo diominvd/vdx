@@ -40,7 +40,8 @@ def main():
         config = work / "qs/config"
         config.mkdir(parents=True)
         shutil.copytree(SHELL / "kit", work / "qs/kit")
-        shutil.copy(SHELL / "apps/shellmanager/EntryList.qml", work / "qs/kit/EntryList.qml")
+        for name in ("EntryBrowser.qml", "EntryCard.qml"):
+            shutil.copy(SHELL / "apps/shellmanager" / name, work / "qs/kit" / name)
         shutil.copy(SHELL / "apps/shellmanager/BarArrangement.qml", work / "qs/kit/BarArrangement.qml")
         for name in ("Theme.qml", "Motion.qml"):
             text = (SHELL / "config" / name).read_text()

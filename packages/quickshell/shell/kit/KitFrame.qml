@@ -29,7 +29,7 @@ Rectangle {
   implicitWidth: Math.ceil(Theme.modulePopupWidth * dpr) / dpr
   implicitHeight: Math.ceil((column.implicitHeight + 2 * padding - headerInset - bottomInset) * dpr) / dpr
   radius: framed ? Theme.radiusSurface : 0
-  color: inIsland ? "transparent" : Theme.background0
+  color: inIsland ? Theme.clear : Theme.background0
   border.width: framed && !inIsland ? Math.max(1, Math.round(Theme.windowFrameWidth * dpr)) / dpr : 0
   border.color: Theme.popupFrame
 

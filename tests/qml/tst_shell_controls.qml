@@ -32,10 +32,12 @@ Item {
   SignalSpy { id: inspected; target: board; signalName: "inspected" }
   SignalSpy { id: drops; target: board; signalName: "dropped" }
   SignalSpy { id: chosen; target: picker; signalName: "chosen" }
-  EntryList {
-    id: entries; x: 480; y: 0; width: 220; height: 180
-    model: [{id: "audio", label: "Audio", icon: "volume", off: false}, {id: "ai", label: "AI", icon: "bot", off: true}]
-    selected: "ai"
+  EntryBrowser {
+    id: entries; x: 480; y: 0; width: 520; height: 300
+    model: [{id: "audio", label: "Audio", icon: "volume", section: "on"},
+            {id: "clock", label: "Clock", icon: "clock", section: "on"},
+            {id: "ai", label: "AI", icon: "bot", off: true, section: "absent"}]
+    sections: [{key: "on", label: "ON"}, {key: "absent", label: "NOT INSTALLED"}]
     onPicked: id => selected = id
   }
   SignalSpy { id: clicks; target: button; signalName: "clicked" }
@@ -527,12 +529,18 @@ Item {
       compare(picker.pairOf("red")[0], "#ff0000");
       compare(picker.pairOf("#112233")[0], "#112233");
     }
-    function test_filtered_selection_stays_in_list() {
-      entries.query = ""; entries.selected = "ai";
-      compare(entries.matches.length, 2);
-      entries.query = "audio"; compare(entries.matches.length, 1); compare(entries.selected, "audio");
+    function test_entry_browser_order_search_and_neighbours() {
+      entries.query = ""; entries.selected = "";
+      compare(entries.ordered.map(e => e.id), ["audio", "clock", "ai"]);   // section by section, by name
+      compare(entries.entry, null);                                        // "" is the index
+      entries.query = "CL"; compare(entries.matches.map(e => e.id), ["clock"]);
       entries.query = "nothing"; compare(entries.matches.length, 0);
-      entries.query = ""; compare(entries.selected, "audio");
+      entries.query = "";
+      entries.selected = "audio";
+      compare(entries.previous, null); compare(entries.next.id, "clock");
+      entries.selected = "ai";
+      compare(entries.previous.id, "clock"); compare(entries.next, null);
+      entries.picked(""); compare(entries.selected, "");
     }
     function test_island_copy_preserves_hidden() {
       const hidden = BarLayout.modules.map(m => m.id).filter(id => !["workspaces", "audio", "wifi", "clock", "folder"].includes(id));

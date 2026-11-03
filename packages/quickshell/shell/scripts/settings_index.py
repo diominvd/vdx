@@ -70,6 +70,10 @@ ALIASES = {
     "Layout": ["add module", "arrange", "order"],
 }
 SECTIONS = {"AccentSection.qml": "accent", "CornersSection.qml": "shape"}
+# shared option blocks (kit): a file that uses one is read with the block's rows in its place
+INCLUDES = {name: SHELL / "kit" / f"{name}.qml"
+            for name in ("KitPanelOptions", "KitEnglishRow", "KitClearSearchRow", "KitPickerViewRow")}
+INCLUDES["MeteredRow"] = SM / "MeteredRow.qml"
 
 ROW = re.compile(r'\blabel:\s*"([^"]+)"')
 GROUP = re.compile(r'(?:KitLabel\s*\{(?:[^{}]|\{[^{}]*\})*?\btext|KitGroup\s*\{(?:[^{}]|\{[^{}]*\})*?\btitle)'
@@ -108,6 +112,14 @@ def hint_of(text: str, pos: int) -> str:
     return m.group(1) if m else ""
 
 
+def expand(text: str) -> str:
+    """The file's text with each shared block (INCLUDES) written out where it is used."""
+    for name, path in INCLUDES.items():
+        block = path.read_text()
+        text = re.sub(r"\b" + name + r"\s*\{[^{}]*\}", lambda m, block=block: block, text)
+    return text
+
+
 def rows(text: str) -> list:
     """(group, label, hint) of every row, in file order."""
     text = re.sub(r"property var jumps: \[.*?\n  \]", "", text, flags=re.S)   # the page's own jump list
@@ -131,7 +143,7 @@ def rows(text: str) -> list:
 
 
 def entries_of(path: Path, title: str, tab: str, target: str = "") -> list:
-    text = path.read_text()
+    text = expand(path.read_text())
     own = jumps(text)
     out = []
     # each group is found by its title too
@@ -191,7 +203,7 @@ def build() -> list:
 
 
 def keys_of(path: Path) -> list:
-    text = path.read_text()
+    text = expand(path.read_text())
     found = re.findall(r'\bkey:\s*"(\w+)"', text) + re.findall(r'ModuleSettings\.\w+\("[\w-]+",\s*"(\w+)"', text)
     if "BarTextRow" in text:
         found.append("text")

@@ -167,6 +167,7 @@ Singleton {
       if (l.end.includes(id)) return "Right of the clock";
       if (l.tiles.includes(id)) return "In the hub, as a tile";
       if (l.hub.includes(id)) return "In the hub, as a chip";
+      if (id === "clock" && islandClock(screen)) return "In the island";   // the island's own (islandOwn)
       return "";
     }
     const names = { left: "Left", center: "Centre", right: "Right" };

@@ -8,7 +8,7 @@ import qs.config
 // width (Theme.controlWidth, so the right edges line up down a page); in a narrow
 // place (under Theme.rowStackBelow) it goes under the text. Only the row's width decides,
 // never its text: every wide row of a page sits the same way. Wide controls keep the same
-// width in either layout. Give a wide KitChoices `stretch: true`.
+// width inline and the row's whole width stacked. Give a wide KitChoices `stretch: true`.
 //
 // `needs`: what this row waits for, in one phrase ("Island style only", "Needs Live
 // activities on"): the row stays in sight, its control out of reach, the phrase where the
@@ -35,7 +35,10 @@ Item {
 
   // Wide controls share one width so their edges line up across the page. Clamp
   // it only when the whole settings column is narrower than the standard width.
+  // Stacked, the control spans the row under its text: a narrower one at the right
+  // edge reads as a diagonal from the label.
   readonly property real controlW: {
+    if (stacked) return width;
     const c = slot.children.length > 0 ? slot.children[0] : null;
     const least = c && c.minWidth !== undefined ? c.minWidth : Theme.controlWidth;
     return Math.min(width, Math.max(least, Math.min(Theme.controlWidth, width - 12)));

@@ -18,18 +18,9 @@ Column {
 
   KitLabel { text: "POPUP" }
 
-  KitOptionRow {
-    module: "themes"; key: "view"; fallback: "auto"
-    label: "View"
-    hint: "Auto: cards in the island"
-    model: [
-      { label: "Auto",  value: "auto" },
-      { label: "Cards", value: "cards" },
-      { label: "List",  value: "list" }
-    ]
-  }
+  KitPickerViewRow { module: "themes" }
 
-  KitToggleRow { module: "themes"; key: "english"; fallback: true; label: "English layout on open"; hint: "Switches the keyboard" }
+  KitEnglishRow { module: "themes" }
   KitToggleRow { module: "themes"; key: "wheel"; fallback: true; label: "Wheel picks"; hint: "Over the cards or the list" }
 
   KitLine {}

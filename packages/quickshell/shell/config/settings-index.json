@@ -1990,7 +1990,7 @@
  },
  {
   "label": "English layout on open",
-  "hint": "Switches the keyboard",
+  "hint": "Switches the keyboard when it opens",
   "where": "Bar modules › Themes › POPUP",
   "target": "modules:themes"
  },
@@ -2074,7 +2074,7 @@
  },
  {
   "label": "English layout on open",
-  "hint": "Switches the keyboard",
+  "hint": "Switches the keyboard when it opens",
   "where": "Bar modules › Wallpapers › POPUP",
   "target": "modules:wallpapers"
  },
