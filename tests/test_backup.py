@@ -62,7 +62,8 @@ class Backup(unittest.TestCase):
         self.home.mkdir()
         self.bin.mkdir()
         self.repo = Path(self.tmp.name) / "repo"
-        for name, text in (("restic", FAKE_RESTIC), ("systemctl", FAKE_SYSTEMCTL)):
+        # a run notifies by default: without a stand-in the tests toast on the real desktop
+        for name, text in (("restic", FAKE_RESTIC), ("systemctl", FAKE_SYSTEMCTL), ("notify-send", "#!/bin/sh\nexit 0\n")):
             path = self.bin / name
             path.write_text(text)
             path.chmod(path.stat().st_mode | stat.S_IXUSR)
