@@ -209,6 +209,8 @@ guarded before it starts (`if (!p.running)`), so a double click cannot start two
 1. Literals: `grep -rnE '(spacing|margins): *[0-9]+'`, `"transparent"`, `"#`,
    `pixelSize: *[0-9]`, `radius: .*(height|width) */ *2`, `border.width: *[0-9]`,
    `duration: *[0-9]`. Each hit is a token or a reason.
+   One top-level `KitGrouper {}` per page column (`grep -c '^  KitGrouper {}'`): each extra one
+   adds a second gap between groups; groups of a flat page are parted by `KitLine {}`.
 2. Repeats: the same block twice → component. The same comment twice in a file
    → one of them is misplaced (it happened: a `jumps` comment above `resetKeys`).
 3. Both styles (Strict, Material), both corners, a narrow window (rows stack

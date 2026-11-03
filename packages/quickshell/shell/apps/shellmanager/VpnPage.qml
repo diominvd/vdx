@@ -37,7 +37,7 @@ KitColumn {
     }
   }
 
-  KitGrouper {}
+  KitLine {}
 
   // ---- subscription ----
   KitLabel { id: subscriptionGroup; text: "SUBSCRIPTION"; value: root.listed ? Format.count(vpn.nodes.length, "SERVER") : "" }
@@ -77,7 +77,7 @@ KitColumn {
     }
   }
 
-  KitGrouper {}
+  KitLine {}
 
   // ---- files ----
   KitLabel { id: filesGroup; text: "FILES"; about: "Open in the editor" }
