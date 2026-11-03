@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Services.Pipewire
+import qs.components
 import qs.config
 import qs.kit
 
@@ -14,6 +15,7 @@ KitFrame {
 
   // Set while the popup is shown; the input level meter runs only then.
   property bool open: false
+  signal closeRequested()
 
   // Live input level: the peak in dBFS mapped onto 0..1 over -60..0 dB.
   // PwNodePeakMonitor reports the cube root of the sample peak, so dBFS = 60·log10.
@@ -52,7 +54,7 @@ KitFrame {
   // ---- output ----
   Column {
     width: parent.width
-    spacing: Theme.gapGroup
+    spacing: Theme.gapMedium
 
     KitLabel {
       text: "OUTPUT"
@@ -81,12 +83,10 @@ KitFrame {
     }
   }
 
-  KitLine {}
-
   // ---- input ----
   Column {
     width: parent.width
-    spacing: Theme.gapGroup
+    spacing: Theme.gapMedium
 
     KitLabel {
       text: "INPUT"
@@ -115,49 +115,32 @@ KitFrame {
       iconOff: "mic-off"
     }
 
-    // what the microphone hears right now: green, yellow near the top, red at clipping
-    Column {
+    // what the microphone hears right now, a thin bar under the slider: green, yellow near the top, red at clipping
+    Rectangle {
+      radius: Theme.pill(height)
       width: parent.width
-      spacing: Theme.gapHair
-
-      KitInfo {
-        label: "Level"
-        value: micPeak.enabled ? Math.round(root.micLevel * 100) + "%" : "muted"
-        valueColor: micPeak.enabled ? Theme.foreground2 : Theme.gray
-      }
+      height: 3
+      color: Theme.background3
+      opacity: micPeak.enabled ? 1 : 0.4
 
       Rectangle {
-        radius: Theme.pill(height)
-        width: parent.width
-        height: 4
-        color: Theme.background3
+        width: root.micLevel * parent.width
+        height: parent.height
+        radius: parent.radius
+        color: root.micLevel > 0.92 ? Theme.red : root.micLevel > 0.75 ? Theme.yellow : Theme.green
 
-        Rectangle {
-          width: root.micLevel * parent.width
-          height: parent.height
-          color: root.micLevel > 0.92 ? Theme.red : root.micLevel > 0.75 ? Theme.yellow : Theme.green
-
-          Behavior on width { enabled: Motion.controls; NumberAnimation { duration: Motion.ms(60) } }
-        }
+        Behavior on width { enabled: Motion.controls; NumberAnimation { duration: Motion.ms(60) } }
       }
     }
   }
 
-  KitLine {}
-
-  // ---- applications ----
+  // ---- applications: only while something plays ----
   Column {
     width: parent.width
+    visible: AudioService.streams.length > 0
     spacing: Theme.gapMedium
 
     KitLabel { text: "APPLICATIONS (" + AudioService.streams.length + ")" }
-
-    KitText {
-      visible: AudioService.streams.length === 0
-      text: "Nothing is playing."
-      color: Theme.muted
-      font.pixelSize: Theme.fontSize - 1
-    }
 
     Repeater {
       model: AudioService.streams
@@ -170,7 +153,7 @@ KitFrame {
         KitAppear { target: stream; seen: root.seen; key: String(stream.modelData.id) }
 
         width: parent.width
-        spacing: Theme.gapMedium          // a caption over its slider
+        spacing: Theme.gapSmall          // a caption over its slider
 
         KitText {
           width: parent.width
@@ -182,6 +165,18 @@ KitFrame {
 
         AudioVolumeRow { node: modelData }
       }
+    }
+  }
+
+  KitLine {}
+
+  KitButton {
+    width: parent.width
+    icon: "sliders"
+    text: "Open settings"
+    onClicked: {
+      root.closeRequested();
+      ShellIpc.call("shell", "open", ["sound"]);
     }
   }
 }

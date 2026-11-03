@@ -47,6 +47,7 @@ Item {
       id: content
       anchors.fill: parent
       open: popup.visible
+      onCloseRequested: popup.visible = false
     }
   }
 }
