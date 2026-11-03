@@ -22,7 +22,6 @@ Row {
   // low battery: the level in red, the time left
   LiveGlyph { visible: face.kind === "battery"; size: face.coverSize; name: BatteryService.levelIcon; tint: Theme.red }
   KitText { visible: face.kind === "battery"; anchors.verticalCenter: parent.verticalCenter; text: "Battery"; color: Theme.foreground1 }
-  KitText { visible: face.kind === "battery"; anchors.verticalCenter: parent.verticalCenter; text: BatteryService.capacity + "%"; color: Theme.red; font.weight: Font.Medium }
   KitText {
     visible: face.kind === "battery" && BatteryService.minutesLeft > 0
     anchors.verticalCenter: parent.verticalCenter
@@ -31,21 +30,17 @@ Row {
     text: "· " + (BatteryService.minutesLeft >= 60 ? Math.floor(BatteryService.minutesLeft / 60) + " h " : "") + BatteryService.minutesLeft % 60 + " min left"
     color: Theme.muted
   }
+  LiveCap { visible: face.kind === "battery"; text: BatteryService.capacity + "%"; tint: Theme.red; solid: true }
 
   // a device that connected: its name, the charge
   LiveGlyph { visible: face.kind === "bluetooth"; size: face.coverSize; name: "bluetooth"; tint: Theme.blue }
   KitText { visible: face.kind === "bluetooth"; anchors.verticalCenter: parent.verticalCenter; width: Math.min(implicitWidth, 180); elide: Text.ElideRight; text: BluetoothService.mainDevice?.name ?? ""; color: Theme.foreground1 }
-  KitText {
-    visible: face.kind === "bluetooth" && BluetoothService.mainDevice?.battery != null
-    anchors.verticalCenter: parent.verticalCenter
-    text: BluetoothService.mainDevice?.battery + "%"
-    color: Theme.blue
-  }
+  LiveCap { visible: face.kind === "bluetooth" && BluetoothService.mainDevice?.battery != null; text: BluetoothService.mainDevice?.battery + "%"; tint: Theme.blue; plainBold: false }
 
   // vpn: the server and the ping
   KitText { visible: face.kind === "vpn"; anchors.verticalCenter: parent.verticalCenter; text: "VPN"; color: Theme.foreground1; font.letterSpacing: 1 }
   KitText { visible: face.kind === "vpn"; anchors.verticalCenter: parent.verticalCenter; text: MihomoService.current; color: Theme.foreground2; width: Math.min(implicitWidth, 110); elide: Text.ElideRight }
-  KitText { visible: face.kind === "vpn" && MihomoService.currentDelay > 0; anchors.verticalCenter: parent.verticalCenter; text: String(MihomoService.currentDelay); color: Theme.muted }
+  LiveCap { visible: face.kind === "vpn" && MihomoService.currentDelay > 0; text: MihomoService.currentDelay + " ms"; tint: Theme.green; plainText: String(MihomoService.currentDelay); plainTint: Theme.muted; plainBold: false }
 
   // radio: the station on air, the sound
   Rectangle {
@@ -92,14 +87,7 @@ Row {
     }
   }
   LiveGlyph { visible: face.kind === "timer" && TimerService.kind === "stopwatch"; size: face.coverSize; name: "clock"; tint: Theme.orange }
-  KitText {
-    visible: face.kind === "timer"
-    anchors.verticalCenter: parent.verticalCenter
-    text: TimerService.text
-    color: Theme.orange
-    font.weight: Font.Medium
-    opacity: TimerService.paused ? 0.5 : 1
-  }
+  LiveCap { visible: face.kind === "timer"; text: TimerService.text; tint: Theme.orange; opacity: TimerService.paused ? 0.5 : 1 }
 
   // focus: do not disturb is on
   LiveGlyph { visible: face.kind === "focus"; size: face.coverSize; name: "moon"; tint: Theme.purple }
@@ -120,7 +108,7 @@ Row {
       }
     }
   }
-  KitText { visible: face.kind === "volume"; anchors.verticalCenter: parent.verticalCenter; text: Math.round(IslandService.osdLevel * 100); color: IslandService.osdLoud ? Theme.red : Theme.foreground1 }
+  LiveCap { visible: face.kind === "volume"; text: Math.round(IslandService.osdLevel * 100); tint: IslandService.osdLoud ? Theme.red : Theme.foreground1; plainBold: false }
 
   // flashes: the mic, the layout, the cable
   LiveGlyph { visible: face.kind === "mic"; size: face.coverSize; name: IslandService.micMuted ? "mic-off" : "mic"; tint: IslandService.micMuted ? Theme.red : Theme.green }
