@@ -6,14 +6,12 @@ import qs.kit
 
 // How one of the shell's windows opens (Apps › WINDOW): Window (floating / tiled)
 // and, floating, Size (its own, a preset share of the screen, custom pixels) and
-// Position (a spot on the screen, at the pointer, custom x, y), then Preview: a
-// small screen with the window as it will open (a click on it places the window). Choices apply at once, numbers on Enter; it shows the next
+// Position (a spot on the screen, at the pointer, custom x, y). Choices apply at once, numbers on Enter; it shows the next
 // time the window opens.
 KitColumn {
   id: root
 
   required property var app                 // ShellAppsService.windows entry
-  property bool showPreview: true
   property bool labelled: true              // its WINDOW label (a dialog has a header)
 
   readonly property var s: app.settings
@@ -94,15 +92,26 @@ KitColumn {
     wide: true
     label: "Position"
     hint: root.s.position === "cursor" ? "Centred on the pointer"
-        : root.s.position === "custom" ? "Exact screen coordinates"
-        : root.s.position === "center" ? "Centre of the screen"
-        : root.s.position.replace("-", " ") + " of the screen"
+        : root.s.position === "custom" ? "Exact screen coordinates" : "A spot on the screen"
 
     KitSegments {
       model: [{ label: "Screen", value: "screen" }, { label: "Pointer", value: "cursor" }, { label: "Custom", value: "custom" }]
       current: root.screenSpot ? "screen" : root.s.position
       onPicked: value => root.set({ position: value === "screen" ? (ShellAppsService.spots[root.s.position] ? root.s.position : "center") : value })
     }
+  }
+
+  // the nine spots, in reading order
+  KitSelect {
+    visible: root.floating && root.screenSpot
+    label: "Spot"
+    hint: "Where on the screen it opens"
+    model: [["top-left", "Top left"], ["top", "Top"], ["top-right", "Top right"],
+            ["left", "Left"], ["center", "Centre"], ["right", "Right"],
+            ["bottom-left", "Bottom left"], ["bottom", "Bottom"], ["bottom-right", "Bottom right"]]
+      .map(p => ({ label: p[1], value: p[0] }))
+    current: root.s.position
+    onPicked: value => root.set({ position: value })
   }
 
   PairRow {
@@ -114,32 +123,6 @@ KitColumn {
     second: root.yDraft
     onEdited: (a, b) => { root.xDraft = a; root.yDraft = b; }
     onAccepted: (a, b) => root.set({ position: "custom", x: a, y: b })
-  }
-
-  // the window as it will open, on a small screen at the controls' width: a row like
-  // the rest, its words on the left (a click on the screen places it)
-  KitRow {
-    visible: root.showPreview
-    label: "Preview"
-    hint: root.app.id === "shell-manager" ? "Close and reopen this window to see it"
-        : root.floating && root.screenSpot ? "Click the screen to place it. Shows the next time it opens"
-        : "Shows the next time it opens"
-
-    // the row's own gap above and below it, as a control's in a row of row height
-    Item {
-      width: preview.width
-      height: preview.height + 2 * Theme.gapMedium
-
-      WindowPreview {
-        id: preview
-        anchors.verticalCenter: parent.verticalCenter
-        width: Math.min(Theme.controlWidth, root.width / 2)
-        app: root.app
-        settings: root.s
-        pickable: root.floating && root.screenSpot
-        onPicked: spot => root.set({ position: spot })
-      }
-    }
   }
 
   KitText {

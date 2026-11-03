@@ -7,7 +7,7 @@ import qs.kit
 
 // Apps: the shell's own apps (ShellAppsService.entries) as cards (EntryBrowser); a card
 // opens the app across the pane: its key and Reset in the heading, how its window opens
-// (WindowOptions, with its preview), its own options page (values in ModuleSettings) and
+// (WindowOptions), its own options page (values in ModuleSettings) and
 // a link to its bar module's options in Bar modules.
 Item {
   id: root
@@ -29,17 +29,10 @@ Item {
       id: e.id, label: e.label, icon: e.icon, about: e.about,
       off: !installed, ok: false,
       section: installed ? "apps" : "absent",
-      state: !installed ? "Not installed" : keys.length > 0 ? keys.join(" + ") : windowState(e),
-      note: installed ? "" : "Not installed"   // the heading shows its keys, the page its window
+      state: !installed ? "Not installed" : keys.length > 0 ? keys.join(" + ") : "No key",
+      note: installed ? "" : "Not installed"   // the heading shows its keys
     };
   })
-
-  // how an app's window opens, in a few words ("" without a window of its own)
-  function windowState(e) {
-    const w = e?.window ? ShellAppsService.windows.find(a => a.id === e.window.id) : null;
-    if (!w) return "";
-    return w.settings.mode === "tiled" ? "Tiled" : "Floating · " + ShellAppsService.sizeOf(w, w.settings).join(" × ");
-  }
 
   property string selected: ""
   // an open entry: the window header's crumb ("‹ All apps / <name>") goes back to the index
@@ -78,6 +71,11 @@ Item {
     ]
     selected: root.selected
     searchHint: "Search apps…"
+    filters: [
+      { label: "All", value: "all", sections: null },
+      { label: "Installed", value: "apps", sections: ["apps"] },
+      { label: "Not installed", value: "absent", sections: ["absent"] }
+    ]
     onPicked: id => root.selected = id
 
     trailing: [

@@ -1808,13 +1808,13 @@
   "target": "windows"
  },
  {
-  "label": "X, Y",
-  "hint": "",
+  "label": "Spot",
+  "hint": "Where on the screen it opens",
   "where": "Windows › WINDOW",
   "target": "windows"
  },
  {
-  "label": "Preview",
+  "label": "X, Y",
   "hint": "",
   "where": "Windows › WINDOW",
   "target": "windows"

@@ -4,11 +4,14 @@ import qs.kit
 
 // One entry of EntryBrowser's index: its icon on a plate, its name and, under it, its
 // state behind a dot (green: good news, e.g. on the bar). An entry that is off (not
-// installed) is muted. The whole card is the button: click, Enter or Space.
+// installed) is muted. The whole card is the button: click, Enter or Space. On the
+// browser's reveal() it rises in after the cards before it (Motion.pages).
 Rectangle {
   id: root
 
   required property var entry
+  property int order: 0          // its place in the index: the entrance waits its turn
+  property Item browser: null    // the EntryBrowser whose reveal() it answers
   signal clicked()
 
   readonly property bool hovered: area.containsMouse
@@ -28,6 +31,23 @@ Rectangle {
       event.accepted = true;
     }
   }
+  Connections {
+    target: root.browser
+    function onReveal() { if (Motion.pages) entrance.restart(); }
+  }
+
+  transform: Translate { id: lift }
+  SequentialAnimation {
+    id: entrance
+    // the first ones at once: none waits long, however long the index
+    ScriptAction { script: { root.opacity = 0; lift.y = Theme.gapMedium; } }
+    PauseAnimation { duration: Math.max(0, Math.min(root.order, 8)) * Motion.ms(24) }
+    ParallelAnimation {
+      NumberAnimation { target: root; property: "opacity"; to: 1; duration: Motion.normal; easing.type: Motion.easing }
+      NumberAnimation { target: lift; property: "y"; to: 0; duration: Motion.normal; easing.type: Motion.easing }
+    }
+  }
+
   Accessible.role: Accessible.Button
   Accessible.name: entry.label + (entry.state ? ", " + entry.state : "")
 

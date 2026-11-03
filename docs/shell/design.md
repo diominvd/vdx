@@ -283,9 +283,9 @@ Pages by the user's area; the look follows macOS System Settings.
   the variant currently shown by its preview, including Light / Dark.
 - Password fields always use dots. The old key remains readable for settings
   import compatibility but is no longer an appearance choice.
-- A small visual of a setting (an app's window on its screen) is the control of a
-  row, at `controlWidth`, its words in the row's hint: never a full-width block
-  over the rows it shows.
+- Options are rows; a picture of what they do (a window on a screen) is not added
+  beside them: the rows' hints say it. An app's window spot is a select of the
+  nine spots, a card's state is its key, never its window's size.
 - Scrollbars use a 2 px thumb, hidden at rest, in a separate gutter.
 - A `kitUnboxed` pane is a grouping boundary: a nested KitGrouper owns its own
   boxes rather than joining groups across unrelated columns.

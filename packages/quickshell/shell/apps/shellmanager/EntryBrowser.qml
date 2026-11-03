@@ -15,6 +15,8 @@ import qs.kit
 // says it otherwise: "" for none), ok (the state is good news), off (not installed: muted),
 // section (a key of `sections`)}. `selected` "" is the index; picked(id)
 // asks the page to open one ("" goes back). Each view scrolls on its own.
+// Motion (Motion.pages): an entry comes in from the right, the index back from the left,
+// its cards one after another when it shows and when the filter changes (not as you type).
 Item {
   id: root
 
@@ -32,6 +34,8 @@ Item {
   property string query: ""
   readonly property string needle: query.trim().toLowerCase()
   readonly property var entry: model.find(e => e.id === selected) ?? null
+  // each change runs the cards' entrance (EntryCard.reveal)
+  signal reveal()
 
   // the entries in the order the index shows them: section by section, then by name
   readonly property var ordered: {
@@ -50,6 +54,8 @@ Item {
   Flickable {
     id: index
     visible: root.entry === null
+    opacity: indexIn.shown
+    transform: Translate { x: -(1 - indexIn.shown) * 18 }
     anchors.fill: parent
     Controls.ScrollBar.vertical: KitScrollBar {}
     contentHeight: grid.implicitHeight
@@ -119,6 +125,8 @@ Item {
               EntryCard {
                 required property var modelData
                 entry: modelData
+                order: root.matches.indexOf(modelData)   // across the sections
+                browser: root
                 width: grid.cardWidth
                 onClicked: root.picked(modelData.id)
               }
@@ -154,6 +162,7 @@ Item {
       width: pane.width - Theme.windowPadding
       spacing: Theme.sectionGap
       opacity: paneIn.shown
+      transform: Translate { x: (1 - paneIn.shown) * 18 }   // in from the right, like a page
 
       // heading: icon, name, about and state; `trailing` (keys, Reset) on the right
       Item {
@@ -226,13 +235,19 @@ Item {
     }
   }
 
-  // an entry fades in like a page does (ShellManager's pageIn)
+  // a view comes in like a page does (ShellManager's pageIn)
   QtObject { id: paneIn; property real shown: 1 }
   NumberAnimation { id: paneAnim; target: paneIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
+  QtObject { id: indexIn; property real shown: 1 }
+  NumberAnimation { id: indexAnim; target: indexIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
 
   onSelectedChanged: {
     pane.contentY = 0;
     if (selected === "") Qt.callLater(() => search.input.forceActiveFocus());
-    if (Motion.pages) paneAnim.restart();
+    if (!Motion.pages) return;
+    if (selected === "") { indexAnim.restart(); reveal(); } else paneAnim.restart();
   }
+  // after the Repeaters made the filter's cards
+  onFilterChanged: Qt.callLater(reveal)
+  Component.onCompleted: Qt.callLater(reveal)
 }
