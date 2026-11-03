@@ -1346,7 +1346,7 @@
  },
  {
   "label": "Background",
-  "hint": "Appearance wallpaper or desktop blur",
+  "hint": "Blurred: the desktop as it was",
   "where": "Lock screen › LOOK",
   "target": "lockscreen"
  },

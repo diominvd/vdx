@@ -22,7 +22,7 @@ KitColumn {
   KitOptionRow {
     wide: false
     module: "lock"; key: "background"; fallback: "solid"
-    label: "Background"; hint: "Appearance wallpaper or desktop blur"
+    label: "Background"; hint: "Blurred: the desktop as it was"
     model: [{ label: "Solid", value: "solid" }, { label: "Wallpaper", value: "wallpaper" }, { label: "Blurred", value: "blur" }]
   }
 
