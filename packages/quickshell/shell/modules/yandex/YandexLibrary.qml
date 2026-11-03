@@ -28,6 +28,14 @@ Singleton {
   property string error: ""
   property string notice: ""                   // "Added to Sport": a finished action, for the status line
 
+  // a backend's raw exception (a connection pool, a certificate) is no text for a status line
+  function plain(e, fallback) {
+    if (!e) return fallback;
+    if (/SSL|certificate/i.test(e)) return "Yandex Music is unreachable: a secure connection could not be made";
+    if (/ConnectionPool|Max retries|timed? ?out|resolve|Connection (refused|reset)/i.test(e)) return "Yandex Music is unreachable: check the connection";
+    return e;
+  }
+
   // a liked track the library has downloaded: it plays from MPD
   function playable(id) { return YandexService.localIds[id] !== undefined; }
 
@@ -139,7 +147,7 @@ Singleton {
         const o = root.parse(text);
         root.likesLoading = false;
         if (o?.ok) root.likes = o.tracks;
-        else root.error = o?.error ?? "could not load the likes";
+        else root.error = root.plain(o?.error, "could not load the likes");
       }
     }
   }
@@ -152,7 +160,7 @@ Singleton {
         root.searching = false;
         if (root.query !== root.sent) root.runSearch();
         else if (o?.ok) root.results = o.tracks;
-        else root.error = o?.error ?? "search failed";
+        else root.error = root.plain(o?.error, "search failed");
       }
     }
   }
@@ -164,7 +172,7 @@ Singleton {
         const o = root.parse(text);
         root.playlistsLoading = false;
         if (o?.ok) root.playlists = o.playlists;
-        else root.error = o?.error ?? "could not load the playlists";
+        else root.error = root.plain(o?.error, "could not load the playlists");
       }
     }
   }
@@ -177,7 +185,7 @@ Singleton {
         root.playlistLoading = false;
         if (!root.playlist) return;
         if (o?.ok) root.playlist = Object.assign({}, root.playlist, { tracks: o.tracks });
-        else root.error = o?.error ?? "could not load the playlist";
+        else root.error = root.plain(o?.error, "could not load the playlist");
       }
     }
   }
@@ -188,7 +196,7 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const o = root.parse(text);
-        if (!o?.ok) root.error = o?.error ?? "that did not work";
+        if (!o?.ok) root.error = root.plain(o?.error, "that did not work");
         if (actProc.done) actProc.done(o);
       }
     }

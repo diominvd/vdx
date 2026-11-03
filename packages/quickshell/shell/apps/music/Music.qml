@@ -68,7 +68,6 @@ Item {
 
   // a folder's path with ~ as the home folder, and its name
   function home(path) { return path.replace(/^~(?=\/|$)/, Quickshell.env("HOME")); }
-  function nameOf(path) { return path.split("/").filter(s => s !== "").pop() ?? path; }
   function parentOf(path) { const i = path.lastIndexOf("/"); return i > 0 ? path.slice(0, i) : path; }
 
   onDirChanged: {
@@ -257,7 +256,7 @@ Item {
       anchors { top: parent.top; left: parent.left; right: parent.right; topMargin: root.padding - Theme.headerInset }
       icon: root.tab === "files" ? "folder" : root.tab === "radio" ? (root.radioPage === "favorites" ? "star" : "radio")
           : ({ likes: "heart", search: "search", playlist: "list" })[root.page]
-      title: root.tab === "files" ? (root.dir === "" ? "Files" : root.nameOf(root.dir))
+      title: root.tab === "files" ? (root.dir === "" ? "Files" : Paths.nameOf(root.dir))
            : root.tab === "radio" ? (root.radioPage === "favorites" ? "Favourites" : "All stations")
            : root.page === "likes" ? "Likes"
            : root.page === "search" ? "Search"
@@ -273,7 +272,7 @@ Item {
       KitButton {
         visible: root.tab === "files" && root.dir !== "" && root.folders.indexOf(root.dir) < 0
         icon: "arrow-up"
-        text: root.dir === "" ? "" : root.nameOf(root.parentOf(root.dir))
+        text: root.dir === "" ? "" : Paths.nameOf(root.parentOf(root.dir))
         onClicked: root.openDir(root.parentOf(root.dir))
       }
 
@@ -359,7 +358,7 @@ Item {
         visible: root.tab === "yandex"
         kind: "yandex"
         tracks: root.yandexTracks
-        empty: !root.yandexOn ? "" : root.page === "likes" ? (YandexLibrary.likesLoading ? "Loading…" : root.filter !== "" ? "Nothing matches" : "No liked tracks")
+        empty: !root.yandexOn ? "" : root.page === "likes" ? (YandexLibrary.likesLoading ? "Loading…" : YandexLibrary.error !== "" ? "" : root.filter !== "" ? "Nothing matches" : "No liked tracks")
              : root.page === "search" ? (YandexLibrary.searching ? "Searching…"
                  : YandexLibrary.query === "" ? "Type and press Enter to search Yandex Music"
                  : "Nothing matches “" + YandexLibrary.query + "”")
