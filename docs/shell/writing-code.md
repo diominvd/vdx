@@ -180,6 +180,9 @@ Item {
     sections: [{ key: "on", label: "ON THE BAR" }, { key: "off", label: "OFF THE BAR" }]
     selected: root.selected
     searchHint: "Search modules…"
+    // optional: segments beside the search, each a set of sections
+    filters: [{ label: "All", value: "all", sections: null },
+              { label: "On the bar", value: "on", sections: ["on"] }]
     onPicked: id => root.selected = id
     trailing: KitResetButton { /* … */ }          // keys, Reset: right of the heading
 

@@ -178,7 +178,8 @@ Pages by the user's area; the look follows macOS System Settings.
   Cursor: its shapes large, colour and size, a card per cursor theme; a pick waits
   for Apply.
 - MUST — a page over many entries with options of their own (Apps, Bar modules) is
-  an `EntryBrowser`: an index of `EntryCard`s (a search, a titled grid per section:
+  an `EntryBrowser`: an index of `EntryCard`s (a search, with segments that narrow it
+  to some sections where they help — Bar modules: All / On the bar / Off — then a titled grid per section:
   on the bar, off it, not installed) and one entry across the whole pane (a heading with its icon on a plate, state and Reset, then its
   options); the way back is a crumb on the right of the window's header,
   `‹ All apps / Backups`, never a row in the pane. No third navigation column beside the sidebar: it narrows the options

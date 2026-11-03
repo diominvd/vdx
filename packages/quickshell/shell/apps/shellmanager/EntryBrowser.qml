@@ -4,8 +4,9 @@ import qs.config
 import qs.kit
 
 // The page of Apps and Bar modules, in two views over the whole pane.
-// Index: a search, then a grid of EntryCards per section (the section's name and count
-// above). Typing filters, Enter opens the first match.
+// Index: a search (and, given `filters`, segments that narrow it to some sections), then
+// a grid of EntryCards per section (the section's name and count above). Typing filters,
+// Enter opens the first match.
 // Entry: its heading (icon, name, about, state; `trailing` on the right: keys, Reset),
 // then its options (the children, a Column's content that ends with its own KitGrouper).
 // The way back is the crumb in the window's header (ShellManager reads the page's
@@ -21,6 +22,9 @@ Item {
   property var sections: []          // [{key, label}] in their order
   property string selected: ""
   property string searchHint: "Search…"
+  // [{label, value, sections}]: segments beside the search, each showing those sections
+  // (none: every one); the first is picked at first
+  property var filters: []
   default property alias content: body.data
   property alias trailing: trailingRow.data
   signal picked(string id)
@@ -37,7 +41,10 @@ Item {
         out.push(e);
     return out;
   }
-  readonly property var matches: ordered.filter(e => e.label.toLowerCase().includes(needle))
+  property var filter: filters.length > 0 ? filters[0].value : null
+  readonly property var shownSections: filters.find(f => f.value === filter)?.sections ?? null
+  readonly property var matches: ordered.filter(e => e.label.toLowerCase().includes(needle)
+    && (shownSections === null || shownSections.includes(e.section)))
 
   // ---- index ----
   Flickable {
@@ -61,14 +68,29 @@ Item {
       readonly property int columns: Math.max(1, Math.floor((width + Theme.gapMedium) / (Theme.sideWidth + Theme.gapMedium)))
       readonly property real cardWidth: (width - (columns - 1) * Theme.gapMedium) / columns
 
-      KitInput {
-        id: search
+      Item {
         width: parent.width
-        placeholder: root.searchHint
-        icon: "search"
-        text: root.query
-        onTextEdited: root.query = text
-        onAccepted: if (root.matches.length > 0) root.picked(root.matches[0].id)
+        height: search.height
+
+        KitInput {
+          id: search
+          anchors { left: parent.left; right: segments.visible ? segments.left : parent.right; rightMargin: segments.visible ? Theme.gapMedium : 0 }
+          placeholder: root.searchHint
+          icon: "search"
+          text: root.query
+          onTextEdited: root.query = text
+          onAccepted: if (root.matches.length > 0) root.picked(root.matches[0].id)
+        }
+
+        KitSegments {
+          id: segments
+          visible: root.filters.length > 0
+          anchors { right: parent.right; verticalCenter: search.verticalCenter }
+          width: minWidth
+          model: root.filters
+          current: root.filter
+          onPicked: value => root.filter = value
+        }
       }
 
       Repeater {
@@ -110,7 +132,7 @@ Item {
         width: parent.width
         icon: "search"
         title: "No matches"
-        hint: "Try a shorter search"
+        hint: root.needle !== "" ? "Try a shorter search" : "None here: pick " + (root.filters[0]?.label ?? "another")
       }
     }
   }

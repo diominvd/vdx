@@ -79,6 +79,11 @@ Item {
     ]
     selected: root.selected
     searchHint: "Search modules…"
+    filters: [
+      { label: "All", value: "all", sections: null },
+      { label: "On the bar", value: "on", sections: ["on"] },
+      { label: "Off", value: "off", sections: ["off", "absent"] }
+    ]
     onPicked: id => root.selected = id
 
     trailing: KitResetButton {
