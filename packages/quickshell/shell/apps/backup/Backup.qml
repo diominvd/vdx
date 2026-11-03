@@ -62,20 +62,26 @@ Rectangle {
   }
 
   // ---- pages ----
-  BackupOverview {
-    anchors { left: side.right; right: parent.right; top: head.bottom; bottom: foot.top; leftMargin: Theme.windowPadding; rightMargin: Theme.windowPadding; topMargin: Theme.gapGroup }
-    visible: root.tab === "overview"
-    onOpenSettings: root.tab = "settings"
-  }
+  // ends at the foot when it shows, else at the window's padding
+  Item {
+    id: pages
+    anchors { left: side.right; right: parent.right; top: head.bottom; bottom: foot.visible ? foot.top : parent.bottom; leftMargin: Theme.windowPadding; rightMargin: Theme.windowPadding; topMargin: Theme.gapGroup; bottomMargin: foot.visible ? 0 : Theme.windowPadding }
 
-  BackupSnapshots {
-    anchors { left: side.right; right: parent.right; top: head.bottom; bottom: foot.top; leftMargin: Theme.windowPadding; rightMargin: Theme.windowPadding; topMargin: Theme.gapGroup }
-    visible: root.tab === "snapshots"
-  }
+    BackupOverview {
+      anchors.fill: parent
+      visible: root.tab === "overview"
+      onOpenSettings: root.tab = "settings"
+    }
 
-  BackupSettings {
-    anchors { left: side.right; right: parent.right; top: head.bottom; bottom: foot.top; leftMargin: Theme.windowPadding; rightMargin: Theme.windowPadding; topMargin: Theme.gapGroup }
-    visible: root.tab === "settings"
+    BackupSnapshots {
+      anchors.fill: parent
+      visible: root.tab === "snapshots"
+    }
+
+    BackupSettings {
+      anchors.fill: parent
+      visible: root.tab === "settings"
+    }
   }
 
   // ---- foot ----
