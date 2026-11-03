@@ -32,6 +32,9 @@ QtObject {
     .filter((id, i, list) => all.includes(id) && list.indexOf(id) === i)
     .concat(all.filter(id => !saved.includes(id) && !(saved.includes("sliders") && sliderIds.includes(id))))
 
+  // the toggles above the module chips: the Bar page lists the two rows in this order
+  readonly property bool tilesFirst: order.indexOf("tiles") < order.indexOf("modules") || order.indexOf("modules") < 0
+
   // a slider's switch is its own key (volume, microphone, ...), on by default for volume and brightness
   // (the player once had a switch of its own, ShellSettings look hubPlayer: off there is off here)
   function shown(id) {

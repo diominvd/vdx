@@ -42,7 +42,7 @@ KitSettingsWorkspace {
   readonly property string other: roles.find(n => n !== screenName) ?? ""
   readonly property var layout: BarLayout.layout(screenName)
   readonly property var children: BarLayout.barsOn(screenName)
-  readonly property var columnZones: (island ? ["start", "end", "hub", "tiles"] : ["left", "center", "right", "folder"])
+  readonly property var columnZones: (island ? ["start", "end"].concat(HubBlocks.tilesFirst ? ["tiles", "hub"] : ["hub", "tiles"]) : ["left", "center", "right", "folder"])
     .concat(children.map(b => "bar:" + b.id), ["hidden"])
   function childOf(zone) { return zone.startsWith("bar:") ? zone.slice(4) : ""; }
   readonly property string selectedZone: columnZones.find(z => ids(z).includes(selectedModule)) ?? ""
@@ -218,7 +218,7 @@ KitSettingsWorkspace {
         // its own group: the caption takes the same inset as the other sections' (KitGrouper)
         Column {
           width: parent.width
-          KitLabel { text: "LAYOUT"; about: "Drag modules between rows" }
+          KitLabel { text: "LAYOUT"; about: root.island ? "Drag modules between rows. The hub's two rows follow the order of its blocks (Hub › Blocks)" : "Drag modules between rows" }
           BarArrangement {
             id: editor
             showOverview: false

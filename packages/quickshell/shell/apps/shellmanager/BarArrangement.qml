@@ -24,7 +24,7 @@ Column {
   property Flickable scrollViewport: null
   readonly property alias dragBoard: board
   readonly property bool dragging: board.dragId !== ""
-  readonly property var mainZones: island ? ["start", "end", "hub", "tiles"] : ["left", "center", "right", "folder"]
+  readonly property var mainZones: island ? ["start", "end"].concat(HubBlocks.tilesFirst ? ["tiles", "hub"] : ["hub", "tiles"]) : ["left", "center", "right", "folder"]
   readonly property var zones: mainZones.concat(extraZones, showAvailable ? ["hidden"] : [])
   readonly property var strips: {
     const main = {id: "main", ids: island
