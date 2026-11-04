@@ -8,9 +8,10 @@ QtObject {
   id: root
 
   // id -> what it is, in the default order
-  readonly property var all: ["tiles", "week", "volume", "microphone", "brightness", "night", "dimming", "player", "modules"]
-  readonly property var names: ({ tiles: "Toggles", week: "Calendar", player: "Player", volume: "Volume", microphone: "Microphone", brightness: "Brightness", night: "Night light", dimming: "Dimming", modules: "Module chips" })
+  readonly property var all: ["machine", "tiles", "week", "volume", "microphone", "brightness", "night", "dimming", "player", "modules"]
+  readonly property var names: ({ machine: "Machine", tiles: "Toggles", week: "Calendar", player: "Player", volume: "Volume", microphone: "Microphone", brightness: "Brightness", night: "Night light", dimming: "Dimming", modules: "Module chips" })
   readonly property var notes: ({
+    machine: "Battery, memory and disk as rings, the CPU gauge",
     tiles: "The tiles of the Hub row: Wi-Fi, Bluetooth, VPN, Focus",
     week: "The week, or the whole month",
     player: "Opens the Music popup",

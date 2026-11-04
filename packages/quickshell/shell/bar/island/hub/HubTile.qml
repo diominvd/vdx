@@ -4,6 +4,7 @@ import qs.kit
 
 // One tile of the hub: a round icon (light when on, dark when off), the name, a
 // detail line and a chevron. Compact (four to a row): the icon over the name.
+// Bare (Bezel's 1×1): no plate, the disc filled when on and outlined when off, the name under it.
 // A click on the icon switches the thing; a click on the rest opens its popup.
 Rectangle {
   id: root
@@ -13,34 +14,39 @@ Rectangle {
   property string detail: ""
   property bool on: false
   property bool compact: false
+  property bool bare: false                    // a disc with no plate (implies compact)
   property bool canOpen: true                  // a popup behind the tile: the chevron and the click
 
   signal toggled()
   signal opened()
   signal context()                             // a right click: the options of what it shows
 
-  implicitHeight: compact ? 84 : 64
+  implicitHeight: bare ? Theme.ringPeek + Theme.gapSmall + Theme.fontSize + 2 : compact ? 84 : 64
   radius: Theme.radiusCard
-  color: area.containsMouse && !discArea.containsMouse ? Theme.controlHover : Theme.controlFill
+  color: bare ? Theme.clear : area.containsMouse && !discArea.containsMouse ? Theme.controlHover : Theme.controlFill
   Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }
-  border.width: Theme.frameWidth
+  border.width: bare ? 0 : Theme.frameWidth
   border.color: Theme.controlLine
 
   Rectangle {
     id: disc
-    x: root.compact ? (parent.width - width) / 2 : Theme.gapMedium
-    y: root.compact ? Theme.gapMedium : (parent.height - height) / 2
-    width: root.compact ? 34 : 40
+    x: root.compact || root.bare ? (parent.width - width) / 2 : Theme.gapMedium
+    y: root.bare ? 0 : root.compact ? Theme.gapMedium : (parent.height - height) / 2
+    width: root.bare ? Theme.ringPeek : root.compact ? 34 : 40
     height: width
-    radius: Theme.pill(height)
-    color: discArea.containsMouse
+    // bare: a ring is a circle in either corner style (design.md › Rings)
+    radius: root.bare ? width / 2 : Theme.pill(height)
+    border.width: root.bare && !root.on ? Math.max(1, Theme.ringStroke(width) * 0.6) : 0
+    border.color: discArea.containsMouse ? Theme.ringOff : Theme.ringTrack
+    color: root.bare && !root.on ? (discArea.containsMouse ? Theme.controlHover : Theme.clear)
+      : discArea.containsMouse
       ? (root.on ? Theme.accentFor("switches", Theme.foreground0) : Theme.background3)
       : root.on ? Theme.accentFor("switches", Theme.foreground1) : Theme.pickFill
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.normal; easing.type: Motion.easing } }
     scale: discArea.pressed ? 0.94 : 1
     Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
 
-    KitIcon { anchors.centerIn: parent; name: root.icon; size: root.compact ? 16 : 18; tint: root.on ? Theme.inkOn(disc.color) : Theme.foreground2 }
+    KitIcon { anchors.centerIn: parent; name: root.icon; size: root.compact ? 16 : 18; tint: root.on ? Theme.inkOn(disc.color) : root.bare ? Theme.muted : Theme.foreground2 }
     MouseArea { id: discArea; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.toggled() }
   }
 
@@ -78,7 +84,7 @@ Rectangle {
 
   KitText {
     visible: root.compact
-    anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.gapMedium }
+    anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: root.bare ? 0 : Theme.gapMedium }
     width: parent.width - 2 * Theme.gapSmall
     horizontalAlignment: Text.AlignHCenter
     text: root.title

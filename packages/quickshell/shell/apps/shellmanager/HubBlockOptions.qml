@@ -18,11 +18,21 @@ Column {
   KitRow {
     visible: root.block === "tiles"
     wide: true
-    label: "Tiles per row"
+    label: "Shown as"
+    hint: "Discs: a row of states, filled when on"
     KitSegments {
-      model: [{ label: "2 ×", value: 2 }, { label: "4 ×", value: 4 }]
-      current: ModuleSettings.get("hub", "tileColumns", 2)
+      model: [{ label: "Discs", value: 6 }, { label: "Tiles 2 ×", value: 2 }, { label: "Tiles 4 ×", value: 4 }]
+      current: ModuleSettings.get("hub", "tileColumns", 6)
       onPicked: value => ModuleSettings.set("hub", "tileColumns", value)
+    }
+  }
+  KitRow {
+    visible: root.block === "modules"
+    label: "Rings"
+    hint: "A module with a whole as a ring; off: chips"
+    KitSwitch {
+      checked: ModuleSettings.get("hub", "chipsRings", true)
+      onToggled: ModuleSettings.set("hub", "chipsRings", !checked)
     }
   }
   KitRow {

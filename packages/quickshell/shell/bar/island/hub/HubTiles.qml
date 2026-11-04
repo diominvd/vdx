@@ -10,7 +10,8 @@ import qs.modules.timer
 import qs.modules.wifi
 
 // The hub's tiles: the modules of the hub row that can be one (BarLayout `tile`),
-// in the row's order, two or four to a row (Bar › Hub › Tiles per row). A tile
+// in the row's order: bare discs, as many as fit a row (Bezel: a state is a disc), or
+// tiles two or four to a row (Hub › Toggles › Shown as). A tile
 // shows the module's state; the icon switches it, the rest opens its popup. The
 // module itself is made here, out of sight, so its own popup answers.
 Item {
@@ -19,7 +20,9 @@ Item {
   signal settings(string id)                    // a right click on a tile
   property var ids: []                          // tile modules, in order
   property var modules: ({})                    // Bar's module id -> Component
-  readonly property int columns: ModuleSettings.get("hub", "tileColumns", 2)
+  readonly property int shape: ModuleSettings.get("hub", "tileColumns", 6)   // 6: discs; 2 | 4: tiles
+  readonly property bool discs: shape !== 2 && shape !== 4
+  readonly property int columns: discs ? Math.max(3, Math.floor((width + Theme.gapMedium) / (Theme.ringCell + Theme.gapMedium))) : shape
 
   implicitHeight: grid.implicitHeight
   visible: ids.length > 0
@@ -83,6 +86,7 @@ Item {
         readonly property var s: root.spec(modelData)
         width: (grid.width - (root.columns - 1) * grid.spacing) / root.columns
         compact: root.columns > 2
+        bare: root.discs
         icon: s.icon
         title: s.title
         detail: s.detail

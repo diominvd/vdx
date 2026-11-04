@@ -9,7 +9,8 @@ import qs.modules.sysmon
 import qs.modules.audio
 import qs.modules.brightness
 
-// The hub: profile and uptime, media, quick sliders and module chips.
+// The hub (Bezel: a watch face for the desktop): the time large, then its blocks — the
+// Machine's rings, toggles as discs, the week, sliders, the player, modules as bare rings or chips.
 // A chip is the module's own face: its click opens the module's popup in the
 // island, a right click its options.
 Item {
@@ -46,7 +47,7 @@ Item {
          : id === "modules" ? ids.length > 0 : true;
   }
   function blockOf(id) {
-    return ({ tiles: tilesBlock, week: weekBlock, player: playerBlock, volume: volumeBlock, microphone: microphoneBlock, brightness: brightnessBlock, night: nightBlock, dimming: dimmingBlock, modules: modulesBlock })[id] ?? null;
+    return ({ machine: machineBlock, tiles: tilesBlock, week: weekBlock, player: playerBlock, volume: volumeBlock, microphone: microphoneBlock, brightness: brightnessBlock, night: nightBlock, dimming: dimmingBlock, modules: modulesBlock })[id] ?? null;
   }
 
   // the month is a page of the hub: the island grows to it and back
@@ -72,8 +73,9 @@ Item {
     sourceComponent: root.modules["tuner"] ?? null
   }
 
+  // the large clock: a tick a second while the hub shows, none while it is hidden
   Timer {
-    interval: 30000
+    interval: 1000
     running: root.visible
     repeat: true
     triggeredOnStart: true
@@ -101,22 +103,43 @@ Item {
     anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.gapGroup }
     spacing: Theme.sectionGap
 
-    // ---- header ----
+    // ---- header: the time large (the pill's clock grown), the day, then you, settings, power ----
     Item {
       width: parent.width
-      height: 38
+      height: Math.max(time.implicitHeight + day.implicitHeight, 38)
+
+      KitText {
+        id: time
+        anchors { left: parent.left; top: parent.top }
+        // a display figure: a fixed size (design.md › Text)
+        text: Qt.formatDateTime(root.now, ModuleSettings.get("clock", "twelveHour", false) ? "h:mm" : "HH:mm")
+        font.pixelSize: 34
+        font.weight: Font.Bold
+        font.features: { "tnum": 1 }
+        font.letterSpacing: -1.4
+      }
+      KitText {
+        id: day
+        anchors { left: parent.left; top: time.bottom; right: avatar.left; rightMargin: Theme.gapMedium }
+        text: (root.subtitleMode === "both" ? root.uptime(SysmonService.uptime) + " · " : "") + Qt.formatDateTime(root.now, "dddd · d MMM")
+        color: Theme.muted
+        font.pixelSize: Theme.fontSize - 1
+        elide: Text.ElideRight
+      }
+
       ClippingRectangle {
         id: avatar
-        anchors { left: parent.left; verticalCenter: parent.verticalCenter }
-        width: 34; height: 34
+        anchors { right: settingsButton.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
+        width: 30; height: 30
         radius: Theme.radiusFor(height)
         color: Theme.pickFill
+        Accessible.name: root.userName
         Image {
           id: avatarImage
           anchors.fill: parent
           source: root.avatarPath ? "file://" + root.avatarPath : ""
           fillMode: Image.PreserveAspectCrop
-          sourceSize: Qt.size(68, 68)
+          sourceSize: Qt.size(60, 60)
           visible: status === Image.Ready
         }
         KitText {
@@ -126,23 +149,10 @@ Item {
           font.weight: Font.Medium
         }
       }
-      Column {
-        anchors { left: avatar.right; leftMargin: Theme.gapMedium; right: settingsButton.left; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
-        spacing: Theme.gapTight
-        KitText { width: parent.width; text: root.userName; font.weight: Font.Medium; elide: Text.ElideRight }
-        KitText {
-          width: parent.width
-          visible: root.subtitleMode !== "none"
-          text: (root.subtitleMode === "both" ? root.uptime(SysmonService.uptime) + " · " : "") + Qt.formatDateTime(root.now, "d MMM")
-          color: Theme.muted
-          font.pixelSize: Theme.fontSize - 1
-          elide: Text.ElideRight
-        }
-      }
 
       IslandButton {
         id: settingsButton
-        anchors { right: powerButton.left; rightMargin: Theme.gapSmall }
+        anchors { right: powerButton.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
         icon: "settings"
         iconSize: 16
         onClicked: root.manager()
@@ -150,7 +160,7 @@ Item {
 
       IslandButton {
         id: powerButton
-        anchors.right: parent.right
+        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
         icon: "power"
         iconSize: 16
         onClicked: root.power()
@@ -201,6 +211,11 @@ Item {
       now: root.now
       embedded: true
     }
+  }
+
+  Component {
+    id: machineBlock
+    HubMachine { width: parent.width; live: root.visible }
   }
 
   Component {
@@ -357,12 +372,93 @@ Item {
 
   Component {
     id: modulesBlock
+    // the Hub row's modules: those whose value has a whole as bare rings (Bezel: one value,
+    // no plate; Hub › Module chips › Rings), the rest as chips under them
+    Column {
+      id: modulesColumn
+      width: parent.width
+      spacing: Theme.sectionGap
+
+      readonly property bool rings: ModuleSettings.get("hub", "chipsRings", true)
+      // "id:index" per ring, as a string: it changes when a ring comes or goes, not with a value
+      readonly property string cellKey: !rings ? "" : root.ids.map(id => Complications.of(id).map((r, i) => id + ":" + i).join(",")).filter(k => k !== "").join(",")
+      readonly property var cells: cellKey === "" ? [] : cellKey.split(",")
+      readonly property var chipIds: root.ids.filter(id => !cells.some(c => c.startsWith(id + ":")))
+
+      // the modules behind the rings, made once each, out of sight: a ring's click opens its popup
+      property var hosts: ({})
+      Repeater {
+        model: modulesColumn.cells.map(c => c.split(":")[0]).filter((id, i, list) => list.indexOf(id) === i)
+        Loader {
+          required property string modelData
+          visible: false
+          sourceComponent: root.modules[modelData] ?? null
+          onLoaded: modulesColumn.hosts[modelData] = item
+        }
+      }
+
+      Flow {
+        width: parent.width
+        visible: modulesColumn.cells.length > 0
+        spacing: Theme.gapMedium
+
+        Repeater {
+          model: modulesColumn.cells
+          Item {
+            id: cell
+            required property string modelData
+            readonly property string moduleId: modelData.split(":")[0]
+            readonly property var spec: Complications.of(moduleId)[Number(modelData.split(":")[1])] ?? ({})
+            width: Theme.ringCell
+            height: Theme.ringCell + Theme.gapHair + caption.implicitHeight
+
+            KitRing {
+              anchors.horizontalCenter: parent.horizontalCenter
+              size: Theme.ringCell
+              kind: cell.spec.kind ?? "fill"
+              value: cell.spec.value ?? 0
+              text: cell.spec.text ?? ""
+              icon: cell.spec.icon ?? ""
+              tint: cell.spec.tint ?? Theme.foreground1
+              on: cell.spec.on ?? true
+              quiet: cell.spec.quiet ?? false
+              steps: cell.spec.steps ?? 5
+              scale: tap.pressed ? 0.96 : 1
+              Behavior on scale { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+            }
+            KitText {
+              id: caption
+              anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom }
+              width: parent.width + Theme.gapMedium
+              horizontalAlignment: Text.AlignHCenter
+              text: cell.spec.words ?? ""
+              color: Theme.muted
+              font.pixelSize: Theme.fontSize - 2
+              elide: Text.ElideRight
+            }
+
+            TapHandler {
+              id: tap
+              acceptedButtons: Qt.LeftButton
+              cursorShape: Qt.PointingHandCursor
+              onTapped: modulesColumn.hosts[cell.moduleId]?.openPopup?.()
+            }
+            TapHandler {
+              acceptedButtons: Qt.RightButton
+              enabled: ShellSettings.barRightSettings
+              onTapped: root.settings("hubchip:" + cell.moduleId)
+            }
+          }
+        }
+      }
+
       // the chips wrap to rows by what they hold; Hub › Fill each row stretches the chips of a row
       // to the whole width (the last row too), so the width is always full
       Item {
         id: chips
         width: parent.width
         height: extent
+        readonly property var ids: modulesColumn.chipIds
 
         readonly property bool fill: ModuleSettings.get("hub", "chipsFill", true)
         readonly property int chipHeight: 32
@@ -387,7 +483,7 @@ Item {
             y += chips.chipHeight + gap;
             row = []; used = 0;
           };
-          for (let i = 0; i < root.ids.length; i++) {
+          for (let i = 0; i < chips.ids.length; i++) {
             const w = Math.min(chips.naturals[i] ?? 0, chips.width);
             if (row.length > 0 && used + gap + w > chips.width) flush();
             used += (row.length > 0 ? gap : 0) + w;
@@ -399,7 +495,7 @@ Item {
         readonly property real extent: places.length > 0 ? places.reduce((m, p) => Math.max(m, p.y), 0) + chipHeight : 0
 
         Repeater {
-          model: root.ids
+          model: chips.ids
 
           Rectangle {
             id: chip
@@ -448,6 +544,7 @@ Item {
           }
         }
       }
+    }
   }
 
 }

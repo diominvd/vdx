@@ -174,8 +174,11 @@ size, gap, separators and hub opening.
   follows its switch there; a new notification as a live line instead is the
   Messages activity (Live activities › Asks).
 - **The hub** opens from the clock on a hover or a click (Hub › Opens on). Under the
-  clock and day it holds blocks — Toggles (tiles), Calendar (week or month), Sliders,
-  Player (card or compact), Module chips — in the order and with the visibility set in
+  time, large, and the day it holds blocks — Machine (battery, memory and the root disk
+  as concentric rings, the CPU gauge; `hub/HubMachine.qml`, a Sysmon holder only while
+  the hub shows), Toggles (discs by default, or tiles), Calendar (week or month), Sliders,
+  Player (card or compact), Module chips (a module with a whole as a bare ring, the rest
+  as chips) — in the order and with the visibility set in
   Hub › Blocks (`config/HubBlocks.qml`): the date, settings and power, the week (a click opens the month), the **tiles** (their own zone of Bar › Layout, "Hub tiles":
   the modules that can be one — Wi-Fi, Bluetooth, VPN, Focus, Timer, Dark mode — two or four to a row, Bar › Hub ›
   Tiles per row; the icon switches, the rest opens the module's popup), the player card (a click opens the
