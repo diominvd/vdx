@@ -154,7 +154,11 @@ centre is the whole bar (`bar/island/`). Solid and island keep their own icon
 size, gap, separators and hub opening.
 
 - At rest: LEFT · clock · RIGHT (by default the workspaces and the
-  equalizer).
+  equalizer). A module whose value has a whole is a ring there (Bar look › Style ›
+  Rings in the pill): battery, volume, brightness and memory as arcs, CPU and
+  temperature as gauges, a running timer as ticks, Wi-Fi, Bluetooth, VPN and Focus as
+  discs (`bar/Complications.qml`, `kit/KitRing.qml`; docs/shell/design.md › Rings). The
+  rest keep their words.
 - **The live slot** (`IslandLive`, between the clock and RIGHT) shows what
   runs, only while it does, in three kinds: Asks (low battery, a connected
   device), Held (recording, update, backup, timer, VPN, Focus, radio, music, media) and Flash (the mic, the

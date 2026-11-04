@@ -6,7 +6,8 @@ import qs.kit
 import qs.modules.notifications
 
 // The island at rest: the modules of LEFT, the clock, the modules of RIGHT
-// (Shell Manager › Bar, island style) and a dot for unseen notifications.
+// (Shell Manager › Bar, island style) and a dot for unseen notifications. Each
+// module is an IslandSlot: its complication ring when it has one (Bezel), else its face.
 // Each side takes the room its modules need — an empty one none — so the
 // clock is centred only when both sides match.
 Item {
@@ -37,9 +38,6 @@ Item {
   implicitWidth: Math.max(110, line.implicitWidth + 2 * Theme.gapGroup)
   implicitHeight: Theme.islandHeight
 
-  // a custom separator on the island's side: its line, no module behind it
-  Component { id: separatorFace; Separator {} }
-
   // a side with nothing in it is zero wide: the Row skips it and its gap
   Row {
     id: line
@@ -53,19 +51,7 @@ Item {
 
     Repeater {
       model: BarLayout.islandIn("start", root.screen)
-      Loader {
-        required property string modelData
-        anchors.verticalCenter: parent.verticalCenter
-        sourceComponent: BarLayout.isSeparator(modelData) ? separatorFace : (root.modules[modelData] ?? null)
-
-        // a right click takes its options; without this it falls through to the island
-        MouseArea {
-          anchors.fill: parent
-          acceptedButtons: Qt.RightButton
-          enabled: !BarLayout.isSeparator(modelData)
-          onClicked: if (ShellSettings.barRightSettings) root.settings(modelData)
-        }
-      }
+      IslandSlot { modules: root.modules; onSettings: id => root.settings(id) }
     }
   }
 
@@ -106,18 +92,7 @@ Item {
 
     Repeater {
       model: BarLayout.islandIn("end", root.screen)
-      Loader {
-        required property string modelData
-        anchors.verticalCenter: parent.verticalCenter
-        sourceComponent: BarLayout.isSeparator(modelData) ? separatorFace : (root.modules[modelData] ?? null)
-
-        MouseArea {
-          anchors.fill: parent
-          acceptedButtons: Qt.RightButton
-          enabled: !BarLayout.isSeparator(modelData)
-          onClicked: if (ShellSettings.barRightSettings) root.settings(modelData)
-        }
-      }
+      IslandSlot { modules: root.modules; onSettings: id => root.settings(id) }
     }
 
     Rectangle {

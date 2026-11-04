@@ -57,7 +57,7 @@ KitSettingsWorkspace {
   // The header's Reset is the Bar look page's: the look of both styles and the right click. The
   // style is the owner's choice; Layout has its own Reset beside its rows, Monitors none; the
   // hub and the live activities have their own pages and Resets.
-  readonly property var lookKeys: ["barIconGrow", "barSeparators", "barGap", "pillHeight"]
+  readonly property var lookKeys: ["barIconGrow", "barSeparators", "barGap", "pillHeight", "pillRings"]
   readonly property bool changed: tab === "appearance"
                                   && (ShellSettings.looksTouched(lookKeys, "solid") || ShellSettings.looksTouched(lookKeys, "island")
                                       || ShellSettings.changed(["barRightSettings"]))
@@ -278,6 +278,14 @@ KitSettingsWorkspace {
             current: Theme.islandHeight
             onPicked: value => ShellSettings.setLook("pillHeight", value, "island")
           }
+        }
+        KitRow {
+          needs: root.island ? "" : "The pill belongs to the Island style"
+          needsAction: "Use Island"
+          onNeedsActed: ShellSettings.set("barStyle", "island")
+          label: "Rings in the pill"
+          hint: "Off: icons and text, as on the strip"
+          KitSwitch { checked: ShellSettings.pillRings; onToggled: ShellSettings.setLook("pillRings", !checked, "island") }
         }
         KitRow {
           label: "Icon size"

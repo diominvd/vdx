@@ -285,6 +285,31 @@ QtObject {
     return ms > 0 ? qualityColor(ms, pingGoodMs, pingFairMs) : muted;
   }
 
+  // ---- rings (Bezel: a module drawn as a watch complication, kit/KitRing) ----
+  // One ladder of sizes, one per distance: the pill, a peek, a hub cell, a 2×2
+  // widget, the expanded live activity. A ring is drawn only where its value has a whole.
+  readonly property int ringPill: 22
+  readonly property int ringPeek: 40
+  readonly property int ringCell: 64
+  readonly property int ringWide: 88
+  readonly property int ringLarge: 120
+  // the stroke follows the size (22 → 2.4 … 120 → 7.2); Strict draws it thinner, Material thicker
+  function ringStroke(size: real): real {
+    const steps = [[22, 2.4], [40, 3.6], [64, 5.1], [88, 6.2], [120, 7.2]];
+    let w = steps[steps.length - 1][1];
+    for (let i = 0; i < steps.length; i++) {
+      if (size <= steps[i][0]) {
+        if (i === 0) { w = steps[0][1] * size / steps[0][0]; break; }
+        const a = steps[i - 1], b = steps[i];
+        w = a[1] + (b[1] - a[1]) * (size - a[0]) / (b[0] - a[0]);
+        break;
+      }
+    }
+    return w * (material ? 1.25 : 0.85);
+  }
+  readonly property color ringTrack: mix(background0, foreground0, 0.14)   // the whole
+  readonly property color ringOff: mix(background0, foreground0, 0.26)     // unlit ticks and dots
+
   // Load of a resource in %: yellow from 70, red from 90.
   function loadColor(percent) {
     return percent >= 90 ? red : percent >= 70 ? yellow : foreground0;

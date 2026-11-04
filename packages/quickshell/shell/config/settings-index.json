@@ -341,6 +341,12 @@
   "target": "barlook"
  },
  {
+  "label": "Rings in the pill",
+  "hint": "Off: icons and text, as on the strip",
+  "where": "Bar look › STYLE",
+  "target": "barlook"
+ },
+ {
   "label": "Icon size",
   "hint": "The icons on the bar",
   "where": "Bar look › STYLE",

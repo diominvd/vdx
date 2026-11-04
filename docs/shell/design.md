@@ -152,6 +152,36 @@ uses tonal layers and more spacious controls.
   `Theme.clear`, never `"transparent"` (black: it flashes dark); rows in a
   filled box hover with `Theme.controlHover`, the whole row lit, not the text.
 
+## Rings (Bezel)
+
+The island, its live activities and the hub draw a module as a watch
+complication: one question, one whole, read in one glance.
+
+- MUST — a ring only where there is a whole: the track is 100 % of something real
+  (a battery's capacity, a timer's length, a backup's steps). A rate, a count, a
+  layout, the clock have none and stay words.
+- MUST — the data picks the shape, never taste (`kit/KitRing`, `kind`): a share of
+  a whole is `fill` (a closed arc from twelve), a level with zones `gauge` (270°, the
+  gap down holds the icon), a span with an end `ticks` (lit = left; a tick steps,
+  never sweeps), steps `dots` (lit = done), a state `disc` (filled on, outlined
+  quiet, faint off).
+- MUST — one source per module: `bar/Complications.qml` `of(id)` gives its rings
+  (kind, value, numeral, icon, tint); an empty list means no whole. Pill, peek and hub
+  read the same entry at their own size.
+- Sizes are one ladder, one per distance: `Theme.ringPill` 22 (the pill),
+  `ringPeek` 40, `ringCell` 64 (a hub cell), `ringWide` 88, `ringLarge` 120. The
+  stroke is `Theme.ringStroke(size)` (Strict 0.85 ×, Material 1.25 ×), the track
+  `Theme.ringTrack`, unlit ticks and dots `Theme.ringOff`. A ring is a circle in
+  either corner style.
+- Numerals are bold, tabular; two digits fit inside at every size, a longer value
+  shrinks to fit. Without a numeral the icon sits inside.
+- Colour is news: at rest a ring is `foreground1` on its track; a state (low,
+  charging, load) takes its state colour, an active state the accent's `modules` place.
+- Motion: a new value eases (`Motion.bar`, `slow`); nothing moves at rest.
+- In the pill (Bar look › Style › Rings in the pill, on by default) a module's face
+  stays under its rings, unseen (`bar/island/IslandSlot.qml`): the click, the wheel,
+  the popup and the right click are the module's own.
+
 ## Settings pages
 
 Pages by the user's area; the look follows macOS System Settings.
