@@ -11,15 +11,16 @@ import qs.kit
 // on its own. Under the open section its groups (`jumps` of the page) jump
 // there on a click.
 // The sections come in groups, by what the user is after (a rail button each; the
-// list beside it shows the open group):
-//   LOOK     — how it looks and moves
-//   BAR      — Bar, Hub, Live activities, Bar modules
-//   WINDOWS  — Windows, Lock screen
+// list beside it shows the open group). In a group the most used page comes first, a
+// page shared with others (`pageTab`) sits next to them, the rare ones last:
+//   LOOK     — how it looks and moves: Interface, Themes, Colours, Glow, Wallpaper, Fonts,
+//              Icons, Cursor, Motion
+//   BAR      — Bar, Bar look, Bar modules, Hub, Live activities, Bar monitors
+//   DESKTOP  — the session around the windows: Windows, Notifications, Lock screen
 //   CONNECT  — Network, Bluetooth, VPN
 //   DEVICES  — Sound, Displays, Power
-//   SYSTEM   — what runs on the machine: Notifications, Apps (each app's options and
-//              window), Updates
-//   SHELL    — Profile and About, the rail's foot (`foot`)
+//   SYSTEM   — what runs on the machine: Apps (each app's options and window), Updates
+//   SHELL    — Profile, System, Settings, About: the rail's foot (`foot`)
 // A page may offer `changed` + `reset()`: Reset (two steps) in the header.
 Rectangle {
   id: root
@@ -54,27 +55,28 @@ Rectangle {
 // the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
   readonly property var allSections: [
     { value: "appearance", label: "Interface",  icon: "sliders",    caption: "LOOK",
-      page: "appearance", pageTab: "style", description: "Style, corners and controls." },
+      page: "appearance", pageTab: "style", description: "Style, density, fields and corners." },
+    { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "colours",    label: "Colours",    icon: "paint-bucket",
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
-    { value: "themes",     label: "Themes",     icon: "brush" },
+    { value: "glow",       label: "Glow",       icon: "sun",
+      page: "appearance", pageTab: "glow", description: "A soft halo behind bright elements." },
+    { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "fonts",      label: "Fonts",      icon: "text" },
     { value: "icons",      label: "Icons",      icon: "star" },
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
-    { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "animations", label: "Motion",     icon: "curve" },
-    { value: "glow",       label: "Glow",       icon: "sun",
-      page: "appearance", pageTab: "glow", description: "A soft halo behind bright elements." },
     { value: "bar",        label: "Bar",        icon: "columns",     caption: "BAR",
       page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
     { value: "barlook",    label: "Bar look",   icon: "layout",
       page: "bar", pageTab: "appearance", description: "The bar's style, size and spacing." },
-    { value: "barmonitor", label: "Bar monitors", icon: "laptop",
-      page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
+    { value: "modules",    label: "Bar modules", icon: "puzzle" },
     { value: "hub",        label: "Hub",        icon: "home",    island: true },
     { value: "live",       label: "Live activities", icon: "activity", island: true },
-    { value: "modules",    label: "Bar modules", icon: "puzzle" },
-    { value: "windows",    label: "Windows",    icon: "tiling", caption: "WINDOWS" },
+    { value: "barmonitor", label: "Bar monitors", icon: "laptop",
+      page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
+    { value: "windows",    label: "Windows",    icon: "tiling", caption: "DESKTOP" },
+    { value: "notifications", label: "Notifications", icon: "bell" },
     { value: "lockscreen", label: "Lock screen", icon: "lock" },
     { value: "network",    label: "Network",    icon: "public",       caption: "CONNECT" },
     { value: "bluetooth",  label: "Bluetooth",  icon: "bluetooth" },
@@ -82,8 +84,7 @@ Rectangle {
     { value: "sound",      label: "Sound",      icon: "volume",     caption: "DEVICES" },
     { value: "displays",   label: "Displays",   icon: "monitor" },
     { value: "power",      label: "Power",      icon: "zap" },
-    { value: "notifications", label: "Notifications", icon: "bell", caption: "SYSTEM" },
-    { value: "apps",       label: "Apps",       icon: "grid" },
+    { value: "apps",       label: "Apps",       icon: "grid",       caption: "SYSTEM" },
     { value: "updates",    label: "Updates",    icon: "download" },
     { value: "profile",    label: "Profile",    icon: "user",       caption: "SHELL", foot: true },
     { value: "system",     label: "System",     icon: "gauge",        foot: true,
@@ -97,7 +98,7 @@ Rectangle {
 
   // the rail's groups: one button each, the list beside it shows the open group's pages
   readonly property var groups: [
-    { name: "LOOK", icon: "palette" }, { name: "BAR", icon: "menu" }, { name: "WINDOWS", icon: "app-window" },
+    { name: "LOOK", icon: "palette" }, { name: "BAR", icon: "menu" }, { name: "DESKTOP", icon: "app-window" },
     { name: "CONNECT", icon: "wifi" }, { name: "DEVICES", icon: "usb" }, { name: "SYSTEM", icon: "cpu" }
   ]
   readonly property var footSections: sections.filter(s => s.foot)

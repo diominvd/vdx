@@ -174,10 +174,10 @@ links, secrets, `/etc`, units, services). `link` also writes
 | Dotfiles state | `~/.local/state/dotfiles/` | installer + shell | `components.json` (modules not installed), `accent.lua`, `window-mode`, `shell-apps.json` |
 
 Settings UI = **Shell Manager** (`apps/shellmanager/`, Super+S). The sidebar is a rail of group
-buttons (LOOK, BAR, WINDOWS, CONNECT, DEVICES, SYSTEM) with the shell's own pages (`foot: true`: Profile, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after: LOOK Interface, Colours (one page with Glow: `pageTab`), Themes (also Dark / Light), Fonts, Icons, Cursor, Wallpaper, Motion, Glow ·
-BAR Bar, Bar look, Bar monitors (one page, three sections: `pageTab`; under them, in the Island style only: Hub, Live activities),
-Bar modules · WINDOWS Windows, Lock screen · CONNECT Network (with Hotspot), Bluetooth, VPN · DEVICES Sound,
-Displays (with the night light), Power · SYSTEM Notifications, Apps, Updates · foot: Profile, System, Settings, About (the last three one page, `pageTab`). Windows, Network (Wi-Fi, Ethernet, Hotspot) and Fonts are each one page with groups. A page has no tab strip: a section that shares a page with others sets `page` + `pageTab` in `allSections`.
+buttons (LOOK, BAR, DESKTOP, CONNECT, DEVICES, SYSTEM) with the shell's own pages (`foot: true`: Profile, System, Settings, About) at its foot, and a list of the open group's pages beside it. Groups, by what the user is after; in a group the most used page first, pages that share one page (`pageTab`) side by side, the rare ones last: LOOK Interface (style, density, input text, corners), Themes (also Dark / Light), Colours, Glow (Interface, Colours and Glow are one page: `pageTab`), Wallpaper, Fonts (typeface, text size), Icons, Cursor, Motion ·
+BAR Bar, Bar look (the Solid / Island style first), Bar modules, in the Island style only Hub and Live activities, Bar monitors (Bar, Bar look and Bar monitors are one page: `pageTab`) ·
+DESKTOP Windows, Notifications, Lock screen · CONNECT Network (with Hotspot), Bluetooth, VPN · DEVICES Sound,
+Displays (with the night light), Power · SYSTEM Apps, Updates (checking, installing, removal safety: the Packages app keeps only what it opens on and lists) · foot: Profile, System, Settings, About (the last three one page, `pageTab`). Windows, Network (Wi-Fi, Ethernet, Hotspot) and Fonts are each one page with groups. A page has no tab strip: a section that shares a page with others sets `page` + `pageTab` in `allSections`.
 A page header has its group, a
 state line and one or two lines on what the page does; a block has an `about` line (`KitLabel`).
 One home per setting; a setting that waits for something (a style, a switch, a module in the Hub

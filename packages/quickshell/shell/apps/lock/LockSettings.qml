@@ -4,17 +4,30 @@ import qs.components
 import qs.config
 import qs.kit
 
-// Lock screen options, the Lock screen page (ModuleSettings "lock"): what the lock
-// (Super+Z) shows — the background, the clock, the blur, the date, the user and
-// the monitors it shows on; then the controls on it: the keyboard layout, the
-// power buttons and the cursor that hides after a few still seconds (apps/lock
-// reads them).
+// Lock screen options, the Lock screen page (ModuleSettings "lock"), the most used
+// first: when it locks by itself (SESSION); what the lock (Super+Z) shows — the
+// background, the blur, the clock, the date, the user (LOOK); the controls on it: the
+// keyboard layout, the power buttons and the cursor that hides after a few still
+// seconds (ON SCREEN); the monitors it shows on (WHERE). apps/lock reads them.
 KitColumn {
   id: root
 
   function opt(key, fallback) { return ModuleSettings.get("lock", key, fallback); }
 
   spacing: Theme.sectionGap
+
+  // ---- session ----
+  KitLabel { text: "SESSION" }
+
+  KitSelect {
+    width: parent.width
+    label: "Lock after"; hint: "Minutes without input"
+    model: [{ label: "Never", value: 0 }].concat([1, 5, 10, 15, 30].map(v => ({ label: v + " min", value: v })))
+    current: root.opt("autoLock", 0)
+    onPicked: value => ModuleSettings.set("lock", "autoLock", value)
+  }
+
+  KitLine {}
 
   // ---- look ----
   KitLabel { text: "LOOK" }
@@ -48,34 +61,6 @@ KitColumn {
 
   KitLine {}
 
-  // ---- where ----
-  KitLabel { text: "WHERE" }
-
-  // other monitors stay dark; typing there still goes into the password
-  KitSelect {
-    width: parent.width
-    label: "Monitors"; hint: "Focused: the one in use"
-    model: [{ label: "All", value: "all" }, { label: "Focused", value: "focused" }]
-           .concat(Quickshell.screens.map(s => ({ label: s.name, value: s.name })))
-    current: root.opt("screen", "all")
-    onPicked: value => ModuleSettings.set("lock", "screen", value)
-  }
-
-  KitLine {}
-
-  // ---- session ----
-  KitLabel { text: "SESSION" }
-
-  KitSelect {
-    width: parent.width
-    label: "Lock after"; hint: "Minutes without input"
-    model: [{ label: "Never", value: 0 }].concat([1, 5, 10, 15, 30].map(v => ({ label: v + " min", value: v })))
-    current: root.opt("autoLock", 0)
-    onPicked: value => ModuleSettings.set("lock", "autoLock", value)
-  }
-
-  KitLine {}
-
   // ---- on screen ----
   KitLabel { text: "ON SCREEN" }
 
@@ -90,6 +75,21 @@ KitColumn {
     module: "lock"; key: "cursorDelay"; fallback: 3
     label: "Hide after"; hint: "Seconds without a mouse move"
     model: [1, 3, 5, 10].map(v => ({ label: v + " s", value: v }))
+  }
+
+  KitLine {}
+
+  // ---- where ----
+  KitLabel { text: "WHERE" }
+
+  // other monitors stay dark; typing there still goes into the password
+  KitSelect {
+    width: parent.width
+    label: "Monitors"; hint: "Focused: the one in use"
+    model: [{ label: "All", value: "all" }, { label: "Focused", value: "focused" }]
+           .concat(Quickshell.screens.map(s => ({ label: s.name, value: s.name })))
+    current: root.opt("screen", "all")
+    onPicked: value => ModuleSettings.set("lock", "screen", value)
   }
 
   KitGrouper {}
