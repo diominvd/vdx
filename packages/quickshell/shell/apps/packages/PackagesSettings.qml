@@ -3,8 +3,9 @@ import qs.config
 import qs.kit
 
 // Package manager options in the Shell Manager (ModuleSettings "packages"):
-// what opens and what is listed. Checking for updates and the removal safety are the
-// Updates page. The bar module's own row is PackagesBarSettings (Shell apps › BAR).
+// what opens and what is listed. Checking for updates, installing them (without
+// asking, the notification when done) and the removal safety are the Updates page.
+// The bar module's own rows are PackagesBarSettings (Bar modules › Packages).
 Column {
   spacing: Theme.sectionGap
 
@@ -14,20 +15,6 @@ Column {
     module: "packages"; key: "startTab"; fallback: "updates"
     label: "Opens on"; hint: "The tab shown first"
     model: [{ label: "Updates", value: "updates" }, { label: "Installed", value: "installed" }, { label: "Cache", value: "cache" }]
-  }
-
-  KitLine {}
-
-  KitLabel { text: "UPDATING" }
-
-  KitToggleRow {
-    module: "packages"; key: "noConfirm"; label: "Update without asking"
-    hint: "Skips the confirmation panel"
-  }
-
-  KitToggleRow {
-    module: "packages"; key: "notify"; fallback: true
-    label: "Notify when done"; hint: "A notification: all updated, or what failed"
   }
 
   KitLine {}

@@ -21,7 +21,13 @@ KitSettingsWorkspace {
   function jump(key) {
     tab = key === "accent" || key === "glow" ? key : "style";
   }
-  readonly property var resetKeys: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere", "glow", "glowStrength", "glowWhere"]
+  // the header's Reset: the keys of the sidebar page shown (Interface, Colours or Glow), not the other two
+  readonly property var tabKeys: ({
+    style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders"],
+    accent: ["accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere"],
+    glow: ["glow", "glowStrength", "glowWhere"]
+  })
+  readonly property var resetKeys: tabKeys[tab] ?? []
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 

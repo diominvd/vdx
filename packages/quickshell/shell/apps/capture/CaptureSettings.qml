@@ -110,7 +110,7 @@ Column {
 
   KitLinkRow {
     label: "Toasts"
-    hint: "How long, the history: Notifications"
+    hint: "In Notifications › New notifications"
     target: "notifications"
   }
 

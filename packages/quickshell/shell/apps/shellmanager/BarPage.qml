@@ -54,12 +54,15 @@ KitSettingsWorkspace {
     undoStack = []; selectedModule = ""; activeZone = island ? "start" : "left";
   }
   onColumnZonesChanged: if (!columnZones.includes(activeZone)) activeZone = island ? "start" : "left"
-  // Reset covers this page: the look of both styles and the right click. The style is the owner's
-  // choice, and the hub and the live activities have their own pages and Resets.
+  // The header's Reset is the Bar look page's: the look of both styles and the right click. The
+  // style is the owner's choice; Layout has its own Reset beside its rows, Monitors none; the
+  // hub and the live activities have their own pages and Resets.
   readonly property var lookKeys: ["barIconGrow", "barSeparators", "barGap", "pillHeight"]
-  readonly property bool changed: ShellSettings.looksTouched(lookKeys, "solid") || ShellSettings.looksTouched(lookKeys, "island")
-                                   || ShellSettings.changed(["barRightSettings"])
+  readonly property bool changed: tab === "appearance"
+                                  && (ShellSettings.looksTouched(lookKeys, "solid") || ShellSettings.looksTouched(lookKeys, "island")
+                                      || ShellSettings.changed(["barRightSettings"]))
   function reset() {
+    if (tab !== "appearance") return;
     ShellSettings.looksReset(lookKeys, "solid");
     ShellSettings.looksReset(lookKeys, "island");
     ShellSettings.reset(["barRightSettings"]);
@@ -67,13 +70,14 @@ KitSettingsWorkspace {
   // the Layout, Look and Monitors tabs are sidebar pages (Shell Manager `pageTab`): a page lists its own
   readonly property var jumps: [
     { key: "layout", label: "Layout", y: 0 },
-    { key: "look", label: "Look", y: 0 },
+    { key: "look", label: "Style", y: 0 },
+    { key: "separators", label: "Separators", y: 0 },
     { key: "behaviour", label: "Behaviour", y: 0 },
     { key: "monitor", label: "Monitor", y: 0 }
   ].filter(j => j.key === tab || (tab === "appearance" && j.key !== "layout" && j.key !== "monitor"))
   function jump(key) {
     if (key === "hubzone") { tab = "layout"; if (island) chooseZone("hub"); return; }
-    tab = ["look", "behaviour", "appearance"].includes(key) ? "appearance" : key === "monitor" ? "monitor" : "layout";
+    tab = ["look", "separators", "behaviour", "appearance"].includes(key) ? "appearance" : key === "monitor" ? "monitor" : "layout";
   }
   function zoneLabel(zone) {
     return childOf(zone) ? "Bar " + (children.findIndex(b => b.id === childOf(zone)) + 2)
@@ -175,22 +179,6 @@ KitSettingsWorkspace {
   settings: Component {
     Column {
       width: parent.width
-      // the style decides what the rest of the page has: it sits above every tab
-      Column {
-        width: parent.width
-        KitLabel { text: "STYLE" }
-        KitRow {
-          label: "Bar style"
-          hint: (root.island ? "One pill with a hub and live activities" : "A strip along the screen edge")
-          wide: true
-          KitSegments {
-            model: [{label: "Solid", value: "solid"}, {label: "Island", value: "island"}]
-            current: ShellSettings.barStyle
-            onPicked: value => ShellSettings.set("barStyle", value)
-          }
-        }
-        KitGrouper {}
-      }
       KitSelect {
         visible: root.roles.length > 1 && !BarLayout.shared && (root.tab === "layout" || root.tab === "monitor")
         label: "Monitor"
@@ -266,7 +254,18 @@ KitSettingsWorkspace {
 
         width: parent.width
         visible: root.tab === "appearance"
-        KitLabel { text: "LOOK" }
+        // the style decides what the rest of the bar has (the hub, the live activities, Layout's rows)
+        KitLabel { text: "STYLE" }
+        KitRow {
+          label: "Bar style"
+          hint: (root.island ? "One pill with a hub and live activities" : "A strip along the screen edge")
+          wide: true
+          KitSegments {
+            model: [{label: "Solid", value: "solid"}, {label: "Island", value: "island"}]
+            current: ShellSettings.barStyle
+            onPicked: value => ShellSettings.set("barStyle", value)
+          }
+        }
         KitRow {
           needs: root.island ? "" : "The pill belongs to the Island style"
           needsAction: "Use Island"
@@ -286,12 +285,8 @@ KitSettingsWorkspace {
           wide: true
           KitSegments { model: [{label: "Small", value: 0}, {label: "Medium", value: 2}, {label: "Large", value: 4}]; current: ShellSettings.barIconGrow; onPicked: value => ShellSettings.setLook("barIconGrow", value) }
         }
-        KitRow {
-          label: "Separator spacing"
-          hint: "Room on each side of a line"
-          wide: true
-          KitSegments { model: [{label: "Tight", value: 2}, {label: "Normal", value: 5}, {label: "Wide", value: 8}]; current: ShellSettings.barGap; onPicked: value => ShellSettings.setLook("barGap", value) }
-        }
+        KitLine {}
+        KitLabel { text: "SEPARATORS" }
         KitRow {
           label: "Separator lines"
           hint: "Between neighbouring modules"
@@ -299,6 +294,12 @@ KitSettingsWorkspace {
           needsAction: "Use Solid"
           onNeedsActed: ShellSettings.set("barStyle", "solid")
           KitSwitch { checked: ShellSettings.barSeparators; onToggled: ShellSettings.setLook("barSeparators", !checked) }
+        }
+        KitRow {
+          label: "Separator spacing"
+          hint: "Room on each side of a line"
+          wide: true
+          KitSegments { model: [{label: "Tight", value: 2}, {label: "Normal", value: 5}, {label: "Wide", value: 8}]; current: ShellSettings.barGap; onPicked: value => ShellSettings.setLook("barGap", value) }
         }
         KitLine {}
         KitLabel { text: "BEHAVIOUR" }

@@ -34,8 +34,6 @@
  ],
  "apps/packages/PackagesSettings.qml": [
   "cacheView",
-  "noConfirm",
-  "notify",
   "sortBy",
   "startTab"
  ],
@@ -91,5 +89,14 @@
   "showRemaining",
   "text",
   "titleLength"
+ ],
+ "apps/shellmanager/UpdatesPage.qml": [
+  "aur",
+  "autoInstall",
+  "checkOnOpen",
+  "confirm",
+  "interval",
+  "noConfirm",
+  "notify"
  ]
 }

@@ -266,12 +266,6 @@
   "target": "bar"
  },
  {
-  "label": "Style",
-  "hint": "",
-  "where": "Bar",
-  "target": "bar"
- },
- {
   "label": "Clock",
   "hint": "",
   "where": "Bar",
@@ -289,10 +283,16 @@
   ]
  },
  {
-  "label": "Look",
+  "label": "Style",
   "hint": "",
   "where": "Bar",
   "target": "bar:look"
+ },
+ {
+  "label": "Separators",
+  "hint": "",
+  "where": "Bar",
+  "target": "bar:separators"
  },
  {
   "label": "Behaviour",
@@ -307,21 +307,9 @@
   "target": "bar:monitor"
  },
  {
-  "label": "Bar style",
-  "hint": "",
-  "where": "Bar › STYLE",
-  "target": "bar",
-  "aliases": [
-   "island",
-   "solid",
-   "strip",
-   "pill"
-  ]
- },
- {
   "label": "Monitor",
   "hint": "The one Layout and Monitors edit",
-  "where": "Bar › STYLE",
+  "where": "Bar",
   "target": "bar"
  },
  {
@@ -335,28 +323,40 @@
   ]
  },
  {
+  "label": "Bar style",
+  "hint": "",
+  "where": "Bar › STYLE",
+  "target": "bar:look",
+  "aliases": [
+   "island",
+   "solid",
+   "strip",
+   "pill"
+  ]
+ },
+ {
   "label": "Pill height",
   "hint": "The island's height at rest",
-  "where": "Bar › LOOK",
+  "where": "Bar › STYLE",
   "target": "bar:look"
  },
  {
   "label": "Icon size",
   "hint": "The icons on the bar",
-  "where": "Bar › LOOK",
-  "target": "bar:look"
- },
- {
-  "label": "Separator spacing",
-  "hint": "Room on each side of a line",
-  "where": "Bar › LOOK",
+  "where": "Bar › STYLE",
   "target": "bar:look"
  },
  {
   "label": "Separator lines",
   "hint": "Between neighbouring modules",
-  "where": "Bar › LOOK",
-  "target": "bar:look"
+  "where": "Bar › SEPARATORS",
+  "target": "bar:separators"
+ },
+ {
+  "label": "Separator spacing",
+  "hint": "Room on each side of a line",
+  "where": "Bar › SEPARATORS",
+  "target": "bar:separators"
  },
  {
   "label": "Right click opens options",
@@ -617,7 +617,7 @@
  },
  {
   "label": "Window corners",
-  "hint": "In Appearance › Shape",
+  "hint": "In Interface › Shape",
   "where": "Windows › LOOK",
   "target": "windows:look"
  },
@@ -903,8 +903,20 @@
   "target": "updates"
  },
  {
+  "label": "Update without asking",
+  "hint": "Skips the confirmation panel",
+  "where": "Updates › INSTALLING",
+  "target": "updates"
+ },
+ {
   "label": "Install right after the download",
   "hint": "Off: asks again after the download",
+  "where": "Updates › INSTALLING",
+  "target": "updates"
+ },
+ {
+  "label": "Notify when done",
+  "hint": "A notification: all updated, or what failed",
   "where": "Updates › INSTALLING",
   "target": "updates"
  },
@@ -1255,12 +1267,6 @@
   "target": "appearance:accent"
  },
  {
-  "label": "Window frames",
-  "hint": "Focused window",
-  "where": "Appearance",
-  "target": "appearance:accent"
- },
- {
   "label": "Accent colour",
   "hint": "Active and selected controls",
   "where": "Appearance › ACCENT",
@@ -1270,6 +1276,12 @@
   "label": "Colour",
   "hint": "A named one, or your own",
   "where": "Appearance › ACCENT",
+  "target": "appearance:accent"
+ },
+ {
+  "label": "Window frames",
+  "hint": "In Windows › Look",
+  "where": "Appearance › ACCENT TARGETS",
   "target": "appearance:accent"
  },
  {
@@ -1447,19 +1459,6 @@
   "target": "notifications"
  },
  {
-  "label": "New ones arrive as",
-  "hint": "",
-  "where": "Notifications › NEW NOTIFICATIONS",
-  "target": "notifications",
-  "aliases": [
-   "card",
-   "toast",
-   "live line",
-   "popup",
-   "banner"
-  ]
- },
- {
   "label": "Card stays for",
   "hint": "Stay: until closed; urgent ones always stay",
   "where": "Notifications › NEW NOTIFICATIONS",
@@ -1469,6 +1468,12 @@
    "how long",
    "duration"
   ]
+ },
+ {
+  "label": "Arrive as a live line",
+  "hint": "In Live activities › Asks",
+  "where": "Notifications › NEW NOTIFICATIONS",
+  "target": "notifications"
  },
  {
   "label": "Notifications shown",
@@ -2020,7 +2025,7 @@
  },
  {
   "label": "Theme",
-  "hint": "The popup switches; all of them in Themes",
+  "hint": "In Themes",
   "where": "Bar modules › Themes › POPUP",
   "target": "modules:themes"
  },
@@ -2104,7 +2109,7 @@
  },
  {
   "label": "Wallpaper",
-  "hint": "The popup switches; set it in Appearance",
+  "hint": "In Wallpaper",
   "where": "Bar modules › Wallpapers › POPUP",
   "target": "modules:wallpapers"
  },
@@ -2210,7 +2215,7 @@
  },
  {
   "label": "Wi-Fi",
-  "hint": "Networks, DNS, the speed test: Network",
+  "hint": "In Network › Wi-Fi",
   "where": "Bar modules › Wi-Fi › BAR",
   "target": "modules:wifi"
  },
@@ -2228,7 +2233,7 @@
  },
  {
   "label": "Bluetooth",
-  "hint": "Devices and pairing: Bluetooth",
+  "hint": "In Bluetooth",
   "where": "Bar modules › Bluetooth › BAR",
   "target": "modules:bluetooth"
  },
@@ -2615,7 +2620,7 @@
  },
  {
   "label": "Unseen dot",
-  "hint": "In Notifications › Unseen dot",
+  "hint": "In Notifications › Unseen",
   "where": "Bar modules › Folder › BAR",
   "target": "modules:folder"
  },
@@ -3027,12 +3032,6 @@
   "target": "apps:packages"
  },
  {
-  "label": "Updating",
-  "hint": "",
-  "where": "Apps › Packages",
-  "target": "apps:packages"
- },
- {
   "label": "List",
   "hint": "",
   "where": "Apps › Packages",
@@ -3042,18 +3041,6 @@
   "label": "Opens on",
   "hint": "The tab shown first",
   "where": "Apps › Packages › OPENING",
-  "target": "apps:packages"
- },
- {
-  "label": "Update without asking",
-  "hint": "Skips the confirmation panel",
-  "where": "Apps › Packages › UPDATING",
-  "target": "apps:packages"
- },
- {
-  "label": "Notify when done",
-  "hint": "A notification: all updated, or what failed",
-  "where": "Apps › Packages › UPDATING",
   "target": "apps:packages"
  },
  {
@@ -3598,7 +3585,7 @@
  },
  {
   "label": "Toasts",
-  "hint": "How long, the history: Notifications",
+  "hint": "In Notifications › New notifications",
   "where": "Apps › Capture › NOTIFICATIONS",
   "target": "apps:capture"
  },

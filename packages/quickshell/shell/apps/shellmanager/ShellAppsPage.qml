@@ -92,10 +92,13 @@ Item {
       KitResetButton {
         anchors.verticalCenter: parent.verticalCenter
         visible: !!root.entry?.settings && root.installed
-        // an app with a bar module: every key but the module's (they stay)
-        readonly property var moduleKeys: root.hasModule ? (ModuleSettings.keysOf(root.entry.moduleSettings) ?? []) : []
-        readonly property var keys: root.hasModule
-          ? Object.keys(ModuleSettings.values[root.selected] ?? {}).filter(k => !moduleKeys.includes(k)) : null
+        // an app with a bar module: every key but the module's (they stay); nor the keys
+        // another page owns under the same id (Packages: the Updates page's)
+        readonly property var sharedPages: ({ packages: "apps/shellmanager/UpdatesPage.qml" })
+        readonly property var otherKeys: (root.hasModule ? (ModuleSettings.keysOf(root.entry.moduleSettings) ?? []) : [])
+          .concat(sharedPages[root.selected] ? (ModuleSettings.keysOf(sharedPages[root.selected]) ?? []) : [])
+        readonly property var keys: otherKeys.length > 0
+          ? Object.keys(ModuleSettings.values[root.selected] ?? {}).filter(k => !otherKeys.includes(k)) : null
         changed: ModuleSettings.changed(root.selected, keys)
         onReset: ModuleSettings.reset(root.selected, keys)
       }

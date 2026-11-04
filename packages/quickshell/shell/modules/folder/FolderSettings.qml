@@ -20,7 +20,7 @@ Column {
 
   KitLinkRow {
     label: "Unseen dot"
-    hint: "In Notifications › Unseen dot"
+    hint: "In Notifications › Unseen"
     target: "notifications"
   }
 

@@ -4,32 +4,33 @@ import qs.config
 import qs.kit
 
 // Notifications options in the Shell Manager, by what they decide: how a new one
-// arrives (NEW NOTIFICATIONS: a card or a live line, how long), its avatar's colour
+// arrives (NEW NOTIFICATIONS: how long a card stays; a live line instead of a card is
+// the Messages activity of Live activities, linked here), its avatar's colour
 // (APP COLOURS), the history popup (CENTRE), the mark for the unseen (UNSEEN: the dot
 // on the island's pill or the Folder) and the Notifications bar module (BELL: its
 // unseen mark).
 KitColumn {
   spacing: Theme.sectionGap
 
-  KitLabel { text: "NEW NOTIFICATIONS"; about: "How a new one reaches you: a card, or a line in the live slot" }
+  KitLabel { text: "NEW NOTIFICATIONS"; about: "How a new one reaches you" }
 
-  KitOptionRow {
-    needs: Theme.island ? "" : "A live line needs the Island style"
-    needsAction: "Use Island"
-    onNeedsActed: ShellSettings.set("barStyle", "island")
-    module: "notifications"; key: "appear"; fallback: "card"
-    label: "New ones arrive as"; hint: ShellSettings.liveEnabled ? "A card, or a line in the live slot" : "Live activities are off: cards only"
-    model: [{ label: "Card", value: "card" }, { label: "Live activity", value: "live" }]
-  }
-
-  // a card (and a toast) stays this long; a live line has its own time in Bar › Live. Cards are what
-  // arrives in the strip, in card mode and with the live activities off
+  // a card (and a toast) stays this long; a live line has its own time in Live activities.
+  // Cards are what arrives in the strip, in card mode and with the live activities off
   KitOptionRow {
     needs: !Theme.island || ModuleSettings.get("notifications", "appear", "card") === "card" || !ShellSettings.liveEnabled
-           ? "" : "Live lines: set in Bar › Live"
+           ? "" : "Set by Live activities › Messages"
     module: "notifications"; key: "toastSeconds"; fallback: 5
     label: "Card stays for"; hint: "Stay: until closed; urgent ones always stay"
     model: [{ label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }, { label: "Stay", value: 0 }]
+  }
+
+  // a card, or (Island style) a line in the live slot: that choice is the Messages activity's
+  // switch, kept in Live activities › Asks with its own options; a link here
+  KitLinkRow {
+    visible: Theme.island
+    label: "Arrive as a live line"
+    hint: "In Live activities › Asks"
+    target: "live:notice"
   }
 
   KitLine {}

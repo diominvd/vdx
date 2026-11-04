@@ -27,8 +27,8 @@ Column {
 
   KitLinkRow {
     label: "Wallpaper"
-    hint: "The popup switches; set it in Appearance"
-    target: "appearance:wallpaper"
+    hint: "In Wallpaper"
+    target: "wallpaper"
   }
 
   KitGrouper {}
