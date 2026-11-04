@@ -4,8 +4,9 @@ import qs.kit
 import qs.modules.windows
 
 // Windows: how windows behave (hypr/components/windowmode.lua). LAYOUT: the
-// mode (tiling, floating, scrolling) and the options of the current one (the
-// floating mode's switcher and taskbar too); LOOK: gaps, frames, shadows.
+// mode (tiling, floating, scrolling), the options of the current one and the wheel;
+// SWITCHING (floating only): the switcher and the taskbar; LOOK: gaps, frames, shadows;
+// OVERVIEW: Super + Tab.
 // Applied at once: Hyprland reloads.
 KitColumn {
   id: root
@@ -22,6 +23,7 @@ KitColumn {
   // groups for the Shell Manager's sidebar: a click scrolls to `y`
   readonly property var jumps: [
     { key: "layout", label: "Layout", y: layoutGroup.y },
+    { key: "switching", label: "Switching", y: switchingGroup.y },
     { key: "look",   label: "Look",   y: lookGroup.y },
     { key: "overview", label: "Overview", y: overviewGroup.y }
   ]
@@ -82,7 +84,7 @@ KitColumn {
     }
   }
 
-  // floating only: the switcher and the taskbar
+  // floating only: how the windows are laid out when it starts
   KitRow {
     wide: true
     visible: root.floating
@@ -95,6 +97,23 @@ KitColumn {
       onPicked: value => root.ws.setOption("arrange", value)
     }
   }
+
+  KitRow {
+    wide: true
+    label: "Scroll with"
+    hint: "The modes' wheel binds"
+
+    KitSegments {
+      model: [{ label: "Wheel", value: "wheel" }, { label: "Arrows", value: "arrows" }, { label: "Both", value: "both" }]
+      current: root.o.scrollKeys
+      onPicked: value => root.ws.setOption("scrollKeys", value)
+    }
+  }
+
+  // floating only: the switcher and the taskbar, its ways to find a window
+  KitLine { visible: root.floating }
+
+  KitLabel { id: switchingGroup; visible: root.floating; text: "SWITCHING"; about: "Floating mode: Alt + Tab and the taskbar" }
 
   KitRow {
     visible: root.floating
@@ -128,18 +147,6 @@ KitColumn {
       model: [{ label: "Strip", value: "strip" }, { label: "Pill", value: "island" }]
       current: root.o.taskbarShape
       onPicked: value => root.o.taskbarShape = value
-    }
-  }
-
-  KitRow {
-    wide: true
-    label: "Scroll with"
-    hint: "The modes' wheel binds"
-
-    KitSegments {
-      model: [{ label: "Wheel", value: "wheel" }, { label: "Arrows", value: "arrows" }, { label: "Both", value: "both" }]
-      current: root.o.scrollKeys
-      onPicked: value => root.ws.setOption("scrollKeys", value)
     }
   }
 

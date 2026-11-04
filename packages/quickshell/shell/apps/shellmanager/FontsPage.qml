@@ -4,18 +4,19 @@ import qs.config
 import qs.kit
 
 // Preview a family before applying it. Installed and downloadable families
-// share a compact list; system scaling is a separate group.
+// share a compact list; the text size (the shell's, GTK apps') is a separate group.
+// Density and where text stands in a field are Interface's (AppearancePage).
 KitColumn {
   id: root
   readonly property string icon: "text"
   readonly property string title: "Fonts"
-  readonly property string description: "The shell's typeface, text size and density."
+  readonly property string description: "The shell's typeface and text size."
   readonly property var jumps: [
     { key: "preview", label: "Preview", y: previewLabel.y },
     { key: "families", label: "Families", y: familiesLabel.y },
     { key: "size", label: "Text size", y: sizeLabel.y }
   ]
-  readonly property var resetKeys: ["textSize", "density", "inputAlign"]
+  readonly property var resetKeys: ["textSize"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
@@ -142,16 +143,8 @@ KitColumn {
     KitSegments { model: [12, 13, 14, 15].map(n => ({ label: n + " px", value: n })); current: ShellSettings.textSize; onPicked: value => ShellSettings.set("textSize", value) }
   }
   KitRow {
-    wide: true; label: "Density"; hint: "Air between and inside things"
-    KitSegments { model: [{ label: "Compact", value: "compact" }, { label: "Regular", value: "regular" }, { label: "Airy", value: "airy" }]; current: ShellSettings.density; onPicked: value => ShellSettings.set("density", value) }
-  }
-  KitRow {
     wide: true; label: "GTK apps text"; hint: "Applied at once, GTK only"
     KitSegments { disabled: DisplayService.busy; model: DisplayService.textScales.map(f => ({ label: Math.round(f * 100) + "%", value: f })); current: DisplayService.textFactor; onPicked: value => DisplayService.setText(value) }
-  }
-  KitRow {
-    wide: true; label: "Input text"; hint: "Where text stands in a field; Auto: left"
-    KitSegments { model: [{ label: "Auto", value: "auto" }, { label: "Left", value: "left" }, { label: "Centre", value: "center" }]; current: ShellSettings.inputAlign; onPicked: value => ShellSettings.set("inputAlign", value) }
   }
     KitGrouper {}
   }

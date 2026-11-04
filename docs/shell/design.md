@@ -45,7 +45,7 @@ uses tonal layers and more spacious controls.
 
 - Spacing: the gaps and edge insets are `Theme.gapHair` (4), `gapTight` (2),
   `gapSmall` (6), `gapMedium` (8), `gapLoose` (10), `gapWide` (12) and `gapGroup`
-  (14), at Regular density; Fonts › Density (Compact 0.8 ×, Regular, Airy 1.2 ×; default Compact)
+  (14), at Regular density; Interface › Style › Density (Compact 0.8 ×, Regular, Airy 1.2 ×; default Compact)
   scales them with `rowHeight`, `controlHeight` and the paddings (`Theme.aired`); a value that is used once stays a literal.
 - MUST — dividers: use `KitLine`, horizontally or with `vertical: true`.
   The stroke is `Theme.dividerThickness` (1 px), in `Theme.dividerColor`
@@ -96,7 +96,7 @@ uses tonal layers and more spacious controls.
   An exact number or text → `KitInput` (Enter). A folder or file → `KitInput` + a
   `Choose…` button (`FilesService.pickFolder` / `pick`, the file picker's own window's
   A password → `KitInput { echoMode: TextInput.Password }`: it carries its own eye, and where text
-  stands (left, centre) is the user's (Text › Input text), never set per field.
+  stands (left, centre) is the user's (Interface › Style › Input text), never set per field.
   picker). A long list to preview + Apply → a searchable list and a preview, as
   on Themes. A slider of 3–4 stops is chips.
   On a Settings page the choices are `KitSegments` (one track, the picked segment

@@ -205,7 +205,8 @@ island of its own, with its modules' popups inside it.
 
 ## Look
 
-All in Shell Manager › Appearance.
+All in Shell Manager's LOOK group: Interface, Themes, Colours, Glow, Wallpaper,
+Fonts, Icons, Cursor, Motion.
 
 - **Style**: Strict (quiet outlined controls) or Material 3 (tonal surfaces, spacious
   filled controls). Appearance shows both choices as cards; corners remain a
@@ -217,11 +218,11 @@ All in Shell Manager › Appearance.
   gradients remain readable from imported settings.
 - **Glow**: off by default; a soft halo (`KitGlow`) behind bright elements, each
   in its own colour, with a strength. Targets: switches, sliders, workspaces,
-  live activities, status dots; switch each off under Appearance › Glow.
+  live activities, status dots; switch each off under Glow.
 - **Shape › Corners**: sharp, or round with one radius — popups, controls,
   the island, Hyprland's windows and mako follow, and the icons switch to
   Material Symbols Rounded.
-- **Shape › Icons**: Material Symbols or Phosphor (outline or solid), or Lucide
+- **Icons**: Material Symbols or Phosphor (outline or solid), or Lucide
   (outline only).
 - Password fields use dots; there is no separate appearance option.
 
@@ -298,7 +299,8 @@ above a divider. Module layout offers compact semantic groups (the default), equ
 grid tiles and content-sized chips. The profile
 shows the user's initial or chosen image and current system uptime.
 
-Appearance has Interface, Accent and Glow tabs; Interface includes corners.
+Interface, Colours and Glow are sidebar pages of one form; Interface holds the
+style, density, input text and corners.
 Wallpaper is a separate page. Fonts
 and Cursor use searchable lists and a single preview, with explicit Apply.
 The colour picker offers named palette choices with keyboard activation.

@@ -2,7 +2,8 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Interface (style, corners) and accent use a full-width form. Icons and Wallpaper are pages of their own.
+// Interface (style, density, fields, corners), Colours and Glow: three sidebar pages on one
+// full-width form. Icons, Fonts and Wallpaper are pages of their own.
 KitSettingsWorkspace {
   id: root
   readonly property bool fillsViewport: true
@@ -23,7 +24,7 @@ KitSettingsWorkspace {
   }
   // the header's Reset: the keys of the sidebar page shown (Interface, Colours or Glow), not the other two
   readonly property var tabKeys: ({
-    style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders"],
+    style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "density", "inputAlign"],
     accent: ["accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere"],
     glow: ["glow", "glowStrength", "glowWhere"]
   })
@@ -43,7 +44,7 @@ KitSettingsWorkspace {
 
         width: parent.width
         visible: root.tab === "style"
-        KitLabel { text: "APPEARANCE" }
+        KitLabel { text: "STYLE" }
         KitRow {
           label: "Interface style"
           hint: ShellSettings.material ? "Tonal surfaces and soft controls" : "Clean outlines and compact controls"
@@ -64,6 +65,14 @@ KitSettingsWorkspace {
             current: ShellSettings.segmentedSliders
             onPicked: value => ShellSettings.set("segmentedSliders", value)
           }
+        }
+        KitRow {
+          wide: true; label: "Density"; hint: "Air between and inside things"
+          KitSegments { model: [{ label: "Compact", value: "compact" }, { label: "Regular", value: "regular" }, { label: "Airy", value: "airy" }]; current: ShellSettings.density; onPicked: value => ShellSettings.set("density", value) }
+        }
+        KitRow {
+          wide: true; label: "Input text"; hint: "Where text stands in a field; Auto: left"
+          KitSegments { model: [{ label: "Auto", value: "auto" }, { label: "Left", value: "left" }, { label: "Centre", value: "center" }]; current: ShellSettings.inputAlign; onPicked: value => ShellSettings.set("inputAlign", value) }
         }
         KitLine {}
         KitLabel { text: "SHAPE" }

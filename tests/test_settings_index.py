@@ -148,6 +148,12 @@ class OneHome(unittest.TestCase):
         self.assertNotIn('key: "appear"', notes)
         self.assertIn('target: "live:notice"', notes)
 
+    def test_interface_holds_density_and_input_text(self):
+        index = si.build()
+        for label in ("Density", "Input text"):
+            targets = {e["target"] for e in index if e["label"] == label and not e["where"].startswith("Apps")}
+            self.assertEqual(targets, {"appearance"}, label)
+
     def test_app_reset_leaves_a_shared_page(self):
         keys = si.build_keys()
         self.assertIn("apps/shellmanager/UpdatesPage.qml", keys)
