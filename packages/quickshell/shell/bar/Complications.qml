@@ -27,12 +27,17 @@ Singleton {
   readonly property color onInk: Theme.accentFor("modules", Theme.foreground1)
 
   function ring(kind, value, text, icon, tint, words, extra) {
-    const r = { kind: kind, value: value, text: text, icon: icon, tint: tint ?? ink, words: words ?? "", on: true, quiet: false, steps: 5 };
+    const r = { kind: kind, value: value, text: text, icon: icon, tint: tint ?? ink, words: words ?? "", unit: "%", on: true, quiet: false, steps: 5 };
     return Object.assign(r, extra ?? {});
   }
   function pct(v) { return Math.max(0, Math.min(1, v / 100)); }
   function heat(t) { return t >= 85 ? Theme.red : t >= 70 ? Theme.yellow : ink; }
   function load(p) { return p >= 90 ? Theme.red : p >= 70 ? Theme.yellow : ink; }
+
+  // the peek's line: each ring's words and value ("Battery 64 %", "VPN NL-Amsterdam")
+  function line(rings) {
+    return rings.map(r => r.text !== "" ? r.words + " " + r.text + (r.unit === "%" ? " %" : r.unit) : r.words).join(" · ");
+  }
 
   function of(id) {
     switch (id) {
@@ -65,7 +70,7 @@ Singleton {
       }
       if (ModuleSettings.get("sysmon", "barTemp", false) && SysmonService.temps.cpu !== null) {
         const t = Math.round(SysmonService.temps.cpu);
-        list.push(ring("gauge", pct(t), String(t), "gauge", heat(t), "Temperature"));
+        list.push(ring("gauge", pct(t), String(t), "gauge", heat(t), "Temperature", { unit: "°" }));
       }
       return list;
     }
@@ -74,7 +79,7 @@ Singleton {
         return [ring("disc", 0, "", "clock", ink, "Timer", { on: TimerService.active, quiet: true })];
       const left = Math.ceil(TimerService.remaining / 60000);
       return [ring("ticks", 1 - TimerService.progress, String(left), "clock",
-                   TimerService.paused ? Theme.muted : Theme.orange, "Timer")];
+                   TimerService.paused ? Theme.muted : Theme.orange, TimerService.paused ? "Paused" : "Timer", { unit: " min" })];
     }
     case "wifi":
       return [ring("disc", 0, "", WifiService.radioOn ? "wifi" : "wifi-off", onInk, WifiService.ssid || "Wi-Fi",

@@ -6,6 +6,7 @@ import qs.kit
 
 // One module in the resting pill. With Rings in the pill (Bar look › Style) a module
 // whose value has a whole is drawn as its complication (bar/Complications.qml, ring 22);
+// a pointer resting on it 150 ms adds its words beside the rings (the peek);
 // its face stays under the rings, unseen, so the click, the wheel and the popup are the
 // module's own, as on the strip. A module with no whole (the workspaces, a layout, the
 // clock) and a separator keep their face of words.
@@ -19,6 +20,8 @@ Item {
   readonly property bool separator: BarLayout.isSeparator(modelData)
   readonly property var rings: ShellSettings.pillRings && !separator ? Complications.of(modelData) : []
   readonly property bool drawn: rings.length > 0
+  // the glance: the pointer rests on the rings a moment and their words show beside them
+  property bool peek: false
 
   anchors.verticalCenter: parent ? parent.verticalCenter : undefined
   implicitWidth: drawn ? dial.implicitWidth : face.implicitWidth
@@ -59,7 +62,25 @@ Item {
         steps: spec.steps ?? 5
       }
     }
+
+    KitText {
+      anchors.verticalCenter: parent.verticalCenter
+      visible: slot.peek
+      text: Complications.line(slot.rings)
+      color: Theme.muted
+      font.pixelSize: Theme.fontSize - 1
+    }
   }
+
+  HoverHandler {
+    id: hover
+    enabled: slot.drawn
+    onHoveredChanged: {
+      if (hovered) wait.restart();
+      else { wait.stop(); slot.peek = false; }
+    }
+  }
+  Timer { id: wait; interval: 150; onTriggered: slot.peek = true }
 
   // a right click takes its options; without this it falls through to the island
   MouseArea {

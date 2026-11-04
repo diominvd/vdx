@@ -96,14 +96,18 @@ Row {
   }
 
   // update: the download's progress, else what runs
-  KitIcon { visible: face.kind === "update"; glowTarget: "live"; name: "download"; tint: Theme.blue; size: 16; anchors.verticalCenter: parent.verticalCenter }
   readonly property bool updateDone: face.kind === "update" && !PackagesService.busy && !RootService.running && PackagesService.status !== ""
   readonly property bool updateBar: face.kind === "update" && PackagesService.stage === "downloading"
-  IslandLiveProgress {
-    visible: face.updateBar
+  // the head: the download as a fill ring; before and after it, a disc
+  KitRing {
+    visible: face.kind === "update"
     anchors.verticalCenter: parent.verticalCenter
+    size: face.coverSize
+    kind: face.updateBar ? "fill" : "disc"
+    quiet: !face.updateDone
     value: PackagesService.stagePercent
-    tint: Theme.blue
+    icon: face.updateDone ? (PackagesService.status === "error" ? "info" : "check") : "download"
+    tint: face.updateDone ? (PackagesService.status === "error" ? Theme.red : Theme.green) : Theme.blue
   }
   KitText { visible: face.updateBar; anchors.verticalCenter: parent.verticalCenter; width: 34; horizontalAlignment: Text.AlignLeft; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
@@ -116,14 +120,17 @@ Row {
     color: face.updateDone ? (PackagesService.status === "error" ? Theme.red : Theme.green) : Theme.blue
   }
 
-  // backup: BKP and its progress
-  KitText { visible: face.kind === "backup"; anchors.verticalCenter: parent.verticalCenter; text: "BKP"; color: Theme.foreground1; font.letterSpacing: 1 }
-  IslandLiveProgress {
-    visible: face.kind === "backup" && BackupService.status === ""
+  // backup: its progress as a fill ring, then the outcome
+  KitRing {
+    visible: face.kind === "backup"
     anchors.verticalCenter: parent.verticalCenter
-    value: BackupService.progress / 100
-    tint: Theme.green
+    size: face.coverSize
+    kind: BackupService.status === "" ? "fill" : "disc"
+    value: Math.max(0, BackupService.progress) / 100
+    icon: BackupService.status === "error" ? "info" : BackupService.status === "ok" ? "check" : "shield"
+    tint: BackupService.status === "error" ? Theme.red : Theme.green
   }
+  KitText { visible: face.kind === "backup"; anchors.verticalCenter: parent.verticalCenter; text: "Backup"; color: Theme.foreground1 }
 
   KitText {
     visible: face.kind === "backup"
