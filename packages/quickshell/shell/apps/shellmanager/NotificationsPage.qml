@@ -18,10 +18,12 @@ Column {
   readonly property int toast: ModuleSettings.get("notifications", "toastSeconds", 5)
   readonly property var jumps: []
 
-  // the header's Reset
-  readonly property bool changed: ModuleSettings.changed("notifications") || ShellSettings.changed(["barFolderDot", "barDotColor"])
+  // the header's Reset: every "notifications" key but `appear` (a card or a live line: the
+  // Messages activity's switch, Live activities resets it)
+  readonly property var keys: Object.keys(ModuleSettings.values.notifications ?? {}).filter(k => k !== "appear")
+  readonly property bool changed: ModuleSettings.changed("notifications", keys) || ShellSettings.changed(["barFolderDot", "barDotColor"])
   function reset() {
-    ModuleSettings.reset("notifications");
+    ModuleSettings.reset("notifications", keys);
     ShellSettings.reset(["barFolderDot", "barDotColor"]);
   }
 

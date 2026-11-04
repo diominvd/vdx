@@ -4,9 +4,10 @@ import qs.components
 import qs.config
 import qs.kit
 
-// Updates: when the shell looks for package updates and how careful it is when removing.
-// It was Apps › Packages (UPDATES and SAFETY); the keys are the same ModuleSettings
-// "packages" ones. The Packages window itself is an app.
+// Updates: when the shell looks for package updates, how it installs them and how careful
+// it is when removing. It was Apps › Packages (UPDATES, UPDATING and SAFETY); the keys are
+// the same ModuleSettings "packages" ones. The Packages window itself is an app (Apps ›
+// Packages: what it opens on and lists); its Reset leaves these keys to this page's.
 Column {
   id: root
   readonly property Item previewItem: null
@@ -16,7 +17,7 @@ Column {
   readonly property string description: "When the shell looks for updates, and how careful it is."
   readonly property var jumps: []
 
-  readonly property var resetKeys: ["checkOnOpen", "interval", "aur", "autoInstall", "confirm"]
+  readonly property var resetKeys: ["checkOnOpen", "interval", "aur", "noConfirm", "autoInstall", "notify", "confirm"]
   readonly property bool changed: ModuleSettings.changed("packages", resetKeys)
   function reset() { ModuleSettings.reset("packages", resetKeys); }
 
@@ -36,7 +37,17 @@ Column {
 
   KitLabel { text: "INSTALLING" }
 
+  KitToggleRow {
+    module: "packages"; key: "noConfirm"; label: "Update without asking"
+    hint: "Skips the confirmation panel"
+  }
+
   KitToggleRow { module: "packages"; key: "autoInstall"; label: "Install right after the download"; hint: "Off: asks again after the download" }
+
+  KitToggleRow {
+    module: "packages"; key: "notify"; fallback: true
+    label: "Notify when done"; hint: "A notification: all updated, or what failed"
+  }
 
   KitLine {}
 

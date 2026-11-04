@@ -221,8 +221,16 @@ Pages by the user's area; the look follows macOS System Settings.
   module's options in Bar modules (an app's module too), an app's own options in
   Apps, Lock screen and Notifications on their own pages.
 - MUST — link row: a setting kept on another page shows a row where it is also
-  looked for: `KitLinkRow` — label = the setting, hint `In <Page> › <Group>`;
-  the whole row is the button, a chevron on the right.
+  looked for: `KitLinkRow` — label = the setting, hint `In <Page> › <Group>`
+  (the sidebar's page name, `In Themes` for a page without groups);
+  the whole row is the button, a chevron on the right. Never a second control for
+  the same key: Colours links Window frames (Windows › Look), Notifications links a
+  live line (Live activities › Asks › Messages), `tests/test_settings_index.py`
+  (OneHome) fails on a key two settings files write.
+- MUST — Reset in the header of a page shared by sidebar pages (`pageTab`: Interface,
+  Colours, Glow; Bar, Bar look, Bar monitors) resets only the shown page's keys; a key
+  another page owns under the same ModuleSettings id is left to it (Apps › Packages
+  leaves the Updates page's).
 - MUST — overridden: a row another setting overrides stays visible and
   `disabled`, hint `Set by <Page> › <Row>`; a row meaningless without its parent
   hides with it (above).
@@ -274,9 +282,9 @@ Pages by the user's area; the look follows macOS System Settings.
 
 - Appearance separates Interface, Accent and Glow. Interface includes corners;
   Wallpaper has its own page.
-- Bar separates Layout, Look and Monitors. Layout selects Solid / Island and
-  arranges modules; the module inspector offers destination and order controls
-  as an alternative to drag. Available modules are searchable.
+- Bar separates Layout, Look and Monitors. Bar look holds the style (Solid /
+  Island) first; Layout arranges modules; the module inspector offers destination
+  and order controls as an alternative to drag. Available modules are searchable.
 - Hub and Live activities have their own pages. Hub appearance
   options always address the Island settings, even when Solid is active.
 - Fonts and Cursor use searchable rows and one preview. Picking a row does

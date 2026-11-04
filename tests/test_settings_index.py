@@ -41,8 +41,8 @@ JOURNEYS = {
     "live": "live",
     "flash": "live",
     "low battery": "live",
-    "island": "bar",
-    "solid": "bar",
+    "island": "bar:look",
+    "solid": "bar:look",
     "wifi": "network:wifi",
     "hotspot": "network:hotspot",
     "ethernet": "network:ethernet",
@@ -102,6 +102,58 @@ class Index(unittest.TestCase):
     def test_journeys(self):
         for q, target in JOURNEYS.items():
             self.assertIn(target, [e["target"] for e in search(self.index, q)], q)
+
+
+SHELL = SCRIPT.parent.parent
+# the files that show settings rows: the Shell Manager's pages and the options of each module and app
+SETTINGS_FILES = sorted(set((SHELL / "apps/shellmanager").glob("*.qml")) | set(SHELL.glob("modules/*/*Settings.qml"))
+                        | set(SHELL.glob("apps/*/*Settings.qml")) | set(SHELL.glob("modules/*/*Colours.qml")))
+# a key written from two files on purpose: a `needs` button that switches the bar's style, the
+# layout's undo (it puts the Folder's dot back), the wallpaper's service; accentWhere is a map of
+# places: Colours sets the controls', Windows › Look the frame's (test_moved_rows_have_one_home)
+NOT_A_SECOND_HOME = {"barStyle", "barFolderDot", "wallpaperMode", "accentWhere"}
+
+
+class OneHome(unittest.TestCase):
+    """Every setting has one row: a second place is a KitLinkRow, never a second control."""
+
+    def writers(self):
+        import re
+        found = {}
+        for f in SETTINGS_FILES:
+            text = f.read_text()
+            keys = {f"{m}.{k}" for m, k in re.findall(r'module:\s*"([\w-]+)";\s*key:\s*"(\w+)"', text)}
+            keys |= {f"{m}.{k}" for m, k in re.findall(r'ModuleSettings\.set\("([\w-]+)",\s*"(\w+)"', text)}
+            keys |= {k for k in re.findall(r'ShellSettings\.set(?:Look)?\("(\w+)"', text) if k not in NOT_A_SECOND_HOME}
+            for k in keys:
+                found.setdefault(k, []).append(f.name)
+        return found
+
+    def test_one_file_writes_each_key(self):
+        for key, files in self.writers().items():
+            self.assertEqual(len(files), 1, f"{key} is set in {files}")
+
+    def test_moved_rows_have_one_home(self):
+        updates = (SHELL / "apps/shellmanager/UpdatesPage.qml").read_text()
+        packages = (SHELL / "apps/packages/PackagesSettings.qml").read_text()
+        for key in ("noConfirm", "notify"):
+            self.assertIn(f'key: "{key}"', updates)
+            self.assertNotIn(f'key: "{key}"', packages)
+        # the window frames' accent is Windows › Look's Frames; Colours links there
+        accent = (SHELL / "apps/shellmanager/AccentSection.qml").read_text()
+        self.assertNotIn('value: "window"', accent)
+        self.assertIn('target: "windows:look"', accent)
+        # a live line or a card: the Messages activity's switch; Notifications links there
+        notes = (SHELL / "modules/notifications/NotificationsSettings.qml").read_text()
+        self.assertNotIn('key: "appear"', notes)
+        self.assertIn('target: "live:notice"', notes)
+
+    def test_app_reset_leaves_a_shared_page(self):
+        keys = si.build_keys()
+        self.assertIn("apps/shellmanager/UpdatesPage.qml", keys)
+        self.assertTrue({"noConfirm", "notify", "autoInstall"} <= set(keys["apps/shellmanager/UpdatesPage.qml"]))
+        page = (SHELL / "apps/shellmanager/ShellAppsPage.qml").read_text()
+        self.assertIn('packages: "apps/shellmanager/UpdatesPage.qml"', page)
 
 
 if __name__ == "__main__":

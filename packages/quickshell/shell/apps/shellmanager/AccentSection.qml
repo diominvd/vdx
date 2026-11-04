@@ -2,7 +2,8 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// One accent colour, independently enabled for each UI target.
+// One accent colour, independently enabled for each UI target. The windows' frame
+// (its place "window") is chosen in Windows › Look (Frames: off | theme | accent).
 KitColumn {
   id: root
 
@@ -12,8 +13,7 @@ KitColumn {
     { value: "switches", label: "Switches", hint: "On switches" },
     { value: "sliders", label: "Sliders", hint: "Filled track" },
     { value: "choices", label: "Choices", hint: "Selected option" },
-    { value: "selects", label: "Dropdowns", hint: "Selected field" },
-    { value: "window", label: "Window frames", hint: "Focused window" }
+    { value: "selects", label: "Dropdowns", hint: "Selected field" }
   ]
   readonly property string selected: names.includes(ShellSettings.accentStops[0]) || ShellSettings.customColours.includes(ShellSettings.accentStops[0]) ? ShellSettings.accentStops[0] : "theme"
 
@@ -56,6 +56,12 @@ KitColumn {
         onToggled: root.setTarget(modelData.value, !checked)
       }
     }
+  }
+  KitLinkRow {
+    visible: ShellSettings.accent
+    label: "Window frames"
+    hint: "In Windows › Look"
+    target: "windows:look"
   }
 
   KitLine {}

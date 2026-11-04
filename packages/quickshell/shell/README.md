@@ -149,7 +149,7 @@ VirusTotal, Packages, Display, Windows, Chat, Folder.
 
 ## Island
 
-Shell Manager › Bar, mode selector › Island: no strip, one pill at the top
+Shell Manager › Bar look › Style › Bar style › Island: no strip, one pill at the top
 centre is the whole bar (`bar/island/`). Solid and island keep their own icon
 size, gap, separators and hub opening.
 
@@ -159,12 +159,13 @@ size, gap, separators and hub opening.
   runs, only while it does, in three kinds: Asks (low battery, a connected
   device), Held (recording, update, backup, timer, VPN, Focus, radio, music, media) and Flash (the mic, the
   layout, the cable). The wheel over it pages through them with a
-  slide, and it stays on the one paged to (nothing pages back by itself; Bar › Live › New one comes forward lets an activity that starts take the pill first); one shows whole in the pill (activities never fold);
+  slide, and it stays on the one paged to (nothing pages back by itself; Live activities › New one comes forward lets an activity that starts take the pill first); one shows whole in the pill (activities never fold);
   a click on the music opens the
-  Music popup (a middle click plays / pauses). Bar › Live: each activity on or
+  Music popup (a middle click plays / pauses). Live activities: each activity on or
   off, the row order in its kind is the priority (drag a row), the low battery
   line, how long a flash stays and the wheel. The notification toast is the island's own view and only
-  follows its switch there.
+  follows its switch there; a new notification as a live line instead is the
+  Messages activity (Live activities › Asks).
 - **The hub** opens from the clock on a hover or a click (Hub › Opens on). Under the
   clock and day it holds blocks — Toggles (tiles), Calendar (week or month), Sliders,
   Player (card or compact), Module chips — in the order and with the visibility set in
@@ -182,7 +183,7 @@ size, gap, separators and hub opening.
 - Volume and brightness show in the live slot as a flash (a ruler and the
   value; not when changed in the open volume popup); new notifications pass
   over the island as a toast — a click on one focuses its app's window, else
-  opens the centre. Toast duration: Notifications › Toasts.
+  opens the centre. Toast duration: Notifications › New notifications › Card stays for.
 - Bar › Monitor › Island clock, per monitor: off with nothing beside it, the
   island hides there until it has something to show.
 
@@ -285,7 +286,7 @@ Its Quickshell clipping substitute does not verify GPU rendering; check the
 live shell too.
 
 Bar settings separate Layout, Look and Monitors; Hub and Live activities have
-their own pages. Layout selects Solid / Island and arranges modules. Click a module to choose its destination and order, or
+their own pages. Bar look selects Solid / Island; Layout arranges modules. Click a module to choose its destination and order, or
 drag it between zones. Available modules have their own searchable bank.
 The main layouts and appearance values are kept independently for Solid and
 Island; child bars retain the existing shared model.

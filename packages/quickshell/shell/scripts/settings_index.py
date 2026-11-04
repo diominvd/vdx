@@ -14,7 +14,8 @@ entry of its own too. ./install.py check fails on a stale index.
 
 settings-keys.json: the ModuleSettings keys each settings file of an app and
 of its bar module writes ({file: [key, ...]}): the two share one id, so the
-module's Reset clears only its keys, the app's every other one."""
+module's Reset clears only its keys, the app's every other one but those of a
+page of its own under the same id (SHARED_PAGES: Updates writes "packages")."""
 import json, re, sys
 from pathlib import Path
 
@@ -210,12 +211,18 @@ def keys_of(path: Path) -> list:
     return sorted(set(found))
 
 
+# pages of their own that write an app's ModuleSettings id: the app's Reset leaves their keys
+SHARED_PAGES = ["apps/shellmanager/UpdatesPage.qml"]
+
+
 def build_keys() -> dict:
     out = {}
     for a in json.loads((SHELL / "apps" / "apps.json").read_text()):
         for k in ("settings", "moduleSettings"):
             if a.get("module") and a.get(k):
                 out[a[k]] = keys_of(SHELL / a[k])
+    for f in SHARED_PAGES:
+        out[f] = keys_of(SHELL / f)
     return out
 
 

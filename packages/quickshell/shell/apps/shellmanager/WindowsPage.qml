@@ -207,7 +207,7 @@ KitColumn {
 
   KitLinkRow {
     label: "Window corners"
-    hint: "In Appearance › Shape"
+    hint: "In Interface › Shape"
     target: "appearance:shape"
   }
 

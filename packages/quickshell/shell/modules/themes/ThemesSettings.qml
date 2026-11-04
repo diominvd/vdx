@@ -27,7 +27,7 @@ Column {
 
   KitLinkRow {
     label: "Theme"
-    hint: "The popup switches; all of them in Themes"
+    hint: "In Themes"
     target: "themes"
   }
 

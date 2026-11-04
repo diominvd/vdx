@@ -19,8 +19,8 @@ Column {
 
   KitLinkRow {
     label: "Wi-Fi"
-    hint: "Networks, DNS, the speed test: Network"
-    target: "network"
+    hint: "In Network › Wi-Fi"
+    target: "network:wifi"
   }
 
   KitGrouper {}

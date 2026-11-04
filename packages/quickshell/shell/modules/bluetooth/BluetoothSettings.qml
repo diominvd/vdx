@@ -14,7 +14,7 @@ Column {
 
   KitLinkRow {
     label: "Bluetooth"
-    hint: "Devices and pairing: Bluetooth"
+    hint: "In Bluetooth"
     target: "bluetooth"
   }
 
