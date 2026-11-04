@@ -93,6 +93,8 @@ How to write a page, a module's options, a service, and the review checklist:
 - Search (the sidebar's): `config/settings-index.json`, built from the pages'
   literal `label:` / `hint:` by `scripts/settings_index.py`; after a row changes run
   it (`check` fails on a stale index). A new page or settings file goes in its `PAGES` / registry walk.
+  `where` names the page as the sidebar does: a section of a shared form goes in `SECTIONS`, a
+  group that is a sidebar page of its own (`pageTab`) in `GROUP_PAGES`, a page with no file in `SIDEBAR`.
   It also writes `config/settings-keys.json` (each app / app-module settings file's keys):
   an app and its bar module share a ModuleSettings id and reset apart by it.
 - A right click on a bar module opens its options page (Bar › Behaviour › Right

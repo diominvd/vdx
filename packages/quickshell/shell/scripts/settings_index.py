@@ -5,8 +5,9 @@
     settings_index.py --check    the paths of the files out of date (exit 1)
 
 An entry is a row the pages write out — {"label", "hint", "where", "target"}:
-`where` is "Page › GROUP", `target` what `shell open` takes ("bar:look",
-"modules:sysmon", "apps:files"). A row is a `label: "…"` outside a choice
+`where` is "Page › GROUP" with the page as the sidebar names it (Interface, Bar
+look, Settings), `target` what `shell open` takes ("barlook", "modules:sysmon",
+"apps:files"). A row is a `label: "…"` outside a choice
 list (a one-line object with a `value:` and no `hint:` is a choice); a computed
 label is not found. The group is the KitLabel above it (and an entry itself); a group that is one of
 the page's jumps makes the target that jump. Every bar module and app is an
@@ -24,9 +25,9 @@ OUT = SHELL / "config" / "settings-index.json"
 KEYS = SHELL / "config" / "settings-keys.json"
 SM = SHELL / "apps" / "shellmanager"
 
-# the pages with their own rows: tab, title, files (Appearance's sections each one jump)
+# the pages with their own rows: tab, title (the sidebar's name), files
 PAGES = [
-    ("appearance", "Appearance", ["AppearancePage.qml"]),
+    ("appearance", "Interface", ["AppearancePage.qml"]),
     ("themes", "Themes", ["ThemesPage.qml"]),
     ("fonts", "Fonts", ["FontsPage.qml"]),
     ("icons", "Icons", ["IconsPage.qml"]),
@@ -69,8 +70,21 @@ ALIASES = {
     "Music": ["player", "song", "track"],
     "VPN": ["mihomo", "proxy"],
     "Layout": ["add module", "arrange", "order"],
+    "Frames": ["window frames", "border", "borders"],
 }
-SECTIONS = {"AccentSection.qml": "accent", "CornersSection.qml": "shape"}
+# sections of a form shared by sidebar pages: file -> (the page's title, target)
+SECTIONS = {"CornersSection.qml": ("Interface", "appearance:shape"), "AccentSection.qml": ("Colours", "colours"),
+            "GlowSection.qml": ("Glow", "glow")}
+# a page whose groups are sidebar pages of their own (`pageTab`): group -> (title, target)
+GROUP_PAGES = {
+    "BarPage.qml": {"STYLE": ("Bar look", "barlook"), "SEPARATORS": ("Bar look", "barlook"),
+                    "BEHAVIOUR": ("Bar look", "barlook"), "MONITOR": ("Bar monitors", "barmonitor")},
+    "AboutPage.qml": {"SETTINGS": ("Settings", "settings"), "SYSTEM": ("System", "system")},
+}
+# sidebar pages with no PAGES entry of their own: found by their name too
+SIDEBAR = [("colours", "Colours"), ("glow", "Glow"), ("barlook", "Bar look"), ("barmonitor", "Bar monitors"),
+           ("modules", "Bar modules"), ("notifications", "Notifications"), ("lockscreen", "Lock screen"),
+           ("apps", "Apps"), ("system", "System"), ("settings", "Settings")]
 # shared option blocks (kit): a file that uses one is read with the block's rows in its place
 INCLUDES = {name: SHELL / "kit" / f"{name}.qml"
             for name in ("KitPanelOptions", "KitEnglishRow", "KitClearSearchRow", "KitPickerViewRow")}
@@ -146,14 +160,22 @@ def rows(text: str) -> list:
 def entries_of(path: Path, title: str, tab: str, target: str = "") -> list:
     text = expand(path.read_text())
     own = jumps(text)
+    pages = GROUP_PAGES.get(path.name, {})
+
+    def place(group):
+        """The page title and the target of a group's rows."""
+        if group in pages:
+            return pages[group]
+        return title, target or (f"{tab}:{own[group]}" if group in own else tab)
+
     out = []
     # each group is found by its title too
     for group in dict.fromkeys(GROUP.findall(text)):
-        t = target or (f"{tab}:{own[group]}" if group in own else tab)
-        out.append({"label": caption(group), "hint": "", "where": title, "target": t})
+        where, t = place(group)
+        out.append({"label": caption(group), "hint": "", "where": where, "target": t})
     for group, label, hint in rows(text):
-        t = target or (f"{tab}:{own[group]}" if group in own else tab)
-        out.append({"label": label, "hint": hint, "where": " › ".join(x for x in (title, group) if x), "target": t})
+        where, t = place(group)
+        out.append({"label": label, "hint": hint, "where": " › ".join(x for x in (where, group) if x), "target": t})
     return out
 
 
@@ -163,8 +185,10 @@ def build() -> list:
         out.append({"label": title, "hint": "", "where": "", "target": tab})   # the page by its name
         for f in files:
             out += entries_of(SM / f, title, tab)
-    for f, key in SECTIONS.items():
-        out += entries_of(SM / f, "Appearance", "appearance", f"appearance:{key}")
+    for tab, title in SIDEBAR:
+        out.append({"label": title, "hint": "", "where": "", "target": tab})
+    for f, (title, target) in SECTIONS.items():
+        out += entries_of(SM / f, title, target.split(":")[0], target)
     out += entries_of(SHELL / "apps/lock/LockSettings.qml", "Lock screen", "lockscreen")
     out += entries_of(SM / "LockScreenPage.qml", "Lock screen", "lockscreen")
     out += entries_of(SHELL / "modules/notifications/NotificationsSettings.qml", "Notifications", "notifications")
@@ -172,7 +196,8 @@ def build() -> list:
     out += entries_of(SM / "BarLive.qml", "Live activities", "live")
     out += entries_of(SM / "NetworkHotspot.qml", "Network › Hotspot", "network", "network:hotspot")
     out += entries_of(SM / "NetworkEthernet.qml", "Network › Ethernet", "network", "network:ethernet")
-    out += entries_of(SM / "WindowOptions.qml", "Windows", "windows")
+    # how an app's window opens: under each app in Apps (ShellAppsPage), not the Windows page
+    out += entries_of(SM / "WindowOptions.qml", "Apps", "apps")
     out.append({"label": "Bar text", "hint": "Content, name or icon only, for each bar module", "where": "Bar modules", "target": "modules"})
     layout = (SHELL / "bar" / "BarLayout.qml").read_text()
     for entry in re.findall(r'\{ id: "\w+",[^}]*\}', layout):
