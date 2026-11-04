@@ -201,7 +201,7 @@ island of its own, with its modules' popups inside it.
 - Bar › Look › Module gap and Separators apply to every bar; Bar › Layout ›
   ADD › Separator adds a custom "|".
 - The unseen-notifications dot shows while the notifications centre is tucked
-  away (in the Folder, or in the hub); Notifications › UNSEEN DOT.
+  away (in the Folder, or in the hub); Notifications › Unseen.
 
 ## Look
 

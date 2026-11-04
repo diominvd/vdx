@@ -7,7 +7,7 @@ import qs.kit
 
 // Bell at the right edge. Unseen notifications light it (tint); a tucked-away
 // bell tells the Folder (its `attention`), which draws the dot. The bell's own
-// badge (Notifications › BELL › Unseen mark): off, a dot or the count.
+// badge (Notifications › Unseen › Mark on the bell): off, a dot or the count.
 Item {
   id: root
 
@@ -26,7 +26,7 @@ Item {
     id: bell
     anchors { left: parent.left; verticalCenter: parent.verticalCenter }
     icon: "bell"
-    // the bell is an icon; "Unseen mark › Count" adds the number while there is something unseen
+    // the bell is an icon; "Mark on the bell › Count" adds the number while there is something unseen
     text: root.badge === "count" && root.attention
       ? (NotificationsService.unseen > 99 ? "99+" : String(NotificationsService.unseen)) : ""
     tint: root.attention ? Theme.foreground0 : Theme.gray

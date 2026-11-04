@@ -64,6 +64,7 @@ JOURNEYS = {
     "update without asking": "updates",
     "notify when done": "updates",
     "restart the shell": "system",
+    "badge": "notifications",
 }
 
 # a row is found on the page that shows it: (label, where it is not)

@@ -3,12 +3,12 @@ import qs.bar
 import qs.config
 import qs.kit
 
-// Notifications options in the Shell Manager, by what they decide: how a new one
+// Notifications options in the Shell Manager, the most used first: how a new one
 // arrives (NEW NOTIFICATIONS: how long a card stays; a live line instead of a card is
-// the Messages activity of Live activities, linked here), its avatar's colour
-// (APP COLOURS), the history popup (CENTRE), the mark for the unseen (UNSEEN: the dot
-// on the island's pill or the Folder) and the Notifications bar module (BELL: its
-// unseen mark).
+// the Messages activity of Live activities, linked here), the history popup (POPUP:
+// the centre), the mark for the unseen (UNSEEN: on the bell, or the dot on the
+// island's pill or the Folder while the bell is off the bar) and, last, the rules for
+// an app's avatar colour (APP COLOURS).
 KitColumn {
   spacing: Theme.sectionGap
 
@@ -35,11 +35,7 @@ KitColumn {
 
   KitLine {}
 
-  NotificationsColours { width: parent.width }
-
-  KitLine {}
-
-  KitLabel { text: "CENTRE"; about: "The history you open from the bell" }
+  KitLabel { text: "POPUP"; about: "The centre: the history you open from the bell" }
 
   KitOptionRow {
     module: "notifications"; key: "rows"; fallback: 6
@@ -54,6 +50,12 @@ KitColumn {
   KitLine {}
 
   KitLabel { text: "UNSEEN"; about: "The mark for what you have not looked at yet" }
+
+  KitOptionRow {
+    module: "notifications"; key: "badge"; fallback: "off"
+    label: "Mark on the bell"; hint: "Off: the bell only lights"
+    model: [{ label: "Off", value: "off" }, { label: "Dot", value: "dot" }, { label: "Count", value: "count" }]
+  }
 
   KitRow {
     label: "Dot while tucked away"
@@ -77,15 +79,7 @@ KitColumn {
 
   KitLine {}
 
-  KitLabel { text: "BELL"; about: "The Notifications module on the bar" }
-
-  KitOptionRow {
-    module: "notifications"; key: "badge"; fallback: "off"
-    label: "Unseen mark"; hint: "A mark on the bell; off: it only lights"
-    model: [{ label: "Off", value: "off" }, { label: "Dot", value: "dot" }, { label: "Count", value: "count" }]
-  }
-
-  KitLine {}
+  NotificationsColours { width: parent.width }
 
   KitGrouper {}
 }
