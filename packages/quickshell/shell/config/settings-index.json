@@ -1566,19 +1566,13 @@
   "target": "notifications"
  },
  {
-  "label": "Centre",
+  "label": "Popup",
   "hint": "",
   "where": "Notifications",
   "target": "notifications"
  },
  {
   "label": "Unseen",
-  "hint": "",
-  "where": "Notifications",
-  "target": "notifications"
- },
- {
-  "label": "Bell",
   "hint": "",
   "where": "Notifications",
   "target": "notifications"
@@ -1603,20 +1597,31 @@
  {
   "label": "Notifications shown",
   "hint": "Before the list scrolls",
-  "where": "Notifications › CENTRE",
+  "where": "Notifications › POPUP",
   "target": "notifications"
  },
  {
   "label": "Close after Clear all",
   "hint": "Off: the centre stays open",
-  "where": "Notifications › CENTRE",
+  "where": "Notifications › POPUP",
   "target": "notifications"
  },
  {
   "label": "Remove on click",
   "hint": "A click takes it out of the centre",
-  "where": "Notifications › CENTRE",
+  "where": "Notifications › POPUP",
   "target": "notifications"
+ },
+ {
+  "label": "Mark on the bell",
+  "hint": "Off: the bell only lights",
+  "where": "Notifications › UNSEEN",
+  "target": "notifications",
+  "aliases": [
+   "badge",
+   "unseen count",
+   "unseen mark"
+  ]
  },
  {
   "label": "Dot while tucked away",
@@ -1628,12 +1633,6 @@
   "label": "Dot colour",
   "hint": "Theme: the text colour",
   "where": "Notifications › UNSEEN",
-  "target": "notifications"
- },
- {
-  "label": "Unseen mark",
-  "hint": "A mark on the bell; off: it only lights",
-  "where": "Notifications › BELL",
   "target": "notifications"
  },
  {

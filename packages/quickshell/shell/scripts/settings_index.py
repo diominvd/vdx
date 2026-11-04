@@ -71,6 +71,7 @@ ALIASES = {
     "VPN": ["mihomo", "proxy"],
     "Layout": ["add module", "arrange", "order"],
     "Frames": ["window frames", "border", "borders"],
+    "Mark on the bell": ["badge", "unseen count", "unseen mark"],
 }
 # sections of a form shared by sidebar pages: file -> (the page's title, target)
 SECTIONS = {"CornersSection.qml": ("Interface", "appearance:shape"), "AccentSection.qml": ("Colours", "colours"),
