@@ -203,6 +203,21 @@ KitSettingsWorkspace {
           }
           KitGrouper {}
         }
+        // Island style: the pill as it rests, at 1:1; a click selects the module below
+        Column {
+          width: parent.width
+          visible: root.island
+          KitLabel { text: "STAGE"; about: "The pill at rest, drawn as the island draws it" }
+          IslandStage {
+            width: parent.width
+            start: root.ids("start")
+            end: root.ids("end")
+            clock: BarLayout.islandClock(root.screenName)
+            selectedId: root.selectedModule
+            onSelected: id => root.selectModule(id)
+          }
+          KitGrouper {}
+        }
         // its own group: the caption takes the same inset as the other sections' (KitGrouper)
         Column {
           width: parent.width

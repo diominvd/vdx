@@ -272,6 +272,12 @@
   "target": "bar"
  },
  {
+  "label": "Stage",
+  "hint": "",
+  "where": "Bar",
+  "target": "bar"
+ },
+ {
   "label": "Layout",
   "hint": "",
   "where": "Bar",

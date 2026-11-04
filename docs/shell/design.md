@@ -316,7 +316,8 @@ Pages by the user's area; the look follows macOS System Settings.
 - Appearance separates Interface, Accent and Glow. Interface includes corners;
   Wallpaper has its own page.
 - Bar separates Layout, Look and Monitors. Bar look holds the style (Solid /
-  Island) first; Layout arranges modules; the module inspector offers destination
+  Island) first; Layout arranges modules (in the Island style under a stage: the
+  resting pill at 1:1, drawn as the island draws it, a click selects a module); the module inspector offers destination
   and order controls as an alternative to drag. Available modules are searchable.
 - Hub and Live activities have their own pages. Hub appearance
   options always address the Island settings, even when Solid is active.
