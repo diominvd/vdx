@@ -1,6 +1,6 @@
 [
  {
-  "label": "Appearance",
+  "label": "Interface",
   "hint": "",
   "where": "",
   "target": "appearance"
@@ -8,37 +8,37 @@
  {
   "label": "Style",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance"
  },
  {
   "label": "Shape",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Interface style",
   "hint": "",
-  "where": "Appearance › STYLE",
+  "where": "Interface › STYLE",
   "target": "appearance"
  },
  {
   "label": "Slider style",
   "hint": "",
-  "where": "Appearance › STYLE",
+  "where": "Interface › STYLE",
   "target": "appearance"
  },
  {
   "label": "Density",
   "hint": "Air between and inside things",
-  "where": "Appearance › STYLE",
+  "where": "Interface › STYLE",
   "target": "appearance"
  },
  {
   "label": "Input text",
   "hint": "Where text stands in a field; Auto: left",
-  "where": "Appearance › STYLE",
+  "where": "Interface › STYLE",
   "target": "appearance"
  },
  {
@@ -285,26 +285,26 @@
  {
   "label": "Style",
   "hint": "",
-  "where": "Bar",
-  "target": "bar:look"
+  "where": "Bar look",
+  "target": "barlook"
  },
  {
   "label": "Separators",
   "hint": "",
-  "where": "Bar",
-  "target": "bar:separators"
+  "where": "Bar look",
+  "target": "barlook"
  },
  {
   "label": "Behaviour",
   "hint": "",
-  "where": "Bar",
-  "target": "bar:behaviour"
+  "where": "Bar look",
+  "target": "barlook"
  },
  {
   "label": "Monitor",
   "hint": "",
-  "where": "Bar",
-  "target": "bar:monitor"
+  "where": "Bar monitors",
+  "target": "barmonitor"
  },
  {
   "label": "Monitor",
@@ -325,8 +325,8 @@
  {
   "label": "Bar style",
   "hint": "",
-  "where": "Bar › STYLE",
-  "target": "bar:look",
+  "where": "Bar look › STYLE",
+  "target": "barlook",
   "aliases": [
    "island",
    "solid",
@@ -337,38 +337,38 @@
  {
   "label": "Pill height",
   "hint": "The island's height at rest",
-  "where": "Bar › STYLE",
-  "target": "bar:look"
+  "where": "Bar look › STYLE",
+  "target": "barlook"
  },
  {
   "label": "Icon size",
   "hint": "The icons on the bar",
-  "where": "Bar › STYLE",
-  "target": "bar:look"
+  "where": "Bar look › STYLE",
+  "target": "barlook"
  },
  {
   "label": "Separator lines",
   "hint": "Between neighbouring modules",
-  "where": "Bar › SEPARATORS",
-  "target": "bar:separators"
+  "where": "Bar look › SEPARATORS",
+  "target": "barlook"
  },
  {
   "label": "Separator spacing",
   "hint": "Room on each side of a line",
-  "where": "Bar › SEPARATORS",
-  "target": "bar:separators"
+  "where": "Bar look › SEPARATORS",
+  "target": "barlook"
  },
  {
   "label": "Right click opens options",
   "hint": "On a module: its settings here",
-  "where": "Bar › BEHAVIOUR",
-  "target": "bar:behaviour"
+  "where": "Bar look › BEHAVIOUR",
+  "target": "barlook"
  },
  {
   "label": "Show bar",
   "hint": "",
-  "where": "Bar › MONITOR",
-  "target": "bar:monitor",
+  "where": "Bar monitors › MONITOR",
+  "target": "barmonitor",
   "aliases": [
    "per monitor",
    "monitors",
@@ -378,20 +378,20 @@
  {
   "label": "Same bar on every monitor",
   "hint": "Off: each monitor gets its own",
-  "where": "Bar › MONITOR",
-  "target": "bar:monitor"
+  "where": "Bar monitors › MONITOR",
+  "target": "barmonitor"
  },
  {
   "label": "Main monitor",
   "hint": "Automatic prefers an external monitor",
-  "where": "Bar › MONITOR",
-  "target": "bar:monitor"
+  "where": "Bar monitors › MONITOR",
+  "target": "barmonitor"
  },
  {
   "label": "Copy layout",
   "hint": "",
-  "where": "Bar › MONITOR",
-  "target": "bar:monitor"
+  "where": "Bar monitors › MONITOR",
+  "target": "barmonitor"
  },
  {
   "label": "Profile",
@@ -613,7 +613,12 @@
   "label": "Frames",
   "hint": "",
   "where": "Windows › LOOK",
-  "target": "windows:look"
+  "target": "windows:look",
+  "aliases": [
+   "window frames",
+   "border",
+   "borders"
+  ]
  },
  {
   "label": "Shadows",
@@ -1173,14 +1178,14 @@
  {
   "label": "Settings",
   "hint": "",
-  "where": "About",
-  "target": "about:settings"
+  "where": "Settings",
+  "target": "settings"
  },
  {
   "label": "System",
   "hint": "",
-  "where": "About",
-  "target": "about:system"
+  "where": "System",
+  "target": "system"
  },
  {
   "label": "diominvd",
@@ -1191,164 +1196,278 @@
  {
   "label": "Export",
   "hint": "Options, bar layout and windows; no theme",
-  "where": "About › SETTINGS",
-  "target": "about:settings"
+  "where": "Settings › SETTINGS",
+  "target": "settings"
  },
  {
   "label": "Import",
   "hint": "Replaces your options; the shell restarts",
-  "where": "About › SETTINGS",
-  "target": "about:settings"
+  "where": "Settings › SETTINGS",
+  "target": "settings"
  },
  {
   "label": "Reset everything",
   "hint": "Defaults; the old set is kept as a file",
-  "where": "About › SETTINGS",
-  "target": "about:settings"
+  "where": "Settings › SETTINGS",
+  "target": "settings"
  },
  {
   "label": "Machine health",
   "hint": "Files, services and the running desktop",
-  "where": "About › SYSTEM",
-  "target": "about:system"
+  "where": "System › SYSTEM",
+  "target": "system"
  },
  {
   "label": "Shell resources",
   "hint": "A one-time snapshot of the shell process",
-  "where": "About › SYSTEM",
-  "target": "about:system"
+  "where": "System › SYSTEM",
+  "target": "system"
  },
  {
   "label": "Recovery",
   "hint": "Restores the last backed-up managed files",
-  "where": "About › SYSTEM",
-  "target": "about:system"
+  "where": "System › SYSTEM",
+  "target": "system"
  },
  {
   "label": "Restart the shell",
   "hint": "Kills Quickshell and starts it anew",
-  "where": "About › SYSTEM",
-  "target": "about:system"
+  "where": "System › SYSTEM",
+  "target": "system"
  },
  {
-  "label": "Accent",
+  "label": "Colours",
   "hint": "",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "where": "",
+  "target": "colours"
  },
  {
-  "label": "Accent targets",
+  "label": "Glow",
   "hint": "",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "where": "",
+  "target": "glow"
  },
  {
-  "label": "Own colours",
+  "label": "Bar look",
   "hint": "",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "where": "",
+  "target": "barlook"
  },
  {
-  "label": "Switches",
-  "hint": "On switches",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "label": "Bar monitors",
+  "hint": "",
+  "where": "",
+  "target": "barmonitor"
  },
  {
-  "label": "Sliders",
-  "hint": "Filled track",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "label": "Bar modules",
+  "hint": "",
+  "where": "",
+  "target": "modules"
  },
  {
-  "label": "Choices",
-  "hint": "Selected option",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "label": "Notifications",
+  "hint": "",
+  "where": "",
+  "target": "notifications"
  },
  {
-  "label": "Dropdowns",
-  "hint": "Selected field",
-  "where": "Appearance",
-  "target": "appearance:accent"
+  "label": "Lock screen",
+  "hint": "",
+  "where": "",
+  "target": "lockscreen"
  },
  {
-  "label": "Accent colour",
-  "hint": "Active and selected controls",
-  "where": "Appearance › ACCENT",
-  "target": "appearance:accent"
+  "label": "Apps",
+  "hint": "",
+  "where": "",
+  "target": "apps"
  },
  {
-  "label": "Colour",
-  "hint": "A named one, or your own",
-  "where": "Appearance › ACCENT",
-  "target": "appearance:accent"
+  "label": "System",
+  "hint": "",
+  "where": "",
+  "target": "system"
  },
  {
-  "label": "Window frames",
-  "hint": "In Windows › Look",
-  "where": "Appearance › ACCENT TARGETS",
-  "target": "appearance:accent"
- },
- {
-  "label": "Share own colours",
-  "hint": "Show them in every colour choice",
-  "where": "Appearance › OWN COLOURS",
-  "target": "appearance:accent"
- },
- {
-  "label": "Own colours",
-  "hint": "How many can be saved",
-  "where": "Appearance › OWN COLOURS",
-  "target": "appearance:accent"
+  "label": "Settings",
+  "hint": "",
+  "where": "",
+  "target": "settings"
  },
  {
   "label": "Corners",
   "hint": "Every part at once, icons too",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Radius",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Set each part",
   "hint": "A slider per part",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Windows and popups",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Cards and boxes",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Controls",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Bar",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
  },
  {
   "label": "Hub",
   "hint": "",
-  "where": "Appearance",
+  "where": "Interface",
   "target": "appearance:shape"
+ },
+ {
+  "label": "Accent",
+  "hint": "",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Accent targets",
+  "hint": "",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Own colours",
+  "hint": "",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Switches",
+  "hint": "On switches",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Sliders",
+  "hint": "Filled track",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Choices",
+  "hint": "Selected option",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Dropdowns",
+  "hint": "Selected field",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
+  "label": "Accent colour",
+  "hint": "Active and selected controls",
+  "where": "Colours › ACCENT",
+  "target": "colours"
+ },
+ {
+  "label": "Colour",
+  "hint": "A named one, or your own",
+  "where": "Colours › ACCENT",
+  "target": "colours"
+ },
+ {
+  "label": "Window frames",
+  "hint": "In Windows › Look",
+  "where": "Colours › ACCENT TARGETS",
+  "target": "colours"
+ },
+ {
+  "label": "Share own colours",
+  "hint": "Show them in every colour choice",
+  "where": "Colours › OWN COLOURS",
+  "target": "colours"
+ },
+ {
+  "label": "Own colours",
+  "hint": "How many can be saved",
+  "where": "Colours › OWN COLOURS",
+  "target": "colours"
+ },
+ {
+  "label": "Glow",
+  "hint": "",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Glow on",
+  "hint": "",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Switches",
+  "hint": "The ones that are on",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Sliders",
+  "hint": "The filled part",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Workspaces",
+  "hint": "The focused one, in the shape styles",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Live activity",
+  "hint": "The island's bars, dots and icons",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Status dots",
+  "hint": "The folder's mark and the tags' dots",
+  "where": "Glow",
+  "target": "glow"
+ },
+ {
+  "label": "Glow",
+  "hint": "A soft halo behind bright elements",
+  "where": "Glow › GLOW",
+  "target": "glow"
+ },
+ {
+  "label": "Strength",
+  "hint": "",
+  "where": "Glow › GLOW",
+  "target": "glow"
  },
  {
   "label": "Session",
@@ -1797,50 +1916,50 @@
  {
   "label": "Window",
   "hint": "",
-  "where": "Windows",
-  "target": "windows"
+  "where": "Apps",
+  "target": "apps"
  },
  {
   "label": "Window",
   "hint": "",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "Size",
   "hint": "",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "Preset",
   "hint": "",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "Width × height",
   "hint": "",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "Position",
   "hint": "",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "Spot",
   "hint": "Where on the screen it opens",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "X, Y",
   "hint": "",
-  "where": "Windows › WINDOW",
-  "target": "windows"
+  "where": "Apps › WINDOW",
+  "target": "apps"
  },
  {
   "label": "Bar text",

@@ -135,8 +135,11 @@ Steps:
 3. A new `ShellSettings` key: declare its default in `ShellState`, add the
    `readonly property` in `ShellSettings.qml` with a comment of its values.
    A changed stored shape also needs a migration (CLAUDE.md › Settings).
-4. Add the page to `PAGES` in `scripts/settings_index.py` and run it: the search
-   index (`config/settings-index.json`) must match, `check` fails on a stale one.
+4. Add the page to `PAGES` in `scripts/settings_index.py` (a section of a shared
+   form to `SECTIONS`, a group that is its own sidebar page to `GROUP_PAGES`) and run
+   it: the search index (`config/settings-index.json`) must match, `check` fails on a
+   stale one. `tests/test_settings_index.py` › OneHome fails when two settings files
+   write one key: the second place is a `KitLinkRow`.
 5. `./install.py link`, restart, open the page in both styles (Strict, Material)
    and both corners (sharp, round).
 

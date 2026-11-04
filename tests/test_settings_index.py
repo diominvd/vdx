@@ -12,14 +12,15 @@ spec = importlib.util.spec_from_file_location("settings_index", SCRIPT)
 si = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(si)
 
-TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "animations", "bar", "modules", "windows", "lockscreen", "notifications",
-        "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about"}
+TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "colours", "glow", "animations",
+        "bar", "barlook", "barmonitor", "modules", "windows", "lockscreen", "notifications",
+        "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings"}
 
 # a word typed -> where the task is done
 JOURNEYS = {
     "wallpaper": "wallpaper",
     "toast": "notifications",
-    "show bar": "bar:monitor",
+    "show bar": "barmonitor",
     "clock format": "lockscreen",
     "animations": "animations:general",
     "seconds": "modules:clock",
@@ -27,7 +28,7 @@ JOURNEYS = {
     "text size": "fonts:size",
     "hub width": "hub",
     "sliders": "hub",
-    "accent": "appearance:accent",
+    "accent": "colours",
     "gap": "windows:look",
     "search field": "modules:clipboard",
     "pause": "sound",
@@ -35,14 +36,14 @@ JOURNEYS = {
     "aur": "updates",
     "dot colour": "notifications",
     "width": "apps:launcher",
-    "reset everything": "about:settings",
+    "reset everything": "settings",
     "refresh rate": "displays:monitor",
     # the live activities, the island and the words people use for them
     "live": "live",
     "flash": "live",
     "low battery": "live",
-    "island": "bar:look",
-    "solid": "bar:look",
+    "island": "barlook",
+    "solid": "barlook",
     "wifi": "network:wifi",
     "hotspot": "network:hotspot",
     "ethernet": "network:ethernet",
@@ -53,7 +54,20 @@ JOURNEYS = {
     "vpn": "modules:mihomo",
     "night light": "displays",
     "charge limit": "power",
+    # the sidebar's pages by their names, and rows that moved
+    "glow": "glow",
+    "strength": "glow",
+    "bar look": "barlook",
+    "density": "appearance",
+    "input text": "appearance",
+    "window frames": "windows:look",
+    "update without asking": "updates",
+    "notify when done": "updates",
+    "restart the shell": "system",
 }
+
+# a row is found on the page that shows it: (label, where it is not)
+NOT_THERE = {("Preset", "Windows"), ("Width × height", "Windows"), ("Spot", "Windows")}
 
 # a row's hint is its own: these used to carry the next row's
 NOT_THIS_HINT = {("Open the hub", "Hub row modules"), ("Bar style", "Off and nothing beside it"),
@@ -87,6 +101,17 @@ class Index(unittest.TestCase):
             for e in self.index:
                 if e["label"] == label:
                     self.assertNotIn(wrong, e["hint"], e)
+
+    def test_rows_are_where_they_show(self):
+        for label, page in NOT_THERE:
+            for e in self.index:
+                if e["label"] == label:
+                    self.assertNotEqual(e["where"].split(" › ")[0], page, e)
+
+    def test_sidebar_titles(self):
+        # `where` names the page as the sidebar does, never the form it shares (Appearance)
+        for e in self.index:
+            self.assertNotEqual(e["where"].split(" › ")[0], "Appearance", e)
 
     def test_no_computed_labels(self):
         for e in self.index:
