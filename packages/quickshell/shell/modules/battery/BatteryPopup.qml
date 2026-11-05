@@ -138,7 +138,7 @@ KitFrame {
     font.pixelSize: Theme.fontSize - 1
   }
 
-  KitLine { visible: BatteryService.error !== "" }
+  KitLine {}
 
   KitButton {
     width: parent.width
