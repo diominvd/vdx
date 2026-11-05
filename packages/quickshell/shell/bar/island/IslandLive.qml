@@ -23,7 +23,7 @@ Item {
   readonly property Item frontFace: front === 0 ? faceA : faceB
   readonly property Item backFace: front === 0 ? faceB : faceA
 
-  clip: sliding        // only while a step slides: a halo (Appearance › Glow) must not be cut to the slot
+  clip: sliding        // only while a step slides
   // the activity sits in a chip of its own, always whole: concentric with the
   // pill — the same gap (`edge`) to the pill's rim above and below, its corners
   // the pill's less that gap; a cover inside sits `inset` from the chip's rim

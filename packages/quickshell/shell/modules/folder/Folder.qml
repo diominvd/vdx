@@ -41,17 +41,6 @@ Item {
     tint: root.ids.length > 0 ? Theme.foreground0 : Theme.gray
 
     // unseen mark: a small red square on the folder's corner
-    KitGlow {
-      z: -1
-      x: Theme.fontSize - 3
-      y: 0
-      width: 6
-      height: 6
-      target: "dots"
-      lit: root.attention && ShellSettings.barFolderDot
-      tint: Theme.notifyDot(ShellSettings.barDotColor)
-      radius: Theme.pill(height)
-    }
 
     Rectangle {
       radius: Theme.pill(height)

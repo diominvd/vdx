@@ -205,7 +205,7 @@ island of its own, with its modules' popups inside it.
 
 ## Look
 
-All in Shell Manager's LOOK group: Interface, Themes, Colours, Glow, Wallpaper,
+All in Shell Manager's LOOK group: Interface, Themes, Colours, Wallpaper,
 Fonts, Icons, Cursor, Motion.
 
 - **Style**: Strict (quiet outlined controls) or Material 3 (tonal surfaces, spacious
@@ -216,9 +216,6 @@ Fonts, Icons, Cursor, Motion.
   workspaces, dropdowns, bar modules, the window border (Hyprland's focused
   frame, via `~/.local/state/dotfiles/accent.lua`). Older custom colours and
   gradients remain readable from imported settings.
-- **Glow**: off by default; a soft halo (`KitGlow`) behind bright elements, each
-  in its own colour, with a strength. Targets: switches, sliders, workspaces,
-  live activities, status dots; switch each off under Glow.
 - **Shape › Corners**: sharp, or round with one radius — popups, controls,
   the island, Hyprland's windows and mako follow, and the icons switch to
   Material Symbols Rounded.
@@ -299,7 +296,7 @@ above a divider. Module layout offers compact semantic groups (the default), equ
 grid tiles and content-sized chips. The profile
 shows the user's initial or chosen image and current system uptime.
 
-Interface, Colours and Glow are sidebar pages of one form; Interface holds the
+Interface and Colours are sidebar pages of one form; Interface holds the
 style, density, input text and corners.
 Wallpaper is a separate page. Fonts
 and Cursor use searchable lists and a single preview, with explicit Apply.

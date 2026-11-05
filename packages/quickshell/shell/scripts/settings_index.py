@@ -74,8 +74,7 @@ ALIASES = {
     "Mark on the bell": ["badge", "unseen count", "unseen mark"],
 }
 # sections of a form shared by sidebar pages: file -> (the page's title, target)
-SECTIONS = {"CornersSection.qml": ("Interface", "appearance:shape"), "AccentSection.qml": ("Colours", "colours"),
-            "GlowSection.qml": ("Glow", "glow")}
+SECTIONS = {"CornersSection.qml": ("Interface", "appearance:shape"), "AccentSection.qml": ("Colours", "colours")}
 # a page whose groups are sidebar pages of their own (`pageTab`): group -> (title, target)
 GROUP_PAGES = {
     "BarPage.qml": {"STYLE": ("Bar look", "barlook"), "SEPARATORS": ("Bar look", "barlook"),
@@ -83,7 +82,7 @@ GROUP_PAGES = {
     "AboutPage.qml": {"SETTINGS": ("Settings", "settings"), "SYSTEM": ("System", "system")},
 }
 # sidebar pages with no PAGES entry of their own: found by their name too
-SIDEBAR = [("colours", "Colours"), ("glow", "Glow"), ("barlook", "Bar look"), ("barmonitor", "Bar monitors"),
+SIDEBAR = [("colours", "Colours"), ("barlook", "Bar look"), ("barmonitor", "Bar monitors"),
            ("modules", "Bar modules"), ("notifications", "Notifications"), ("lockscreen", "Lock screen"),
            ("apps", "Apps"), ("system", "System"), ("settings", "Settings")]
 # shared option blocks (kit): a file that uses one is read with the block's rows in its place

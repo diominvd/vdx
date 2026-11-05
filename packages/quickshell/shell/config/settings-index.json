@@ -1242,12 +1242,6 @@
   "target": "colours"
  },
  {
-  "label": "Glow",
-  "hint": "",
-  "where": "",
-  "target": "glow"
- },
- {
   "label": "Bar look",
   "hint": "",
   "where": "",
@@ -1414,60 +1408,6 @@
   "hint": "How many can be saved",
   "where": "Colours › OWN COLOURS",
   "target": "colours"
- },
- {
-  "label": "Glow",
-  "hint": "",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Glow on",
-  "hint": "",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Switches",
-  "hint": "The ones that are on",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Sliders",
-  "hint": "The filled part",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Workspaces",
-  "hint": "The focused one, in the shape styles",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Live activity",
-  "hint": "The island's bars, dots and icons",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Status dots",
-  "hint": "The folder's mark and the tags' dots",
-  "where": "Glow",
-  "target": "glow"
- },
- {
-  "label": "Glow",
-  "hint": "A soft halo behind bright elements",
-  "where": "Glow › GLOW",
-  "target": "glow"
- },
- {
-  "label": "Strength",
-  "hint": "",
-  "where": "Glow › GLOW",
-  "target": "glow"
  },
  {
   "label": "Session",

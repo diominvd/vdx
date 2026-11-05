@@ -64,16 +64,6 @@ Row {
 
       // the shapes: a filled one for the focused / visible, an outline for the
       // rest (dots are round); dashes and pills are always filled, in the tone
-      KitGlow {
-        z: -1
-        anchors.centerIn: parent
-        width: workspace.shapeWidth
-        height: root.style === "dashes" ? 2 : root.style === "pills" ? 6 : 8
-        target: "workspaces"
-        lit: root.shape && workspace.highlighted
-        tint: Theme.foreground0
-        radius: root.style === "dots" ? 4 : root.style === "pills" ? 3 : 0
-      }
 
       Rectangle {
         anchors.centerIn: parent

@@ -57,14 +57,6 @@ Rectangle {
     }
   }
 
-  KitGlow {
-    z: -1
-    anchors.fill: parent
-    target: "switches"
-    lit: root.checked && !root.disabled
-    tint: root.accented ? Theme.accent : Theme.foreground0
-    radius: root.radius
-  }
 
   Rectangle {
     anchors { fill: parent; margins: -4 }

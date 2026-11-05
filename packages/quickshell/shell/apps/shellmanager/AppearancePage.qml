@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Interface (style, density, fields, corners), Colours and Glow: three sidebar pages on one
+// Interface (style, density, fields, corners) and Colours: sidebar pages on one
 // full-width form. Icons, Fonts and Wallpaper are pages of their own.
 KitSettingsWorkspace {
   id: root
@@ -16,23 +16,21 @@ KitSettingsWorkspace {
   readonly property var jumps: [
     { key: "style", label: "Interface", y: 0 },
     { key: "accent", label: "Colours", y: 0 },
-    { key: "glow", label: "Glow", y: 0 },
     { key: "shape", label: "Shape", y: 0 }
   ].filter(j => tab === "style" ? ["style", "shape"].includes(j.key) : j.key === tab)   // the open tab's: a sidebar page each
   function jump(key) {
-    tab = key === "accent" || key === "glow" ? key : "style";
+    tab = key === "accent" ? key : "style";
   }
-  // the header's Reset: the keys of the sidebar page shown (Interface, Colours or Glow), not the other two
+  // the header's Reset: the keys of the sidebar page shown (Interface or Colours), not the other
   readonly property var tabKeys: ({
     style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "density", "inputAlign"],
-    accent: ["accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere"],
-    glow: ["glow", "glowStrength", "glowWhere"]
+    accent: ["accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere"]
   })
   readonly property var resetKeys: tabKeys[tab] ?? []
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
-  sections: [{label: "Interface", value: "style"}, {label: "Colours", value: "accent"}, {label: "Glow", value: "glow"}]
+  sections: [{label: "Interface", value: "style"}, {label: "Colours", value: "accent"}]
   current: tab
   onPicked: value => tab = value
 
@@ -80,7 +78,6 @@ KitSettingsWorkspace {
         KitGrouper {}
       }
       AccentSection { width: parent.width; visible: root.tab === "accent" }
-      GlowSection { width: parent.width; visible: root.tab === "glow" }
       KitGrouper {}
     }
   }

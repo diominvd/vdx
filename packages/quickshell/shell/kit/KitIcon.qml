@@ -18,12 +18,7 @@ Item {
   property int size: Theme.fontSize + 3
   property bool solid: ShellSettings.solidIcons
   property bool filled: false              // force filled pause / play / stop glyphs
-  property string glowTarget: ""          // a Glow target (Appearance › Glow): the icon gets a halo
   readonly property bool filledGlyph: filled && ["pause", "play", "square"].includes(name)
-
-  // 0..1: the halo fades in and out with Glow, as KitGlow's does
-  property real glowAmount: glowTarget !== "" && Theme.glowOn(glowTarget) ? 1 : 0
-  Behavior on glowAmount { enabled: Motion.controls; NumberAnimation { duration: Motion.slow; easing.type: Motion.easing } }
 
   // the battery glyphs are wide and short, so drawn alone they look smaller
   // than the others: their box is a third larger, the glyph's height matches
@@ -50,12 +45,6 @@ Item {
     visible: !root.filledGlyph
     colorization: 1
     colorizationColor: root.tint
-    autoPaddingEnabled: root.glowTarget !== ""
-    shadowEnabled: root.glowAmount > 0.001
-    shadowColor: root.tint
-    shadowBlur: 0.4
-    shadowOpacity: Theme.glowLevel * 0.6 * root.glowAmount
-    shadowScale: 1
   }
 
   Row {

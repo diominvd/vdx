@@ -12,7 +12,7 @@ spec = importlib.util.spec_from_file_location("settings_index", SCRIPT)
 si = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(si)
 
-TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "colours", "glow", "animations",
+TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "colours", "animations",
         "bar", "barlook", "barmonitor", "modules", "windows", "lockscreen", "notifications",
         "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings"}
 
@@ -55,8 +55,6 @@ JOURNEYS = {
     "night light": "displays",
     "charge limit": "power",
     # the sidebar's pages by their names, and rows that moved
-    "glow": "glow",
-    "strength": "glow",
     "bar look": "barlook",
     "density": "appearance",
     "input text": "appearance",

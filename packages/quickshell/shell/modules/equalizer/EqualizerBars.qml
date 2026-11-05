@@ -53,7 +53,6 @@ Row {
 
       Behavior on height { enabled: Motion.bar; NumberAnimation { duration: Motion.ms(70) } }
 
-      KitGlow { z: -1; anchors.fill: parent; target: root.glowTarget; lit: root.active && root.glowTarget !== ""; tint: parent.color; radius: parent.radius }
     }
   }
 }

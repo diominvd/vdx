@@ -64,7 +64,6 @@ Row {
     color: Theme.yellow
     opacity: RadioService.active && MpdService.playing ? 1 : 0.4
 
-    KitGlow { z: -1; anchors.fill: parent; target: "live"; lit: RadioService.active && MpdService.playing; tint: parent.color; radius: parent.radius }
   }
   KitText {
     visible: face.kind === "radio"
@@ -80,7 +79,6 @@ Row {
     anchors.verticalCenter: parent.verticalCenter
     barCount: 4
     tone: Theme.yellow
-    glowTarget: "live"
     height: 14
     active: RadioService.active && MpdService.playing
     flatWhenIdle: true
@@ -96,7 +94,6 @@ Row {
       anchors.centerIn: parent
       barCount: 4
       tone: Theme.yellow
-      glowTarget: ""
       height: 14
       active: RadioService.active && MpdService.playing
       flatWhenIdle: true
@@ -126,7 +123,7 @@ Row {
   KitText { visible: face.kind === "focus"; anchors.verticalCenter: parent.verticalCenter; text: Theme.material ? "Focus on" : "Focus"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
 
   // volume and brightness: the level as a ruler while it changes
-  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "volume"; size: face.coverSize; glowTarget: ""; name: IslandService.osdIcon; tint: IslandService.osdMuted || IslandService.osdLoud ? Theme.red : Theme.foreground2 }
+  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "volume"; size: face.coverSize; name: IslandService.osdIcon; tint: IslandService.osdMuted || IslandService.osdLoud ? Theme.red : Theme.foreground2 }
   IslandLiveProgress {
     visible: face.kind === "volume" && Theme.material
     anchors.verticalCenter: parent.verticalCenter

@@ -13,7 +13,7 @@ import qs.kit
 // The sections come in groups, by what the user is after (a rail button each; the
 // list beside it shows the open group). In a group the most used page comes first, a
 // page shared with others (`pageTab`) sits next to them, the rare ones last:
-//   LOOK     — how it looks and moves: Interface, Themes, Colours, Glow, Wallpaper, Fonts,
+//   LOOK     — how it looks and moves: Interface, Themes, Colours, Wallpaper, Fonts,
 //              Icons, Cursor, Motion
 //   BAR      — Bar, Bar look, Bar modules, Hub, Live activities, Bar monitors
 //   DESKTOP  — the session around the windows: Windows, Notifications, Lock screen
@@ -59,8 +59,6 @@ Rectangle {
     { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "colours",    label: "Colours",    icon: "paint-bucket",
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
-    { value: "glow",       label: "Glow",       icon: "sun",
-      page: "appearance", pageTab: "glow", description: "A soft halo behind bright elements." },
     { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "fonts",      label: "Fonts",      icon: "text" },
     { value: "icons",      label: "Icons",      icon: "star" },
@@ -140,9 +138,8 @@ Rectangle {
     if (value === "wallpaper") return { tab: "wallpaper", target: "" };
     // the hotspot is a tab of Network
     if (value === "hotspot" || (value === "network" && target === "hotspot")) return { tab: "network", target: "hotspot" };
-    // the Appearance page's tabs became pages: Interface, Colours, Glow
+    // the Appearance page's tabs became pages: Interface, Colours
     if (value === "appearance" && target === "accent") return { tab: "colours", target: "" };
-    if (value === "appearance" && target === "glow") return { tab: "glow", target: "" };
     // the Bar page's tabs became pages: Layout, Look, Monitors
     if (value === "bar" && ["look", "behaviour", "appearance"].includes(target)) return { tab: "barlook", target: "" };
     if (value === "bar" && target === "monitor") return { tab: "barmonitor", target: "" };

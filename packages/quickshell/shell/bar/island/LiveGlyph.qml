@@ -10,7 +10,6 @@ Rectangle {
   property string name: ""
   property color tint: Theme.foreground1
   property int size: 18
-  property string glowTarget: "live"
   property int corner: Theme.pill(height)          // the chip's less its inset: concentric (IslandLive.badgeRadius)
   readonly property string liveEnd: "badge"        // at a chip's end it sits the inset in (IslandLiveFace.padFor)
   default property alias content: slot.data      // a drawing of its own instead of the icon (a ring)
@@ -27,7 +26,6 @@ Rectangle {
     name: root.name
     size: Math.round(root.size * 0.66)
     tint: root.tint
-    glowTarget: root.glowTarget
   }
   Item { id: slot; anchors.centerIn: parent; width: parent.width; height: parent.height }
 }

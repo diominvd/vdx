@@ -27,7 +27,6 @@ Row {
     color: Theme.red
     opacity: CaptureService.paused ? 0.4 : 1
 
-    KitGlow { z: -1; anchors.fill: parent; target: "live"; lit: !CaptureService.paused; tint: parent.color; radius: parent.radius }
   }
   KitText {
     visible: face.kind === "recording" && CaptureService.recording
@@ -41,7 +40,6 @@ Row {
     anchors.verticalCenter: parent.verticalCenter
     barCount: 7
     tone: Theme.red
-    glowTarget: "live"
     height: 16
     active: !CaptureService.paused
   }
@@ -97,7 +95,7 @@ Row {
   }
 
   // update: the download's progress, else what runs
-  KitIcon { visible: face.kind === "update"; glowTarget: "live"; name: "download"; tint: Theme.blue; size: 16; anchors.verticalCenter: parent.verticalCenter }
+  KitIcon { visible: face.kind === "update"; name: "download"; tint: Theme.blue; size: 16; anchors.verticalCenter: parent.verticalCenter }
   readonly property bool updateDone: face.kind === "update" && !PackagesService.busy && !RootService.running && PackagesService.status !== ""
   readonly property bool updateBar: face.kind === "update" && PackagesService.stage === "downloading"
   IslandLiveProgress {

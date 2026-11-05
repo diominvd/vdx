@@ -47,7 +47,6 @@ Row {
     anchors.verticalCenter: parent.verticalCenter
     barCount: 4
     tone: face.kind === "media" ? Theme.foreground2 : Theme.green
-    glowTarget: "live"
     height: 16
     active: face.player.playing      // its own player: the radio or another app playing does not move it
     flatWhenIdle: true

@@ -46,10 +46,6 @@ Singleton {
   }
   function removeCustomColour(hex) { set("customColours", customColours.filter(c => c !== hex)); }
   readonly property var accentWhere: state.accentWhere            // independently accented UI targets
-  // the glow (Appearance › Glow): a halo behind bright elements; glowWhere: target key -> false when switched off
-  readonly property bool glow: state.glow
-  readonly property int glowStrength: state.glowStrength          // 0..100
-  readonly property var glowWhere: state.glowWhere
   readonly property bool passwordDots: state.passwordDots         // legacy import compatibility; password fields always use dots
   readonly property string corners: state.corners                 // sharp | round: the whole shell's corners
   readonly property int cornerRadius: state.cornerRadius          // px, a popup's corner while round (Theme scales the rest)
@@ -119,7 +115,7 @@ Singleton {
   readonly property bool motionControls: state.motionControls     // buttons, switches, selects, level bars
   readonly property bool motionBar: state.motionBar               // workspaces, bar values
   readonly property bool motionPages: state.motionPages           // Shell Manager pages and sidebar
-  readonly property bool motionTabs: state.motionTabs             // the sections of a page (Interface / Colours / Glow)
+  readonly property bool motionTabs: state.motionTabs             // the sections of a page (Interface / Colours)
   readonly property bool motionIsland: state.motionIsland         // the island morphing between its views
   readonly property bool motionLock: state.motionLock             // the lock screen coming in, a wrong password
 

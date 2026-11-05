@@ -113,9 +113,6 @@ QtObject {
   readonly property color accent: accentColour(ShellSettings.accentStops[0] ?? "theme")
   // Each control group can opt in independently (Appearance › Colours).
   function accentOn(key) { return ShellSettings.accent && ShellSettings.accentWhere[key] === true; }
-  // the glow: a target glows unless switched off (Appearance › Glow)
-  readonly property real glowLevel: ShellSettings.glowStrength / 100
-  function glowOn(key) { return ShellSettings.glow && ShellSettings.glowWhere[key] !== false; }
   function accentFor(key, fallback) { return accentOn(key) ? accent : fallback; }
 
   // ---- type and bar metrics ----

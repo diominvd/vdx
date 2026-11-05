@@ -147,8 +147,7 @@ uses tonal layers and more spacious controls.
      options then show a note and are disabled (`KitSwatches { disabled }`).
   4. Legacy imported gradients remain readable: a `Gradient` runs from `accent`
      to `accentEnd`; text, dots and outlines take `accent` alone.
-  Glow (Appearance › Glow) is separate: a bright element gets a `KitGlow` in its own
-  colour, keyed by a Glow target (`Theme.glowOn(key)`); never a hand-made shadow.
+  There is no glow: no halo or hand-made shadow behind a bright element.
   No hex in QML — `Theme.*` only. Legacy custom colours remain in settings.
   Dimmed screens use `Theme.scrim`.
 - Text: secondary text (hints, captions, times) is `Theme.muted`, lifted to
@@ -254,7 +253,7 @@ Pages by the user's area; the look follows macOS System Settings.
   live line (Live activities › Asks › Messages), `tests/test_settings_index.py`
   (OneHome) fails on a key two settings files write.
 - MUST — Reset in the header of a page shared by sidebar pages (`pageTab`: Interface,
-  Colours, Glow; Bar, Bar look, Bar monitors) resets only the shown page's keys; a key
+  Colours; Bar, Bar look, Bar monitors) resets only the shown page's keys; a key
   another page owns under the same ModuleSettings id is left to it (Apps › Packages
   leaves the Updates page's).
 - MUST — overridden: a row another setting overrides stays visible and
@@ -306,7 +305,7 @@ Pages by the user's area; the look follows macOS System Settings.
 
 ## Settings navigation and previews
 
-- Appearance separates Interface, Accent and Glow. Interface includes corners;
+- Appearance separates Interface and Accent. Interface includes corners;
   Wallpaper has its own page.
 - Bar separates Layout, Look and Monitors. Bar look holds the style (Solid /
   Island) first; Layout arranges modules; the module inspector offers destination

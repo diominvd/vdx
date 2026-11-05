@@ -37,9 +37,6 @@ JsonAdapter {
   property bool shareColours: false
   property int customColoursMax: 3
   property var accentWhere: ({})
-  property bool glow: false
-  property int glowStrength: 60
-  property var glowWhere: ({})
   property bool passwordDots: false
   property int cornerRadius: 12
   property bool cornerSplit: false

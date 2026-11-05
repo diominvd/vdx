@@ -18,7 +18,6 @@ Row {
     radius: Theme.pill(height)
     color: root.tint
 
-    KitGlow { z: -1; anchors.fill: parent; target: "dots"; tint: root.tint; radius: parent.radius }
   }
 
   KitText {
