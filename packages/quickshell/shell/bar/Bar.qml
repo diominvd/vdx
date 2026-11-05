@@ -391,6 +391,37 @@ PanelWindow {
     }
   }
 
+  // ---- modules asked for by id ----
+  // A module no bar draws (a hub tile, a live activity's target) has no popup. Asked to
+  // open by BarLayout.openModule, it is made here, its `openPopup()` is called (every module
+  // with a popup has one; without it, its options open), and it is let go once no popup is open.
+  property var hosted: []
+  Connections {
+    target: BarLayout
+    function onHostRequested(id, screen) {
+      if (screen !== "" && screen !== root.modelData.name) return;
+      if (!root.hosted.includes(id)) root.hosted = root.hosted.concat([id]);
+    }
+  }
+  Connections {
+    target: PopupManager
+    function onCurrentChanged() { if (PopupManager.current === null) root.hosted = []; }
+  }
+  // an `openPopup()` that opens no popup (the capture overlay) leaves nothing to wait for
+  Timer { id: hostedSettle; interval: 100; onTriggered: if (PopupManager.current === null) root.hosted = [] }
+  Repeater {
+    model: root.hosted
+    Loader {
+      required property string modelData
+      visible: false
+      sourceComponent: root.modules[modelData] ?? null
+      onLoaded: {
+        if (item.openPopup) { item.openPopup(); hostedSettle.restart(); }
+        else { root.hosted = root.hosted.filter(h => h !== modelData); root.openSettings(modelData); }
+      }
+    }
+  }
+
   // ---- solid ⇄ island ----
   // Switching the style: a plate in the bar's colour stretches between the strip and the
   // pill (the strip shrinks into the pill, the pill spreads into the strip), then fades to

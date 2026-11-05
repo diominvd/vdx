@@ -280,7 +280,7 @@ Specifics that are easy to miss:
 - A command whose result is guessed (an optimistic flip) re-reads the truth when
   the process exits: `Process { id: set; onExited: root.refresh() }`.
 - Text on the face goes through `BarLayout.faceText(id, content)`.
-- Opening a module from elsewhere: `BarLayout.openModule(id)`.
+- Opening a module from elsewhere: `BarLayout.openModule(id)`; a module with a popup gives `function openPopup()`, nothing hosts it by hand.
 
 ## Recipe: a service
 

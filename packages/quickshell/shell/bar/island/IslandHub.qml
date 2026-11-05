@@ -47,7 +47,7 @@ Item {
   }
   // Material: the quick sliders next to each other share one tonal section
   readonly property var sliderIds: ["volume", "microphone", "brightness", "night", "dimming"]
-  readonly property var shownBlocks: HubBlocks.order.filter(id => HubBlocks.shown(id) && wants(id))
+  readonly property var shownBlocks: root.visible ? HubBlocks.order.filter(id => HubBlocks.shown(id) && wants(id)) : []
   function inRun(id, step) {
     const next = shownBlocks[shownBlocks.indexOf(id) + step];
     return next !== undefined && sliderIds.indexOf(next) >= 0;
@@ -60,24 +60,6 @@ Item {
   property bool calendarOpen: false
   onVisibleChanged: if (!visible) calendarOpen = false
   implicitHeight: (calendarOpen ? calendarPage.implicitHeight : column.implicitHeight) + 2 * Theme.gapGroup
-
-  // the player modules are on no bar; they live here for their popups (the player card opens
-  // the one of what plays: the radio, the music, another app's media)
-  Loader {
-    id: musicHost
-    visible: false
-    sourceComponent: root.modules["music"] ?? null
-  }
-  Loader {
-    id: mediaHost
-    visible: false
-    sourceComponent: root.modules["media"] ?? null
-  }
-  Loader {
-    id: tunerHost
-    visible: false
-    sourceComponent: root.modules["tuner"] ?? null
-  }
 
   Timer {
     interval: 30000
@@ -171,7 +153,7 @@ Item {
       Loader {
         required property string modelData
         width: parent.width
-        active: HubBlocks.shown(modelData) && root.wants(modelData)
+        active: root.visible && HubBlocks.shown(modelData) && root.wants(modelData)
         visible: active
         sourceComponent: Theme.material && root.sliderIds.indexOf(modelData) >= 0 ? sliderSection : root.blockOf(modelData)
 
@@ -239,7 +221,7 @@ Item {
         MouseArea {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
-          onClicked: (IslandService.family === "radio" ? tunerHost : IslandService.family === "music" ? musicHost : mediaHost).item?.openPopup()
+          onClicked: BarLayout.openModule(IslandService.family === "radio" ? "tuner" : IslandService.family === "music" ? "music" : "media")
         }
 
         IslandCover {

@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import qs.components
 import qs.config
@@ -68,15 +69,19 @@ Singleton {
 
   // ---- opening a module ----
   // The one way to open a module's popup from anywhere (a live activity, a key,
-  // a tile): by its id. Its popup answers wherever the module sits (the bar, the
-  // Folder, the island's hub, a child bar); a module placed nowhere has none, so
-  // its options open instead — where it can be put on the bar.
+  // a tile, the hub's player card): by its id. A module drawn somewhere (the bar,
+  // the Folder, the hub, a child bar) answers from there. One drawn nowhere in the
+  // island style is made for the moment by the focused monitor's bar (`hostRequested`,
+  // Bar.qml), which calls its `openPopup()` and lets it go when no popup is open; a module
+  // without `openPopup()` opens its options instead.
+  signal hostRequested(string id, string screen)
   readonly property var popupTargets: ({ music: "player", backup: "backups", cleaner: "clean", virustotal: "scan",
                                          taskmanager: "tasks", display: "monitors", packages: "updates", clipboard: "clip" })
   function popupTarget(id) { return popupTargets[id] ?? id; }
   function openModule(id) {
     const target = popupTarget(id);
     if (PopupManager.ipcOwner(target)) ShellIpc.call(target, "toggle");
+    else if (Theme.island && installed(id)) hostRequested(id, Hyprland.focusedMonitor?.name ?? "");
     else if (modules.find(p => p.id === id)?.settings) ShellIpc.call("shell", "open", ["modules:" + id]);
   }
 

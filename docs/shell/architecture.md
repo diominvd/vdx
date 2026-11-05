@@ -231,7 +231,12 @@ still loads, so it must tolerate missing binaries.
 the focused monitor. `BarPopup` owns outside-click and default Escape closing;
 nested module views may handle Escape first. Island owns its local view stack:
 Escape returns to the Hub when a view came from there, otherwise to compact.
-`BarLayout.openModule(id)` is the shared route to a module popup or its options.
+`BarLayout.openModule(id)` is the shared route to a module popup or its options:
+a module drawn somewhere answers through its popup's IPC; one drawn nowhere (a hub
+tile, a live activity's target) is made on demand by the focused monitor's bar
+(`Bar.hosted`), which calls its `openPopup()` and lets it go once no popup is open.
+A module with a popup has `openPopup()` (a click on it does the same); without it,
+its options open. No component keeps hosts of other modules for their popups.
 `KitInput` owns text focus; pages pass navigation keys explicitly so typing,
 selection and parent-level Escape do not compete.
 
