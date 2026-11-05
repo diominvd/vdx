@@ -28,6 +28,7 @@ and agents. A rule that is in the way is changed in its file.
 | UI rules: tokens, controls, wording, Settings pages | [shell/design.md](shell/design.md) |
 | Recipes: a page, a module's options, a service, review checklist | [shell/writing-code.md](shell/writing-code.md) |
 | Checks, manual scenarios, regressions | [shell/testing.md](shell/testing.md) |
+| The Companion: the lively ball beside the bar | [shell/companion.md](shell/companion.md) |
 | What exists, for users | [packages/quickshell/shell/README.md](../packages/quickshell/shell/README.md) |
 
 ## Asking an agent

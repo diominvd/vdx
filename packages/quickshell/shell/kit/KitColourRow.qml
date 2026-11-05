@@ -20,6 +20,7 @@ Item {
   property string picked: ""
   property var colours: name => Theme.foreground0
   property bool dimmed: false
+  property bool framed: false                 // a hairline round each dot, the pick ringed outside it (white, black)
   readonly property int maxCustoms: ShellSettings.customColoursMax
 
   signal chosen(string value)
@@ -84,14 +85,23 @@ Item {
           readonly property var pair: root.pairOf(modelData)
           width: root.dotSize; height: width
           radius: Theme.pill(height)
-          border.width: root.picked === modelData ? Theme.ring : 0
-          border.color: Theme.foreground0
+          border.width: root.framed ? Theme.hairline : root.picked === modelData ? Theme.ring : 0
+          border.color: root.framed ? Theme.gray : Theme.foreground0
           gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0; color: named.pair[0] }
             GradientStop { position: 1; color: named.pair[1] }
           }
           Behavior on border.width { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+          // framed: the pick is a ring round the dot, so a white dot still shows it
+          Rectangle {
+            visible: root.framed && root.picked === named.modelData
+            anchors { fill: parent; margins: -3 }
+            radius: Theme.pill(height)
+            color: Theme.clear
+            border.width: Theme.ring
+            border.color: Theme.foreground0
+          }
           MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
@@ -125,9 +135,17 @@ Item {
             anchors.fill: parent
             radius: Theme.pill(height)
             color: own.modelData
-            border.width: root.picked === own.modelData ? Theme.ring : 0
-            border.color: Theme.foreground0
+            border.width: root.framed ? Theme.hairline : root.picked === own.modelData ? Theme.ring : 0
+            border.color: root.framed ? Theme.gray : Theme.foreground0
             Behavior on border.width { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+          }
+          Rectangle {
+            visible: root.framed && root.picked === own.modelData
+            anchors { fill: parent; margins: -3 }
+            radius: Theme.pill(height)
+            color: Theme.clear
+            border.width: Theme.ring
+            border.color: Theme.foreground0
           }
           MouseArea {
             id: dotArea

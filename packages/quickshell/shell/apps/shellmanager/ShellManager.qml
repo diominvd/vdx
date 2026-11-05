@@ -65,6 +65,7 @@ Rectangle {
     { value: "fonts",      label: "Fonts",      icon: "text" },
     { value: "icons",      label: "Icons",      icon: "star" },
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
+    { value: "kimmy",      label: "Kimmy",      icon: "bot" },
     { value: "animations", label: "Motion",     icon: "curve" },
     { value: "bar",        label: "Bar",        icon: "columns",     caption: "BAR",
       page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
@@ -623,7 +624,7 @@ Rectangle {
 
       function pageComponent(value) {
         return ({ themes: themesComponent, fonts: fontsComponent, icons: iconsComponent, wallpaper: wallpaperComponent,
-                  cursor: cursorComponent, bar: barComponent, animations: animationsComponent, windows: windowsComponent,
+                  cursor: cursorComponent, kimmy: kimmyComponent, bar: barComponent, animations: animationsComponent, windows: windowsComponent,
                   network: networkComponent, sound: soundComponent, power: powerComponent, updates: updatesComponent,
                   hub: hubComponent, live: liveComponent, profile: profileComponent, bluetooth: bluetoothComponent,
                   vpn: vpnComponent, displays: displaysComponent, modules: modulesComponent, apps: appsComponent,
@@ -637,6 +638,7 @@ Rectangle {
       Component { id: iconsComponent; IconsPage { width: pages.width } }
       Component { id: wallpaperComponent; WallpaperPage { width: pages.width } }
       Component { id: cursorComponent; CursorPage { width: pages.width } }
+      Component { id: kimmyComponent; KimmyPage { width: pages.width } }
       Component { id: animationsComponent; AnimationsPage { width: pages.width } }
       Component { id: appsComponent; ShellAppsPage { width: pages.width; height: page.height - pages.y } }
       Component { id: windowsComponent; WindowsPage { width: pages.width } }

@@ -33,6 +33,7 @@ PAGES = [
     ("icons", "Icons", ["IconsPage.qml"]),
     ("wallpaper", "Wallpaper", ["WallpaperPage.qml"]),
     ("cursor", "Cursor", ["CursorPage.qml"]),
+    ("kimmy", "Kimmy", ["KimmyPage.qml"]),
     ("animations", "Motion", ["AnimationsPage.qml"]),
     ("bar", "Bar", ["BarPage.qml"]),
     ("profile", "Profile", ["ProfilePage.qml"]),
@@ -90,6 +91,7 @@ SIDEBAR = [("colours", "Colours"), ("glow", "Glow"), ("barlook", "Bar look"), ("
 INCLUDES = {name: SHELL / "kit" / f"{name}.qml"
             for name in ("KitPanelOptions", "KitEnglishRow", "KitClearSearchRow", "KitPickerViewRow")}
 INCLUDES["MeteredRow"] = SM / "MeteredRow.qml"
+INCLUDES["CompanionSettings"] = SHELL / "apps" / "companion" / "CompanionSettings.qml"   # Kimmy's rows, on its page
 
 ROW = re.compile(r'\blabel:\s*"([^"]+)"')
 GROUP = re.compile(r'(?:KitLabel\s*\{(?:[^{}]|\{[^{}]*\})*?\btext|KitGroup\s*\{(?:[^{}]|\{[^{}]*\})*?\btitle)'

@@ -222,7 +222,8 @@ Pages by the user's area; the look follows macOS System Settings.
   user's own colours is `KitColourRow`: they sit right of a divider, at most the Own colours limit, a
   cross over one on hover removes it, the plus dot (last on the right) turns the row
   into a strip (hue plate, shade plate, preview, tick). Custom values and gradients
-  from older settings remain readable. Window frames (off | theme | accent) are
+  from older settings remain readable. A choice that offers white and black too (Kimmy's
+  parts) sets `framed`: a hairline round each dot, the pick ringed outside it. Window frames (off | theme | accent) are
   in Windows › Look.
 - A caption over a slider (an app's name, a device) sits `gapMedium` above it;
   never `gapTight`.

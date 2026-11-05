@@ -25,6 +25,7 @@ import qs.bar.island
 import qs.components
 import qs.config
 import qs.modules.audio
+import qs.apps.companion
 
 // Entry point: a bar on every screen that has one on (BarLayout), recoloured when the dotfiles theme changes.
 Scope {
@@ -52,6 +53,8 @@ Scope {
   Overview {}
   WallpaperPreview {}
   LooksIpc {}
+  // Kimmy, the pet ball: one window, on the monitor you work on (Shell Manager › Kimmy)
+  CompanionHost {}
   // Alt+Tab: the floating mode's window switcher (Switcher.step)
   Switcher {}
 
