@@ -460,6 +460,12 @@
   "target": "hub"
  },
  {
+  "label": "On the hub",
+  "hint": "",
+  "where": "Hub",
+  "target": "hub"
+ },
+ {
   "label": "Hub width",
   "hint": "",
   "where": "Hub › SIZE",
@@ -489,9 +495,15 @@
   "target": "hub"
  },
  {
-  "label": "Under the name",
-  "hint": "Both: uptime and the date",
+  "label": "Under the time",
+  "hint": "Both: uptime and the date; None: the time alone",
   "where": "Hub › HEADER",
+  "target": "hub"
+ },
+ {
+  "label": "Edit on the hub",
+  "hint": "Arrange and add blocks on the hub itself",
+  "where": "Hub › ON THE HUB",
   "target": "hub"
  },
  {

@@ -419,6 +419,12 @@ Item {
   }
   onShownChanged: if (shown === "notice" && flashTimer.running) flashTimer.restart()
 
+  // editing the hub holds it open: the pointer leaving does not close it
+  Connections {
+    target: hub
+    function onEditingChanged() { if (hub.editing) root.pinned = true; }
+  }
+
   Connections {
     target: IslandService
     // the last notice gone: the flash ends here, not in the delegate (its
@@ -438,6 +444,8 @@ Item {
     function onRequested(v, screen) {
       if (screen !== "" && screen !== root.bar.screen?.name) return;
       if (v === "compact") root.collapse();
+      // Shell Manager › Hub › Edit on the hub: the hub opens, held, in its edit mode
+      else if (v === "hubedit") { root.openView("hub"); hub.editing = true; }
       else root.toggleView(v);
     }
   }

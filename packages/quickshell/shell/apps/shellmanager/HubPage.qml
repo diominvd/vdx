@@ -1,5 +1,7 @@
 import QtQuick
 import qs.bar
+import qs.bar.island
+import qs.components
 import qs.config
 import qs.kit
 
@@ -96,8 +98,8 @@ Column {
     KitLabel { text: "HEADER" }
     KitRow {
       wide: true
-      label: "Under the name"
-      hint: "Both: uptime and the date"
+      label: "Under the time"
+      hint: "Both: uptime and the date; None: the time alone"
       KitSegments {
         model: [{ label: "Both", value: "both" }, { label: "Date", value: "date" }, { label: "None", value: "none" }]
         current: ModuleSettings.get("hub", "subtitle", "both")
@@ -110,6 +112,20 @@ Column {
   KitLine { visible: Theme.island }
 
   function jump(target) { blocks.jump(target); }
+
+  Column {
+    width: parent.width
+    visible: Theme.island
+    KitLabel { text: "ON THE HUB" }
+    KitRow {
+      label: "Edit on the hub"
+      hint: "Arrange and add blocks on the hub itself"
+      KitButton { text: "Edit…"; onClicked: IslandService.requested("hubedit", Hypr.focusedScreen?.name ?? "") }
+    }
+    KitGrouper {}
+  }
+
+  KitLine { visible: Theme.island }
 
   HubBlocksList { id: blocks; width: parent.width; visible: Theme.island; onArrange: root.navigate("bar", "hubzone") }
 

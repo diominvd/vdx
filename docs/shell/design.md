@@ -182,6 +182,9 @@ complication: one question, one whole, read in one glance.
   `ringWide`, its centre the primary control; one muted line of context; the number at
   its largest; two actions at most, the destructive one red. A span may also run along
   the island's edge (`bar/island/IslandBezel.qml`, from twelve, clockwise).
+- The hub is edited on the hub, never in a second copy of it: edit mode veils each
+  block (its clicks go nowhere), names it and gives it up, down and remove; Add lists the
+  hidden blocks. Shell Manager's Hub page opens that mode and keeps its list as the other way.
 - In the hub a ring has no plate: one value, one ring (Machine's concentric fills,
   module rings at `ringCell` with their words under, toggles as bare discs). A plate
   holds a value with its context (the player, the week).

@@ -181,7 +181,9 @@ size, gap, separators and hub opening.
   the hub shows), Toggles (discs by default, or tiles), Calendar (week or month), Sliders,
   Player (card or compact), Module chips (a module with a whole as a bare ring, the rest
   as chips) — in the order and with the visibility set in
-  Hub › Blocks (`config/HubBlocks.qml`): the date, settings and power, the week (a click opens the month), the **tiles** (their own zone of Bar › Layout, "Hub tiles":
+  Hub › Blocks (`config/HubBlocks.qml`), or on the hub itself: its grid button (or Hub ›
+  Edit on the hub) holds it open in edit mode, each block with up, down and a red ×,
+  Add listing the hidden ones, Done to leave: the date, settings and power, the week (a click opens the month), the **tiles** (their own zone of Bar › Layout, "Hub tiles":
   the modules that can be one — Wi-Fi, Bluetooth, VPN, Focus, Timer, Dark mode — two or four to a row, Bar › Hub ›
   Tiles per row; the icon switches, the rest opens the module's popup), the player card (a click opens the
   Music popup, the Music module is on no bar; the card shows with nothing playing

@@ -52,7 +52,24 @@ Item {
 
   // the month is a page of the hub: the island grows to it and back
   property bool calendarOpen: false
-  onVisibleChanged: if (!visible) calendarOpen = false
+  // editing the hub on the hub (Bezel: no second copy to arrange): each block shows −, up and
+  // down; Add lists the hidden ones. The same store as Hub › Blocks (config/HubBlocks.qml).
+  property bool editing: false
+  property bool adding: false
+  onEditingChanged: adding = false
+  onVisibleChanged: if (!visible) { calendarOpen = false; editing = false; }
+  function moveBlock(id, step) {
+    const list = HubBlocks.order.slice();
+    // past the neighbours the hub does not show: a step lands next to a shown block
+    const shownIds = list.filter(b => HubBlocks.shown(b) && root.wants(b));
+    const at = shownIds.indexOf(id), to = at + step;
+    if (at < 0 || to < 0 || to >= shownIds.length) return;
+    const from = list.indexOf(id), other = list.indexOf(shownIds[to]);
+    list.splice(from, 1);
+    list.splice(other, 0, id);
+    HubBlocks.setOrder(list);
+  }
+  readonly property var hiddenBlocks: HubBlocks.all.filter(b => !HubBlocks.shown(b))
   implicitHeight: (calendarOpen ? calendarPage.implicitHeight : column.implicitHeight) + 2 * Theme.gapGroup
 
   // the player modules are on no bar; they live here for their popups (the player card opens
@@ -121,7 +138,8 @@ Item {
       KitText {
         id: day
         anchors { left: parent.left; top: time.bottom; right: avatar.left; rightMargin: Theme.gapMedium }
-        text: (root.subtitleMode === "both" ? root.uptime(SysmonService.uptime) + " · " : "") + Qt.formatDateTime(root.now, "dddd · d MMM")
+        visible: root.editing || root.subtitleMode !== "none"
+        text: root.editing ? "Editing the hub" : (root.subtitleMode === "both" ? root.uptime(SysmonService.uptime) + " · " : "") + Qt.formatDateTime(root.now, "dddd · d MMM")
         color: Theme.muted
         font.pixelSize: Theme.fontSize - 1
         elide: Text.ElideRight
@@ -129,7 +147,8 @@ Item {
 
       ClippingRectangle {
         id: avatar
-        anchors { right: settingsButton.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
+        visible: !root.editing
+        anchors { right: editButton.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
         width: 30; height: 30
         radius: Theme.radiusFor(height)
         color: Theme.pickFill
@@ -151,7 +170,27 @@ Item {
       }
 
       IslandButton {
+        id: editButton
+        visible: !root.editing
+        anchors { right: settingsButton.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
+        icon: "grid"
+        iconSize: 16
+        Accessible.name: "Edit the hub"
+        onClicked: root.editing = true
+      }
+
+      // editing: Add and Done take the buttons' place
+      Row {
+        visible: root.editing
+        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+        spacing: Theme.gapSmall
+        KitButton { compact: true; icon: "plus"; iconWithText: true; text: "Add"; selected: root.adding; onClicked: root.adding = !root.adding }
+        KitButton { compact: true; icon: "check"; iconWithText: true; text: "Done"; onClicked: root.editing = false }
+      }
+
+      IslandButton {
         id: settingsButton
+        visible: !root.editing
         anchors { right: powerButton.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
         icon: "settings"
         iconSize: 16
@@ -160,10 +199,35 @@ Item {
 
       IslandButton {
         id: powerButton
+        visible: !root.editing
         anchors { right: parent.right; verticalCenter: parent.verticalCenter }
         icon: "power"
         iconSize: 16
         onClicked: root.power()
+      }
+    }
+
+    // ---- editing: the hidden blocks, one click puts each back ----
+    Flow {
+      width: parent.width
+      visible: root.editing && root.adding
+      spacing: Theme.gapSmall
+      Repeater {
+        model: root.hiddenBlocks
+        KitButton {
+          required property string modelData
+          compact: true
+          icon: "plus"
+          iconWithText: true
+          text: HubBlocks.names[modelData] ?? modelData
+          onClicked: HubBlocks.setShown(modelData, true)
+        }
+      }
+      KitText {
+        visible: root.hiddenBlocks.length === 0
+        text: "Every block is on the hub"
+        color: Theme.muted
+        font.pixelSize: Theme.fontSize - 1
       }
     }
 
@@ -182,8 +246,36 @@ Item {
         // answer for themselves: their module's options)
         TapHandler {
           acceptedButtons: Qt.RightButton
-          enabled: ShellSettings.barRightSettings && modelData !== "tiles" && modelData !== "modules"
+          enabled: !root.editing && ShellSettings.barRightSettings && modelData !== "tiles" && modelData !== "modules"
           onTapped: root.settings("hub:" + modelData)
+        }
+
+        // editing: the block is held, not used — an outline, its name, up, down and −
+        Rectangle {
+          id: held
+          visible: root.editing && parent.active
+          anchors { fill: parent; margins: -Theme.gapHair }
+          radius: Theme.radiusCard
+          color: Theme.clear
+          border.width: Theme.hairline
+          border.color: Theme.controlLineHover
+
+          // a veil over the content: it takes the clicks, so nothing switches by mistake
+          Rectangle { anchors.fill: parent; radius: parent.radius; color: Theme.scrim; opacity: 0.55 }
+          MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onWheel: wheel => wheel.accepted = true }
+
+          KitText {
+            anchors { left: parent.left; leftMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+            text: HubBlocks.names[modelData] ?? modelData
+            font.weight: Font.Medium
+          }
+          Row {
+            anchors { right: parent.right; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
+            spacing: Theme.gapHair
+            IslandButton { icon: "chevron-up"; iconSize: 14; Accessible.name: "Move up"; onClicked: root.moveBlock(modelData, -1) }
+            IslandButton { icon: "chevron-down"; iconSize: 14; Accessible.name: "Move down"; onClicked: root.moveBlock(modelData, 1) }
+            IslandButton { icon: "x"; iconSize: 14; iconTint: Theme.red; Accessible.name: "Remove from the hub"; onClicked: HubBlocks.setShown(modelData, false) }
+          }
         }
       }
     }
