@@ -1,10 +1,11 @@
 import QtQuick
 import qs.config
 import qs.kit
+import qs.modules.focus
 import "../../kit/markup.js" as Markup
 
 // Notification history, newest first, in day groups under filter tabs (all, unread,
-// urgent). A card: the app's avatar in its colour rule, summary, app and time, the
+// urgent); the header switch is Focus mode (off = on). A card: the app's avatar in its colour rule, summary, app and time, the
 // body in an inset block; unread ones carry a red dot, critical summaries are red,
 // a hover brings up a cross that dismisses the one. Footer: mark all as read, clear.
 KitFrame {
@@ -56,6 +57,14 @@ KitFrame {
       visible: root.fresh > 0
       text: root.fresh + " NEW"
       tint: Theme.red
+    }
+
+    // on: toasts come; off: Focus (do not disturb) is on
+    KitSwitch {
+      anchors.verticalCenter: parent.verticalCenter
+      checked: !FocusService.on
+      accessibleName: "Notifications"
+      onToggled: FocusService.toggle()
     }
   }
 
