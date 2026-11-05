@@ -121,7 +121,7 @@ Item {
     return stack + (IslandService.noticeMore > 0 ? Theme.gapTight + moreRow : 0);
   }
   readonly property var sizes: ({
-    compact: [compact.implicitWidth, Theme.islandHeight],
+    compact: [compact.implicitWidth, compact.implicitHeight],   // a peek makes it taller
     hub:     [Math.max(280, Math.min(hub.preferredWidth, ModuleSettings.get("hub", "width", 400), (bar.screen?.width ?? 1920) - 24)), hub.implicitHeight],
     launcher: [520, islandLauncher.implicitHeight],
     keybinds: [520, islandKeybinds.implicitHeight],

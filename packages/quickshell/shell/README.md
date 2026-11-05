@@ -158,8 +158,8 @@ size, gap, separators and hub opening.
   Rings in the pill): battery, volume, brightness and memory as arcs, CPU and
   temperature as gauges, a running timer as ticks, Wi-Fi, Bluetooth, VPN and Focus as
   discs (`bar/Complications.qml`, `kit/KitRing.qml`; docs/shell/design.md › Rings). The
-  rest keep their words. The pointer resting on a ring 150 ms shows its words beside it
-  (the peek: `Battery 64 %`).
+  rest keep their words. The pointer resting on a ring 150 ms is the peek: that ring
+  grows to 40, the pill 20 px taller around it, its words beside it (`Battery 64 %`).
 - **The live slot** (`IslandLive`, between the clock and RIGHT) shows what
   runs, only while it does, each with a head ring of its data in its kind's colour
   (a timer's ticks, a download's or a backup's fill, a state's disc; a recording and

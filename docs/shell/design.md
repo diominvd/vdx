@@ -188,6 +188,8 @@ complication: one question, one whole, read in one glance.
 - In the hub a ring has no plate: one value, one ring (Machine's concentric fills,
   module rings at `ringCell` with their words under, toggles as bare discs). A plate
   holds a value with its context (the player, the week).
+- The peek (the glance distance) grows only the slot looked at: its ring `ringPill` →
+  `ringPeek`, the pill 20 px taller while it lasts, one line of words beside the ring.
 - In the pill (Bar look › Style › Rings in the pill, on by default) a module's face
   stays under its rings, unseen (`bar/island/IslandSlot.qml`): the click, the wheel,
   the popup and the right click are the module's own.

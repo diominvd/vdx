@@ -16,16 +16,21 @@ Item {
   required property string modelData
   property var modules: ({})
   signal settings(string id)
+  signal peeked(bool on)                         // the pill grows taller for it
 
   readonly property bool separator: BarLayout.isSeparator(modelData)
   readonly property var rings: ShellSettings.pillRings && !separator ? Complications.of(modelData) : []
   readonly property bool drawn: rings.length > 0
   // the glance: the pointer rests on the rings a moment and their words show beside them
   property bool peek: false
+  onPeekChanged: peeked(peek)
+  // the ring grows from the pill's size to the peek's
+  property real ringSize: peek ? Theme.ringPeek : Theme.ringPill
+  Behavior on ringSize { enabled: Motion.island; NumberAnimation { duration: Motion.normal; easing.type: Motion.morph } }
 
   anchors.verticalCenter: parent ? parent.verticalCenter : undefined
   implicitWidth: drawn ? dial.implicitWidth : face.implicitWidth
-  implicitHeight: drawn ? Theme.ringPill : face.implicitHeight
+  implicitHeight: drawn ? ringSize : face.implicitHeight
 
   Component { id: separatorFace; Separator {} }
 
@@ -51,7 +56,7 @@ Item {
         required property int index
         readonly property var spec: slot.rings[index] ?? ({})
         anchors.verticalCenter: parent.verticalCenter
-        size: Theme.ringPill
+        size: Math.round(slot.ringSize)
         kind: spec.kind ?? "fill"
         value: spec.value ?? 0
         text: spec.text ?? ""

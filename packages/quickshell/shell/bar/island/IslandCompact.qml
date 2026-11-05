@@ -33,10 +33,15 @@ Item {
   // nothing to show at rest: the island hides (Shell Manager › Bar › Clock)
   readonly property bool empty: !clockOn && !unseen && BarLayout.islandIn("start", screen).length === 0
                                 && BarLayout.islandIn("end", screen).length === 0 && live.kind === ""
+  // a ring the pointer rests on (IslandSlot's peek): the pill grows taller around it
+  property string peekId: ""
+  readonly property int peekGrow: peekId !== "" ? 20 : 0
+  function peeked(id, on) { peekId = on ? id : (peekId === id ? "" : peekId); }
+
   // the pointer resting on the clock (not on a module) opens the hub
   readonly property bool clockHovered: clockHover.hovered
   implicitWidth: Math.max(110, line.implicitWidth + 2 * Theme.gapGroup)
-  implicitHeight: Theme.islandHeight
+  implicitHeight: Theme.islandHeight + peekGrow
 
   // a side with nothing in it is zero wide: the Row skips it and its gap
   Row {
@@ -51,7 +56,7 @@ Item {
 
     Repeater {
       model: BarLayout.islandIn("start", root.screen)
-      IslandSlot { modules: root.modules; onSettings: id => root.settings(id) }
+      IslandSlot { modules: root.modules; onSettings: id => root.settings(id); onPeeked: on => root.peeked(modelData, on) }
     }
   }
 
@@ -92,7 +97,7 @@ Item {
 
     Repeater {
       model: BarLayout.islandIn("end", root.screen)
-      IslandSlot { modules: root.modules; onSettings: id => root.settings(id) }
+      IslandSlot { modules: root.modules; onSettings: id => root.settings(id); onPeeked: on => root.peeked(modelData, on) }
     }
 
     Rectangle {
