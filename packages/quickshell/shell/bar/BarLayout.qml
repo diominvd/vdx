@@ -37,7 +37,6 @@ Singleton {
     { id: "media",         label: "Media",         zone: "left",   icon: "play", about: "What plays in other apps" },
     { id: "tuner",         label: "Radio",         zone: "right",  icon: "radio", settings: "modules/radio/RadioSettings.qml", about: "Internet radio dial" },
     { id: "focus",         label: "Focus",         zone: "right",  tile: true, icon: "moon", about: "Do not disturb" },
-    { id: "language",      label: "Language",      zone: "right",  icon: "keyboard", settings: "LanguageSettings.qml", about: "Keyboard layout" },
     { id: "ai",            label: "AI",            zone: "right",  icon: "bot", settings: "AiSettings.qml", about: "AI limits and local models" },
     { id: "shell",         label: "Shell",         zone: "right",  icon: "sliders", about: "Shell settings and layout" },
     { id: "notifications", label: "Notifications", zone: "right",  icon: "bell", settings: "NotificationsSettings.qml", about: "History of notifications" },
@@ -57,7 +56,7 @@ Singleton {
   // Stable semantic groups for the hub; custom ordering is retained within each.
   function hubGroups(ids, layout) {
     if (layout !== "grouped") return [{ label: "", ids: ids }];
-    const controls = ["language", "windows", "brightness", "audio", "battery", "wifi", "bluetooth"];
+    const controls = ["windows", "brightness", "audio", "battery", "wifi", "bluetooth"];
     const appearance = ["wallpapers", "themes", "mode"];
     return [
       { label: "Controls", ids: ids.filter(id => controls.includes(id)) },

@@ -2371,18 +2371,6 @@
   "target": "modules:focus"
  },
  {
-  "label": "Language",
-  "hint": "Keyboard layout",
-  "where": "Bar modules",
-  "target": "modules:language"
- },
- {
-  "label": "Bar",
-  "hint": "",
-  "where": "Bar modules › Language",
-  "target": "modules:language"
- },
- {
   "label": "AI",
   "hint": "AI limits and local models",
   "where": "Bar modules",

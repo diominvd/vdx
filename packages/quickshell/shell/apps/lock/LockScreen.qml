@@ -134,7 +134,7 @@ Rectangle {
         }
       }
 
-      // the layout the password is typed in, as the bar's Language shows it
+      // the layout the password is typed in, as the island's layout flash shows it
       KitButton {
         id: layoutButton
         x: parent.width + 6

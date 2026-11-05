@@ -6,7 +6,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import "../../kit/reply.js" as Reply
 
-// The active keyboard layout, one for every screen's face. The first value
+// The active keyboard layout (the island's layout flash). The first value
 // comes from `hyprctl devices` (Hyprland doesn't replay activelayout on
 // connect), changes from the activelayout event.
 Singleton {

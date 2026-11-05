@@ -134,7 +134,7 @@ Each lives in `modules/<id>/`; its popup opens with
 `player`: `music` is its window).
 
 Workspaces, Music, Themes, Tray, Mode, Wallpapers, Clock,
-Brightness, Audio, Wi-Fi, Bluetooth, Mihomo, Radio, Media, Timer, Battery, Language, AI, Shell,
+Brightness, Audio, Wi-Fi, Bluetooth, Mihomo, Radio, Media, Timer, Battery, AI, Shell,
 Notifications, Capture, Clipboard, System, Task Manager, Cleaner, Backups,
 VirusTotal, Packages, Display, Windows, Chat, Folder.
 

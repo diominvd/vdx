@@ -16,7 +16,6 @@ import qs.modules.focus
 import qs.modules.mpd
 import qs.modules.radio
 import qs.modules.timer
-import qs.modules.language
 import qs.modules.mihomo
 import qs.modules.brightness
 import qs.modules.player
@@ -114,14 +113,14 @@ Singleton {
   Timer { id: flashTimer; onTriggered: root.flashKind = "" }
   readonly property bool micMuted: AudioService.source?.audio?.muted ?? false
   onMicMutedChanged: flash("mic")
-  readonly property string layoutNow: LanguageService.layout
+  readonly property string layoutNow: LayoutService.layout
   property string layoutFrom: ""               // the layout it changed from
   property string layoutLast: ""
   onLayoutNowChanged: { layoutFrom = layoutLast; layoutLast = layoutNow; if (layoutFrom !== "") flash("layout"); }
   readonly property bool pluggedNow: BatteryService.plugged
   onPluggedNowChanged: if (pluggedNow) flash("plugged")
   // the module a click on an activity opens (BarLayout.openModule)
-  readonly property var liveTarget: ({ recording: "capture", timer: "timer", radio: "tuner", media: "media", music: "music", vpn: "mihomo", battery: "battery", bluetooth: "bluetooth", update: "packages", backup: "backup", mic: "audio", layout: "language", plugged: "battery" })
+  readonly property var liveTarget: ({ recording: "capture", timer: "timer", radio: "tuner", media: "media", music: "music", vpn: "mihomo", battery: "battery", bluetooth: "bluetooth", update: "packages", backup: "backup", mic: "audio", plugged: "battery" })
   property var liveViews: ({})             // screen name -> { selected: activity ID, manual: bool }
   property var liveWheelTimes: ({})        // screen name -> last accepted wheel step
   property string pendingFrontKind: ""
