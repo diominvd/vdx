@@ -77,6 +77,7 @@ Singleton {
   readonly property bool liveMediaCover: look("liveMediaCover", "island")  // show artwork in the media live activity
   readonly property bool liveMusicCover: look("liveMusicCover", "island")  // show the album cover in its live activity
   readonly property string liveNoticeMark: look("liveNoticeMark", "island")  // avatar | dot: what marks a message in the live slot
+  readonly property bool liveVpnServer: look("liveVpnServer", "island")  // the VPN activity names the server
   readonly property bool liveMusicAlways: look("liveMusicAlways", "island")  // the music stays in the live slot with no player at all
   readonly property var liveSections: ({
     asks:  ["notice", "battery", "bluetooth"],
@@ -102,7 +103,7 @@ Singleton {
   }
   readonly property var lookDefaults: ({ barIconGrow: 0, barSeparators: true, barGap: 5, clockOpens: "hover", hubPlayer: true, pillHeight: 0,
     liveEnabled: true, liveBattery: true, liveBluetooth: true,
-    liveRecording: true, liveUpdate: true, liveBackup: true, liveTimer: true, liveRadio: true, liveRadioPaused: true, liveRadioAlways: false, liveMedia: true, liveMediaPaused: false, liveMediaCover: true, liveVpn: false, liveFocus: true, liveMusic: true, liveMusicPaused: false, liveMusicCover: true, liveMusicAlways: false, liveNoticeMark: "avatar",
+    liveRecording: true, liveUpdate: true, liveBackup: true, liveTimer: true, liveRadio: true, liveRadioPaused: true, liveRadioAlways: false, liveMedia: true, liveMediaPaused: false, liveMediaCover: true, liveVpn: false, liveVpnServer: true, liveFocus: true, liveMusic: true, liveMusicPaused: false, liveMusicCover: true, liveMusicAlways: false, liveNoticeMark: "avatar",
     liveVolume: true, liveMic: true, liveLayout: true, livePlugged: true,
     liveFront: true, liveFocusClick: true, liveFlashMs: 1500, liveNoticeMs: 5000, liveWheel: true, liveWheelDelayMs: 0, liveRightSettings: true,
     liveBatteryBelow: 20, liveBatteryStay: "fixed", liveOrder: ({}) })

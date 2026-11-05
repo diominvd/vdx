@@ -142,7 +142,7 @@ Rectangle {
       spacing: Theme.gapMedium
       LiveGlyph { visible: Theme.material; size: root.coverSize; corner: root.badgeRadius; name: "shield"; tint: Theme.green }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: !Theme.material; text: "VPN"; color: Theme.foreground1; font.letterSpacing: 1 }
-      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Finland"; color: Theme.material ? Theme.foreground1 : Theme.foreground2; font.weight: Theme.material ? Font.Medium : Font.Normal }
+      KitText { anchors.verticalCenter: parent.verticalCenter; visible: ShellSettings.liveVpnServer; text: "Finland"; color: Theme.material ? Theme.foreground1 : Theme.foreground2; font.weight: Theme.material ? Font.Medium : Font.Normal }
       LiveCap { text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48"; plainTint: Theme.muted; plainBold: false }
     }
   }

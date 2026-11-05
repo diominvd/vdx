@@ -115,6 +115,13 @@ Column {
     }
 
     KitRow {
+      visible: root.kind === "vpn"
+      label: "Show server name"
+      hint: "The server's name in the live activity"
+      KitSwitch { checked: ShellSettings.liveVpnServer; onToggled: ShellSettings.setLook("liveVpnServer", !checked, "island") }
+    }
+
+    KitRow {
       visible: root.kind === "focus"
       label: "Turn off on click"
       hint: "A click on the activity ends Focus"

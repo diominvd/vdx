@@ -42,7 +42,7 @@ Row {
   LiveGlyph { corner: face.badgeRadius; visible: face.kind === "vpn" && Theme.material; size: face.coverSize; name: "shield"; tint: Theme.green }
   KitText { visible: face.kind === "vpn" && !Theme.material; anchors.verticalCenter: parent.verticalCenter; text: "VPN"; color: Theme.foreground1; font.letterSpacing: 1 }
   KitText {
-    visible: face.kind === "vpn"
+    visible: face.kind === "vpn" && ShellSettings.liveVpnServer
     anchors.verticalCenter: parent.verticalCenter
     text: MihomoService.current
     color: Theme.material ? Theme.foreground1 : Theme.foreground2
