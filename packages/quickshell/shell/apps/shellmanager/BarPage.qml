@@ -215,6 +215,8 @@ KitSettingsWorkspace {
             clock: BarLayout.islandClock(root.screenName)
             selectedId: root.selectedModule
             onSelected: id => root.selectModule(id)
+            onMoved: (id, zone, index) => root.drop(id, zone, index)
+            onRemoved: id => root.removeModule(id)
           }
           KitGrouper {}
         }

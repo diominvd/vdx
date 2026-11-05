@@ -326,7 +326,8 @@ Pages by the user's area; the look follows macOS System Settings.
   Wallpaper has its own page.
 - Bar separates Layout, Look and Monitors. Bar look holds the style (Solid /
   Island) first; Layout arranges modules (in the Island style under a stage: the
-  resting pill at 1:1, drawn as the island draws it, a click selects a module); the module inspector offers destination
+  resting pill at 1:1, drawn as the island draws it: a click selects a module, a drag
+  moves it along the pill — left of the clock START, right END — and down off it removes it); the module inspector offers destination
   and order controls as an alternative to drag. Available modules are searchable.
 - Hub and Live activities have their own pages. Hub appearance
   options always address the Island settings, even when Solid is active.
