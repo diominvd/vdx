@@ -7,7 +7,6 @@ import qs.modules.audio
 import qs.modules.battery
 import qs.modules.brightness
 import qs.modules.capture
-import qs.modules.chat
 import qs.modules.cleaner
 import qs.modules.backup
 import qs.modules.clipboard
@@ -48,7 +47,7 @@ Item {
     workspaces: workspaces, music: music, themes: themes, mode: mode, tray: tray, wallpapers: wallpapers, clock: clock,
     brightness: brightness, audio: audio, wifi: wifi, bluetooth: bluetooth, mihomo: mihomo,
     battery: battery, ai: ai, notifications: notifications,
-    shell: shell, capture: capture, clipboard: clipboard, sysmon: sysmon, taskmanager: taskmanager, cleaner: cleaner, backup: backup, virustotal: virustotal, packages: packages, display: display, windows: windows, chat: chat, folder: folder, focus: focus, timer: timer, tuner: tuner, media: media
+    shell: shell, capture: capture, clipboard: clipboard, sysmon: sysmon, taskmanager: taskmanager, cleaner: cleaner, backup: backup, virustotal: virustotal, packages: packages, display: display, windows: windows, folder: folder, focus: focus, timer: timer, tuner: tuner, media: media
   })
 
   Component { id: workspaces; Workspaces {} }
@@ -80,7 +79,6 @@ Item {
   Component { id: packages; PackagesBar { bar: root.bar } }
   Component { id: display; DisplayBar { bar: root.bar } }
   Component { id: windows; Windows { bar: root.bar } }
-  Component { id: chat; Chat { bar: root.bar } }
   Component { id: folder; Folder { bar: root.bar; modules: root.map } }
 
   // The Shell Manager's button; a module of its own so it can move between zones.

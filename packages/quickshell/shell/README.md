@@ -136,7 +136,7 @@ Each lives in `modules/<id>/`; its popup opens with
 Workspaces, Music, Themes, Tray, Mode, Wallpapers, Clock,
 Brightness, Audio, Wi-Fi, Bluetooth, Mihomo, Radio, Media, Timer, Battery, AI, Shell,
 Notifications, Capture, Clipboard, System, Task Manager, Cleaner, Backups,
-VirusTotal, Packages, Display, Windows, Chat, Folder.
+VirusTotal, Packages, Display, Windows, Folder.
 
 - Order, zones and visibility: Shell Manager › Bar › Modules. Options:
   Shell Manager › Bar modules (an app's module too; Notifications has its own

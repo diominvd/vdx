@@ -2,11 +2,10 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.config
-import qs.modules.chat
 import "steer.js" as Steer
 
 // Kimmy gets smarter while there is internet: now and then, instead of a canned line, it
-// asks a free opencode model (the Chat module's, `opencode run`, the read-only "plan"
+// asks a free opencode model (`opencode run`, the read-only "plan"
 // agent in an empty folder, so it can touch nothing) for one short line about the moment.
 // Only a few plain facts go out (the kind of program, the hour, its mood); never a window
 // title, a file or text from the screen. One request at a time, at most one in a few
@@ -39,8 +38,8 @@ Item {
     // stdin closed: with a pipe open, opencode waits to read the message from it
     proc.command = ["bash", "-c", 'mkdir -p "$1" && cd "$1" && shift && exec opencode run "$@" </dev/null', "_",
                     Quickshell.env("HOME") + "/.cache/dotfiles/kimmy",
-                    "-m", ChatService.model, "--agent", "plan", "--format", "json"]
-                   .concat(ChatService.keepServer ? [] : ["--standalone"]).concat([Steer.witPrompt(facts)]);
+                    "-m", "opencode/big-pickle", "--agent", "plan", "--format", "json"]
+                   .concat([Steer.witPrompt(facts)]);
     proc.running = true;
     killer.restart();
     return true;

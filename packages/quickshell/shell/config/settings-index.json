@@ -2581,42 +2581,6 @@
   "target": "modules:windows"
  },
  {
-  "label": "Chat",
-  "hint": "A chat with a free opencode model",
-  "where": "Bar modules",
-  "target": "modules:chat"
- },
- {
-  "label": "Bar",
-  "hint": "",
-  "where": "Bar modules › Chat",
-  "target": "modules:chat"
- },
- {
-  "label": "Model",
-  "hint": "",
-  "where": "Bar modules › Chat",
-  "target": "modules:chat"
- },
- {
-  "label": "Opencode",
-  "hint": "",
-  "where": "Bar modules › Chat",
-  "target": "modules:chat"
- },
- {
-  "label": "Model",
-  "hint": "A new chat uses it",
-  "where": "Bar modules › Chat › MODEL",
-  "target": "modules:chat"
- },
- {
-  "label": "Background server",
-  "hint": "Off: starts per message",
-  "where": "Bar modules › Chat › OPENCODE",
-  "target": "modules:chat"
- },
- {
   "label": "Folder",
   "hint": "Grouped bar modules",
   "where": "Bar modules",

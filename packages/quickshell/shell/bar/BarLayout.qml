@@ -50,7 +50,6 @@ Singleton {
     { id: "packages",      label: "Packages",      zone: "right",  icon: "package", about: "Check and install updates" },
     { id: "display",       label: "Display",       zone: "right",  icon: "monitor", settings: "DisplaySettings.qml", about: "Scale and refresh rate" },
     { id: "windows",       label: "Windows",       zone: "right",  icon: "app-window", settings: "WindowsSettings.qml", about: "Window mode: tiling, floating, scrolling" },
-    { id: "chat",          label: "Chat",          zone: "right",  icon: "message", settings: "ChatSettings.qml", about: "A chat with a free opencode model" },
     { id: "folder",        label: "Folder",        zone: "right",  icon: "folder", settings: "FolderSettings.qml", about: "Grouped bar modules" }
   ]
   // Stable semantic groups for the hub; custom ordering is retained within each.

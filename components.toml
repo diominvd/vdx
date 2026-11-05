@@ -261,11 +261,10 @@ modules = ["ai"]
 
 [opencode]
 group = "ai"
-about = "opencode, and the bar's chat with its free models"
+about = "opencode, the coding agent"
 default = false
 pacman = ["opencode"]
 links = ["opencode"]
-modules = ["chat"]
 secrets = ["opencode/service.json"]
 
 # ---- personal ----

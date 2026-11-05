@@ -194,7 +194,7 @@ Column {
     module: "companion"; key: "smart"; fallback: true
     label: "Smarter online"
     hint: "No window titles or screen text sent"
-    tip: "Now and then a free opencode model (the Chat module's) words its line. It is told only the kind of program, the time of day, how long you have sat, its mood, how many days you have known each other and the machine's state (music, a busy processor, the battery); never a window title, a file or text from the screen. Offline: its usual lines"
+    tip: "Now and then a free opencode model (`opencode run`) words its line. It is told only the kind of program, the time of day, how long you have sat, its mood, how many days you have known each other and the machine's state (music, a busy processor, the battery); never a window title, a file or text from the screen. Offline: its usual lines"
   }
 
   KitToggleRow {
