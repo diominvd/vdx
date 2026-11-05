@@ -22,6 +22,8 @@ Column {
 
   readonly property int coverSize: YandexService.coverSize
   readonly property int gap: Theme.gapWide
+  // the slider is 18 high, its line 3 in the middle: the empty strip above the line
+  readonly property int lineInset: 7
   // the timeline's right end: the total, or the time left (Modules › Music)
   readonly property bool showRemaining: ModuleSettings.get("music", "showRemaining", false)
   // the like belongs to a Yandex track only
@@ -51,7 +53,7 @@ Column {
     visible: root.player.hasMedia || root.emptyPlayer
     width: parent.width
     // the row of the cover and the text, the timeline, the transport
-    height: Math.max(root.coverSize, info.height) + root.gap + timeline.height + root.gap + transport.height
+    height: Math.max(root.coverSize, info.height) + Theme.sectionGap - root.lineInset + timeline.height + root.gap + transport.height
 
     // ---- cover ----
     ClippingRectangle {
@@ -151,7 +153,7 @@ Column {
     Column {
       id: timeline
 
-      y: Math.max(root.coverSize, info.height) + root.gap
+      y: Math.max(root.coverSize, info.height) + Theme.sectionGap - root.lineInset   // as far from the cover as the separator above it
       width: parent.width
       spacing: Theme.gapTight
 
