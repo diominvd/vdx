@@ -246,8 +246,8 @@ QtObject {
   readonly property color clear: Qt.rgba(controlHover.r, controlHover.g, controlHover.b, 0)
 
   // the spacing scale: between the items of a column, in px
-  // Appearance › Density: every gap, row and control grows or shrinks by this
-  readonly property real air: ShellSettings.density === "airy" ? 1.2 : ShellSettings.density === "regular" ? 1 : 0.8
+  // every gap, row and control is its base value times this
+  readonly property real air: 0.8
   function aired(px: real): int { return Math.round(px * air); }
   readonly property int gapTight: aired(2)
   readonly property int gapHair: aired(4)

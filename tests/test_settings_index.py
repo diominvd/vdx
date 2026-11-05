@@ -56,7 +56,6 @@ JOURNEYS = {
     "charge limit": "power",
     # the sidebar's pages by their names, and rows that moved
     "bar look": "barlook",
-    "density": "appearance",
     "input text": "appearance",
     "window frames": "windows:look",
     "update without asking": "updates",
@@ -172,11 +171,10 @@ class OneHome(unittest.TestCase):
         self.assertNotIn('key: "appear"', notes)
         self.assertIn('target: "live:notice"', notes)
 
-    def test_interface_holds_density_and_input_text(self):
+    def test_interface_holds_input_text(self):
         index = si.build()
-        for label in ("Density", "Input text"):
-            targets = {e["target"] for e in index if e["label"] == label and not e["where"].startswith("Apps")}
-            self.assertEqual(targets, {"appearance"}, label)
+        targets = {e["target"] for e in index if e["label"] == "Input text" and not e["where"].startswith("Apps")}
+        self.assertEqual(targets, {"appearance"})
 
     def test_app_reset_leaves_a_shared_page(self):
         keys = si.build_keys()

@@ -70,8 +70,7 @@ uses tonal layers and more spacious controls.
 
 - Spacing: the gaps and edge insets are `Theme.gapHair` (4), `gapTight` (2),
   `gapSmall` (6), `gapMedium` (8), `gapLoose` (10), `gapWide` (12) and `gapGroup`
-  (14), at Regular density; Interface › Style › Density (Compact 0.8 ×, Regular, Airy 1.2 ×; default Compact)
-  scales them with `rowHeight`, `controlHeight` and the paddings (`Theme.aired`); a value that is used once stays a literal.
+  (14), before `Theme.air` (0.8 ×), which scales them with `rowHeight`, `controlHeight` and the paddings (`Theme.aired`); a value that is used once stays a literal.
 - MUST — dividers: use `KitLine`, horizontally or with `vertical: true`.
   The stroke is `Theme.dividerThickness` (1 px), in `Theme.dividerColor`
   (`outlineVariant`) in both styles. The line owns no margins. A surrounding
@@ -281,7 +280,7 @@ Pages by the user's area; the look follows macOS System Settings.
 - MUST — search: every row's label and hint is a literal string where it can be
   (the search index reads them, `scripts/settings_index.py`).
 
-## Shared roles and density
+## Shared roles
 
 - MUST — semantic surfaces are derived in Theme from the active palette:
   `surfaceContainer`, `surfaceHigh`, `surfaceHighest`, `onSurfaceVariant`,

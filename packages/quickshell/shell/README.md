@@ -297,7 +297,7 @@ grid tiles and content-sized chips. The profile
 shows the user's initial or chosen image and current system uptime.
 
 Interface and Colours are sidebar pages of one form; Interface holds the
-style, density, input text and corners.
+style, input text and corners.
 Wallpaper is a separate page. Fonts
 and Cursor use searchable lists and a single preview, with explicit Apply.
 The colour picker offers named palette choices with keyboard activation.

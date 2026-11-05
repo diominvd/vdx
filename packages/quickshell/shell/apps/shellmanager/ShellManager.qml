@@ -55,7 +55,7 @@ Rectangle {
 // the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
   readonly property var allSections: [
     { value: "appearance", label: "Interface",  icon: "sliders",    caption: "LOOK",
-      page: "appearance", pageTab: "style", description: "Style, density, fields and corners." },
+      page: "appearance", pageTab: "style", description: "Style, fields and corners." },
     { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "colours",    label: "Colours",    icon: "paint-bucket",
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },

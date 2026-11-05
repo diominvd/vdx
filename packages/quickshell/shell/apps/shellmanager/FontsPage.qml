@@ -5,16 +5,16 @@ import qs.kit
 
 // Preview a family before applying it. Installed and downloadable families
 // share a compact list; the text size (the shell's, GTK apps') is a separate group.
-// Density and where text stands in a field are Interface's (AppearancePage).
+// Where text stands in a field is Interface's (AppearancePage).
 KitColumn {
   id: root
   readonly property string icon: "text"
   readonly property string title: "Fonts"
   readonly property string description: "The shell's typeface and text size."
   readonly property var jumps: [
+    { key: "size", label: "Text size", y: sizeLabel.y },
     { key: "preview", label: "Preview", y: previewLabel.y },
-    { key: "families", label: "Families", y: familiesLabel.y },
-    { key: "size", label: "Text size", y: sizeLabel.y }
+    { key: "families", label: "Families", y: familiesLabel.y }
   ]
   readonly property var resetKeys: ["textSize"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
@@ -41,6 +41,20 @@ KitColumn {
   Component.onCompleted: visibleChanged()
   onVisibleChanged: if (visible) DisplayService.refresh()
 
+  Column {
+    width: parent.width
+  KitLabel { id: sizeLabel; text: "TEXT SIZE" }
+  KitRow {
+    wide: true; label: "Text size"; hint: "Shell text and controls"
+    KitSegments { model: [12, 13, 14, 15].map(n => ({ label: n + " px", value: n })); current: ShellSettings.textSize; onPicked: value => ShellSettings.set("textSize", value) }
+  }
+  KitRow {
+    wide: true; label: "GTK apps text"; hint: "Applied at once, GTK only"
+    KitSegments { disabled: DisplayService.busy; model: DisplayService.textScales.map(f => ({ label: Math.round(f * 100) + "%", value: f })); current: DisplayService.textFactor; onPicked: value => DisplayService.setText(value) }
+  }
+    KitGrouper {}
+  }
+  KitLine {}
   Column {
   spacing: Theme.sectionGap
 
@@ -133,19 +147,6 @@ KitColumn {
   }
   KitEmptyState { visible: root.shown.length === 0; icon: "text"; title: "No installed fonts match"; hint: "Try a shorter search" }
   KitLine {}
-    KitGrouper {}
-  }
-  Column {
-    width: parent.width
-  KitLabel { id: sizeLabel; text: "TEXT SIZE" }
-  KitRow {
-    wide: true; label: "Text size"; hint: "Shell text and controls"
-    KitSegments { model: [12, 13, 14, 15].map(n => ({ label: n + " px", value: n })); current: ShellSettings.textSize; onPicked: value => ShellSettings.set("textSize", value) }
-  }
-  KitRow {
-    wide: true; label: "GTK apps text"; hint: "Applied at once, GTK only"
-    KitSegments { disabled: DisplayService.busy; model: DisplayService.textScales.map(f => ({ label: Math.round(f * 100) + "%", value: f })); current: DisplayService.textFactor; onPicked: value => DisplayService.setText(value) }
-  }
     KitGrouper {}
   }
   KitGrouper {}

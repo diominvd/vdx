@@ -18,20 +18,8 @@
   "target": "appearance:shape"
  },
  {
-  "label": "Interface style",
-  "hint": "",
-  "where": "Interface › STYLE",
-  "target": "appearance"
- },
- {
   "label": "Slider style",
   "hint": "",
-  "where": "Interface › STYLE",
-  "target": "appearance"
- },
- {
-  "label": "Density",
-  "hint": "Air between and inside things",
   "where": "Interface › STYLE",
   "target": "appearance"
  },
@@ -62,6 +50,12 @@
   "target": "fonts"
  },
  {
+  "label": "Text size",
+  "hint": "",
+  "where": "Fonts",
+  "target": "fonts:size"
+ },
+ {
   "label": "Preview",
   "hint": "",
   "where": "Fonts",
@@ -72,12 +66,6 @@
   "hint": "",
   "where": "Fonts",
   "target": "fonts:families"
- },
- {
-  "label": "Text size",
-  "hint": "",
-  "where": "Fonts",
-  "target": "fonts:size"
  },
  {
   "label": "Text size",

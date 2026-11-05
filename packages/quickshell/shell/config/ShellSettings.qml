@@ -18,7 +18,6 @@ Singleton {
   readonly property string managerTab: state.managerTab            // the page it was left on
   readonly property string font: state.font                       // family, kept in step with fontconfig
   readonly property int textSize: state.textSize                  // px, the shell's text (Theme.fontSize): 12 | 13 | 14 | 15
-  readonly property string density: state.density                 // compact | regular | airy: the air in gaps, rows and controls (Theme.air)
   readonly property string inputAlign: state.inputAlign           // auto | left | center: where the text stands in a field (auto: left, a password in the middle)
   readonly property string underlineAnimation: state.underlineAnimation  // none | grow | slide
   readonly property string wallpaperMode: state.wallpaperMode     // theme | custom | image

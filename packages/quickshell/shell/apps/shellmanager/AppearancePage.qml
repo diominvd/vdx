@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Interface (style, density, fields, corners) and Colours: sidebar pages on one
+// Interface (style, fields, corners) and Colours: sidebar pages on one
 // full-width form. Icons, Fonts and Wallpaper are pages of their own.
 KitSettingsWorkspace {
   id: root
@@ -23,7 +23,7 @@ KitSettingsWorkspace {
   }
   // the header's Reset: the keys of the sidebar page shown (Interface or Colours), not the other
   readonly property var tabKeys: ({
-    style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "density", "inputAlign"],
+    style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "inputAlign"],
     accent: ["accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere"]
   })
   readonly property var resetKeys: tabKeys[tab] ?? []
@@ -43,16 +43,7 @@ KitSettingsWorkspace {
         width: parent.width
         visible: root.tab === "style"
         KitLabel { text: "STYLE" }
-        KitRow {
-          label: "Interface style"
-          hint: ShellSettings.material ? "Tonal surfaces and soft controls" : "Clean outlines and compact controls"
-          wide: true
-          KitSegments {
-            model: [{label: "Strict", value: false}, {label: "Material 3", value: true}]
-            current: ShellSettings.material
-            onPicked: value => ShellSettings.set("material", value)
-          }
-        }
+        StyleCards { width: parent.width }
         KitRow {
           visible: !ShellSettings.material
           label: "Slider style"
@@ -63,10 +54,6 @@ KitSettingsWorkspace {
             current: ShellSettings.segmentedSliders
             onPicked: value => ShellSettings.set("segmentedSliders", value)
           }
-        }
-        KitRow {
-          wide: true; label: "Density"; hint: "Air between and inside things"
-          KitSegments { model: [{ label: "Compact", value: "compact" }, { label: "Regular", value: "regular" }, { label: "Airy", value: "airy" }]; current: ShellSettings.density; onPicked: value => ShellSettings.set("density", value) }
         }
         KitRow {
           wide: true; label: "Input text"; hint: "Where text stands in a field; Auto: left"
