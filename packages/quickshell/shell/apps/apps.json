@@ -41,7 +41,7 @@
   { "id": "filepicker", "label": "File picker", "icon": "folder", "about": "Choose a file or a folder for another program",
     "listed": false, "ipc": "filepicker", "open": "open",
     "window": { "id": "file-picker", "title": "Choose file", "width": 760, "height": 540 } },
-  { "id": "backup", "label": "Backups", "icon": "shield", "about": "Encrypted backups and restore",
+  { "id": "backup", "label": "Backups", "icon": "history", "about": "Encrypted backups and restore",
     "ipc": "backup", "open": "toggle",
     "window": { "id": "backup", "title": "Backups", "width": 840, "height": 640 }, "module": "backup", "moduleSettings": "apps/backup/BackupBarSettings.qml" },
   { "id": "capture", "label": "Capture", "icon": "camera", "about": "Screenshots and recordings",

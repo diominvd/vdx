@@ -44,7 +44,7 @@ Singleton {
     { id: "clipboard",     label: "Clipboard",     zone: "right",  icon: "clipboard", about: "Clipboard history and images" },
     { id: "sysmon",        label: "System",        zone: "right",  icon: "cpu", settings: "SysmonSettings.qml", about: "CPU, memory, GPU, disks, network, sensors" },
     { id: "cleaner",       label: "Cleaner",       zone: "right",  icon: "brush", about: "Free up disk space" },
-    { id: "backup",        label: "Backups",       zone: "right",  icon: "shield", about: "Back up and restore files" },
+    { id: "backup",        label: "Backups",       zone: "right",  icon: "history", about: "Back up and restore files" },
     { id: "virustotal",    label: "VirusTotal",    zone: "right",  icon: "scan", about: "Scan files, links and hashes" },
     { id: "packages",      label: "Packages",      zone: "right",  icon: "package", about: "Check and install updates" },
     { id: "display",       label: "Display",       zone: "right",  icon: "monitor", settings: "DisplaySettings.qml", about: "Scale and refresh rate" },

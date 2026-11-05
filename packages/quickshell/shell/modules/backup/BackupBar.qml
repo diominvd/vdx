@@ -20,7 +20,7 @@ Item {
 
   KitBarItem {
     id: face
-    icon: "shield"
+    icon: "history"
     text: BarLayout.faceText("backup", BarLayout.label("backup"))
   }
 

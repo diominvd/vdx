@@ -24,7 +24,7 @@ KitFrame {
   }
 
   KitHeader {
-    icon: "shield"
+    icon: "history"
     title: "Backups"
     subtitle: !bs.loaded ? "LOADING…" : !bs.configured ? "NOT SET UP"
       : bs.last ? "LAST " + bs.agoText(bs.last.ts).toUpperCase() : "NEVER RUN"

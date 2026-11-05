@@ -31,7 +31,7 @@ Rectangle {
   KitSidebar {
     id: side
     anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
-    icon: "shield"
+    icon: "history"
     title: "Backups"
     subtitle: "RESTIC"
     lineY: head.y + head.height - Theme.dividerThickness
