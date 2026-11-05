@@ -12,7 +12,7 @@ spec = importlib.util.spec_from_file_location("settings_index", SCRIPT)
 si = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(si)
 
-TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "kimmy", "appearance", "colours", "glow", "animations",
+TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "colours", "glow", "animations",
         "bar", "barlook", "barmonitor", "modules", "windows", "lockscreen", "notifications",
         "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings"}
 
@@ -53,10 +53,6 @@ JOURNEYS = {
     "app colour": "notifications",
     "vpn": "modules:mihomo",
     "night light": "displays",
-    # Kimmy's rows come from its settings file, shown whole on its page
-    "mumbling": "kimmy:voice",
-    "sparkles": "kimmy:halo",
-    "rim width": "kimmy:body",
     "charge limit": "power",
     # the sidebar's pages by their names, and rows that moved
     "glow": "glow",

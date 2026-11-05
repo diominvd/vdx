@@ -57,7 +57,5 @@
   { "id": "music", "label": "Music", "icon": "music", "about": "Music player and queue",
     "ipc": "music", "open": "toggle",
     "window": { "id": "music", "title": "Music", "width": 1000, "height": 660 },
-    "module": "music", "moduleSettings": "modules/music/MusicSettings.qml" },
-  { "id": "companion", "label": "Kimmy", "icon": "bot", "about": "Kimmy, a pet ball with eyes: watches the pointer, runs after it, pesters, naps",
-    "ipc": "companion", "open": "poke", "settings": "apps/companion/CompanionSettings.qml", "page": "kimmy" }
+    "module": "music", "moduleSettings": "modules/music/MusicSettings.qml" }
 ]
