@@ -18,6 +18,11 @@ Item {
   required property PanelWindow bar
   property var modules: ({})
 
+  // the blocks are built while the hub shows, and while a module's popup opened from it is up:
+  // the popup belongs to the tile or the chip, which must not go with the hub's fade
+  property bool keep: false
+  readonly property bool built: visible || keep
+
   signal power()
   signal manager()                          // the gear: Shell Manager
   signal settings(string id)
@@ -47,7 +52,7 @@ Item {
   }
   // Material: the quick sliders next to each other share one tonal section
   readonly property var sliderIds: ["volume", "microphone", "brightness", "night", "dimming"]
-  readonly property var shownBlocks: root.visible ? HubBlocks.order.filter(id => HubBlocks.shown(id) && wants(id)) : []
+  readonly property var shownBlocks: root.built ? HubBlocks.order.filter(id => HubBlocks.shown(id) && wants(id)) : []
   function inRun(id, step) {
     const next = shownBlocks[shownBlocks.indexOf(id) + step];
     return next !== undefined && sliderIds.indexOf(next) >= 0;
@@ -153,7 +158,7 @@ Item {
       Loader {
         required property string modelData
         width: parent.width
-        active: root.visible && HubBlocks.shown(modelData) && root.wants(modelData)
+        active: root.built && HubBlocks.shown(modelData) && root.wants(modelData)
         visible: active
         sourceComponent: Theme.material && root.sliderIds.indexOf(modelData) >= 0 ? sliderSection : root.blockOf(modelData)
 

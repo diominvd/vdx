@@ -188,6 +188,7 @@ Item {
       width: root.sizes.hub[0] - 2 * Theme.islandFrameWidth
       bar: root.bar
       modules: root.modules
+      keep: root.fromHub && root.popup !== null
       // a module's popup takes its place at once: the hub does not fade under it
       visible: root.shown === "hub" && opacity > 0
       opacity: root.shown === "hub" ? 1 : 0
