@@ -4,7 +4,6 @@ import qs.kit
 import qs.modules.battery
 import qs.modules.bluetooth
 import qs.modules.mihomo
-import qs.modules.equalizer
 import qs.modules.focus
 import qs.modules.mpd
 import qs.modules.radio
@@ -74,7 +73,7 @@ Row {
     color: Theme.foreground1
     font.weight: Theme.material ? Font.Medium : Font.Normal
   }
-  EqualizerBars {
+  LiveBars {
     visible: face.kind === "radio" && !Theme.material
     anchors.verticalCenter: parent.verticalCenter
     barCount: 4
@@ -90,7 +89,7 @@ Row {
     text: ""
     tint: Theme.yellow
     width: 40
-    EqualizerBars {
+    LiveBars {
       anchors.centerIn: parent
       barCount: 4
       tone: Theme.yellow

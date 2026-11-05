@@ -133,7 +133,7 @@ Each lives in `modules/<id>/`; its popup opens with
 `tasks`, cleaner `clean`, virustotal `scan`, packages `updates`, music
 `player`: `music` is its window).
 
-Workspaces, Music, Themes, Tray, Mode, Wallpapers, Equalizer, Clock,
+Workspaces, Music, Themes, Tray, Mode, Wallpapers, Clock,
 Brightness, Audio, Wi-Fi, Bluetooth, Mihomo, Radio, Media, Timer, Battery, Language, AI, Shell,
 Notifications, Capture, Clipboard, System, Task Manager, Cleaner, Backups,
 VirusTotal, Packages, Display, Windows, Chat, Folder.
@@ -153,8 +153,7 @@ Shell Manager › Bar look › Style › Bar style › Island: no strip, one pil
 centre is the whole bar (`bar/island/`). Solid and island keep their own icon
 size, gap, separators and hub opening.
 
-- At rest: LEFT · clock · RIGHT (by default the workspaces and the
-  equalizer).
+- At rest: LEFT · clock · RIGHT (by default the workspaces).
 - **The live slot** (`IslandLive`, between the clock and RIGHT) shows what
   runs, only while it does, in three kinds: Asks (low battery, a connected
   device), Held (recording, update, backup, timer, VPN, Focus, radio, music, media) and Flash (the mic, the

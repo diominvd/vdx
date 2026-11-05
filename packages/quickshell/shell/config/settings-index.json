@@ -2166,30 +2166,6 @@
   "target": "modules:wallpapers"
  },
  {
-  "label": "Equalizer",
-  "hint": "Audio visualizer",
-  "where": "Bar modules",
-  "target": "modules:equalizer"
- },
- {
-  "label": "Bar",
-  "hint": "",
-  "where": "Bar modules › Equalizer",
-  "target": "modules:equalizer"
- },
- {
-  "label": "Colour",
-  "hint": "One colour for all bars",
-  "where": "Bar modules › Equalizer › BAR",
-  "target": "modules:equalizer"
- },
- {
-  "label": "Show when paused",
-  "hint": "Off: shown only while it plays",
-  "where": "Bar modules › Equalizer › BAR",
-  "target": "modules:equalizer"
- },
- {
   "label": "Clock",
   "hint": "Time, click for the date",
   "where": "Bar modules",

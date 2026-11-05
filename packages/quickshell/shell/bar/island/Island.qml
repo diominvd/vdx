@@ -12,7 +12,7 @@ import qs.kit
 // The whole bar in the island style: one dark pill that morphs between
 // views. compact (LEFT · clock · RIGHT) is the resting face; hub (the
 // date, the track and every module as a chip) opens on a hover over the clock;
-// media (the player) from the equalizer; notice
+// media (the player); notice
 // (a new notification) pass over it for a moment. A module's popup opens
 // inside the island (module): its content moves in from the BarPopup and back
 // once the island has folded. The launcher and the keybinds (the hub's Launcher and Keys chips)

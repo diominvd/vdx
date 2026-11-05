@@ -1,7 +1,6 @@
 import QtQuick
 import qs.config
 import qs.kit
-import qs.modules.equalizer
 
 // The player: cover, title and artist with the wave, a seek line with the
 // times, and prev / play / next. Material: a thicker seek line, play filled.
@@ -43,7 +42,7 @@ Item {
     }
   }
 
-  EqualizerBars {
+  LiveBars {
     id: wave
     anchors { right: parent.right; rightMargin: 20; verticalCenter: cover.verticalCenter }
     height: 18

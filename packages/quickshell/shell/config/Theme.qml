@@ -89,16 +89,6 @@ QtObject {
     return paletteColour(rule ? rule.colour : autoColourName(name));
   }
 
-  // the equalizer's colour (Modules › Equalizer): a solid choice
-  function equalizerColours(name) {
-    if (name.startsWith("#")) return [name, name];   // an own colour
-    // Older saved settings may still say "sea" or "sunset"; both now fall
-    // back to the theme colour instead of continuing to render a gradient.
-    const solidName = ["sea", "sunset"].includes(name) ? "theme" : name;
-    const one = solidName === "theme" ? frame : notifyDot(solidName);
-    return [one, one];
-  }
-
   // ---- accent (Appearance › Colours) ----
   // A stop by name: "theme" is the theme's frame colour (the accent that follows
   // the theme), "custom" the typed one. slot: the stop it is for (0 the colour,
@@ -186,7 +176,7 @@ QtObject {
   readonly property color focusRing: legible(accentFor("choices", foreground0), background0)
   readonly property int focusWidth: 2
   readonly property int navigationHeight: material ? 36 : 34
-  readonly property int rowHeight: aired(40)
+  readonly property int rowHeight: 40
   // side inset of a box = the gap above/below its controls (row padding + the row's spare height): one distance all round
   readonly property int groupInset: settingsRowInset + Math.round((rowHeight - controlHeight) / 2)
   readonly property color groupFill: material ? surfaceContainer : mix(background0, foreground0, 0.04)   // Strict: a raised card, as Material
@@ -246,34 +236,31 @@ QtObject {
   readonly property color clear: Qt.rgba(controlHover.r, controlHover.g, controlHover.b, 0)
 
   // the spacing scale: between the items of a column, in px
-  // every gap, row and control is its base value times this
-  readonly property real air: 0.8
-  function aired(px: real): int { return Math.round(px * air); }
-  readonly property int gapTight: aired(2)
-  readonly property int gapHair: aired(4)
-  readonly property int gapSmall: aired(6)
-  readonly property int gapMedium: aired(8)
-  readonly property int gapLoose: aired(10)   // also an edge inset of a row
-  readonly property int gapWide: aired(12)
+  readonly property int gapTight: 2
+  readonly property int gapHair: 4
+  readonly property int gapSmall: 6
+  readonly property int gapMedium: 8
+  readonly property int gapLoose: 10   // also an edge inset of a row
+  readonly property int gapWide: 12
   readonly property int settingsGap: sectionGap       // header separator to settings; shared by all settings panes
   // Dividers own only their stroke. Containers supply the same gap on both sides.
   readonly property int sectionGap: gapMedium
   readonly property int settingsRowInset: gapSmall
   readonly property int dividerThickness: hairline
   readonly property color dividerColor: outlineVariant
-  readonly property int gapGroup: aired(14)
+  readonly property int gapGroup: 14
   // icons and the widths of a side column (Shell Manager's pages, the sidebar)
   readonly property int iconSmall: 14
   readonly property int iconLarge: 24
   readonly property int sideWidth: 216
-  readonly property int popupPadding: aired(material ? 20 : 16)  // a popup's frame, every side (KitFrame)
+  readonly property int popupPadding: material ? 20 : 16  // a popup's frame, every side (KitFrame)
   readonly property int popupWidth: 380       // larger standalone surfaces such as auth and recording
   readonly property int modulePopupWidth: 340  // ordinary module popups; wider views opt into their needed width
   // a window's frame: the gap to its edges on every side, and the space the
   // title's line keeps above its capitals (the header draws that far into its box)
-  readonly property int windowPadding: aired(24)
+  readonly property int windowPadding: 24
   readonly property int headerInset: 3
-  readonly property int controlHeight: aired(material ? 36 : 34)       // buttons, selects, fields: one height side by side
+  readonly property int controlHeight: material ? 36 : 34       // buttons, selects, fields: one height side by side
   readonly property int controlWidth: 300        // a setting's choices / field (KitRow wide)
   readonly property int buttonWidth: 120         // a setting's action button (text only, right aligned)
   readonly property int rowStackBelow: 600       // a wide KitRow (or a KitSelect) narrower than this puts its control under the label

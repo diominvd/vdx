@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 
 // Shared crossfade face. Only the selected activity group is instantiated;
-// hidden groups do not keep media effects, equalizer bars or service bindings alive.
+// hidden groups do not keep media effects, sound bars or service bindings alive.
 Row {
   id: face
 

@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell.Widgets
 import qs.config
 import qs.kit
-import qs.modules.equalizer
 import qs.modules.player
 
 Row {
@@ -42,7 +41,7 @@ Row {
     text: !face.player.hasMedia ? "Nothing playing" : face.player.title + (face.player.artist !== "" ? " · " + face.player.artist : "")
     color: Theme.foreground1
   }
-  EqualizerBars {
+  LiveBars {
     visible: face.track
     anchors.verticalCenter: parent.verticalCenter
     barCount: 4

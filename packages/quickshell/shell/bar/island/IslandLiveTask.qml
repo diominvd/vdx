@@ -5,7 +5,6 @@ import qs.apps.capture
 import qs.apps.packages
 import qs.config
 import qs.kit
-import qs.modules.equalizer
 
 Row {
   id: face
@@ -35,7 +34,7 @@ Row {
     color: Theme.foreground1
     font.weight: Font.Medium
   }
-  EqualizerBars {
+  LiveBars {
     visible: face.kind === "recording" && CaptureService.recording
     anchors.verticalCenter: parent.verticalCenter
     barCount: 7

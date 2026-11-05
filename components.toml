@@ -56,7 +56,7 @@ pacman = ["quickshell", "pipewire-audio", "python-gobject", "xdg-desktop-portal"
           "glib2", "fd", "xdg-utils", "ttf-jetbrains-mono-nerd", "cava",
           "dnsmasq", "iw"]
 links = ["quickshell", "xdg-portal"]
-modules = ["workspaces", "clock", "equalizer", "themes", "mode", "wallpapers", "brightness", "audio", "wifi", "bluetooth", "battery", "language", "shell",
+modules = ["workspaces", "clock", "themes", "mode", "wallpapers", "brightness", "audio", "wifi", "bluetooth", "battery", "language", "shell",
            "notifications", "capture", "clipboard", "sysmon", "taskmanager", "tray",
            "display", "windows", "folder", "music", "focus", "timer", "media"]
 system = ["etc/polkit-1/rules.d/50-pkexec-keep.rules"]

@@ -25,7 +25,7 @@ import qs.modules.notifications
 // What the island shows, for every bar's island (Bar › Style island): the
 // track (MPD first, else an MPRIS player), passing flashes (a volume or
 // brightness change, a new notification) and the power actions. The wave is
-// the Equalizer module's.
+// LiveBars'.
 // Each island keeps its own view; this only tells them what happened.
 //
 // IPC: `qs -c shell ipc call island hub|media|power|launcher|keybinds|collapse` (the focused
