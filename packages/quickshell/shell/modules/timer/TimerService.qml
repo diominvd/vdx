@@ -75,6 +75,11 @@ Singleton {
     paused = false;
   }
   function togglePause() { if (paused) resume(); else pause(); }
+  // a running countdown gets longer: what is left grows, the end moves on
+  function addMinutes(n) {
+    if (kind !== "countdown") return;
+    total = Math.min(total + n * 60000, maxMinutes * 60000);
+  }
   function stop() { ended = false; kind = ""; paused = false; base = 0; laps = []; }
   function lap() {
     if (kind !== "stopwatch" || !running) return;

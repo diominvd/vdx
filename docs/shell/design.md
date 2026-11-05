@@ -178,6 +178,10 @@ complication: one question, one whole, read in one glance.
 - Colour is news: at rest a ring is `foreground1` on its track; a state (low,
   charging, load) takes its state colour, an active state the accent's `modules` place.
 - Motion: a new value eases (`Motion.bar`, `slow`); nothing moves at rest.
+- The act distance (a popup of a live kind, prototyped on Timer): the head ring at
+  `ringWide`, its centre the primary control; one muted line of context; the number at
+  its largest; two actions at most, the destructive one red. A span may also run along
+  the island's edge (`bar/island/IslandBezel.qml`, from twelve, clockwise).
 - In the hub a ring has no plate: one value, one ring (Machine's concentric fills,
   module rings at `ringCell` with their words under, toggles as bare discs). A plate
   holds a value with its context (the player, the week).

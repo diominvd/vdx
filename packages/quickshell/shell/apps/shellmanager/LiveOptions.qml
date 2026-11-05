@@ -15,7 +15,7 @@ Column {
   onShownChanged: if (shown) built = true
 
   // what a kind has to set: the rows below read this to know whether to offer the opening
-  readonly property bool any: kind === "notice" || kind === "battery" || kind === "music" || kind === "media" || kind === "radio" || kind === "focus"
+  readonly property bool any: kind === "notice" || kind === "battery" || kind === "music" || kind === "media" || kind === "radio" || kind === "focus" || kind === "timer"
 
   width: parent ? parent.width : 0
   height: opts.item ? opts.item.implicitHeight : 0
@@ -112,6 +112,13 @@ Column {
       label: "Show cover"
       hint: "The app's artwork in the live activity"
       KitSwitch { checked: ShellSettings.liveMediaCover; onToggled: ShellSettings.setLook("liveMediaCover", !checked, "island") }
+    }
+
+    KitRow {
+      visible: root.kind === "timer"
+      label: "Bezel"
+      hint: "Opened, time also runs along the island's edge"
+      KitSwitch { checked: ShellSettings.liveBezel; onToggled: ShellSettings.setLook("liveBezel", !checked, "island") }
     }
 
     KitRow {

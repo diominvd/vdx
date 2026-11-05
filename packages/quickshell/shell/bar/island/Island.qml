@@ -9,6 +9,7 @@ import qs.components
 import qs.config
 import qs.kit
 import qs.modules.audio
+import qs.modules.timer
 
 // The whole bar in the island style: one dark pill that morphs between
 // views. compact (LEFT · clock · RIGHT) is the resting face; hub (the
@@ -156,6 +157,21 @@ Item {
     Behavior on radius { enabled: Motion.island; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
 
     HoverHandler { id: hover }
+
+    // the timer's popup open: what is left runs along the outline (Live activities › Timer › Bezel)
+    IslandBezel {
+      z: 10
+      anchors.fill: parent
+      readonly property bool on: ShellSettings.liveBezel && root.shown === "module"
+                                 && root.popup?.ipcTarget === "timer" && TimerService.kind === "countdown"
+      visible: opacity > 0
+      opacity: on ? 1 : 0
+      Behavior on opacity { enabled: Motion.island; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
+      value: 1 - TimerService.progress
+      tint: TimerService.paused ? Theme.muted : Theme.orange
+      radius: shape.radius
+      stroke: Theme.ringStroke(Theme.ringPill)
+    }
 
     // compact's clicks, under its face: its modules take their own. A click on
     // the bare island does nothing but middle (play / pause): a misclick must

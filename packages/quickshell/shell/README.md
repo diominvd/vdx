@@ -163,7 +163,9 @@ size, gap, separators and hub opening.
 - **The live slot** (`IslandLive`, between the clock and RIGHT) shows what
   runs, only while it does, each with a head ring of its data in its kind's colour
   (a timer's ticks, a download's or a backup's fill, a state's disc; a recording and
-  the radio have no end and no ring), in three kinds: Asks (low battery, a connected
+  the radio have no end and no ring). A click on the timer opens it expanded: the ring
+  at 88 with pause in its centre, the time large, +1 min and Stop, and what is left
+  running along the island's edge (Live activities › Timer › Bezel), in three kinds: Asks (low battery, a connected
   device), Held (recording, update, backup, timer, VPN, Focus, radio, music, media) and Flash (the mic, the
   layout, the cable). The wheel over it pages through them with a
   slide, and it stays on the one paged to (nothing pages back by itself; Live activities › New one comes forward lets an activity that starts take the pill first); one shows whole in the pill (activities never fold);

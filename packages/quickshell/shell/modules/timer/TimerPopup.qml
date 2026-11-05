@@ -99,23 +99,65 @@ KitFrame {
     }
   }
 
-  // ---- a countdown running ----
-  Column {
+  // ---- a countdown running (Bezel, the act distance): the head ring, the number, two actions ----
+  Item {
     visible: TimerService.kind === "countdown"
     width: parent.width
-    spacing: Theme.gapGroup
+    height: Math.max(Theme.ringWide, info.implicitHeight)
 
-    KitLabel {
-      text: "REMAINING"
-      value: TimerService.text
-      valueColor: TimerService.paused ? Theme.muted : root.tone
+    // lit ticks are what is left; its centre is the primary control
+    KitRing {
+      id: head
+      anchors.verticalCenter: parent.verticalCenter
+      size: Theme.ringWide
+      kind: "ticks"
+      value: 1 - TimerService.progress
+      tint: TimerService.paused ? Theme.muted : root.tone
+
+      Rectangle {
+        anchors.centerIn: parent
+        width: Math.round(head.size * 0.42)
+        height: width
+        radius: width / 2     // inside a ring: a circle in either corner style
+        color: centre.containsMouse ? Theme.controlHover : Theme.clear
+        Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
+        KitIcon { anchors.centerIn: parent; name: TimerService.paused ? "play" : "pause"; filled: true; size: 20; tint: Theme.foreground1 }
+        MouseArea {
+          id: centre
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: TimerService.togglePause()
+        }
+        Accessible.role: Accessible.Button
+        Accessible.name: TimerService.paused ? "Resume" : "Pause"
+      }
     }
-    KitRow {
-      label: TimerService.label !== "" ? TimerService.label : "Timer"
-      hint: TimerService.paused ? "Paused" : "of " + Math.round(TimerService.total / 60000) + " min"
+
+    Column {
+      id: info
+      anchors { left: head.right; leftMargin: Theme.gapGroup; right: parent.right; verticalCenter: parent.verticalCenter }
+      spacing: Theme.gapHair
+
+      KitText {
+        width: parent.width
+        text: (TimerService.label !== "" ? TimerService.label : "Timer")
+          + (TimerService.paused ? " · paused" : " · of " + Math.round(TimerService.total / 60000) + " min")   // the end is in the header
+        color: Theme.muted
+        elide: Text.ElideRight
+      }
+      // a display figure: the same number as the pill's, at its largest
+      KitText {
+        text: TimerService.text
+        color: TimerService.paused ? Theme.muted : root.tone
+        font.pixelSize: 38
+        font.weight: Font.Bold
+        font.features: { "tnum": 1 }
+        font.letterSpacing: -1.5
+      }
       Row {
         spacing: Theme.gapMedium
-        KitButton { icon: TimerService.paused ? "play" : "pause"; text: TimerService.paused ? "Resume" : "Pause"; onClicked: TimerService.togglePause() }
+        KitButton { text: "+1 min"; onClicked: TimerService.addMinutes(1) }
         KitButton { icon: "x"; iconTint: Theme.red; text: "Stop"; onClicked: TimerService.stop() }
       }
     }
