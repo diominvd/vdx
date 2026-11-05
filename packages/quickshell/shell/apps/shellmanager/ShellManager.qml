@@ -152,6 +152,8 @@ Rectangle {
     // the theme, the font and the cursor left Appearance for pages of their own
     if (value === "appearance" && ["themes", "font", "cursor"].includes(target))
       return { tab: target === "font" ? "fonts" : target, target: "" };
+    // a page that is gone (a saved last page, an old `shell open`): the main page, not a blank one
+    if (sectionOf(value) === null) return { tab: "appearance", target: "" };
     return { tab: value, target: target ?? "" };
   }
 
