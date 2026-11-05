@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import qs.bar
-import qs.components
 import qs.config
 import qs.kit
 
@@ -43,6 +42,7 @@ Item {
     implicitWidth: content.implicitWidth
     implicitHeight: content.implicitHeight
     onShown: BluetoothService.popupShown()
+    onHidden: BluetoothService.popupHidden()
 
     BluetoothPopup {
       id: content

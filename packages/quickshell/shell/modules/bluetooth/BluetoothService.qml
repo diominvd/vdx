@@ -11,7 +11,8 @@ Singleton {
   id: root
 
   // ---- tuning ----
-  readonly property int statusPollMs: 5000
+  readonly property int statusPollMs: 5000     // while the popup is open
+  readonly property int idlePollMs: 30000      // closed: the face (changes come by --listen)
   readonly property int changeMs: 500         // the least gap between two re-reads on events
   readonly property int barMaxLength: 14  // the device's name on the bar, in characters
   readonly property string script: Paths.scriptsDir + "/bluetooth.sh"
@@ -39,7 +40,9 @@ Singleton {
   property string actionError: ""
 
   // ---- lifecycle ----
-  function popupShown() { refresh(); }
+  property bool popupOpen: false
+  function popupShown() { popupOpen = true; refresh(); }
+  function popupHidden() { popupOpen = false; }
 
   Component.onCompleted: refreshStatus()
 
@@ -132,9 +135,9 @@ Singleton {
   }
 
   // ---- polling ----
-  // the fallback when no event comes: the status every statusPollMs
+  // the fallback when no event comes: the status every statusPollMs (idlePollMs with the popup closed)
   Timer {
-    interval: root.statusPollMs
+    interval: root.popupOpen ? root.statusPollMs : root.idlePollMs
     running: true
     repeat: true
     onTriggered: root.refreshStatus()

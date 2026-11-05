@@ -3,6 +3,7 @@ import qs.bar
 import qs.components
 import qs.config
 import qs.kit
+import qs.modules.clock
 import qs.modules.notifications
 
 // The island at rest: the modules of LEFT, the clock, the modules of RIGHT
@@ -16,13 +17,7 @@ Item {
   property string screen: ""
   signal settings(string id)                   // a module's right click: its options
   signal clockClicked()                        // the clock's click, when the hub opens on a click
-  property date now: new Date()
-
-  // Modules › Clock's format
-  readonly property string format: (ModuleSettings.get("clock", "date", false) ? "ddd dd · " : "")
-    + (ModuleSettings.get("clock", "twelveHour", false) ? "h:mm" : "HH:mm")
-    + (ModuleSettings.get("clock", "seconds", false) ? ":ss" : "")
-    + (ModuleSettings.get("clock", "twelveHour", false) ? " AP" : "")
+  ClockTime { id: time }
 
   // the dot: unseen notices while the centre sits in the hub (Bar › Style › Notifications dot)
   readonly property bool unseen: NotificationsService.unseen > 0 && ShellSettings.barFolderDot && !BarLayout.bellOnPill(screen)
@@ -78,7 +73,7 @@ Item {
     KitText {
       id: clock
       anchors.centerIn: parent
-      text: Qt.formatDateTime(root.now, root.format)
+      text: Qt.formatDateTime(time.now, time.format)
       font.weight: Font.Bold
     }
 
@@ -131,11 +126,4 @@ Item {
   }
   }
 
-  Timer {
-    interval: 1000
-    running: true
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: root.now = new Date()
-  }
 }

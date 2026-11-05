@@ -7,30 +7,17 @@ Item {
   id: root
 
   property bool full: false
-  property date now: new Date()
-
-  // the bar's format, from the Shell Manager's Modules › Clock
-  readonly property string format: (ModuleSettings.get("clock", "date", false) ? "ddd dd · " : "")
-    + (ModuleSettings.get("clock", "twelveHour", false) ? "h:mm" : "HH:mm")
-    + (ModuleSettings.get("clock", "seconds", false) ? ":ss" : "")
-    + (ModuleSettings.get("clock", "twelveHour", false) ? " AP" : "")
+  ClockTime { id: time; forceSeconds: root.full }
 
   implicitWidth: label.implicitWidth
   implicitHeight: label.implicitHeight
 
   KitText {
     id: label
-    text: Qt.formatDateTime(root.now, root.full ? "dddd, dd MMMM yyyy HH:mm:ss" : root.format)
+    text: Qt.formatDateTime(time.now, root.full ? "dddd, dd MMMM yyyy HH:mm:ss" : time.format)
     color: Theme.muted
   }
 
-  Timer {
-    interval: 1000
-    running: true
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: root.now = new Date()
-  }
 
   MouseArea {
     anchors.fill: parent
