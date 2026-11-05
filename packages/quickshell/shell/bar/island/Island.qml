@@ -128,9 +128,20 @@ Item {
     power:   [434, 86],
     looks:   [looks.implicitWidth, looks.implicitHeight],
     root:    [420, rootView.implicitHeight],
-    module:  [popupContent?.fitWidth ? popupContent.implicitWidth : Math.max(Theme.modulePopupWidth, popupContent?.implicitWidth ?? 0), popupContent?.implicitHeight ?? Theme.islandHeight]
+    module:  moduleSize
   })
   readonly property var size: sizes[shown]
+
+  // the module popup's size, frozen once it closes: its content may empty out (a popup's
+  // hidden() clears its lists) while it fades, and the slot must not jump under the fade
+  property var moduleSize: [Theme.modulePopupWidth, Theme.islandHeight]
+  Binding {
+    target: root
+    property: "moduleSize"
+    when: root.shown === "module"
+    restoreMode: Binding.RestoreNone
+    value: [popupContent?.fitWidth ? popupContent.implicitWidth : Math.max(Theme.modulePopupWidth, popupContent?.implicitWidth ?? 0), popupContent?.implicitHeight ?? Theme.islandHeight]
+  }
 
   implicitWidth: shape.width
   implicitHeight: shape.height
