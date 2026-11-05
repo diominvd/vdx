@@ -29,6 +29,7 @@ bind("Shell", mainMod .. " + B", hl.dsp.exec_cmd("qs -c shell ipc call keybinds 
 bind("Shell", "CTRL + SHIFT + Escape", hl.dsp.exec_cmd("qs -c shell ipc call taskmanager toggle"), "Task manager")
 bind("Shell", mainMod .. " + X", hl.dsp.exec_cmd("qs -c shell ipc call cleaner toggle"), "Cleaner")
 bind("Shell", mainMod .. " + T", hl.dsp.exec_cmd("qs -c shell ipc call themepicker toggle"), "Theme picker")
+bind("Shell", mainMod .. " + P", hl.dsp.exec_cmd("qs -c shell ipc call island power"), "Power menu")
 -- the overview (apps/overview): every workspace and its windows, laid out by the window mode;
 -- Alt + Tab (the window switcher) is the floating mode's: modes/floating.lua
 bind("Shell", mainMod .. " + TAB", hl.dsp.exec_cmd("qs -c shell ipc call overview toggle"), "Overview")
