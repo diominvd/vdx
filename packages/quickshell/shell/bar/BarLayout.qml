@@ -43,7 +43,6 @@ Singleton {
     { id: "capture",       label: "Capture",       zone: "right",  icon: "camera", about: "Screenshots and recordings" },
     { id: "clipboard",     label: "Clipboard",     zone: "right",  icon: "clipboard", about: "Clipboard history and images" },
     { id: "sysmon",        label: "System",        zone: "right",  icon: "cpu", settings: "SysmonSettings.qml", about: "CPU, memory, GPU, disks, network, sensors" },
-    { id: "taskmanager",   label: "Task Manager",  zone: "right",  icon: "activity", about: "Processes and resource usage" },
     { id: "cleaner",       label: "Cleaner",       zone: "right",  icon: "brush", about: "Free up disk space" },
     { id: "backup",        label: "Backups",       zone: "right",  icon: "shield", about: "Back up and restore files" },
     { id: "virustotal",    label: "VirusTotal",    zone: "right",  icon: "scan", about: "Scan files, links and hashes" },
@@ -73,7 +72,7 @@ Singleton {
   // without `openPopup()` opens its options instead.
   signal hostRequested(string id, string screen)
   readonly property var popupTargets: ({ music: "player", backup: "backups", cleaner: "clean", virustotal: "scan",
-                                         taskmanager: "tasks", display: "monitors", packages: "updates", clipboard: "clip" })
+                                         display: "monitors", packages: "updates", clipboard: "clip" })
   function popupTarget(id) { return popupTargets[id] ?? id; }
   function openModule(id) {
     const target = popupTarget(id);

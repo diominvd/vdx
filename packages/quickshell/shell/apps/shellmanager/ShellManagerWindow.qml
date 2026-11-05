@@ -40,7 +40,7 @@ FloatingWindow {
   IpcHandler {
     target: "shell"
     function toggle(): void { ShellSettings.managerOpen = !ShellSettings.managerOpen; }
-    // `open <page>`, or `open <page>:<group or app>` (apps:taskmanager,
+    // `open <page>`, or `open <page>:<group or app>` (apps:cleaner,
     // bar:layout); the old page names still work
     function open(page: string): void {
       const [p, target] = page.split(":");

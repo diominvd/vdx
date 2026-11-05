@@ -90,7 +90,7 @@ uses tonal layers and more spacious controls.
   `Theme.settingsRowInset` (6 px); they are not header separator spacing.
 - Popup: `KitHeader` → `KitLine` → groups separated by `KitLine` → footer.
   No backgrounds under groups (Material: `KitFrame` draws its tonal sections itself).
-- Sidebar: an app window with several pages (Backups, Cleaner, Packages, Task Manager,
+- Sidebar: an app window with several pages (Backups, Cleaner, Packages,
   Files, Music) shows them in a sidebar, not as tabs in the header: `KitSidebar` (brand
   header, a line level with the page header's, rows of `KitSideRow`) at the left, the page
   at `side.right` with its own `KitHeader` (the page's icon and name). Rows are 4 px apart

@@ -1,17 +1,4 @@
 {
- "apps/taskmanager/TaskManagerSettings.qml": [
-  "confirm",
-  "group",
-  "kernel",
-  "onlyMine",
-  "refresh",
-  "sortBy"
- ],
- "apps/taskmanager/TaskManagerBarSettings.qml": [
-  "closeOnOpen",
-  "popupRows",
-  "text"
- ],
  "apps/cleaner/CleanerSettings.qml": [
   "ai",
   "confirm",
