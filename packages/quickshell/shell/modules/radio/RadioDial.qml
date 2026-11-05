@@ -1,6 +1,5 @@
 import QtQuick
 import qs.config
-import qs.kit
 
 // A tuning dial: a major tick for each station with minor ticks between, the
 // stations sliding under a fixed marker. Drag to tune (the station is switched

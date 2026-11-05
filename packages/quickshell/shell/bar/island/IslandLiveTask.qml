@@ -3,7 +3,6 @@ import qs.apps.auth
 import qs.apps.backup
 import qs.apps.capture
 import qs.apps.packages
-import qs.components
 import qs.config
 import qs.kit
 import qs.modules.equalizer

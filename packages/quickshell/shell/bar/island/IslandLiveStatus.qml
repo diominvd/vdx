@@ -1,5 +1,4 @@
 import QtQuick
-import qs.components
 import qs.config
 import qs.kit
 import qs.modules.battery

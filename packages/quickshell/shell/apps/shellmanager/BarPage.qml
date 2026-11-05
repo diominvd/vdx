@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import Quickshell
-import qs.apps.files
 import qs.bar
 import qs.config
 import qs.kit

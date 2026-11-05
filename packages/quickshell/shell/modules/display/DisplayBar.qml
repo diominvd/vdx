@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs.apps.display
 import qs.bar
-import qs.config
 import qs.kit
 
 // Bar module: the scale of this bar's monitor; the popup sets each monitor's

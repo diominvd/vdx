@@ -1,6 +1,4 @@
 import QtQuick
-import qs.components
-import qs.config
 import qs.kit
 
 // Wi-Fi popup: the overview, or a nested view (password) by WifiService.view.

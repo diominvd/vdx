@@ -1,7 +1,6 @@
 import QtQuick
 import qs.apps.shellmanager
 import qs.bar
-import qs.config
 import qs.kit
 
 // Bar module: light or dark. A click switches the theme to its twin

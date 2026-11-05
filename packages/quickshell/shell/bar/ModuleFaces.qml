@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs.config
 import qs.kit
-import qs.apps.shellmanager
 import qs.modules.ai
 import qs.modules.audio
 import qs.modules.battery

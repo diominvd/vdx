@@ -1,5 +1,4 @@
 import QtQuick
-import qs.config
 import qs.kit
 
 // Header of the password view: what it is about and a Back button to the list.

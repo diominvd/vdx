@@ -1,5 +1,4 @@
 import QtQuick
-import qs.apps.keybinds
 import qs.apps.lock
 import qs.config
 import qs.kit

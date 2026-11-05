@@ -8,7 +8,6 @@ import qs.apps.launcher
 import qs.components
 import qs.config
 import qs.kit
-import qs.modules.audio
 
 // The whole bar in the island style: one dark pill that morphs between
 // views. compact (LEFT · clock · RIGHT) is the resting face; hub (the

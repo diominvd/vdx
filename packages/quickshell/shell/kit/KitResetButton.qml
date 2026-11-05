@@ -1,5 +1,4 @@
 import QtQuick
-import qs.config
 
 // Reset in two steps: the first click asks ("Sure?", for 3 s), the second one
 // resets. Set `changed` (nothing to reset: disabled) and handle `reset`.

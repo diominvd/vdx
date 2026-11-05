@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell.Widgets
 import qs.config
-import qs.kit
 
 // A theme as a small desktop: a window with a sidebar, text and chips, drawn in
 // the theme's own colours over its picture when wallpapers are pictures. Laid

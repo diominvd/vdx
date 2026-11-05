@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs.apps.backup
 import qs.bar
-import qs.config
 import qs.kit
 
 // Bar module: the backups' icon; the popup shows when the last backup ran,

@@ -1,5 +1,4 @@
 import QtQuick
-import qs.bar
 import qs.config
 import qs.kit
 

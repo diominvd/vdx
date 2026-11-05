@@ -1,5 +1,4 @@
 import QtQuick
-import qs.config
 
 // Busy mark: a braille spinner, like a CLI progress indicator.
 KitText {

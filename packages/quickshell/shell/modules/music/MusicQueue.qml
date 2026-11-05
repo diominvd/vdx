@@ -1,5 +1,4 @@
 import QtQuick
-import qs.components
 import qs.config
 import qs.modules.mpd
 import qs.modules.player

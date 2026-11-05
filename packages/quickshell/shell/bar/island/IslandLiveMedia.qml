@@ -3,9 +3,7 @@ import Quickshell.Widgets
 import qs.config
 import qs.kit
 import qs.modules.equalizer
-import qs.modules.mpd
 import qs.modules.player
-import qs.modules.radio
 
 Row {
   id: face

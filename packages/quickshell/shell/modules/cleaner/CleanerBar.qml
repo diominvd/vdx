@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs.apps.cleaner
 import qs.bar
-import qs.config
 import qs.kit
 
 // Bar module: the cleaner's icon; the popup shows what can go and cleans the

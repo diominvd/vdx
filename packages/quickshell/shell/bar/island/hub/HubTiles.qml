@@ -2,7 +2,6 @@ import QtQuick
 import qs.apps.shellmanager
 import qs.bar
 import qs.config
-import qs.kit
 import qs.modules.bluetooth
 import qs.modules.focus
 import qs.modules.mihomo
