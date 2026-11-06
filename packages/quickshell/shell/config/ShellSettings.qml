@@ -63,6 +63,7 @@ Singleton {
   // inside its section (the priority), how long a flash stays
   readonly property int liveNoticeMs: look("liveNoticeMs", "island")  // a notification's line stays this long (0: until read)
   readonly property int liveFlashMs: look("liveFlashMs", "island")          // a flash stays this long
+  readonly property bool liveRecordingButtons: look("liveRecordingButtons", "island")  // pause and stop on the Recording activity (and on the hub card)
   readonly property bool liveFocusClick: look("liveFocusClick", "island")  // a click on the Focus activity ends the mode
   readonly property bool liveFront: look("liveFront", "island")    // an activity that starts takes the pill
   readonly property string liveMore: look("liveMore", "island")      // count | dots: how the other activities show
@@ -111,7 +112,7 @@ Singleton {
     liveEnabled: true, liveBattery: true, liveBluetooth: true,
     liveRecording: true, liveUpdate: true, liveBackup: true, liveTimer: true, liveRadio: true, liveRadioPaused: true, liveRadioAlways: false, liveMedia: true, liveMediaPaused: false, liveMediaCover: true, liveVpn: false, liveVpnServer: true, liveVpnPing: true, liveTrackTitle: true, liveTrackArtist: true, liveTrackDuration: false, liveFocus: true, liveMusic: true, liveMusicPaused: false, liveMusicCover: true, liveMusicAlways: false, liveNoticeMark: "avatar", liveMore: "count", liveDotsAt: "left",
     liveVolume: true, liveMic: true, liveLayout: true, livePlugged: true,
-    liveFront: true, liveFocusClick: true, liveFlashMs: 1500, liveNoticeMs: 5000, liveWheel: true, liveWheelDelayMs: 0, liveRightSettings: true,
+    liveFront: true, liveFocusClick: true, liveRecordingButtons: true, liveFlashMs: 1500, liveNoticeMs: 5000, liveWheel: true, liveWheelDelayMs: 0, liveRightSettings: true,
     liveBatteryBelow: 20, liveBatteryStay: "fixed", liveOrder: ({}) })
   // animations (Shell Manager › Animations; Motion reads them)
   readonly property bool motion: state.motion                     // all of them on / off

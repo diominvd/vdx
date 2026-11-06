@@ -27,15 +27,6 @@ Column {
     }
   }
   KitRow {
-    visible: root.block === "activities"
-    label: "Buttons"
-    hint: "Pause and stop on a single card"
-    KitSwitch {
-      checked: ModuleSettings.get("hub", "activitiesButtons", true)
-      onToggled: ModuleSettings.set("hub", "activitiesButtons", !checked)
-    }
-  }
-  KitRow {
     visible: root.block === "tiles"
     wide: true
     label: "Tiles per row"

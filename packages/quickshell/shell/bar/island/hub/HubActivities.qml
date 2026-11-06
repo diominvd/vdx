@@ -7,10 +7,13 @@ import qs.bar
 import qs.bar.island
 import qs.config
 import qs.kit
+import qs.modules.focus
+import qs.modules.mihomo
 import qs.modules.timer
 
-// What runs in the background, as cards under the clock: the tasks of the live activities
-// (recording, update, backup, timer), the most urgent first. One card is wide and keeps its
+// What runs in the background, as cards under the clock: the held live activities (Bar › Live:
+// recording, update, backup, timer, VPN, Focus), in their order and on their switches. The
+// players are the player card's. One card is wide and keeps its
 // buttons; two or more share a row, each a ring, a label and one number; what does not fit
 // the `max` goes to one "+N more" line. A click opens the module the island would open.
 // Options (Bar › Hub › Blocks › Activities): Most cards, Buttons. The hub builds it only while
@@ -18,17 +21,17 @@ import qs.modules.timer
 Column {
   id: root
 
-  // the tasks the hub lists: the transient ones (a mic flash, the layout, a plugged cable) and
-  // the players (the player card is theirs) stay with the island
-  readonly property var kinds: ["recording", "update", "backup", "timer"]
+  // the held activities except the players (the player card is theirs); the asks and the flashes
+  // (a message, the battery, a mic flash, a plugged cable) stay with the island
+  readonly property var kinds: ShellSettings.liveSections.held.filter(k => k !== "radio" && k !== "music" && k !== "media")
   readonly property var running: IslandService.activities.filter(k => kinds.includes(k))
   readonly property int most: ModuleSettings.get("hub", "activitiesMost", 2)
-  readonly property bool buttons: ModuleSettings.get("hub", "activitiesButtons", true)
+  readonly property bool buttons: ShellSettings.liveRecordingButtons     // Bar › Live › Recording: the island's and the hub's
   readonly property var shown: running.slice(0, most)
   readonly property var rest: running.slice(most)
   readonly property int columns: shown.length > 1 ? 2 : 1
 
-  function label(kind) { return ({ recording: "Recording", update: "Packages", backup: "Backup", timer: "Timer" })[kind]; }
+  function label(kind) { return ({ recording: "Recording", update: "Packages", backup: "Backup", timer: "Timer", vpn: "VPN", focus: "Focus" })[kind]; }
 
   // what a card shows: the label, the number, its unit, how full the ring is (-1: no ring) and the tint
   function spec(kind) {
@@ -51,6 +54,11 @@ Column {
                value: state === "" ? String(Math.max(0, Math.round(BackupService.progress))) : "", unit: state === "" ? "%" : "",
                fraction: state === "" ? BackupService.progress / 100 : -1, tint: state === "error" ? Theme.red : Theme.green };
     }
+    case "vpn":
+      return { label: MihomoService.current !== "" ? MihomoService.current : "VPN", value: MihomoService.currentDelay > 0 ? String(MihomoService.currentDelay) : "On",
+               unit: MihomoService.currentDelay > 0 ? "ms" : "", fraction: -1, tint: Theme.green };
+    case "focus":
+      return { label: "Do not disturb", value: "On", unit: "", fraction: -1, tint: Theme.purple };
     case "timer":
       return { label: TimerService.label !== "" ? TimerService.label : TimerService.title + (TimerService.paused ? " · paused" : ""),
                value: TimerService.text, unit: "", fraction: TimerService.kind === "countdown" ? 1 - TimerService.progress : -1,
@@ -58,7 +66,7 @@ Column {
     }
     return { label: kind, value: "", unit: "", fraction: -1, tint: Theme.gray };
   }
-  function icon(kind) { return ({ recording: "camera", update: "download", backup: "history", timer: "clock" })[kind]; }
+  function icon(kind) { return ({ recording: "camera", update: "download", backup: "history", timer: "clock", vpn: "public", focus: "moon" })[kind]; }
   function open(kind) { BarLayout.openModule(IslandService.liveTarget[kind]); }
 
   width: parent ? parent.width : 0
@@ -77,8 +85,8 @@ Column {
         required property string modelData
         readonly property var info: root.spec(modelData)
         readonly property bool wide: root.columns === 1
-        // buttons only on a wide card: recording (pause, stop) and the timer (pause)
-        readonly property bool hasButtons: wide && root.buttons && (modelData === "timer" || modelData === "recording" && CaptureService.recording)
+        // buttons only on a wide card: the recording's (pause, stop; Bar › Live › Recording) and the timer's (pause)
+        readonly property bool hasButtons: wide && (modelData === "timer" || modelData === "recording" && root.buttons && CaptureService.recording)
 
         width: (parent.width - (root.columns - 1) * parent.spacing) / root.columns
         height: wide ? 60 : 52

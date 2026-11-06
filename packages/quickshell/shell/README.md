@@ -167,7 +167,7 @@ size, gap, separators and hub opening.
   follows its switch there; a new notification as a live line instead is the
   Messages activity (Live activities › Asks).
 - **The hub** opens from the clock on a hover or a click (Hub › Opens on). Under the
-  clock and day it holds blocks — Activities (what runs now: recording, update, backup, timer; none running, no block; Hub › Blocks › Activities: Most cards, Buttons), Toggles (tiles), Calendar (week or month), Sliders,
+  clock and day it holds blocks — Activities (what runs now: the held live activities, in their order and on their switches — recording, update, backup, timer, VPN, Focus; recording buttons: Bar › Live › Recording; none running, no block; Hub › Blocks › Activities: Most cards), Toggles (tiles), Calendar (week or month), Sliders,
   Player (card or compact), Module chips — in the order and with the visibility set in
   Hub › Blocks (`config/HubBlocks.qml`): the date, settings and power, the week (a click opens the month), the **tiles** (their own zone of Bar › Layout, "Hub tiles":
   the modules that can be one — Wi-Fi, Bluetooth, VPN, Focus, Timer, Dark mode — two or four to a row, Bar › Hub ›

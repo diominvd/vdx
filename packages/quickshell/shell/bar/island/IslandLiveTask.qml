@@ -44,7 +44,7 @@ Row {
   }
   // buttons, the chip's height less its inset and concentric with it: pause (dim) and stop (red)
   Repeater {
-    model: face.kind === "recording" && CaptureService.recording ? [{ stop: false }, { stop: true }] : []
+    model: face.kind === "recording" && CaptureService.recording && ShellSettings.liveRecordingButtons ? [{ stop: false }, { stop: true }] : []
     Rectangle {
       id: btn
       required property var modelData

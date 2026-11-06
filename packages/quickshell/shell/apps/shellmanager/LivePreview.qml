@@ -125,7 +125,7 @@ Item {
       Wave { visible: root.kind === "recording"; tone: Theme.red; levels: root.wave() }
       // the round buttons of the live face: pause (dim) and stop (red)
       Repeater {
-        model: root.kind === "recording" ? [{ stop: false }, { stop: true }] : []
+        model: root.kind === "recording" && ShellSettings.liveRecordingButtons ? [{ stop: false }, { stop: true }] : []
         Rectangle {
           required property var modelData
           anchors.verticalCenter: parent.verticalCenter

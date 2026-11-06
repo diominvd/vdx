@@ -98,21 +98,8 @@ Row {
     }
   }
 
-  // timer: the ring of what is left (a stopwatch: the clock), the time
-  LiveGlyph {
-    corner: face.badgeRadius
-    visible: face.kind === "timer" && TimerService.kind === "countdown"
-    size: face.coverSize
-    tint: Theme.orange
-    opacity: TimerService.paused ? 0.5 : 1
-    TimerRing {
-      anchors.centerIn: parent
-      width: parent.width - 6; height: width
-      progress: TimerService.progress
-      tint: Theme.orange
-    }
-  }
-  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "timer" && TimerService.kind === "stopwatch"; size: face.coverSize; name: "clock"; tint: Theme.orange }
+  // timer: the clock glyph (the ring of what is left is the hub card's), the time
+  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "timer"; size: face.coverSize; name: "clock"; tint: Theme.orange; opacity: TimerService.paused ? 0.5 : 1 }
   KitText { visible: face.kind === "timer" && Theme.material; anchors.verticalCenter: parent.verticalCenter; text: TimerService.title; color: Theme.foreground1; font.weight: Font.Medium }
   LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "timer"; text: TimerService.text; tint: Theme.orange; opacity: TimerService.paused ? 0.5 : 1 }
 

@@ -47,7 +47,7 @@ Item {
 
   // a block is there when it has something to show
   function wants(id) {
-    return id === "activities" ? IslandService.activities.some(k => ["recording", "update", "backup", "timer"].includes(k)) : id === "tiles" ? tileIds.length > 0 : id === "player" ? hasPlayer : id === "night" ? !ModuleSettings.get("hub", "nightAuto", true) || BrightnessService.nightActive
+    return id === "activities" ? IslandService.activities.some(k => ShellSettings.liveSections.held.includes(k) && k !== "radio" && k !== "music" && k !== "media") : id === "tiles" ? tileIds.length > 0 : id === "player" ? hasPlayer : id === "night" ? !ModuleSettings.get("hub", "nightAuto", true) || BrightnessService.nightActive
          : id === "modules" ? ids.length > 0 : true;
   }
   // Material: the quick sliders next to each other share one tonal section

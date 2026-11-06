@@ -16,7 +16,7 @@ Column {
   onShownChanged: if (shown) built = true
 
   // what a kind has to set: the rows below read this to know whether to offer the opening
-  readonly property bool any: kind === "notice" || kind === "battery" || kind === "vpn" || kind === "music" || kind === "media" || kind === "radio" || kind === "focus"
+  readonly property bool any: kind === "notice" || kind === "battery" || kind === "vpn" || kind === "music" || kind === "media" || kind === "radio" || kind === "focus" || kind === "recording"
 
   width: parent ? parent.width : 0
   height: opts.item ? opts.item.implicitHeight : 0
@@ -173,6 +173,13 @@ Column {
       label: "Show duration"
       hint: "The track's length"
       KitSwitch { checked: ShellSettings.liveTrackDuration; onToggled: ShellSettings.setLook("liveTrackDuration", !checked, "island") }
+    }
+
+    KitRow {
+      visible: root.kind === "recording"
+      label: "Control buttons"
+      hint: "Pause and stop on the activity"
+      KitSwitch { checked: ShellSettings.liveRecordingButtons; onToggled: ShellSettings.setLook("liveRecordingButtons", !checked, "island") }
     }
 
     KitRow {
