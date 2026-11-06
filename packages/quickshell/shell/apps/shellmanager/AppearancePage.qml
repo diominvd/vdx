@@ -44,6 +44,10 @@ KitSettingsWorkspace {
         visible: root.tab === "style"
         KitLabel { text: "STYLE" }
         StyleCards { width: parent.width }
+        KitLabel { text: "SHAPE"; about: "What the two samples above redraw" }
+        CornersSection { width: parent.width }
+        KitLine {}
+        KitLabel { text: "CONTROLS" }
         KitRow {
           visible: !ShellSettings.material
           label: "Slider style"
@@ -59,9 +63,6 @@ KitSettingsWorkspace {
           wide: true; label: "Input text"; hint: "Where text stands in a field; Auto: left"
           KitSegments { model: [{ label: "Auto", value: "auto" }, { label: "Left", value: "left" }, { label: "Centre", value: "center" }]; current: ShellSettings.inputAlign; onPicked: value => ShellSettings.set("inputAlign", value) }
         }
-        KitLine {}
-        KitLabel { text: "SHAPE" }
-        CornersSection { width: parent.width }
         KitGrouper {}
       }
       AccentSection { width: parent.width; visible: root.tab === "accent" }

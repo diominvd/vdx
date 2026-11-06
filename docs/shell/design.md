@@ -18,9 +18,12 @@ uses tonal layers and more spacious controls.
   resting island); all 0 when sharp. One slider (R) sets them all in proportion:
   surface R, card 0.6 R, a thing h high h × R / 48 (pills only at the top stop;
   Material: card R, h × R / 24, see Controls).
-  Separately: a slider per part (windows, cards, controls, the bar, the hub), each R read the
+  Set each part (a fold row, its hint the px one R makes of each part): a slider per part
+  (windows, cards, controls, the bar, the hub), each R read the
   same way (`Theme.cornerOf(part)`), so one tick looks alike on every part; the
-  one slider hides while they show.
+  one slider hides while they show. Interface reads top down: Style (two miniature
+  desktops, each in its own style over the real shape), Shape, Controls (slider style, input text).
+  A settings page's scroll ends a window padding above the window's edge (`KitSettingsWorkspace`).
   No literal `height / 2` for a corner.
   An image in a rounded tile sits in a `ClippingRectangle`.
 - Controls: Appearance › Style (Strict | Material, a select). A control's frame is

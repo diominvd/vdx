@@ -49,26 +49,57 @@ KitColumn {
     }
   }
 
-  KitRow {
-    visible: root.round
-    label: "Set each part"
-    hint: "A slider per part"
+  // the parts, each with the px its R makes (the cards' and the previews' numbers)
+  readonly property var parts: [
+    { part: "windows",  label: "Windows and popups", short: "Windows",  px: r => r },
+    { part: "cards",    label: "Cards and boxes",    short: "Cards",    px: r => Math.round(r * (Theme.material ? 1 : 0.6)) },
+    { part: "controls", label: "Controls",           short: "Controls", px: r => Theme.scaled(Theme.controlHeight, r * Theme.softness) },
+    { part: "bar",      label: "Bar",                short: "Bar",      px: r => Theme.scaled(Theme.islandHeight, r) },
+    { part: "hub",      label: "Hub",                short: "Hub",      px: r => Math.round(r * 1.5) }
+  ]
 
-    KitSwitch {
-      checked: ShellSettings.cornerSplit
-      onToggled: ShellSettings.set("cornerSplit", !ShellSettings.cornerSplit)
+  // the row unfolds the slider per part under it; folded, its hint is what one radius makes of each part
+  Item {
+    id: splitRow
+    visible: root.round
+    width: parent.width
+    implicitHeight: splitInner.implicitHeight
+
+    Rectangle {
+      anchors { fill: parent; leftMargin: -Theme.groupInset; rightMargin: -Theme.groupInset; topMargin: -Theme.settingsRowInset; bottomMargin: -Theme.settingsRowInset }
+      radius: Theme.radiusCard
+      color: splitArea.containsMouse ? Theme.background2 : Theme.clear
+      Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
     }
+    KitRow {
+      id: splitInner
+      anchors.verticalCenter: parent.verticalCenter
+      width: parent.width
+      label: "Set each part"
+      hint: ShellSettings.cornerSplit ? "Each part has its own radius"
+                                      : root.parts.map(p => p.short + " " + p.px(ShellSettings.cornerRadius)).join(" · ")
+      KitIcon {
+        name: "chevron-down"
+        rotation: ShellSettings.cornerSplit ? 0 : -90
+        tint: Theme.foreground2
+        size: Theme.fontSize + 1
+        Behavior on rotation { enabled: Motion.controls; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
+      }
+    }
+    MouseArea {
+      id: splitArea
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      onClicked: ShellSettings.set("cornerSplit", !ShellSettings.cornerSplit)
+    }
+    Accessible.role: Accessible.Button
+    Accessible.name: "Set each part"
   }
 
   // a part on its own: the same tick looks the same on every part (the px differ)
   Repeater {
-    model: [
-      { part: "windows",  label: "Windows and popups", px: r => r },
-      { part: "cards",    label: "Cards and boxes",    px: r => Math.round(r * (Theme.material ? 1 : 0.6)) },
-      { part: "controls", label: "Controls",           px: r => Theme.scaled(Theme.controlHeight, r * Theme.softness) },
-      { part: "bar",      label: "Bar",                px: r => Theme.scaled(Theme.islandHeight, r) },
-      { part: "hub",      label: "Hub",                px: r => Math.round(r * 1.5) }
-    ]
+    model: root.parts
 
     KitSliderRow {
       id: part

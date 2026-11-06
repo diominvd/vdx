@@ -18,15 +18,21 @@
   "target": "appearance:shape"
  },
  {
+  "label": "Controls",
+  "hint": "",
+  "where": "Interface",
+  "target": "appearance"
+ },
+ {
   "label": "Slider style",
   "hint": "",
-  "where": "Interface › STYLE",
+  "where": "Interface › CONTROLS",
   "target": "appearance"
  },
  {
   "label": "Input text",
   "hint": "Where text stands in a field; Auto: left",
-  "where": "Interface › STYLE",
+  "where": "Interface › CONTROLS",
   "target": "appearance"
  },
  {
@@ -1290,12 +1296,6 @@
   "target": "appearance:shape"
  },
  {
-  "label": "Set each part",
-  "hint": "A slider per part",
-  "where": "Interface",
-  "target": "appearance:shape"
- },
- {
   "label": "Windows and popups",
   "hint": "",
   "where": "Interface",
@@ -1321,6 +1321,12 @@
  },
  {
   "label": "Hub",
+  "hint": "",
+  "where": "Interface",
+  "target": "appearance:shape"
+ },
+ {
+  "label": "Set each part",
   "hint": "",
   "where": "Interface",
   "target": "appearance:shape"
