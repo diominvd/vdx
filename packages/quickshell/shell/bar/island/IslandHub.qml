@@ -241,7 +241,7 @@ Item {
 
           KitText {
             width: parent.width
-            text: IslandService.title || "Nothing playing"
+            text: IslandService.title || "Not playing"
             textFormat: Text.PlainText
             font.weight: Font.Bold
             elide: Text.ElideRight

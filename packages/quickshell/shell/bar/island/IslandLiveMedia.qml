@@ -18,7 +18,7 @@ Row {
 
   // the parts Island › Live activities › Music (Media) chooses, joined by " · "
   readonly property string line: {
-    if (!player.hasMedia) return "Nothing playing";
+    if (!player.hasMedia) return "Not playing";
     const parts = [];
     if (ShellSettings.liveTrackTitle && player.title !== "") parts.push(player.title);
     if (ShellSettings.liveTrackArtist && player.artist !== "") parts.push(player.artist);

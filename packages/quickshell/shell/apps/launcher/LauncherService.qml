@@ -129,11 +129,11 @@ Singleton {
       && (term === "" || (m.label + " " + m.about).toLowerCase().includes(term)))
       .map(m => ({ icon: m.icon, title: m.label, hint: m.about || "Bar module", run: () => BarLayout.openModule(m.id) }));
     const items = root.filter(root.shellItems, term)
-      .concat(term === "" ? root.shellApps : root.apps(term), modules, root.shellSettings(term), root.filter(quickPower, term))
+      .concat(term === "" ? root.shellApps : root.apps(term), modules, root.shellSettings(term).slice(0, 6), root.filter(quickPower, term))
       .sort((a, b) => a.title.localeCompare(b.title));
     const seen = new Set();
     return items.filter(item => {
-      const key = (item.title + "|" + (item.hint ?? "")).toLowerCase();
+      const key = item.title.toLowerCase();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
