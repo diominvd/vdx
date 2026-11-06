@@ -47,7 +47,7 @@ Item {
 
   // a block is there when it has something to show
   function wants(id) {
-    return id === "tiles" ? tileIds.length > 0 : id === "player" ? hasPlayer : id === "night" ? !ModuleSettings.get("hub", "nightAuto", true) || BrightnessService.nightActive
+    return id === "activities" ? IslandService.activities.some(k => ["recording", "update", "backup", "timer"].includes(k)) : id === "tiles" ? tileIds.length > 0 : id === "player" ? hasPlayer : id === "night" ? !ModuleSettings.get("hub", "nightAuto", true) || BrightnessService.nightActive
          : id === "modules" ? ids.length > 0 : true;
   }
   // Material: the quick sliders next to each other share one tonal section
@@ -58,7 +58,7 @@ Item {
     return next !== undefined && sliderIds.indexOf(next) >= 0;
   }
   function blockOf(id) {
-    return ({ tiles: tilesBlock, week: weekBlock, player: playerBlock, volume: volumeBlock, microphone: microphoneBlock, brightness: brightnessBlock, night: nightBlock, dimming: dimmingBlock, modules: modulesBlock })[id] ?? null;
+    return ({ activities: activitiesBlock, tiles: tilesBlock, week: weekBlock, player: playerBlock, volume: volumeBlock, microphone: microphoneBlock, brightness: brightnessBlock, night: nightBlock, dimming: dimmingBlock, modules: modulesBlock })[id] ?? null;
   }
 
   // the month is a page of the hub: the island grows to it and back
@@ -195,6 +195,11 @@ Item {
       now: root.now
       embedded: true
     }
+  }
+
+  Component {
+    id: activitiesBlock
+    HubActivities { width: parent.width }
   }
 
   Component {

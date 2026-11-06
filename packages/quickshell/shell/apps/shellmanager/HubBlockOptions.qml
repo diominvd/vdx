@@ -10,11 +10,31 @@ Column {
   property string block: ""
   signal arrange()                              // the Hub row of Layout
 
-  readonly property bool any: ["tiles", "week", "player", "night", "modules"].indexOf(block) >= 0
+  readonly property bool any: ["activities", "tiles", "week", "player", "night", "modules"].indexOf(block) >= 0
 
   width: parent ? parent.width : 0
   spacing: Theme.settingsRowInset
 
+  KitRow {
+    visible: root.block === "activities"
+    wide: true
+    label: "Most cards"
+    hint: "The rest go to one line"
+    KitSegments {
+      model: [{ label: "2", value: 2 }, { label: "4", value: 4 }]
+      current: ModuleSettings.get("hub", "activitiesMost", 2)
+      onPicked: value => ModuleSettings.set("hub", "activitiesMost", value)
+    }
+  }
+  KitRow {
+    visible: root.block === "activities"
+    label: "Buttons"
+    hint: "Pause and stop on a single card"
+    KitSwitch {
+      checked: ModuleSettings.get("hub", "activitiesButtons", true)
+      onToggled: ModuleSettings.set("hub", "activitiesButtons", !checked)
+    }
+  }
   KitRow {
     visible: root.block === "tiles"
     wide: true
