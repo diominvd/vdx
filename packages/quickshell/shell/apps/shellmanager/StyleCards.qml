@@ -6,15 +6,15 @@ import qs.kit
 // Interface › Style: the two styles as cards, each a miniature desktop drawn in its own
 // way — the island, a window (sidebar, a card of rows, buttons) and a toast, text as grey
 // skeleton lines — at 0.6 of the real size, with the real corners (Shape), slider style
-// and input text; the one in use has a check. Under the name: the real corner px.
+// and input text; the one in use has a check.
 Item {
   id: root
 
   property bool kitUnboxed: true               // the cards stand on the page, not in the section's box
   readonly property int spacing: Theme.gapMedium
 
-  // the gap under the cards is the one between two sections of a page
-  implicitHeight: cards.height + Theme.gapGroup
+  // the gap under the cards: the group's own spacing, as under any other item that stands on the page
+  implicitHeight: cards.height
 
   readonly property var styles: [
     { value: false, name: "Strict", hint: "Clean outlines, compact controls" },
@@ -256,67 +256,63 @@ Item {
                 }
               }
 
-              // buttons
-              Row {
-                anchors.right: parent.right
-                spacing: 6
-                Repeater {
-                  model: 2
+              // buttons, and a toast at the other end
+              Item {
+                width: parent.width
+                height: card.ctlMini + 4
+                Row {
+                  anchors.verticalCenter: parent.verticalCenter
+                  spacing: 6
+                  Repeater {
+                    model: 2
+                    Rectangle {
+                      required property int index
+                      width: 42; height: card.ctlMini
+                      radius: card.ctlR
+                      color: index === 1 ? (card.m3 ? Theme.primary : Theme.foreground0) : card.m3 ? card.plate : Theme.clear
+                      border.width: index === 0 && !card.m3 ? Theme.hairline : 0
+                      border.color: card.line
+                      Skel { anchors.centerIn: parent; width: 18; color: index === 1 ? card.ink : Theme.foreground0 }
+                    }
+                  }
+                }
+                Rectangle {
+                  anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+                  width: 96; height: parent.height
+                  radius: card.winR
+                  color: Theme.groupFill
+                  border.width: Theme.hairline
+                  border.color: card.line
                   Rectangle {
-                    required property int index
-                    width: 42; height: card.ctlMini
-                    radius: card.ctlR
-                    color: index === 1 ? (card.m3 ? Theme.primary : Theme.foreground0) : card.m3 ? card.plate : Theme.clear
-                    border.width: index === 0 && !card.m3 ? Theme.hairline : 0
-                    border.color: card.line
-                    Skel { anchors.centerIn: parent; width: 18; color: index === 1 ? card.ink : Theme.foreground0 }
+                    id: toastIcon
+                    anchors { left: parent.left; leftMargin: 6; verticalCenter: parent.verticalCenter }
+                    width: 12; height: 12
+                    radius: Math.min(6, Math.round(Theme.cornerOf("hub") * 1.5 * card.k))
+                    color: card.m3 ? Theme.primary : Theme.foreground0
+                  }
+                  Column {
+                    anchors { left: toastIcon.right; leftMargin: 6; verticalCenter: parent.verticalCenter }
+                    spacing: 3
+                    Skel { width: 40; height: 3; color: Theme.foreground2 }
+                    Skel { width: 28 }
                   }
                 }
               }
             }
           }
-
-          // the toast, over the window's corner
-          Rectangle {
-            anchors { right: parent.right; bottom: parent.bottom; rightMargin: 18; bottomMargin: 16 }
-            width: 110; height: 38
-            radius: card.winR
-            color: Theme.groupFill
-            border.width: Theme.hairline
-            border.color: card.line
-            Rectangle {
-              id: toastIcon
-              anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
-              width: 18; height: 18
-              radius: Math.min(9, Math.round(Theme.cornerOf("hub") * 1.5 * card.k))
-              color: card.m3 ? Theme.primary : Theme.foreground0
-            }
-            Column {
-              anchors { left: toastIcon.right; leftMargin: 8; verticalCenter: parent.verticalCenter }
-              spacing: 4
-              Skel { width: 46; height: 4; color: Theme.foreground2 }
-              Skel { width: 32 }
-            }
-          }
         }
 
-        // ---- name, hint, the real corners ----
+        // ---- name and hint ----
         Item {
           id: footer
           anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-          height: 62
+          height: 44
 
           Column {
             anchors { left: parent.left; leftMargin: Theme.gapLoose; right: mark.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
             spacing: Theme.gapHair
             KitText { width: parent.width; elide: Text.ElideRight; text: card.modelData.name; color: card.picked ? Theme.foreground0 : Theme.foreground2; font.weight: card.picked ? Theme.pickWeight : Font.Normal }
             KitText { width: parent.width; elide: Text.ElideRight; text: card.modelData.hint; color: Theme.muted; font.pixelSize: Theme.fontSize - 1 }
-            KitText {
-              width: parent.width; elide: Text.ElideRight
-              text: "WINDOW " + card.winPx + " · CARD " + card.cardPx + " · CONTROL " + card.ctlPx
-              color: Theme.muted
-              font.pixelSize: Theme.sectionCaptionSize
-            }
           }
 
           Item {
