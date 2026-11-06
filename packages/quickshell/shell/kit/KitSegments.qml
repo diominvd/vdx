@@ -5,7 +5,7 @@ import qs.config
 // A segmented control: one track, a segment per choice; the one matching
 // `current` is raised (filled, bold), the rest are plain text. Model:
 // [{label, value}]. Takes the width it is given (KitRow wide); a segment is as wide as its label, the spare width shared evenly.
-// Strict: a quiet outlined track, the picked segment a filled plate inset in it that glides to the next one picked.
+// Strict: a quiet outlined track, the picked segment a rounded plate inset 4 px in it (corners nested in the track's) that glides to the next one picked.
 // Material (Appearance › Controls): Material 3's connected button group — a pill
 // per choice, 2 px apart with barely rounded inner corners, the picked one filled (Theme.primary).
 Rectangle {
@@ -79,7 +79,9 @@ Rectangle {
   onActiveFocusChanged: if (!activeFocus && Window.active) byMouse = false     // the window losing focus keeps it
 
   readonly property bool m3: Theme.material
-  readonly property int inset: m3 ? 0 : 3
+  readonly property int inset: m3 ? 0 : 4
+  // Strict: the plate and each segment's hover round with the track's inside (nested radii)
+  readonly property int innerRadius: Math.max(0, radius - inset)
 
   implicitWidth: Theme.controlWidth
   implicitHeight: Theme.controlHeight
@@ -111,6 +113,7 @@ Rectangle {
       x: root.widths.slice(0, Math.max(0, at)).reduce((a, b) => a + b, 0)
       width: root.widths[at] ?? 0
       height: parent.height
+      radius: root.innerRadius
       color: Theme.pickFill
       Behavior on x { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
       Behavior on width { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
@@ -135,14 +138,14 @@ Rectangle {
 
           width: root.widths[index] ?? 0
           height: segments.height
-          // Strict: only the enclosing track rounds the outside corners; shared edges stay
-          // straight. Material: each is a pill, its inner corners barely rounded
+          // Strict: each segment rounds like the plate (its hover is a plate too).
+          // Material: each is a pill, its inner corners barely rounded
           readonly property bool first: index === 0
           readonly property bool last: index === root.model.length - 1
-          radius: 0
-          topLeftRadius: root.m3 ? (first ? root.radius : Theme.radiusJoin) : 0
+          radius: root.m3 ? 0 : root.innerRadius
+          topLeftRadius: root.m3 ? (first ? root.radius : Theme.radiusJoin) : root.innerRadius
           bottomLeftRadius: topLeftRadius
-          topRightRadius: root.m3 ? (last ? root.radius : Theme.radiusJoin) : 0
+          topRightRadius: root.m3 ? (last ? root.radius : Theme.radiusJoin) : root.innerRadius
           bottomRightRadius: topRightRadius
           color: !root.m3 ? (hovered ? Theme.controlHover : Theme.clear)
                : selected ? Theme.primary : hovered ? Theme.hoverOn(root.boxed) : Theme.fillOn(root.boxed)

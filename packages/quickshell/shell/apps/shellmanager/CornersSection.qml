@@ -35,17 +35,39 @@ KitColumn {
   function pos(px) { return Math.max(0, stops.indexOf(px)) / (stops.length - 1); }
   function px(p) { return stops[Math.round(p * (stops.length - 1))]; }
 
-  // the one slider: every part; hidden with Separately (turning it off brings this one back)
-  KitSliderRow {
-    id: radius
-    visible: root.round && !ShellSettings.cornerSplit
-    label: "Radius"
-    snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
-    value: root.pos(ShellSettings.cornerRadius)
-    text: root.px(radius.pressed ? radius.dragValue : radius.value) + " px"
-    onMoved: value => {
-      const px = root.px(value);
-      if (px !== ShellSettings.cornerRadius) ShellSettings.set("cornerRadius", px);
+  // a block that folds: its height glides with `open`, the content clipped and faded. It leaves the
+  // layout (and its gap) only once folded; while it glides it carries the gap itself, so nothing jumps
+  component Fold: Item {
+    id: fold
+    property bool open: false
+    default property alias content: inner.data
+    property real p: open ? 1 : 0
+    Behavior on p { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
+    visible: p > 0
+    width: parent.width
+    height: p * (inner.childrenRect.height + root.spacing) - root.spacing
+    clip: true
+    Item {
+      id: inner
+      width: parent.width
+      height: childrenRect.height
+      opacity: fold.p
+    }
+  }
+
+  // the one slider: every part; folded with Separately (turning it off brings this one back)
+  Fold {
+    open: root.round && !ShellSettings.cornerSplit
+    KitSliderRow {
+      id: radius
+      label: "Radius"
+      snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
+      value: root.pos(ShellSettings.cornerRadius)
+      text: root.px(radius.pressed ? radius.dragValue : radius.value) + " px"
+      onMoved: value => {
+        const px = root.px(value);
+        if (px !== ShellSettings.cornerRadius) ShellSettings.set("cornerRadius", px);
+      }
     }
   }
 
@@ -98,21 +120,27 @@ KitColumn {
   }
 
   // a part on its own: the same tick looks the same on every part (the px differ)
-  Repeater {
-    model: root.parts
+  Fold {
+    open: root.round && ShellSettings.cornerSplit
+    Column {
+      width: parent.width
+      spacing: root.spacing
+      Repeater {
+        model: root.parts
 
-    KitSliderRow {
-      id: part
-      required property var modelData
-      readonly property int r: ShellSettings.cornerRadii[modelData.part] ?? ShellSettings.cornerRadius
-      visible: root.round && ShellSettings.cornerSplit
-      label: modelData.label
-      snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
-      value: root.pos(r)
-      text: modelData.px(root.px(part.pressed ? part.dragValue : part.value)) + " px"
-      onMoved: value => {
-        const px = root.px(value);
-        if (px !== r) ShellSettings.set("cornerRadii", Object.assign({}, ShellSettings.cornerRadii, { [modelData.part]: px }));
+        KitSliderRow {
+          id: part
+          required property var modelData
+          readonly property int r: ShellSettings.cornerRadii[modelData.part] ?? ShellSettings.cornerRadius
+          label: modelData.label
+          snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
+          value: root.pos(r)
+          text: modelData.px(root.px(part.pressed ? part.dragValue : part.value)) + " px"
+          onMoved: value => {
+            const px = root.px(value);
+            if (px !== r) ShellSettings.set("cornerRadii", Object.assign({}, ShellSettings.cornerRadii, { [modelData.part]: px }));
+          }
+        }
       }
     }
   }

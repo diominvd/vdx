@@ -32,7 +32,7 @@ uses tonal layers and more spacious controls.
   `controlHover`, a popup's frame `Theme.popupFrame`. Never a literal 1.
   Picked (a choice, a segment, a nav row): `Theme.pickFill` + `Theme.pickWeight`.
   Strict: a Settings box is a raised card (`groupFill`, a faint `controlLineRest` frame) and the controls in it are plates one step above it (`fillOn(boxed)`, a faint 1 px frame); `KitSegments` is an outlined track
-  with the picked segment a plate inset 3 px, no check; `KitSwitch` off is an
+  with the picked segment a plate inset 4 px with nested rounded corners, no check; `KitSwitch` off is an
   outlined dark track with a grey knob, on a light track with a dark knob; a
   field has no prompt, a thin cursor, an optional `icon` (search); a Settings
   group's box is a raised card; a window's sidebar
