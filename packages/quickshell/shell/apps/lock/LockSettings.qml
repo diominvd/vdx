@@ -65,6 +65,8 @@ KitColumn {
 
   KitToggleRow { module: "lock"; key: "layout"; fallback: true; label: "Keyboard layout"; hint: "Beside the field, a click switches it" }
 
+  KitToggleRow { module: "lock"; key: "music"; fallback: true; label: "Now playing"; hint: "Above the power buttons" }
+
   KitToggleRow { module: "lock"; key: "power"; fallback: true; label: "Power buttons"; hint: "Suspend, reboot, shut down" }
 
   KitToggleRow { module: "lock"; key: "hideCursor"; fallback: true; label: "Hide cursor when idle"; hint: "Shows again when the mouse moves" }

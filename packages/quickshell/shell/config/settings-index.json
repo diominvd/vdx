@@ -1470,6 +1470,12 @@
   "target": "lockscreen"
  },
  {
+  "label": "Now playing",
+  "hint": "Above the power buttons",
+  "where": "Lock screen › ON SCREEN",
+  "target": "lockscreen"
+ },
+ {
   "label": "Power buttons",
   "hint": "Suspend, reboot, shut down",
   "where": "Lock screen › ON SCREEN",

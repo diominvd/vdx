@@ -155,6 +155,18 @@ Rectangle {
     }
   }
 
+  // ---- music ----
+  // while something plays, above the power buttons
+  LockMedia {
+    id: media
+    anchors { horizontalCenter: parent.horizontalCenter; bottom: powerRow.visible ? powerRow.top : parent.bottom
+              bottomMargin: powerRow.visible ? Theme.gapLoose : 48 }
+    z: 1
+    opacity: (root.main && root.opt("music", true) ? 1 : 0) * root.intro
+    enabled: opacity > 0
+    onReleased: field.input.forceActiveFocus()
+  }
+
   // ---- power ----
   // a button asks once: the second click within 3 s does it
   property string armed: ""
