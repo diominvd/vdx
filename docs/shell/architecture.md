@@ -84,6 +84,11 @@ adjusts that value. Night-light application coalesces updates until completion.
 Disabling its schedule resets boundary tracking so re-enabling evaluates the
 current window again, while manual overrides hold within an enabled window.
 
+Task Manager groups processes in a dictionary without a prototype: process
+names such as `constructor`, `toString` and `__proto__` remain ordinary keys.
+Descendant traversal tracks visited PIDs with a Set to handle cycles and
+avoid repeatedly scanning the accumulated result.
+
 Backend reply shapes are explicit: `kit/reply.js` parses objects with `parse`
 and arrays with `parseList`. Wi-Fi networks/DNS providers, Mihomo providers
 and nodes, MPD queues/radio stations, Claude sessions and notification lists

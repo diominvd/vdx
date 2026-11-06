@@ -45,7 +45,7 @@ Singleton {
 
   property bool popupOpen: false
   // others that want the full snapshot (GPU, network…) while they are open:
-  // hold() when shown, release() when gone (the bar's face)
+  // hold() when shown, release() when gone (the task manager)
   property int holders: 0
   readonly property bool full: popupOpen || holders > 0
   function hold() { holders++; sample(); }

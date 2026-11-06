@@ -16,7 +16,7 @@
 - **The shell** — a bar or a floating island, popups for every module, a hub,
   notifications, OSD, lock screen, a polkit prompt. Written in
   [Quickshell](https://quickshell.org), one process.
-- **Apps of its own** — Files, Music, Capture, Cleaner,
+- **Apps of its own** — Files, Music, Capture, Task Manager, Cleaner,
   Backups, Clipboard, Packages, VirusTotal, a launcher, a keybinds sheet,
   Overview, a window switcher. Same look, same keys.
 - **Shell Manager** — every option in one window (`Super + S`), with search:
@@ -72,6 +72,7 @@ Without the wizard: `./install.py components set <name>…`, then
 | `Super + Q` | terminal |
 | `Super + E` | Files |
 | `Super + Shift + S` | capture |
+| `Ctrl + Shift + Esc` | Task Manager |
 | `Super + Z` | lock |
 
 ## Commands

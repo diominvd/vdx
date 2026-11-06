@@ -18,6 +18,7 @@ import qs.apps.overview
 import qs.apps.shellmanager
 import qs.apps.themepicker
 import qs.apps.switcher
+import qs.apps.taskmanager
 import qs.bar
 import qs.bar.island
 import qs.components
@@ -33,6 +34,7 @@ Scope {
   }
 
   ShellManagerWindow {}
+  TaskManagerWindow {}
   CleanerWindow {}
   VirusTotalWindow {}
   PackagesWindow {}

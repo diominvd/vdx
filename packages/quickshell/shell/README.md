@@ -18,6 +18,7 @@ Registry: `apps/apps.json` (read by the Shell Manager, the launcher,
 | Files | Super+E | `files toggle\|open\|close`, `files go\|reveal\|inspect\|duplicates <path>`, `files choose <json>` |
 | Capture | Super+Shift+S | `capture open\|stop\|close\|library\|shot <region\|window\|screen>` |
 | Theme picker | Super+T | `themepicker toggle` |
+| Task Manager | Ctrl+Shift+Esc | `taskmanager toggle` |
 | Cleaner | Super+X | `cleaner toggle` |
 | Lock screen | Super+Z | `lock lock` |
 | Window switcher | Alt+Tab (floating mode) | `switcher toggle\|open\|close` |
@@ -128,12 +129,13 @@ Encrypted restic snapshots of home, `/etc` and the package list. The bar module
 ## Bar modules
 
 Each lives in `modules/<id>/`; its popup opens with
-`qs -c shell ipc call <id> toggle` (except clipboard `clip`, cleaner `clean`, virustotal `scan`, packages `updates`, music
+`qs -c shell ipc call <id> toggle` (except clipboard `clip`, taskmanager
+`tasks`, cleaner `clean`, virustotal `scan`, packages `updates`, music
 `player`: `music` is its window).
 
 Workspaces, Music, Themes, Tray, Mode, Wallpapers, Clock,
 Brightness, Audio, Wi-Fi, Bluetooth, Mihomo, Radio, Media, Timer, Battery, AI, Shell,
-Notifications, Capture, Clipboard, System, Cleaner, Backups,
+Notifications, Capture, Clipboard, System, Task Manager, Cleaner, Backups,
 VirusTotal, Packages, Display, Windows, Folder.
 
 - Order, zones and visibility: Shell Manager › Bar › Modules. Options:

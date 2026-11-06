@@ -26,6 +26,7 @@ hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("qs -c shell ipc call lock lid")
 -- shell
 bind("Shell", mainMod .. " + S", hl.dsp.exec_cmd("qs -c shell ipc call shell toggle"), "Shell Manager")
 bind("Shell", mainMod .. " + B", hl.dsp.exec_cmd("qs -c shell ipc call keybinds toggle"), "Keybinds")
+bind("Shell", "CTRL + SHIFT + Escape", hl.dsp.exec_cmd("qs -c shell ipc call taskmanager toggle"), "Task manager")
 bind("Shell", mainMod .. " + X", hl.dsp.exec_cmd("qs -c shell ipc call cleaner toggle"), "Cleaner")
 bind("Shell", mainMod .. " + T", hl.dsp.exec_cmd("qs -c shell ipc call themepicker toggle"), "Theme picker")
 bind("Shell", mainMod .. " + P", hl.dsp.exec_cmd("qs -c shell ipc call island power"), "Power menu")

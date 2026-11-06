@@ -2503,6 +2503,12 @@
   "target": "modules:sysmon"
  },
  {
+  "label": "Task Manager",
+  "hint": "Processes and resource usage",
+  "where": "Bar modules",
+  "target": "modules:taskmanager"
+ },
+ {
   "label": "Cleaner",
   "hint": "Free up disk space",
   "where": "Bar modules",
@@ -2776,6 +2782,84 @@
   "hint": "A theme and a wallpaper, previewed live",
   "where": "Apps",
   "target": "apps:themepicker"
+ },
+ {
+  "label": "Task Manager",
+  "hint": "Processes, CPU and memory, End / Kill",
+  "where": "Apps",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "List",
+  "hint": "",
+  "where": "Apps › Task Manager",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Safety",
+  "hint": "",
+  "where": "Apps › Task Manager",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Group by program",
+  "hint": "One row, its processes summed",
+  "where": "Apps › Task Manager › LIST",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Only my processes",
+  "hint": "Off: root's and the system's too",
+  "where": "Apps › Task Manager › LIST",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Kernel threads",
+  "hint": "Kworkers and the like",
+  "where": "Apps › Task Manager › LIST",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Sort by",
+  "hint": "Or click a column title",
+  "where": "Apps › Task Manager › LIST",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Refresh",
+  "hint": "While it is open",
+  "where": "Apps › Task Manager › LIST",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Ask before ending",
+  "hint": "End / Kill asks “Sure?” once",
+  "where": "Apps › Task Manager › SAFETY",
+  "target": "apps:taskmanager"
+ },
+ {
+  "label": "Bar",
+  "hint": "",
+  "where": "Bar modules › Task Manager",
+  "target": "modules:taskmanager"
+ },
+ {
+  "label": "Popup",
+  "hint": "",
+  "where": "Bar modules › Task Manager",
+  "target": "modules:taskmanager"
+ },
+ {
+  "label": "Programs shown",
+  "hint": "The rest in the window",
+  "where": "Bar modules › Task Manager › POPUP",
+  "target": "modules:taskmanager"
+ },
+ {
+  "label": "Close when its window opens",
+  "hint": "Off: popup stays open",
+  "where": "Bar modules › Task Manager › POPUP",
+  "target": "modules:taskmanager"
  },
  {
   "label": "Cleaner",

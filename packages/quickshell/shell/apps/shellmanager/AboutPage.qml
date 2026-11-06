@@ -193,7 +193,7 @@ Column {
         + "of parts, so a new one looks as if it was always there."
   }
   Paragraph {
-    text: "Apps of the shell — this Shell Manager, the Cleaner, the capture tool — are "
+    text: "Apps of the shell — this Shell Manager, the Task Manager, the Cleaner, the capture tool — are "
         + "windows of their own, opened by a key, set up here."
   }
 

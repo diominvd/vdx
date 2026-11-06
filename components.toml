@@ -57,7 +57,7 @@ pacman = ["quickshell", "pipewire-audio", "python-gobject", "xdg-desktop-portal"
           "dnsmasq", "iw"]
 links = ["quickshell", "xdg-portal"]
 modules = ["workspaces", "clock", "themes", "mode", "wallpapers", "brightness", "audio", "wifi", "bluetooth", "battery", "shell",
-           "notifications", "capture", "clipboard", "sysmon", "tray",
+           "notifications", "capture", "clipboard", "sysmon", "taskmanager", "tray",
            "display", "windows", "folder", "music", "focus", "timer", "media"]
 system = ["etc/polkit-1/rules.d/50-pkexec-keep.rules"]
 services = ["NetworkManager.service", "bluetooth.service"]

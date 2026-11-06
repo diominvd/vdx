@@ -23,7 +23,7 @@ Item {
   readonly property bool needsFull: showMemory || showTemp || showGpu || showNetwork
   readonly property int memPercent: SysmonService.mem.total > 0 ? Math.round(100 * SysmonService.memUsed / SysmonService.mem.total) : -1
 
-  // the full snapshot while one of them is on the bar
+  // the full snapshot while one of them is on the bar, as the task manager holds it
   property bool holding: false
   function syncHold() {
     if (needsFull === holding) return;
