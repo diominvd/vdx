@@ -73,7 +73,15 @@ Item {
     id: body
     x: root.lead
     anchors.verticalCenter: parent.verticalCenter
-    onLoaded: root.measure()
+    onLoaded: { root.measure(); Qt.callLater(root.measure); }
+    // a part comes or goes (the buttons of a recording, an avatar that loads) or takes its size after the
+    // first read: the two ends are read again
+    Connections {
+      target: body.item
+      ignoreUnknownSignals: true
+      function onChildrenChanged() { Qt.callLater(root.measure); }
+      function onImplicitWidthChanged() { Qt.callLater(root.measure); }
+    }
     sourceComponent: ({notice: c_notice, battery: c_battery, bluetooth: c_bluetooth, recording: c_recording, update: c_update, backup: c_backup, vpn: c_vpn, timer: c_timer, radio: c_radio, focus: c_focus, music: c_music, media: c_media, volume: c_volume, mic: c_mic, layout: c_layout, plugged: c_plugged})[root.kind] ?? null
   }
   }
