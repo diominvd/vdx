@@ -10,10 +10,10 @@ KitColumn {
   spacing: Theme.sectionGap
   readonly property var names: ["theme", "red", "orange", "yellow", "green", "aqua", "blue", "purple"]
   readonly property var targets: [
-    { value: "switches", label: "Switches", hint: "On switches" },
-    { value: "sliders", label: "Sliders", hint: "Filled track" },
-    { value: "choices", label: "Choices", hint: "Selected option" },
-    { value: "selects", label: "Dropdowns", hint: "Selected field" }
+    { value: "switches", sample: "switch", label: "Switches", hint: "On switches" },
+    { value: "sliders", sample: "slider", label: "Sliders", hint: "Filled track" },
+    { value: "choices", sample: "choices", label: "Choices", hint: "Selected option" },
+    { value: "selects", sample: "select", label: "Dropdowns", hint: "Selected field" }
   ]
   readonly property string selected: names.includes(ShellSettings.accentStops[0]) || ShellSettings.customColours.includes(ShellSettings.accentStops[0]) ? ShellSettings.accentStops[0] : "theme"
 
@@ -43,17 +43,32 @@ KitColumn {
   }
 
   KitLabel { text: "ACCENT TARGETS"; visible: ShellSettings.accent }
-  Repeater {
-    model: root.targets
-    delegate: KitRow {
-      required property var modelData
+  Item {
+    id: tiles
+    property bool kitUnboxed: true               // KitGrouper: stands on the page
+    visible: ShellSettings.accent
+    width: parent.width
+    height: visible ? grid.height : 0
+    readonly property int columns: width >= 560 ? 4 : 2
+
+    Grid {
+      id: grid
       width: parent.width
-      label: modelData.label
-      hint: modelData.hint
-      visible: ShellSettings.accent
-      KitSwitch {
-        checked: ShellSettings.accentWhere[modelData.value] === true
-        onToggled: root.setTarget(modelData.value, !checked)
+      columns: tiles.columns
+      spacing: Theme.gapMedium
+      readonly property real cell: (width - (tiles.columns - 1) * spacing) / tiles.columns
+
+      Repeater {
+        model: root.targets
+        delegate: KitTargetTile {
+          required property var modelData
+          width: grid.cell
+          sample: modelData.sample
+          label: modelData.label
+          hint: modelData.hint
+          checked: ShellSettings.accentWhere[modelData.value] === true
+          onToggled: root.setTarget(modelData.value, !checked)
+        }
       }
     }
   }

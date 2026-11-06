@@ -115,7 +115,8 @@ uses tonal layers and more spacious controls.
   edge under a label at the left reads as a diagonal. A hint adds something (effect, caveat,
   off-state) or is left out; it never repeats the label.
 - Control by the job: a feature on/off → `KitSwitch` (one row per item of a
-  set, under a caps label with the count: `APPLIES TO` `3 OF 7`). 2–5 named equal
+  set, under a caps label with the count: `APPLIES TO` `3 OF 7`); a few items whose
+  look is the point (the accent's targets) → `KitTargetTile`s, a live sample each. 2–5 named equal
   alternatives (24h | 12h too) → `KitChoices { stretch: true }` in `KitRow
   { wide: true }`. A size judged by eye with a live result (gaps, radius,
   shares, blur) → `KitSliderRow`, value on the right, snapped to its step.
