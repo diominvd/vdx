@@ -28,7 +28,7 @@ Row {
     radius: face.badgeRadius
     readonly property string liveEnd: "badge"      // IslandLiveFace.padFor
     readonly property color tone: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.appColour(IslandService.noticeItem?.app)
-    color: Theme.mix(Theme.background0, tone, 0.22)
+    color: Theme.tonalOn(tone, Theme.background1)
     readonly property string appIcon: Hypr.iconOfApp(IslandService.noticeItem?.desktop, IslandService.noticeItem?.app)
     // the app's own icon; an app with none gets its initial
     IconImage {

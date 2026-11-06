@@ -87,7 +87,7 @@ Item {
         visible: root.kind === "notice" && ShellSettings.liveNoticeMark === "avatar"
         anchors.verticalCenter: parent.verticalCenter
         width: 20; height: 20; radius: Theme.pill(width)
-        color: Theme.mix(Theme.background0, Theme.blue, 0.22)
+        color: Theme.tonalOn(Theme.blue, chip.color)
         KitText { anchors.centerIn: parent; text: "N"; color: Theme.blue; font.pixelSize: Theme.fontSize - 2; font.weight: Font.Medium }
       }
       Rectangle { visible: root.kind === "notice" && ShellSettings.liveNoticeMark === "dot"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.blue; }
@@ -99,9 +99,9 @@ Item {
     id: c_battery
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "battery-2"; tint: Theme.red }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "battery-2"; tint: Theme.red }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "Battery"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
-      LiveCap { text: "9%"; tint: Theme.red; size: root.coverSize; corner: root.badgeRadius; solid: true }
+      LiveCap { surface: chip.color; text: "9%"; tint: Theme.red; size: root.coverSize; corner: root.badgeRadius; solid: true }
     }
   }
 
@@ -109,9 +109,9 @@ Item {
     id: c_bluetooth
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "bluetooth"; tint: Theme.blue }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "bluetooth"; tint: Theme.blue }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "AirPods"; color: Theme.foreground1 }
-      LiveCap { text: "80%"; tint: Theme.blue; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
+      LiveCap { surface: chip.color; text: "80%"; tint: Theme.blue; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
     }
   }
 
@@ -149,7 +149,7 @@ Item {
     Row {
       spacing: Theme.gapMedium
       // updates
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "download"; tint: Theme.blue }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "download"; tint: Theme.blue }
       IslandLiveProgress { anchors.verticalCenter: parent.verticalCenter; value: 0.47; tint: Theme.blue }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "47%"; color: Theme.blue }
     }
@@ -160,7 +160,7 @@ Item {
     Row {
       spacing: Theme.gapMedium
       // backup
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "history"; tint: Theme.green }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "history"; tint: Theme.green }
       IslandLiveProgress { anchors.verticalCenter: parent.verticalCenter; value: 0.46; tint: Theme.green }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "46%"; color: Theme.foreground2 }
     }
@@ -170,9 +170,9 @@ Item {
     id: c_vpn
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "public"; tint: Theme.green }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "public"; tint: Theme.green }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: ShellSettings.liveVpnServer; text: "Finland"; color: Theme.material ? Theme.foreground1 : Theme.foreground2; font.weight: Theme.material ? Font.Medium : Font.Normal }
-      LiveCap { text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48 ms"; plainTint: Theme.muted; plainBold: false }
+      LiveCap { surface: chip.color; text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48 ms"; plainTint: Theme.muted; plainBold: false }
     }
   }
 
@@ -180,9 +180,9 @@ Item {
     id: c_timer
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "clock"; tint: Theme.orange }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "clock"; tint: Theme.orange }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: Theme.material; text: "Timer"; color: Theme.foreground1; font.weight: Font.Medium }
-      LiveCap { text: "13:12"; tint: Theme.orange; size: root.coverSize; corner: root.badgeRadius }
+      LiveCap { surface: chip.color; text: "13:12"; tint: Theme.orange; size: root.coverSize; corner: root.badgeRadius }
     }
   }
 
@@ -190,9 +190,9 @@ Item {
     id: c_radio
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "radio"; tint: Theme.yellow }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "radio"; tint: Theme.yellow }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "Station"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
-      LiveCap {
+      LiveCap { surface: chip.color;
         text: ""; tint: Theme.yellow; size: root.coverSize; corner: root.badgeRadius; width: Theme.material ? 40 : 0; visible: Theme.material
         Row { anchors.centerIn: parent; spacing: Theme.gapTight
           Repeater { model: [0.45, 1, 0.65, 0.85]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.yellow } } }
@@ -210,7 +210,7 @@ Item {
     id: c_focus
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "moon"; tint: Theme.purple }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "moon"; tint: Theme.purple }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: Theme.material ? "Focus on" : "Focus"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
     }
   }
@@ -224,7 +224,7 @@ Item {
         visible: ShellSettings.liveMusicCover
         anchors.verticalCenter: parent.verticalCenter
         readonly property string liveEnd: "badge"
-        width: root.coverSize; height: root.coverSize; radius: root.badgeRadius; color: Theme.background3
+        width: root.coverSize; height: root.coverSize; radius: root.badgeRadius; color: Theme.separated(Theme.background3, chip.color, 1.2)
         KitIcon { anchors.centerIn: parent; name: "music"; size: Math.round(root.coverSize * 0.55); tint: Theme.foreground2 }
       }
       KitText {
@@ -247,7 +247,7 @@ Item {
         visible: ShellSettings.liveMediaCover
         anchors.verticalCenter: parent.verticalCenter
         readonly property string liveEnd: "badge"
-        width: root.coverSize; height: root.coverSize; radius: root.badgeRadius; color: Theme.background3
+        width: root.coverSize; height: root.coverSize; radius: root.badgeRadius; color: Theme.separated(Theme.background3, chip.color, 1.2)
         KitIcon { anchors.centerIn: parent; name: "play"; size: Math.round(root.coverSize * 0.55); tint: Theme.foreground2 }
       }
       KitText {
@@ -265,7 +265,7 @@ Item {
     id: c_volume
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "volume"; tint: Theme.foreground2 }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "volume"; tint: Theme.foreground2 }
       Rectangle { visible: Theme.material; anchors.verticalCenter: parent.verticalCenter; width: 70; height: 6; radius: Theme.pill(height); color: Theme.background3
         Rectangle { width: parent.width * 0.62; height: parent.height; radius: parent.radius; color: Theme.foreground1 } }
       Row {
@@ -274,7 +274,7 @@ Item {
         spacing: 3
         Repeater { model: 14; Rectangle { required property int index; width: 2; height: 14; radius: Theme.pill(height); color: index < 9 ? Theme.foreground1 : Theme.background3 } }
       }
-      LiveCap { text: "62"; tint: Theme.foreground1; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
+      LiveCap { surface: chip.color; text: "62"; tint: Theme.foreground1; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
     }
   }
 
@@ -282,7 +282,7 @@ Item {
     id: c_mic
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "mic-off"; tint: Theme.red }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "mic-off"; tint: Theme.red }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "Muted"; color: Theme.foreground1 }
     }
   }
@@ -302,7 +302,7 @@ Item {
     id: c_plugged
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "zap"; tint: Theme.green }
+      LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "zap"; tint: Theme.green }
       Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 70; height: Theme.material ? 6 : 4; radius: Theme.pill(height); color: Theme.background3
         Rectangle { width: parent.width * 0.52; height: parent.height; radius: parent.radius; color: Theme.green } }
       KitText { anchors.verticalCenter: parent.verticalCenter; text: "52"; color: Theme.green }

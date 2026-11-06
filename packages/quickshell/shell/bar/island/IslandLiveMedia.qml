@@ -36,7 +36,7 @@ Row {
     width: face.coverSize
     height: face.coverSize
     radius: face.badgeRadius
-    color: Theme.background3
+    color: Theme.separated(Theme.background3, Theme.background1, 1.2)
     readonly property string liveEnd: "badge"      // IslandLiveFace.padFor
 
     Image {

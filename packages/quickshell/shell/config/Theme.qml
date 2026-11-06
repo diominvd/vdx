@@ -55,6 +55,9 @@ QtObject {
     }
     return to;
   }
+  // a tonal plate of a colour (a live activity's glyph, capsule, avatar) on the chip `on`: the
+  // tonal fill, kept apart from the chip so a grey tint does not melt into it
+  function tonalOn(c: color, on: color): color { return separated(tonal(c, 0.22), on, 1.2); }
   // c mixed toward foreground0 in 2 % steps until it has 4.5:1 on `on`
   function legible(c: color, on: color): color {
     const to = foreground0;

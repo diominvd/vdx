@@ -11,6 +11,7 @@ Rectangle {
   property string text: ""
   property color tint: Theme.foreground1
   property bool solid: false
+  property color surface: Theme.background1        // the chip it sits on
   property int size: 22
   property int corner: Theme.pill(height)          // the chip's less its inset: concentric (IslandLive.badgeRadius)
   // at a chip's end: a capsule sits the inset in, Strict's bare text as text (IslandLiveFace.padFor)
@@ -23,7 +24,7 @@ Rectangle {
   width: label.implicitWidth + (Theme.material ? Theme.gapLoose * 2 : 0)
   height: size
   radius: corner
-  color: !Theme.material ? "transparent" : solid ? tint : Theme.mix(Theme.background0, tint, 0.22)
+  color: !Theme.material ? "transparent" : solid ? tint : Theme.tonalOn(tint, surface)
 
   KitText {
     id: label
