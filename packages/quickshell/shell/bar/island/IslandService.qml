@@ -176,7 +176,10 @@ Singleton {
       const screens = Quickshell.screens.map(s => s.name).concat([""]);
       for (const screen of screens) {
         const view = views[screen] ?? { selected: "", manual: false };
-        if (!view.manual) { view.selected = kind; view.direction = 1; }
+        // over the others, even after a scroll: the wheel pages on from the new one
+        view.selected = kind;
+        view.manual = false;
+        view.direction = 1;
         views[screen] = view;
       }
       root.liveViews = views;

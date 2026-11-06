@@ -16,6 +16,19 @@ Row {
   spacing: Theme.gapMedium
   visible: kind !== ""
 
+  // the parts Island › Live activities › Music (Media) chooses, joined by " · "
+  readonly property string line: {
+    if (!player.hasMedia) return "Nothing playing";
+    const parts = [];
+    if (ShellSettings.liveTrackTitle && player.title !== "") parts.push(player.title);
+    if (ShellSettings.liveTrackArtist && player.artist !== "") parts.push(player.artist);
+    if (ShellSettings.liveTrackDuration && player.length > 0) {
+      const s = Math.floor(player.length);
+      parts.push(Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"));
+    }
+    return parts.join(" · ");
+  }
+
   // music and media: the cover, the track and the sound
   ClippingRectangle {
     visible: face.track && face.showCover
@@ -34,11 +47,11 @@ Row {
     }
   }
   KitText {
-    visible: face.track
+    visible: face.track && face.line !== ""
     anchors.verticalCenter: parent.verticalCenter
     width: Math.min(implicitWidth, 260)
     elide: Text.ElideRight
-    text: !face.player.hasMedia ? "Nothing playing" : face.player.title + (face.player.artist !== "" ? " · " + face.player.artist : "")
+    text: face.line
     color: Theme.foreground1
   }
   LiveBars {

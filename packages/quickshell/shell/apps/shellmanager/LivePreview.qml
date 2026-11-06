@@ -6,19 +6,17 @@ import qs.kit
 // A sample of one live activity as the island shows it: the island's surface,
 // frame and corners in the current theme, a fixed size so a list of them lines
 // up (Bar › Live), the sample centred in it. Sample data.
-Rectangle {
+Item {
   id: root
 
   property string kind: ""
+  // what the sample lies on (the row's fill): the chip keeps its distance from it in every theme
+  property color surface: Theme.sectionFill
 
-  implicitWidth: 190
+  // a slot of one width, so the names beside the samples line up; the chip is as wide as its content
+  implicitWidth: 230
   implicitHeight: Theme.islandHeight
-  radius: Math.min(Theme.barRadiusFor(height), Theme.islandRadius)
-  color: Theme.background0
-  border.width: Theme.islandFrameWidth
-  border.color: Theme.background2
   clip: true
-  // a sample is at most this wide: samples are short on purpose, a longer one is cut
 
   // the real chip's (IslandLive): its glyphs and capsules, concentric with it
   readonly property int chipRadius: Math.max(0, Math.min(Theme.barRadiusFor(Theme.islandHeight), Theme.islandRadius) - 4)
@@ -29,9 +27,55 @@ Rectangle {
 
   // only the sample of this kind is built: every row of the list has one, and each kind carries
   // its own shapes, so building all kinds in every row made the page lag
+  // the chip of the live slot: darker than the island, its sides padded as IslandLiveFace does
+  readonly property int capHeight: Math.round(Theme.fontSize * 0.73)
+  function padFor(end) {
+    if (!end) return 0;
+    const shape = end.liveEnd ?? (typeof end.text === "string" && end.font !== undefined ? "text" : "");
+    if (shape === "badge") return 3;
+    const ink = shape === "text" ? capHeight : end.height;
+    return Math.max(Math.round((chipHeight - ink) / 2), chipRadius);
+  }
+  property int lead: 0
+  property int trail: 0
+  function measure() {
+    const it = body.item;
+    let first = null, last = null;
+    if (it) for (const c of it.children) {
+      if (!c.visible || c.width <= 0) continue;
+      if (!first) first = c;
+      last = c;
+    }
+    lead = padFor(first);
+    trail = padFor(last);
+  }
+
+  readonly property int chipHeight: Theme.islandHeight - 8
+
+  component Wave: Row {
+    property color tone: Theme.green
+    property var levels: [0.45, 1, 0.65, 0.85]
+    anchors.verticalCenter: parent.verticalCenter
+    spacing: Theme.gapTight
+    Repeater { model: parent.levels; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 16 * modelData; radius: Theme.pill(height); color: parent.tone } }
+  }
+
+  Rectangle {
+    id: chip
+    anchors.verticalCenter: parent.verticalCenter
+    width: Math.min(root.width, body.width + root.lead + root.trail)
+    height: root.chipHeight
+    radius: root.chipRadius
+    color: Theme.separated(Theme.background1, root.surface, 1.25)      // the live slot's own fill in the bar, kept apart from the row
+    clip: true
+
   Loader {
-    anchors.centerIn: parent
+    id: body
+    x: root.lead
+    anchors.verticalCenter: parent.verticalCenter
+    onLoaded: root.measure()
     sourceComponent: ({notice: c_notice, battery: c_battery, bluetooth: c_bluetooth, recording: c_recording, update: c_update, backup: c_backup, vpn: c_vpn, timer: c_timer, radio: c_radio, focus: c_focus, music: c_music, media: c_media, volume: c_volume, mic: c_mic, layout: c_layout, plugged: c_plugged})[root.kind] ?? null
+  }
   }
 
   Component {
@@ -78,24 +122,20 @@ Rectangle {
       // recording
       Rectangle { visible: root.kind === "recording"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.red; }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "recording"; text: "00:03"; font.pixelSize: Theme.fontSize - 1 }
-      Row {
-        visible: root.kind === "recording"
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.gapTight
-        Repeater { model: root.wave(); Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.red; } }
-      }
+      Wave { visible: root.kind === "recording"; tone: Theme.red; levels: root.wave() }
       // the round buttons of the live face: pause (dim) and stop (red)
       Repeater {
         model: root.kind === "recording" ? [{ stop: false }, { stop: true }] : []
         Rectangle {
           required property var modelData
           anchors.verticalCenter: parent.verticalCenter
-          width: 18; height: 18; radius: Theme.pill(height)
+          readonly property string liveEnd: "badge"
+          width: root.coverSize; height: root.coverSize; radius: root.badgeRadius
           color: modelData.stop ? Theme.red : Theme.background3
           KitIcon {
             anchors.centerIn: parent
             name: parent.modelData.stop ? "square" : "pause"
-            size: 10
+            size: 12
             filled: true
             tint: parent.modelData.stop ? Theme.background0 : Theme.foreground1
           }
@@ -109,14 +149,9 @@ Rectangle {
     Row {
       spacing: Theme.gapMedium
       // updates
-      KitIcon { visible: root.kind === "update"; name: "download"; size: 12; tint: Theme.blue; anchors.verticalCenter: parent.verticalCenter }
-      Rectangle {
-        visible: root.kind === "update"
-        anchors.verticalCenter: parent.verticalCenter
-        width: 60; height: 3; radius: Theme.pill(height); color: Theme.background3
-        Rectangle { width: parent.width * 0.47; height: parent.height; radius: Theme.pill(height); color: Theme.blue; }
-      }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "update"; text: "47%"; color: Theme.blue; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "download"; tint: Theme.blue }
+      IslandLiveProgress { anchors.verticalCenter: parent.verticalCenter; value: 0.47; tint: Theme.blue }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "47%"; color: Theme.blue }
     }
   }
 
@@ -125,14 +160,9 @@ Rectangle {
     Row {
       spacing: Theme.gapMedium
       // backup
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "backup"; text: "BKP"; font.pixelSize: Theme.fontSize - 3; font.letterSpacing: 1 }
-      Rectangle {
-        visible: root.kind === "backup"
-        anchors.verticalCenter: parent.verticalCenter
-        width: 70; height: 3; radius: Theme.pill(height); color: Theme.background3
-        Rectangle { width: parent.width * 0.46; height: parent.height; radius: Theme.pill(height); color: Theme.green; }
-      }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "backup"; text: "1.2G"; color: Theme.foreground2; font.pixelSize: Theme.fontSize - 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "history"; tint: Theme.green }
+      IslandLiveProgress { anchors.verticalCenter: parent.verticalCenter; value: 0.46; tint: Theme.green }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "46%"; color: Theme.foreground2 }
     }
   }
 
@@ -140,10 +170,9 @@ Rectangle {
     id: c_vpn
     Row {
       spacing: Theme.gapMedium
-      LiveGlyph { visible: Theme.material; size: root.coverSize; corner: root.badgeRadius; name: "shield"; tint: Theme.green }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: !Theme.material; text: "VPN"; color: Theme.foreground1; font.letterSpacing: 1 }
+      LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "public"; tint: Theme.green }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: ShellSettings.liveVpnServer; text: "Finland"; color: Theme.material ? Theme.foreground1 : Theme.foreground2; font.weight: Theme.material ? Font.Medium : Font.Normal }
-      LiveCap { text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48"; plainTint: Theme.muted; plainBold: false }
+      LiveCap { text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48 ms"; plainTint: Theme.muted; plainBold: false }
     }
   }
 
@@ -162,7 +191,7 @@ Rectangle {
     Row {
       spacing: Theme.gapMedium
       LiveGlyph { size: root.coverSize; corner: root.badgeRadius; name: "radio"; tint: Theme.yellow }
-      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Love Radio"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Station"; color: Theme.foreground1; font.weight: Theme.material ? Font.Medium : Font.Normal }
       LiveCap {
         text: ""; tint: Theme.yellow; size: root.coverSize; corner: root.badgeRadius; width: Theme.material ? 40 : 0; visible: Theme.material
         Row { anchors.centerIn: parent; spacing: Theme.gapTight
@@ -190,16 +219,22 @@ Rectangle {
     id: c_music
     Row {
       spacing: Theme.gapMedium
-      // music: the cover, the name, the sound
-      Rectangle { visible: root.kind === "music" && ShellSettings.liveMusicCover; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
-        KitIcon { anchors.centerIn: parent; name: "music"; size: 9; tint: Theme.foreground2 } }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "music"; text: "Survivor"; font.pixelSize: Theme.fontSize - 1; width: Math.min(implicitWidth, 64); elide: Text.ElideRight }
-      Row {
-        visible: root.kind === "music"
+      // music: the cover, the parts Island › Live activities chooses, the sound
+      Rectangle {
+        visible: ShellSettings.liveMusicCover
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.gapTight
-        Repeater { model: [0.45, 1, 0.65, 0.85]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.green; } }
+        readonly property string liveEnd: "badge"
+        width: root.coverSize; height: root.coverSize; radius: root.badgeRadius; color: Theme.background3
+        KitIcon { anchors.centerIn: parent; name: "music"; size: Math.round(root.coverSize * 0.55); tint: Theme.foreground2 }
       }
+      KitText {
+        readonly property var parts: [ShellSettings.liveTrackTitle ? "Song" : "", ShellSettings.liveTrackArtist ? "Artist" : "", ShellSettings.liveTrackDuration ? "3:42" : ""].filter(t => t !== "")
+        visible: parts.length > 0
+        anchors.verticalCenter: parent.verticalCenter
+        text: parts.join(" · ")
+        color: Theme.foreground1
+      }
+      Wave { tone: Theme.green }
     }
   }
 
@@ -207,16 +242,22 @@ Rectangle {
     id: c_media
     Row {
       spacing: Theme.gapMedium
-      // media: another app's sound — the app's icon, the title, the sound
-      Rectangle { visible: root.kind === "media" && ShellSettings.liveMediaCover; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: Theme.pill(width); color: Theme.background3
-        KitIcon { anchors.centerIn: parent; name: "play"; size: 9; tint: Theme.foreground2 } }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "media"; text: "Lo-fi stream"; font.pixelSize: Theme.fontSize - 1; width: Math.min(implicitWidth, 80); elide: Text.ElideRight }
-      Row {
-        visible: root.kind === "media"
+      // media: the cover, the parts Island › Live activities chooses, the sound
+      Rectangle {
+        visible: ShellSettings.liveMediaCover
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.gapTight
-        Repeater { model: [0.8, 0.4, 1, 0.55]; Rectangle { required property real modelData; anchors.verticalCenter: parent.verticalCenter; width: 2; height: 14 * modelData; radius: Theme.pill(height); color: Theme.foreground2; } }
+        readonly property string liveEnd: "badge"
+        width: root.coverSize; height: root.coverSize; radius: root.badgeRadius; color: Theme.background3
+        KitIcon { anchors.centerIn: parent; name: "play"; size: Math.round(root.coverSize * 0.55); tint: Theme.foreground2 }
       }
+      KitText {
+        readonly property var parts: ["Video"].filter(t => t !== "")
+        visible: parts.length > 0
+        anchors.verticalCenter: parent.verticalCenter
+        text: parts.join(" · ")
+        color: Theme.foreground1
+      }
+      Wave { tone: Theme.foreground2 }
     }
   }
 

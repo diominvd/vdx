@@ -3,6 +3,7 @@ import qs.apps.auth
 import qs.bar
 import qs.components
 import qs.config
+import qs.kit
 import qs.modules.focus
 
 // The pill's live slot: the running activity (IslandService.live), only while
@@ -38,7 +39,10 @@ Item {
   readonly property Item sizedFace: sliding ? backFace : frontFace
   // the slot's width is moving: the island follows it as it goes, without a glide of its own
   readonly property bool moving: targetAnim.running
-  implicitWidth: kind === "" ? 0 : target
+  // the other activities that run besides the shown one: a "+3" plate after the chip
+  readonly property int others: kind === "" ? 0 : Math.max(0, IslandService.activities.length - 1)
+  readonly property int moreWidth: others > 0 ? Math.max(chipHeight, more.implicitWidth + 2 * Theme.gapLoose) : 0
+  implicitWidth: kind === "" ? 0 : target + (others > 0 ? edge + moreWidth : 0)
   implicitHeight: Theme.islandHeight
   width: implicitWidth
   height: implicitHeight
@@ -94,10 +98,35 @@ Item {
 
   Rectangle {
     anchors.verticalCenter: parent.verticalCenter
-    width: parent.width
+    width: root.target
     height: root.chipHeight
     radius: root.chipRadius
-    color: Theme.background2
+    color: Theme.background1
+  }
+
+  // a click pages to the next one, as the wheel does
+  Rectangle {
+    visible: root.others > 0
+    x: root.target + root.edge
+    anchors.verticalCenter: parent.verticalCenter
+    width: root.moreWidth
+    height: root.chipHeight
+    radius: root.chipRadius
+    color: Theme.background1
+
+    KitText {
+      id: more
+      anchors.centerIn: parent
+      text: "+" + root.others
+      color: Theme.muted
+      font.pixelSize: Theme.fontSize - 1
+    }
+
+    MouseArea {
+      anchors.fill: parent
+      cursorShape: Qt.PointingHandCursor
+      onClicked: IslandService.liveStep(1, root.screen)
+    }
   }
 
   IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; inputEnabled: !root.sliding && !root.moving }

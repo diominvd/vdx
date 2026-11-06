@@ -1715,6 +1715,12 @@
   "target": "live"
  },
  {
+  "label": "New one comes forward",
+  "hint": "A new activity takes the pill, then the wheel pages on",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
   "label": "Flash lasts",
   "hint": "",
   "where": "Live activities › BEHAVIOUR",
@@ -1729,12 +1735,6 @@
  {
   "label": "Scroll delay",
   "hint": "",
-  "where": "Live activities › BEHAVIOUR",
-  "target": "live"
- },
- {
-  "label": "New one comes forward",
-  "hint": "Unless you chose one by hand",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },

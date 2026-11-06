@@ -42,9 +42,11 @@ Column {
       checked: ShellSettings.liveKind(key)
       switchEnabled: missing === ""
       foldable: options.any && missing === ""
+      sunken: true
       leading: Component {
         LivePreview {
           kind: row.key
+          surface: row.unfolded ? Theme.foldHeader : Theme.sectionFill
           opacity: row.checked && ShellSettings.liveEnabled && row.missing === "" ? 1 : 0.45
         }
       }
@@ -52,7 +54,7 @@ Column {
         ? ModuleSettings.set("notifications", "appear", checked ? "card" : "live")
         : ShellSettings.setLook("live" + key.charAt(0).toUpperCase() + key.slice(1), !checked, "island")
 
-      LiveOptions { id: options; kind: row.key; shown: row.unfolded }
+      LiveOptions { id: options; kind: row.key; shown: row.unfolded; inset: row.indent + row.edge }
     }
   }
 

@@ -44,6 +44,17 @@ QtObject {
     const x = luminance(a), y = luminance(b);
     return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
   }
+  // a fill that sits on `on` and must stay apart from it: c as it is when it already has
+  // `min`:1 on `on`, else mixed toward foreground0 in 2 % steps (lighter on a dark theme, darker on a light one)
+  function separated(c: color, on: color, min: real): color {
+    if (contrast(c, on) >= min) return c;
+    const to = foreground0;
+    for (let t = 0.02; t < 1; t += 0.02) {
+      const m = Qt.rgba(c.r + (to.r - c.r) * t, c.g + (to.g - c.g) * t, c.b + (to.b - c.b) * t, 1);
+      if (contrast(m, on) >= min) return m;
+    }
+    return to;
+  }
   // c mixed toward foreground0 in 2 % steps until it has 4.5:1 on `on`
   function legible(c: color, on: color): color {
     const to = foreground0;
@@ -220,6 +231,10 @@ QtObject {
   readonly property int sectionMargin: popupPadding - sectionPad   // the popup's edge to a section's
   readonly property int radiusSection: Math.max(0, radiusPopup - sectionMargin)
   readonly property color sectionFill: surfaceContainer
+  // an unfolded row of a list (KitFoldRow sunken): its own line a clear step up from the box, its options a step down towards the page.
+  // Steps from the box, not fixed greys: they stay apart in every theme
+  readonly property color foldHeader: mix(sectionFill, foreground0, 0.06)
+  readonly property color foldBody: mix(background0, sectionFill, 0.35)
   // the filled colour of the main action, a picked segment, an on tile: the accent where
   // Choices takes it, else the theme's text colour (M3 primary)
   readonly property color primary: accentFor("choices", foreground0)

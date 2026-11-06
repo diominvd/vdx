@@ -22,6 +22,7 @@ Item {
   property bool draggable: true
   property bool hasSwitch: true               // false: a row that only unfolds (an arrow, no switch)
   property bool foldable: false
+  property bool sunken: false                  // the unfolded options on a darker plate, the full row wide (Live activities)
   property Component leading: null
   signal toggled()
 
@@ -55,10 +56,27 @@ Item {
   // the hairline between rows, in the middle of the gap above
   Rectangle {
     visible: root.list !== null && root.index > 0 && !root.dragging
+    x: -root.edge
     y: root.list ? -root.list.gap / 2 : 0
-    width: parent.width
+    width: root.fullWidth
     height: Theme.dividerThickness
     color: Theme.dividerColor
+  }
+
+  // sunken (the options of a row): the hairlines and the plates run the box's full width
+  readonly property real edge: sunken && list ? list.x : 0
+  readonly property real fullWidth: list && list.parent ? list.parent.width : width
+  // the unfolded row's own line is a shade lighter than a rest row
+  Rectangle {
+    visible: root.sunken && root.list !== null
+    x: -root.edge
+    y: root.list ? -root.list.gap / 2 : 0
+    z: -1
+    width: root.fullWidth
+    height: root.rowHeight + (root.list ? root.list.gap : 0)
+    color: Theme.foldHeader
+    opacity: root.unfolded ? 1 : 0
+    Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
   }
 
   // lifted while dragged: a raised, rounded plate under the row
@@ -170,12 +188,25 @@ Item {
     onToggled: root.toggled()
   }
 
+  // the nested options on a plate darker than the list, down to the next hairline
+  Rectangle {
+    visible: root.sunken && root.list !== null
+    x: -root.edge
+    y: root.rowHeight + root.bodyGap
+    z: -1
+    width: root.fullWidth
+    height: Math.max(0, root.height - y + (root.list ? root.list.gap / 2 : 0))
+    color: Theme.foldBody
+    opacity: root.unfolded ? 1 : 0
+    Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+  }
+
   // the options: a hairline, then the rows, clipped to the unfolding height. Below the last one
   // the list's own gap to the next hairline is all there is: the same inset as under the first line
   Item {
     id: fold
     readonly property real bodyHeight: body.implicitHeight
-    anchors { left: parent.left; leftMargin: root.indent; right: parent.right; top: parent.top; topMargin: root.rowHeight + root.bodyGap }
+    anchors { left: parent.left; leftMargin: root.sunken ? -root.edge : root.indent; right: parent.right; rightMargin: root.sunken ? -root.edge : 0; top: parent.top; topMargin: root.rowHeight + root.bodyGap }
     height: Math.max(0, root.height - root.rowHeight - root.bodyGap)
     clip: true
     opacity: root.unfolded ? 1 : 0
@@ -186,7 +217,7 @@ Item {
       width: parent.width
       spacing: Theme.settingsRowInset          // the box's own row rhythm: a gap each side of a hairline
       Rectangle { width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
-      Column { id: slot; width: parent.width; spacing: Theme.settingsRowInset }
+      Column { id: slot; width: parent.width; spacing: Theme.settingsRowInset }  // the options bring their own inset when sunken
     }
   }
 }

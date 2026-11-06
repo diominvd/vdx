@@ -94,7 +94,7 @@ Row {
   }
 
   // update: the download's progress, else what runs
-  KitIcon { visible: face.kind === "update"; name: "download"; tint: Theme.blue; size: 16; anchors.verticalCenter: parent.verticalCenter }
+  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "update"; size: face.coverSize; name: "download"; tint: Theme.blue }
   readonly property bool updateDone: face.kind === "update" && !PackagesService.busy && !RootService.running && PackagesService.status !== ""
   readonly property bool updateBar: face.kind === "update" && PackagesService.stage === "downloading"
   IslandLiveProgress {
@@ -103,7 +103,7 @@ Row {
     value: PackagesService.stagePercent
     tint: Theme.blue
   }
-  KitText { visible: face.updateBar; anchors.verticalCenter: parent.verticalCenter; width: 34; horizontalAlignment: Text.AlignRight; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
+  KitText { visible: face.updateBar; anchors.verticalCenter: parent.verticalCenter; text: Math.round(PackagesService.stagePercent * 100) + "%"; color: Theme.blue }
   KitText {
     visible: face.kind === "update" && !face.updateBar
     anchors.verticalCenter: parent.verticalCenter
@@ -115,7 +115,7 @@ Row {
   }
 
   // backup: BKP and its progress
-  KitText { visible: face.kind === "backup"; anchors.verticalCenter: parent.verticalCenter; text: "BKP"; color: Theme.foreground1; font.letterSpacing: 1 }
+  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "backup"; size: face.coverSize; name: "history"; tint: Theme.green }
   IslandLiveProgress {
     visible: face.kind === "backup" && BackupService.status === ""
     anchors.verticalCenter: parent.verticalCenter
@@ -126,8 +126,6 @@ Row {
   KitText {
     visible: face.kind === "backup"
     anchors.verticalCenter: parent.verticalCenter
-    width: BackupService.status === "" ? 34 : 50
-    horizontalAlignment: Text.AlignRight   // fixed width against jitter; the ink keeps to the chip's side
     text: BackupService.status === "error" ? "Failed" : BackupService.status === "ok" ? "Done" : Math.max(0, Math.round(BackupService.progress)) + "%"
     color: BackupService.status === "error" ? Theme.red : BackupService.status === "ok" ? Theme.green : Theme.foreground2
   }

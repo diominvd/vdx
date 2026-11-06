@@ -43,6 +43,9 @@ uses tonal layers and more spacious controls.
   `radiusSection`, `sectionFill`, `primary`, `tonal(c, t)`, `radiusJoin`, `softness`).
   Material rounds controls, tracks and chips twice as fast (`Theme.softness`: pills
   from R 12) and cards take R itself (Strict 0.6 R); sharp stays sharp.
+  An unfolded list row (`KitFoldRow` `sunken`: Live activities) stands out of its box by
+  `Theme.foldHeader` (a step up from `sectionFill`) and sinks its options to `Theme.foldBody`
+  (a step towards the page): both are steps from the box, so they stay apart in every theme.
   A popup is one soft surface (`radiusPopup`, 1.5 × the windows' R; Hyprland's
   rounding keeps `radiusSurface`). `KitFrame` turns the runs between its `KitLine`s
   into tonal sections (`sectionFill`, `radiusSection`, concentric with the popup), the

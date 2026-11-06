@@ -39,8 +39,7 @@ Row {
   LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "bluetooth" && BluetoothService.mainDevice?.battery != null; text: BluetoothService.mainDevice?.battery + "%"; tint: Theme.blue; plainBold: false }
 
   // vpn: the server and the ping
-  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "vpn" && Theme.material; size: face.coverSize; name: "shield"; tint: Theme.green }
-  KitText { visible: face.kind === "vpn" && !Theme.material; anchors.verticalCenter: parent.verticalCenter; text: "VPN"; color: Theme.foreground1; font.letterSpacing: 1 }
+  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "vpn"; size: face.coverSize; name: "public"; tint: Theme.green }
   KitText {
     visible: face.kind === "vpn" && ShellSettings.liveVpnServer
     anchors.verticalCenter: parent.verticalCenter
@@ -50,7 +49,7 @@ Row {
     width: Math.min(implicitWidth, 110)
     elide: Text.ElideRight
   }
-  LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "vpn" && MihomoService.currentDelay > 0; text: MihomoService.currentDelay + " ms"; tint: Theme.green; plainText: String(MihomoService.currentDelay); plainTint: Theme.muted; plainBold: false }
+  LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "vpn" && MihomoService.currentDelay > 0; text: MihomoService.currentDelay + " ms"; tint: Theme.green; plainText: MihomoService.currentDelay + " ms"; plainTint: Theme.muted; plainBold: false }
 
   // radio: the station on air, the sound
   LiveGlyph { corner: face.badgeRadius; visible: face.kind === "radio" && Theme.material; size: face.coverSize; name: "radio"; tint: Theme.yellow; opacity: RadioService.active && MpdService.playing ? 1 : 0.5 }

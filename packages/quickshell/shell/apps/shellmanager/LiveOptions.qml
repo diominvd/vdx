@@ -9,13 +9,14 @@ Column {
   id: root
 
   property string kind: ""
+  property int inset: 0                       // the options start this far in; the hairlines run the full width
   property bool shown: false                  // the row is unfolded: the options are built on the first time
 
   property bool built: false
   onShownChanged: if (shown) built = true
 
   // what a kind has to set: the rows below read this to know whether to offer the opening
-  readonly property bool any: kind === "notice" || kind === "battery" || kind === "music" || kind === "media" || kind === "radio" || kind === "focus"
+  readonly property bool any: kind === "notice" || kind === "battery" || kind === "vpn" || kind === "music" || kind === "media" || kind === "radio" || kind === "focus"
 
   width: parent ? parent.width : 0
   height: opts.item ? opts.item.implicitHeight : 0
@@ -25,8 +26,16 @@ Column {
 
   Component {
     id: rows
-    Column {
+    // a plain Item: the Loader sizes its item to its own width, which would undo the Column's inset
+    Item {
       width: root.width
+      implicitHeight: col.implicitHeight
+      height: implicitHeight
+
+    Column {
+      id: col
+      x: root.inset
+      width: parent.width - root.inset - Theme.gapLoose
       spacing: Theme.settingsRowInset          // the box's own row rhythm: a gap each side of a hairline
 
     KitRow {
@@ -41,7 +50,7 @@ Column {
       }
     }
 
-    Rectangle { visible: root.kind === "notice"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+    Rectangle { visible: root.kind === "notice"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
     KitRow {
       visible: root.kind === "notice"
@@ -68,7 +77,7 @@ Column {
     }
 
     // a hairline parts the options when a kind has several
-    Rectangle { visible: root.kind === "battery"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+    Rectangle { visible: root.kind === "battery"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
     KitRow {
       visible: root.kind === "battery"
@@ -84,12 +93,21 @@ Column {
 
     KitRow {
       visible: root.kind === "music"
+      label: "Always show"
+      hint: "Stays in the slot with no player running"
+      KitSwitch { checked: ShellSettings.liveMusicAlways; onToggled: ShellSettings.setLook("liveMusicAlways", !checked, "island") }
+    }
+
+    Rectangle { visible: root.kind === "music"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+    KitRow {
+      visible: root.kind === "music"
       label: "Show on pause"
       hint: "The track stays in the slot while paused"
       KitSwitch { checked: ShellSettings.liveMusicPaused; onToggled: ShellSettings.setLook("liveMusicPaused", !checked, "island") }
     }
 
-    Rectangle { visible: root.kind === "music"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+    Rectangle { visible: root.kind === "music"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
     KitRow {
       visible: root.kind === "music"
@@ -105,7 +123,7 @@ Column {
       KitSwitch { checked: ShellSettings.liveMediaPaused; onToggled: ShellSettings.setLook("liveMediaPaused", !checked, "island") }
     }
 
-    Rectangle { visible: root.kind === "media"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+    Rectangle { visible: root.kind === "media"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
     KitRow {
       visible: root.kind === "media"
@@ -119,6 +137,33 @@ Column {
       label: "Show server name"
       hint: "The server's name in the live activity"
       KitSwitch { checked: ShellSettings.liveVpnServer; onToggled: ShellSettings.setLook("liveVpnServer", !checked, "island") }
+    }
+
+    Rectangle { visible: root.kind === "music" || root.kind === "media"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+    KitRow {
+      visible: root.kind === "music" || root.kind === "media"
+      label: "Show title"
+      hint: "The track's name"
+      KitSwitch { checked: ShellSettings.liveTrackTitle; onToggled: ShellSettings.setLook("liveTrackTitle", !checked, "island") }
+    }
+
+    Rectangle { visible: root.kind === "music" || root.kind === "media"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+    KitRow {
+      visible: root.kind === "music" || root.kind === "media"
+      label: "Show artist"
+      hint: "Who plays it"
+      KitSwitch { checked: ShellSettings.liveTrackArtist; onToggled: ShellSettings.setLook("liveTrackArtist", !checked, "island") }
+    }
+
+    Rectangle { visible: root.kind === "music" || root.kind === "media"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+    KitRow {
+      visible: root.kind === "music" || root.kind === "media"
+      label: "Show duration"
+      hint: "The track's length"
+      KitSwitch { checked: ShellSettings.liveTrackDuration; onToggled: ShellSettings.setLook("liveTrackDuration", !checked, "island") }
     }
 
     KitRow {
@@ -135,7 +180,7 @@ Column {
       KitSwitch { checked: ShellSettings.liveRadioPaused; onToggled: ShellSettings.setLook("liveRadioPaused", !checked, "island") }
     }
 
-    Rectangle { visible: root.kind === "radio"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+    Rectangle { visible: root.kind === "radio"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
     KitRow {
       visible: root.kind === "radio"
@@ -144,13 +189,6 @@ Column {
       KitSwitch { checked: ShellSettings.liveRadioAlways; onToggled: ShellSettings.setLook("liveRadioAlways", !checked, "island") }
     }
 
-    Rectangle { visible: root.kind === "music"; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
-
-    KitRow {
-      visible: root.kind === "music"
-      label: "Always show"
-      hint: "Stays in the slot with no player running"
-      KitSwitch { checked: ShellSettings.liveMusicAlways; onToggled: ShellSettings.setLook("liveMusicAlways", !checked, "island") }
     }
     }
   }

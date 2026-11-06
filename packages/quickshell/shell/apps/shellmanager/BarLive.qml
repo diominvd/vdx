@@ -83,6 +83,11 @@ Column {
 
     KitLabel { text: "BEHAVIOUR" }
 
+    KitRow {
+      label: "New one comes forward"
+      hint: "A new activity takes the pill, then the wheel pages on"
+      KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
+    }
     KitSliderRow {
       label: "Flash lasts"
       snaps: [0, 1/6, 2/6, 3/6, 4/6, 5/6, 1]
@@ -102,11 +107,6 @@ Column {
       value: ShellSettings.liveWheelDelayMs / 500
       text: ShellSettings.liveWheelDelayMs === 0 ? "Off" : ShellSettings.liveWheelDelayMs + " ms"
       onMoved: value => ShellSettings.setLook("liveWheelDelayMs", Math.round(value * 10) * 50, "island")
-    }
-    KitRow {
-      label: "New one comes forward"
-      hint: "Unless you chose one by hand"
-      KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
     }
     KitRow {
       label: "Right click opens options"
