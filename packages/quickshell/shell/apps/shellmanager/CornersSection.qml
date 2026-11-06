@@ -35,39 +35,20 @@ KitColumn {
   function pos(px) { return Math.max(0, stops.indexOf(px)) / (stops.length - 1); }
   function px(p) { return stops[Math.round(p * (stops.length - 1))]; }
 
-  // a block that folds: its height glides with `open`, the content clipped and faded. It leaves the
-  // layout (and its gap) only once folded; while it glides it carries the gap itself, so nothing jumps
-  component Fold: Item {
-    id: fold
-    property bool open: false
-    default property alias content: inner.data
-    property real p: open ? 1 : 0
-    Behavior on p { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
-    visible: p > 0
-    width: parent.width
-    height: p * (inner.childrenRect.height + root.spacing) - root.spacing
-    clip: true
-    Item {
-      id: inner
-      width: parent.width
-      height: childrenRect.height
-      opacity: fold.p
-    }
-  }
-
-  // the one slider: every part; folded with Separately (turning it off brings this one back)
-  Fold {
-    open: root.round && !ShellSettings.cornerSplit
-    KitSliderRow {
-      id: radius
-      label: "Radius"
-      snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
-      value: root.pos(ShellSettings.cornerRadius)
-      text: root.px(radius.pressed ? radius.dragValue : radius.value) + " px"
-      onMoved: value => {
-        const px = root.px(value);
-        if (px !== ShellSettings.cornerRadius) ShellSettings.set("cornerRadius", px);
-      }
+  // the one slider: every part; while each part has its own it stands dimmed (turning Separately off brings it back)
+  KitSliderRow {
+    id: radius
+    visible: root.round
+    enabled: !ShellSettings.cornerSplit
+    opacity: ShellSettings.cornerSplit ? 0.4 : 1
+    Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
+    label: "Radius"
+    snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
+    value: root.pos(ShellSettings.cornerRadius)
+    text: root.px(radius.pressed ? radius.dragValue : radius.value) + " px"
+    onMoved: value => {
+      const px = root.px(value);
+      if (px !== ShellSettings.cornerRadius) ShellSettings.set("cornerRadius", px);
     }
   }
 
@@ -80,65 +61,68 @@ KitColumn {
     { part: "hub",      label: "Hub",                short: "Hub",      px: r => Math.round(r * 1.5) }
   ]
 
-  // the row unfolds the slider per part under it; folded, its hint is what one radius makes of each part
-  Item {
-    id: splitRow
+  // the row unfolds a slider per part under it: a Live activity's dropdown (KitReorderList of one
+  // KitFoldRow); folded, its hint is what one radius makes of each part
+  KitReorderList {
+    id: partsList
     visible: root.round
-    width: parent.width
-    implicitHeight: splitInner.implicitHeight
+    boxTop: false
+    rowHeight: Theme.rowHeight
 
-    Rectangle {
-      anchors { fill: parent; leftMargin: -Theme.groupInset; rightMargin: -Theme.groupInset; topMargin: -Theme.settingsRowInset; bottomMargin: -Theme.settingsRowInset }
-      radius: Theme.radiusCard
-      color: splitArea.containsMouse ? Theme.background2 : Theme.clear
-      Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
+    keys: ["parts"]
+    onOpenChanged: {
+      const on = open === "parts";
+      if (on !== ShellSettings.cornerSplit) ShellSettings.set("cornerSplit", on);
     }
-    KitRow {
-      id: splitInner
-      anchors.verticalCenter: parent.verticalCenter
-      width: parent.width
+    Component.onCompleted: open = ShellSettings.cornerSplit ? "parts" : ""
+    Connections {
+      target: ShellSettings
+      function onCornerSplitChanged() { partsList.open = ShellSettings.cornerSplit ? "parts" : ""; }
+    }
+
+    delegate: KitFoldRow {
+      id: row
       label: "Set each part"
       hint: ShellSettings.cornerSplit ? "Each part has its own radius"
                                       : root.parts.map(p => p.short + " " + p.px(ShellSettings.cornerRadius)).join(" · ")
-      KitIcon {
-        name: "chevron-down"
-        rotation: ShellSettings.cornerSplit ? 0 : -90
-        tint: Theme.foreground2
-        size: Theme.fontSize + 1
-        Behavior on rotation { enabled: Motion.controls; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
-      }
-    }
-    MouseArea {
-      id: splitArea
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onClicked: ShellSettings.set("cornerSplit", !ShellSettings.cornerSplit)
-    }
-    Accessible.role: Accessible.Button
-    Accessible.name: "Set each part"
-  }
+      checked: true
+      hasSwitch: false
+      draggable: false
+      flush: true
+      foldable: true
+      sunken: true
 
-  // a part on its own: the same tick looks the same on every part (the px differ)
-  Fold {
-    open: root.round && ShellSettings.cornerSplit
-    Column {
-      width: parent.width
-      spacing: root.spacing
-      Repeater {
-        model: root.parts
+      Column {
+        id: opts
+        width: parent ? parent.width : 0
+        spacing: Theme.settingsRowInset
 
-        KitSliderRow {
-          id: part
-          required property var modelData
-          readonly property int r: ShellSettings.cornerRadii[modelData.part] ?? ShellSettings.cornerRadius
-          label: modelData.label
-          snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
-          value: root.pos(r)
-          text: modelData.px(root.px(part.pressed ? part.dragValue : part.value)) + " px"
-          onMoved: value => {
-            const px = root.px(value);
-            if (px !== r) ShellSettings.set("cornerRadii", Object.assign({}, ShellSettings.cornerRadii, { [modelData.part]: px }));
+        Repeater {
+          model: root.parts
+
+          Column {
+            id: part
+            required property var modelData
+            required property int index
+            readonly property int r: ShellSettings.cornerRadii[modelData.part] ?? ShellSettings.cornerRadius
+            width: opts.width
+            spacing: Theme.settingsRowInset
+
+            Rectangle { visible: part.index > 0; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+            KitSliderRow {
+              id: slider
+              x: row.indent + row.edge
+              width: parent.width - 2 * x
+              rowStyle: true
+              label: part.modelData.label
+              snaps: root.stops.map((s, i) => i / (root.stops.length - 1))
+              value: root.pos(part.r)
+              text: part.modelData.px(root.px(slider.pressed ? slider.dragValue : slider.value)) + " px"
+              onMoved: value => {
+                const px = root.px(value);
+                if (px !== part.r) ShellSettings.set("cornerRadii", Object.assign({}, ShellSettings.cornerRadii, { [part.modelData.part]: px }));
+              }
+            }
           }
         }
       }

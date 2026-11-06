@@ -74,6 +74,8 @@ Item {
     z: -1
     width: root.fullWidth
     height: root.rowHeight + (root.list ? root.list.gap : 0)
+    topLeftRadius: root.list && root.list.boxTop && root.index === 0 ? Theme.radiusCard : 0
+    topRightRadius: topLeftRadius
     color: Theme.foldHeader
     opacity: root.unfolded ? 1 : 0
     Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
@@ -145,7 +147,7 @@ Item {
     spacing: Theme.gapTight
     opacity: root.checked || root.tag !== "" ? 1 : 0.5
     KitText { width: parent.width; text: root.label; elide: Text.ElideRight }
-    KitText { width: parent.width; visible: root.hint !== ""; text: root.hint; color: Theme.muted; font.pixelSize: Theme.fontSize - 1; elide: Text.ElideRight }
+    KitText { width: parent.width; visible: root.hint !== ""; text: root.hint; color: Theme.hint; font.pixelSize: Theme.fontSize - 1; elide: Text.ElideRight }
   }
 
   // a click on the name or the arrow unfolds the options
@@ -196,6 +198,8 @@ Item {
     z: -1
     width: root.fullWidth
     height: Math.max(0, root.height - y + (root.list ? root.list.gap / 2 : 0))
+    bottomLeftRadius: root.list && root.list.boxBottom && root.index === root.list.order.count - 1 ? Theme.radiusCard : 0
+    bottomRightRadius: bottomLeftRadius
     color: Theme.foldBody
     opacity: root.unfolded ? 1 : 0
     Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }

@@ -17,6 +17,8 @@ Item {
   property int bodyGap: 0                      // between a row and its unfolded options (a list of plain rows needs its inset)
   readonly property int gap: 2 * Theme.settingsRowInset    // between two rows: a hairline in the middle
   property string open: ""
+  property bool boxTop: true                   // the list's first row is the box's first (an unfolded row's plate rounds with the box)
+  property bool boxBottom: true                // ... its last row the box's last
   property bool settling: false                // a row is gliding to its slot: its y is animated
 
   signal ordered(var keys)
