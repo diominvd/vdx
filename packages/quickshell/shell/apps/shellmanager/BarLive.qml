@@ -31,9 +31,9 @@ Column {
     section: "asks"
     title: "ASKS"
     info: ({
-      notice: { label: "Messages", hint: "A new message as a line; off: a card" },
-      battery: { label: "Low battery", hint: "The charge left, when it runs low" },
-      bluetooth: { label: "Device connected", hint: "Headphones and other Bluetooth devices" }
+      notice: { label: "Messages", hint: "Shows a new message as a line" },
+      battery: { label: "Low battery", hint: "Shows the charge when it runs low" },
+      bluetooth: { label: "Device connected", hint: "Shows a connected Bluetooth device" }
     })
   }
 
@@ -47,15 +47,15 @@ Column {
     title: "HELD"
     about: "They stay while the job runs; drag a row to set who takes the pill first"
     info: ({
-      recording: { label: "Recording", hint: "A timer while the screen records" },
-      update: { label: "Updates", hint: "Progress of an update run" },
-      backup: { label: "Backup", hint: "Progress of a backup" },
-      timer: { label: "Timer", hint: "The time left or the stopwatch; click opens" },
-      vpn: { label: "VPN", hint: "Which server and the ping" },
-      focus: { label: "Focus", hint: "Do not disturb is on" },
-      radio: { label: "Radio", hint: "The station on air; a click opens the dial" },
-      music: { label: "Music", hint: "The playing track: Yandex Music or files" },
-      media: { label: "Media", hint: "Other apps: a browser, Spotify, mpv" }
+      recording: { label: "Recording", hint: "Shows a timer while the screen records" },
+      update: { label: "Updates", hint: "Shows the progress of an update" },
+      backup: { label: "Backup", hint: "Shows the progress of a backup" },
+      timer: { label: "Timer", hint: "Shows the time left or the stopwatch" },
+      vpn: { label: "VPN", hint: "Shows the server and the ping" },
+      focus: { label: "Focus", hint: "Shows that Focus mode is on" },
+      radio: { label: "Radio", hint: "Shows the station on air" },
+      music: { label: "Music", hint: "Shows the track playing in Music" },
+      media: { label: "Media", hint: "Shows the track playing in other apps" }
     })
   }
 
@@ -68,10 +68,10 @@ Column {
     section: "flash"
     title: "FLASH"
     info: ({
-      volume: { label: "Volume and brightness", hint: "A level while you change it" },
-      mic: { label: "Microphone", hint: "When the mic is muted or unmuted" },
-      layout: { label: "Keyboard layout", hint: "EN → RU when it changes" },
-      plugged: { label: "Plugged in", hint: "Charge when the cable connects" }
+      volume: { label: "Volume and brightness", hint: "Shows the level while you change it" },
+      mic: { label: "Microphone", hint: "Shows when the mic is muted or unmuted" },
+      layout: { label: "Keyboard layout", hint: "Shows the layout when it changes" },
+      plugged: { label: "Plugged in", hint: "Shows the charge when the cable connects" }
     })
   }
 

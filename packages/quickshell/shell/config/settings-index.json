@@ -1606,7 +1606,7 @@
  },
  {
   "label": "Messages",
-  "hint": "A new message as a line; off: a card",
+  "hint": "Shows a new message as a line",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live",
   "aliases": [
@@ -1617,43 +1617,43 @@
  },
  {
   "label": "Low battery",
-  "hint": "The charge left, when it runs low",
+  "hint": "Shows the charge when it runs low",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Device connected",
-  "hint": "Headphones and other Bluetooth devices",
+  "hint": "Shows a connected Bluetooth device",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Recording",
-  "hint": "A timer while the screen records",
+  "hint": "Shows a timer while the screen records",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Updates",
-  "hint": "Progress of an update run",
+  "hint": "Shows the progress of an update",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Backup",
-  "hint": "Progress of a backup",
+  "hint": "Shows the progress of a backup",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Timer",
-  "hint": "The time left or the stopwatch; click opens",
+  "hint": "Shows the time left or the stopwatch",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "VPN",
-  "hint": "Which server and the ping",
+  "hint": "Shows the server and the ping",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live",
   "aliases": [
@@ -1663,19 +1663,19 @@
  },
  {
   "label": "Focus",
-  "hint": "Do not disturb is on",
+  "hint": "Shows that Focus mode is on",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Radio",
-  "hint": "The station on air; a click opens the dial",
+  "hint": "Shows the station on air",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Music",
-  "hint": "The playing track: Yandex Music or files",
+  "hint": "Shows the track playing in Music",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live",
   "aliases": [
@@ -1686,31 +1686,31 @@
  },
  {
   "label": "Media",
-  "hint": "Other apps: a browser, Spotify, mpv",
+  "hint": "Shows the track playing in other apps",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Volume and brightness",
-  "hint": "A level while you change it",
+  "hint": "Shows the level while you change it",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Microphone",
-  "hint": "When the mic is muted or unmuted",
+  "hint": "Shows when the mic is muted or unmuted",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Keyboard layout",
-  "hint": "EN → RU when it changes",
+  "hint": "Shows the layout when it changes",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
  {
   "label": "Plugged in",
-  "hint": "Charge when the cable connects",
+  "hint": "Shows the charge when the cable connects",
   "where": "Live activities › LIVE ACTIVITIES",
   "target": "live"
  },
