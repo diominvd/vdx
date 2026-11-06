@@ -16,7 +16,7 @@ Column {
   property string label: ""
   property string hint: ""
   property string placeholder: "—"         // shown while no choice is current
-  property color hintColor: Theme.muted
+  property color hintColor: Theme.hint
   property var model: []
   property var current: null
   property bool busy: false

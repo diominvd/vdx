@@ -33,6 +33,8 @@ QtObject {
   // hints and captions: the theme's muted, lifted toward foreground0 until it
   // reads (WCAG 4.5:1 on background0); the theme file keeps its own (kitty's color8)
   readonly property color muted:  legible(live.muted ?? Colors.muted, material ? surfaceHighest : background2)
+  // the hint under an option's name: a step darker than muted, so the name leads
+  readonly property color hint:   mix(muted, background1, 0.3)
   readonly property color frame:  live.frame ?? Colors.frame
   readonly property color dim:    live.dim ?? Colors.dim
 

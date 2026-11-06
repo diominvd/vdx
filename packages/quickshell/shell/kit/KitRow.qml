@@ -89,7 +89,7 @@ Item {
       width: parent.width
       visible: root.hint !== "" || root.needs !== ""
       text: root.needs !== "" ? root.needs : root.hint
-      color: root.hintLevel === "warn" ? Theme.yellow : root.hintLevel === "danger" ? Theme.red : Theme.muted
+      color: root.hintLevel === "warn" ? Theme.yellow : root.hintLevel === "danger" ? Theme.red : Theme.hint
       wrapMode: Text.WordWrap
       font.pixelSize: Theme.fontSize - 1
     }

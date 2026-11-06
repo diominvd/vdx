@@ -156,9 +156,9 @@ uses tonal layers and more spacious controls.
   There is no glow: no halo or hand-made shadow behind a bright element.
   No hex in QML — `Theme.*` only. Legacy custom colours remain in settings.
   Dimmed screens use `Theme.scrim`.
-- Text: secondary text (hints, captions, times) is `Theme.muted`, lifted to
+- Text: secondary text (captions, times) is `Theme.muted`, lifted to
   4.5:1 on the highest normal control surface in every theme; `gray` is for frames, ticks, icons and
-  inactive text only. Sizes are `Theme.fontSize ± n` (Fonts › Text size,
+  inactive text only. An option's hint (under its name) is `Theme.hint`, a step darker than muted. Sizes are `Theme.fontSize ± n` (Fonts › Text size,
   12–15), never a literal. Display figures are fixed sizes: the lock's
   clock, Overview's workspace numbers, the Fonts page's specimen.
 - Bar: one colour per item; a missing value shows `--`.

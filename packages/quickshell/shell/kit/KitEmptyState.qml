@@ -22,6 +22,6 @@ Item {
     anchors { left: glyph.right; leftMargin: Theme.gapWide; right: parent.right; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
     spacing: Theme.gapHair
     KitText { width: parent.width; text: root.title; font.weight: Font.Medium; wrapMode: Text.WordWrap }
-    KitText { width: parent.width; visible: text !== ""; text: root.hint; color: Theme.muted; font.pixelSize: Theme.fontSize - 1; wrapMode: Text.WordWrap }
+    KitText { width: parent.width; visible: text !== ""; text: root.hint; color: Theme.hint; font.pixelSize: Theme.fontSize - 1; wrapMode: Text.WordWrap }
   }
 }
