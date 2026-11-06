@@ -54,7 +54,9 @@ Imports: `import qs.<dir>` from the config root. Singletons: `pragma Singleton`
    `Component` in `bar/ModuleFaces.qml` (every screen's bar makes its own set). A
    renamed id goes to `BarLayout.renamed`.
 6. Its id in `modules` of a component in `components.toml` (`quickshell` for
-   core ones): a module whose components are all off is "not installed".
+   core ones): a module whose components are all off is "not installed". The user can also
+   switch a module off (`BarLayout.enabled`, Bar modules): every place that lists modules
+   asks `BarLayout.usable(id)` (installed and enabled), not `installed(id)`.
 
 JSON replies use `kit/reply.js`: `Reply.parse(text, script, fallback)` accepts
 objects only; `Reply.parseList(text, fallback)` accepts arrays only (default
@@ -68,8 +70,8 @@ description), ipc + open, `window` {id, title, width, height} for a window of
 its own, `settings`, `module` + `moduleSettings` when it has a bar module,
 `desktop` (the id of its `.desktop` file, when it ships one: the launcher lists the
 app once, not twice).
-A bar module of an app is set in Bar modules like any other (its `moduleSettings`);
-Apps shows a link row to it.
+A bar module of an app is set in Bar modules like any other (its `moduleSettings`).
+Settings of a module or an app carry no links to other pages.
 
 ## UI
 

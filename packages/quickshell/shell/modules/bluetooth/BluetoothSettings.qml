@@ -10,13 +10,5 @@ Column {
   KitLabel { text: "BAR" }
   BarTextRow { module: "bluetooth" }
 
-  KitLine {}
-
-  KitLinkRow {
-    label: "Bluetooth"
-    hint: "In Bluetooth"
-    target: "bluetooth"
-  }
-
   KitGrouper {}
 }

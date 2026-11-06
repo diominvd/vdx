@@ -108,7 +108,7 @@ Column {
     KitLabel { text: "LID" }
     KitSelect {
       width: parent.width
-      label: "Lid closed"; hint: "Anything but Suspend is handled by the shell"
+      label: "Lid closed"; hint: "Other actions are the shell's"
       model: [{ label: "Suspend", value: "suspend" }, { label: "Lock", value: "lock" }, { label: "Lock and hibernate", value: "hibernate" },
               { label: "Shut down", value: "poweroff" }, { label: "Do nothing", value: "nothing" }]
       current: ModuleSettings.get("power", "lid", "suspend")

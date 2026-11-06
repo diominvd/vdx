@@ -228,7 +228,7 @@ Column {
 
   KitRow {
     label: "Export"
-    hint: "Options, bar layout and windows; no theme"
+    hint: "Options, bar layout, windows"
 
     KitButton {
       width: Theme.buttonWidth
@@ -242,7 +242,7 @@ Column {
 
   KitRow {
     label: "Import"
-    hint: "Replaces your options; the shell restarts"
+    hint: "Replaces options; restarts the shell"
 
     KitButton {
       width: Theme.buttonWidth
@@ -337,7 +337,7 @@ Column {
   }
   KitRow {
     label: "Recovery"
-    hint: "Restores the last backed-up managed files"
+    hint: "Restores the last backed-up files"
     KitButton {
       width: Theme.buttonWidth
       icon: "rotate-ccw"

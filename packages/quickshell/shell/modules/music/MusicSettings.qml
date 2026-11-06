@@ -18,7 +18,7 @@ KitColumn {
   KitOptionRow {
     visible: ModuleSettings.get("music", "text", "content") === "content"
     module: "music"; key: "show"; fallback: "both"
-    label: "Shows"; hint: "What the bar names while something plays"
+    label: "Shows"; hint: "Named in the bar while playing"
     model: [{ label: "Icon", value: "icon" }, { label: "Title", value: "title" }, { label: "Artist", value: "artist" },
             { label: "Both", value: "both" }]
   }
@@ -50,7 +50,7 @@ KitColumn {
 
   KitOptionRow {
     module: "music"; key: "queueRows"; fallback: 9
-    label: "Tracks shown"; hint: "In the popup's queue, then it scrolls"
+    label: "Tracks shown"; hint: "Then the queue scrolls"
     model: [{ label: "5", value: 5 }, { label: "7", value: 7 }, { label: "9", value: 9 }, { label: "12", value: 12 }]
   }
 
@@ -60,7 +60,7 @@ KitColumn {
 
   KitOptionRow {
     module: "music"; key: "players"; fallback: "all"
-    label: "Show"; hint: "Hidden ones stay in their own app"
+    label: "Show"; hint: "Hidden stay in their own app"
     model: [{ label: "All players", value: "all" }, { label: "Music only", value: "music" }, { label: "Pick", value: "pick" }]
   }
 

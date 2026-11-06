@@ -16,12 +16,12 @@ Column {
 
   KitToggleRow {
     module: "tuner"; key: "showList"; fallback: true
-    label: "Show the stations"; hint: "A list under the dial; off: the dial alone"
+    label: "Show the stations"; hint: "A list under the dial; off: dial only"
   }
 
   KitToggleRow {
     module: "tuner"; key: "closeAfterStop"; fallback: false
-    label: "Close after stop"; hint: "The popup closes when you stop the station"
+    label: "Close after stop"; hint: "Closes the popup when you stop"
   }
 
   KitGrouper {}

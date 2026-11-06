@@ -152,14 +152,14 @@ Column {
       KitRow {
         visible: root.unruled.length === 0
         label: "Add a rule"
-        hint: "A piece of the name; the first match wins"
+        hint: "Part of the name; first match wins"
         KitButton { icon: "plus"; text: "Add rule"; onClicked: root.add("") }
       }
 
       KitSelect {
         visible: root.unruled.length > 0
         label: "Add a rule"
-        hint: "An app that has notified, or another by name"
+        hint: "A notifying app, or one by name"
         placeholder: "Choose an app…"
         model: root.unruled.map(a => ({ label: a, value: a })).concat([{ label: "Another app…", value: "" }])
         current: "\u0000"

@@ -77,7 +77,7 @@ Singleton {
   function openModule(id) {
     const target = popupTarget(id);
     if (PopupManager.ipcOwner(target)) ShellIpc.call(target, "toggle");
-    else if (Theme.island && installed(id)) hostRequested(id, Hyprland.focusedMonitor?.name ?? "");
+    else if (Theme.island && usable(id)) hostRequested(id, Hyprland.focusedMonitor?.name ?? "");
     else if (modules.find(p => p.id === id)?.settings) ShellIpc.call("shell", "open", ["modules:" + id]);
   }
 
@@ -103,6 +103,12 @@ Singleton {
   // keeps their place for when they come back.
   property var notInstalled: ({})
   function installed(id) { return !(id in notInstalled); }
+
+  // A module the user switched off (Bar modules › the switch): installed, but on no bar, no
+  // island, no folder and no Bar page list. Kept in ModuleSettings as `enabled`.
+  function enabled(id) { return ModuleSettings.get(id, "enabled", true) !== false; }
+  // installed and not switched off: the one test every place a module could show goes through
+  function usable(id) { return installed(id) && enabled(id); }
 
   // Every function takes the screen name, but settings belong to its role:
   // "main" — the external monitor when one is connected, else the only one
@@ -151,7 +157,7 @@ Singleton {
     const known = modules.map(p => p.id);
     const off = hidden(screen);
     return savedFolder(screen).map(id => renamed[id] ?? id)
-      .filter(id => known.includes(id) && id !== "folder" && !off.includes(id) && installed(id) && !taken(id, screen));
+      .filter(id => known.includes(id) && id !== "folder" && !off.includes(id) && usable(id) && !taken(id, screen));
   }
   function customized(screen) {
     const e = entry(screen);
@@ -213,13 +219,13 @@ Singleton {
 
   function visibleIn(zone, screen) {
     const off = hidden(screen).concat(inFolder(screen));
-    return layout(screen)[zone].filter(id => !off.includes(id) && installed(id) && !taken(id, screen));
+    return layout(screen)[zone].filter(id => !off.includes(id) && usable(id) && !taken(id, screen));
   }
 
   // on, but not placed on this monitor's bar
   function unplaced(screen) {
     const off = hidden(screen);
-    return modules.map(p => p.id).filter(id => off.includes(id) && installed(id) && !taken(id, screen));
+    return modules.map(p => p.id).filter(id => off.includes(id) && usable(id) && !taken(id, screen));
   }
 
   // Writes the monitor's entry, starting from what it shows now. Only the
@@ -311,10 +317,10 @@ Singleton {
 
   function islandLayout(screen) {
     const known = modules.map(p => p.id);
-    const usable = id => (known.includes(id) || isSeparator(id)) && installed(id) && !islandOwn.includes(id) && !taken(id, screen);
+    const fits = id => (known.includes(id) || isSeparator(id)) && usable(id) && !islandOwn.includes(id) && !taken(id, screen);
     const saved = entry(screen)?.island ?? null;
     if (!saved) {
-      const placed = zones.reduce((all, z) => all.concat(visibleIn(z, screen)), []).concat(inFolder(screen)).filter(id => !isSeparator(id) && usable(id));
+      const placed = zones.reduce((all, z) => all.concat(visibleIn(z, screen)), []).concat(inFolder(screen)).filter(id => !isSeparator(id) && fits(id));
       const at = id => id === "workspaces" ? "start" : modules.find(p => p.id === id)?.island ?? (isTile(id) ? "tiles" : "hub");
       return { start: placed.filter(id => at(id) === "start"), end: placed.filter(id => at(id) === "end"),
                hub: placed.filter(id => at(id) === "hub"), tiles: placed.filter(id => at(id) === "tiles") };   // "none": in no zone
@@ -333,14 +339,14 @@ Singleton {
     // a module new since it was arranged takes its place (`island`), else the hub
     const off = (saved.hidden ?? []).map(id => renamed[id] ?? id);
     for (const p of modules) if (!seen.has(p.id) && !off.includes(p.id) && p.island !== "none") z[p.island ?? (isTile(p.id) ? "tiles" : "hub")].push(p.id);
-    for (const name of islandZones) z[name] = z[name].filter(usable);
+    for (const name of islandZones) z[name] = z[name].filter(fits);
     return z;
   }
   function islandIn(zone, screen) { return islandLayout(screen)[zone] ?? []; }
   function islandHidden(screen) {
     const l = islandLayout(screen);
     const placed = l.start.concat(l.end, l.hub, l.tiles);
-    return modules.map(p => p.id).filter(id => !placed.includes(id) && installed(id) && !islandOwn.includes(id) && !taken(id, screen));
+    return modules.map(p => p.id).filter(id => !placed.includes(id) && usable(id) && !islandOwn.includes(id) && !taken(id, screen));
   }
   // zone: start | end | hub | tiles | hidden
   function islandMove(id, zone, index, screen) {
@@ -376,7 +382,7 @@ Singleton {
   }
   function taken(id, screen) { return barsOn(screen).some(b => b.modules.includes(id)); }
   function barModules(screen, id) {
-    return (barsOn(screen).find(b => b.id === id)?.modules ?? []).filter(m => installed(m) && modules.some(p => p.id === m));
+    return (barsOn(screen).find(b => b.id === id)?.modules ?? []).filter(m => usable(m) && modules.some(p => p.id === m));
   }
 
   function addBar(screen) {

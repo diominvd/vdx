@@ -137,8 +137,9 @@ Notifications, Capture, Clipboard, System, Cleaner, Backups,
 VirusTotal, Packages, Display, Windows, Folder.
 
 - Order, zones and visibility: Shell Manager › Bar › Modules. Options:
-  Shell Manager › Bar modules (an app's module too; Notifications has its own
-  page). A right click on a module opens its options.
+  Shell Manager › Bar modules: one dropdown per module with its options (an app's
+  module too; Notifications has its own page), and a switch that takes the module off
+  every bar, the island and the launcher. A right click on a module opens its options.
 - A new layout shows workspaces, the clock, audio, Wi-Fi, Bluetooth, battery,
   notifications, Shell and the Folder; the rest start in the Folder, one drag
   from the bar.

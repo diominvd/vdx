@@ -23,13 +23,5 @@ Column {
   KitEnglishRow { module: "themes" }
   KitToggleRow { module: "themes"; key: "wheel"; fallback: true; label: "Wheel picks"; hint: "Over the cards or the list" }
 
-  KitLine {}
-
-  KitLinkRow {
-    label: "Theme"
-    hint: "In Themes"
-    target: "themes"
-  }
-
   KitGrouper {}
 }

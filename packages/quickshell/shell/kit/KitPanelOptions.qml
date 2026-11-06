@@ -31,7 +31,7 @@ Column {
     onNeedsActed: ShellSettings.set("barStyle", "island")
     module: root.module; key: "island"; fallback: true
     label: "Open from the island"
-    hint: "On: opens inside the island, not a window"
+    hint: "On: inside the island, not a window"
   }
 
   KitLine {}

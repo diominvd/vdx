@@ -208,14 +208,15 @@ Pages by the user's area; the look follows macOS System Settings.
   not installed: a second click downloads).
   Cursor: its shapes large, colour and size, a card per cursor theme; a pick waits
   for Apply.
-- MUST — a page over many entries with options of their own (Apps, Bar modules) is
-  an `EntryBrowser`: an index of `EntryCard`s (a search, with segments that narrow it
-  to some sections where they help — Bar modules: All / On the bar / Off — then a titled grid per section:
-  on the bar, off it, not installed) and one entry across the whole pane (a heading with its icon on a plate, state and Reset, then its
-  options); the way back is a crumb on the right of the window's header,
-  `‹ All apps / Backups`, never a row in the pane. No third navigation column beside the sidebar: it narrows the options
-  until every wide row stacks. A card says its state in a few words behind a dot
-  (green: on); one that is not installed is muted, in its own section.
+- MUST — a page over many entries with options of their own (Apps, Bar modules) is an
+  `EntryFolds`: a search, then one box of `KitFoldRow`s by name, like Live activities: icon,
+  name, its state under it, an arrow. One entry, one dropdown: its options unfold in place,
+  one open at a time. No sections, no page inside a page, no crumb, no third navigation
+  column beside the sidebar. A row that is not installed is muted. A bar module has a switch
+  (`ModuleSettings` `enabled`, `BarLayout.enabled` / `usable`): off, it is on no bar, island,
+  Folder or Bar page list and the launcher, and its row stays in its place, dimmed and
+  folded. Its place is set on the Bar page, not here. The options inside a row are flat
+  (`kitFlat`: `KitGrouper` draws hairlines only), as Live activities' are.
 - Themes keeps its side list (a picker with a preview, not options): a search
   field, then the entries in one box (`Theme.groupFill`, `radiusCard`) to the
   pane's foot; rows `radiusControl`, picked `Theme.pickFill` + `Theme.pickWeight`, hover

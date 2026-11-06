@@ -15,7 +15,7 @@ KitColumn {
     width: parent.width
     visible: ModuleSettings.get("ai", "text", "content") === "content"
     label: "Limit"
-    hint: "Choose the limit shown in the bar"
+    hint: "The limit shown in the bar"
     model: [
       { label: "Claude · 5 h", value: "session" },
       { label: "Claude · week", value: "weekly_all" },
@@ -28,7 +28,7 @@ KitColumn {
 
   KitToggleRow {
     module: "ai"; key: "tint"; fallback: true
-    label: "Colour the icon"; hint: "Green, yellow, orange or red with the limit"
+    label: "Colour the icon"; hint: "Green to red with the limit"
   }
 
   KitToggleRow {

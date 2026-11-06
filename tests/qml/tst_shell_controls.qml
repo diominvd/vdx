@@ -32,14 +32,11 @@ Item {
   SignalSpy { id: inspected; target: board; signalName: "inspected" }
   SignalSpy { id: drops; target: board; signalName: "dropped" }
   SignalSpy { id: chosen; target: picker; signalName: "chosen" }
-  EntryBrowser {
+  EntryFolds {
     id: entries; x: 480; y: 0; width: 520; height: 300
-    model: [{id: "audio", label: "Audio", icon: "volume", section: "on"},
-            {id: "clock", label: "Clock", icon: "clock", section: "on"},
-            {id: "ai", label: "AI", icon: "bot", off: true, section: "absent"}]
-    sections: [{key: "on", label: "ON"}, {key: "absent", label: "NOT INSTALLED"}]
-    filters: [{label: "All", value: "all", sections: null}, {label: "Off", value: "off", sections: ["absent"]}]
-    onPicked: id => selected = id
+    model: [{id: "audio", label: "Audio", icon: "volume"},
+            {id: "clock", label: "Clock", icon: "clock"},
+            {id: "ai", label: "AI", icon: "bot", off: true}]
   }
   SignalSpy { id: clicks; target: button; signalName: "clicked" }
   SignalSpy { id: selections; target: select; signalName: "picked" }
@@ -570,19 +567,15 @@ Item {
       compare(picker.pairOf("red")[0], "#ff0000");
       compare(picker.pairOf("#112233")[0], "#112233");
     }
-    function test_entry_browser_order_search_and_filter() {
+    function test_entry_folds_order_search_and_open() {
       entries.query = ""; entries.selected = "";
-      compare(entries.ordered.map(e => e.id), ["audio", "clock", "ai"]);   // section by section, by name
-      compare(entries.entry, null);                                        // "" is the index
+      compare(entries.ordered.map(e => e.id), ["ai", "audio", "clock"]);   // by name
+      compare(entries.selected, "");                                       // none open
       entries.query = "CL"; compare(entries.matches.map(e => e.id), ["clock"]);
       entries.query = "nothing"; compare(entries.matches.length, 0);
       entries.query = "";
-      compare(entries.filter, "all");                                      // the first filter at first
-      entries.filter = "off"; compare(entries.matches.map(e => e.id), ["ai"]);
-      entries.query = "cl"; compare(entries.matches.length, 0);            // search within the filter
-      entries.query = ""; entries.filter = "all";
-      entries.selected = "ai"; compare(entries.entry.id, "ai");
-      entries.picked(""); compare(entries.selected, "");
+      entries.open("ai"); compare(entries.selected, "ai");
+      entries.open("clock"); compare(entries.selected, "clock"); entries.selected = "";
     }
     function test_island_copy_preserves_hidden() {
       const hidden = BarLayout.modules.map(m => m.id).filter(id => !["workspaces", "audio", "wifi", "clock", "folder"].includes(id));

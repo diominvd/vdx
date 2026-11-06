@@ -46,7 +46,7 @@ Column {
 
   KitToggleRow {
     module: "packages"; key: "notify"; fallback: true
-    label: "Notify when done"; hint: "A notification: all updated, or what failed"
+    label: "Notify when done"; hint: "A notice: all updated, or what failed"
   }
 
   KitLine {}
@@ -61,7 +61,7 @@ Column {
 
   KitRow {
     label: "Open Packages"
-    hint: "Updates, installed packages and the cache"
+    hint: "Updates, packages and the cache"
     KitButton { text: "Open"; onClicked: ShellIpc.call("packages", "toggle") }
   }
 

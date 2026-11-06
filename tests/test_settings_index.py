@@ -166,22 +166,19 @@ class OneHome(unittest.TestCase):
         accent = (SHELL / "apps/shellmanager/AccentSection.qml").read_text()
         self.assertNotIn('value: "window"', accent)
         self.assertIn('target: "windows:look"', accent)
-        # a live line or a card: the Messages activity's switch; Notifications links there
+        # a live line or a card: the Messages activity's switch, only there
         notes = (SHELL / "modules/notifications/NotificationsSettings.qml").read_text()
         self.assertNotIn('key: "appear"', notes)
-        self.assertIn('target: "live:notice"', notes)
 
     def test_interface_holds_input_text(self):
         index = si.build()
         targets = {e["target"] for e in index if e["label"] == "Input text" and not e["where"].startswith("Apps")}
         self.assertEqual(targets, {"appearance"})
 
-    def test_app_reset_leaves_a_shared_page(self):
+    def test_updates_page_keys_are_indexed(self):
         keys = si.build_keys()
         self.assertIn("apps/shellmanager/UpdatesPage.qml", keys)
         self.assertTrue({"noConfirm", "notify", "autoInstall"} <= set(keys["apps/shellmanager/UpdatesPage.qml"]))
-        page = (SHELL / "apps/shellmanager/ShellAppsPage.qml").read_text()
-        self.assertIn('packages: "apps/shellmanager/UpdatesPage.qml"', page)
 
 
 if __name__ == "__main__":

@@ -14,13 +14,13 @@ Column {
 
   KitToggleRow {
     module: "mihomo"; key: "compact"; fallback: false
-    label: "Compact popup"; hint: "Hides the details: ping, provider, traffic"
+    label: "Compact popup"; hint: "Hides ping, provider, traffic"
   }
 
   KitRow {
     wide: true
     label: "Servers shown"
-    hint: "How many the popup lists before it scrolls"
+    hint: "Listed before it scrolls"
 
     KitSegments {
       model: [{ label: "5", value: 5 }, { label: "8", value: 8 }, { label: "10", value: 10 }, { label: "15", value: 15 }]

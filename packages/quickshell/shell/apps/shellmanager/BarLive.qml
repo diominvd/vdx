@@ -30,7 +30,7 @@ Column {
 
     KitRow {
       label: "Other activities"
-      hint: "How the ones besides the shown one are marked"
+      hint: "How the other ones are marked"
       wide: true
       KitSegments {
         model: [
@@ -44,7 +44,7 @@ Column {
     KitRow {
       visible: ShellSettings.liveMore === "dots"
       label: "Dots stand"
-      hint: "In the activity's chip, or on a plate of their own"
+      hint: "Chip, or a plate of their own"
       wide: true
       KitSegments {
         model: [
@@ -58,7 +58,7 @@ Column {
     }
     KitRow {
       label: "New one comes forward"
-      hint: "A new activity takes the pill, then the wheel pages on"
+      hint: "The newest takes the pill"
       KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
     }
     KitSliderRow {

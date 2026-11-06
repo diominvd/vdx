@@ -15,13 +15,5 @@ Column {
     label: "Compact popup"; hint: "Hides address, signal, traffic and DNS"
   }
 
-  KitLine {}
-
-  KitLinkRow {
-    label: "Wi-Fi"
-    hint: "In Network › Wi-Fi"
-    target: "network:wifi"
-  }
-
   KitGrouper {}
 }

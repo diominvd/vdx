@@ -16,7 +16,7 @@ Column {
 
   KitRow {
     label: "Getting everything back"
-    hint: "Step by step, for a new or empty computer"
+    hint: "Step by step, for an empty computer"
 
     KitButton {
       width: Theme.buttonWidth

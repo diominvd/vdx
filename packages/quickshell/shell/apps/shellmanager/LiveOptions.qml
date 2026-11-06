@@ -41,7 +41,7 @@ Column {
     KitRow {
       visible: root.kind === "notice"
       label: "Stays for"
-      hint: "How long a message's line holds the slot"
+      hint: "How long it holds the slot"
       wide: true
       KitSegments {
         model: [{label: "5 s", value: 5000}, {label: "10 s", value: 10000}, {label: "Until read", value: 0}]
@@ -55,7 +55,7 @@ Column {
     KitRow {
       visible: root.kind === "notice"
       label: "Marked by"
-      hint: "The app's avatar, or just a coloured dot"
+      hint: "App avatar, or a coloured dot"
       wide: true
       KitSegments {
         model: [{label: "Avatar", value: "avatar"}, {label: "Dot", value: "dot"}]
@@ -67,7 +67,7 @@ Column {
     KitRow {
       visible: root.kind === "battery"
       label: "Shows below"
-      hint: "The charge at which it takes the pill"
+      hint: "The charge that takes the pill"
       wide: true
       KitSegments {
         model: [{label: "10%", value: 10}, {label: "15%", value: 15}, {label: "20%", value: 20}, {label: "30%", value: 30}]
@@ -82,7 +82,7 @@ Column {
     KitRow {
       visible: root.kind === "battery"
       label: "Stays for"
-      hint: "Until fixed: it charges or plugs in"
+      hint: "Until it charges or plugs in"
       wide: true
       KitSegments {
         model: [{label: "5 s", value: "5s"}, {label: "Until fixed", value: "fixed"}]
@@ -185,7 +185,7 @@ Column {
     KitRow {
       visible: root.kind === "radio"
       label: "Show on pause"
-      hint: "The station stays in the slot while paused"
+      hint: "Stays in the slot while paused"
       KitSwitch { checked: ShellSettings.liveRadioPaused; onToggled: ShellSettings.setLook("liveRadioPaused", !checked, "island") }
     }
 
@@ -194,7 +194,7 @@ Column {
     KitRow {
       visible: root.kind === "radio"
       label: "Always show"
-      hint: "Keeps the radio in the slot; click opens it"
+      hint: "Stays in the slot; click opens it"
       KitSwitch { checked: ShellSettings.liveRadioAlways; onToggled: ShellSettings.setLook("liveRadioAlways", !checked, "island") }
     }
 

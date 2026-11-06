@@ -34,7 +34,7 @@
 | | |
 |:---:|:---:|
 | <img src="docs/media/themes.png" alt="Theme list and live preview" width="640"><br>Themes | <img src="docs/media/appearance.png" alt="Shell appearance settings" width="640"><br>Appearance |
-| <img src="docs/media/bar.png" alt="Bar layout and modules" width="640"><br>Bar layout | <img src="docs/media/apps.png" alt="Built-in shell apps" width="640"><br>Built-in apps |
+| <img src="docs/media/bar.png" alt="Bar layout and modules" width="640"><br>Bar layout | <img src="docs/media/apps.png" alt="Apps: one dropdown of options per app" width="640"><br>Built-in apps |
 | <img src="docs/media/island.png" alt="Floating island at rest" width="640"><br>Island | <img src="docs/media/island-hub.png" alt="Expanded island hub" width="360"><br>Island hub |
 
 ## Install

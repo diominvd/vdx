@@ -27,7 +27,7 @@ Column {
 
   KitToggleRow {
     module: "battery"; key: "compact"; fallback: false
-    label: "Compact popup"; hint: "Hides the details: health, cycles, energy"
+    label: "Compact popup"; hint: "Hides health, cycles, energy"
   }
 
   KitGrouper {}

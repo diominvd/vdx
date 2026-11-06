@@ -92,7 +92,7 @@ Rectangle {
     { value: "about",      label: "About",      icon: "info",       foot: true,
       page: "about", pageTab: "about", description: "What this shell believes, how it is put together and who made it." }
   ]
-  readonly property var sections: allSections.filter(s => (!s.island || Theme.island) && (!s.module || BarLayout.installed(s.module)))
+  readonly property var sections: allSections.filter(s => (!s.island || Theme.island) && (!s.module || BarLayout.usable(s.module)))
 
   // the rail's groups: one button each, the list beside it shows the open group's pages
   readonly property var groups: [
@@ -307,7 +307,7 @@ Rectangle {
     KitInput {
       id: searchField
       x: sidebar.listX
-      y: brandLine.y + brandLine.height + Theme.gapGroup
+      y: brandLine.y + brandLine.height + root.contentGap
       width: nav.width
       icon: "search"
       placeholder: "Search settings"
@@ -364,7 +364,7 @@ Rectangle {
       id: nav
       Controls.ScrollBar.vertical: KitScrollBar {}
       x: sidebar.listX
-      y: searchField.y + searchField.height + (Theme.material ? Theme.gapMedium : Theme.gapGroup)
+      y: searchField.y + searchField.height + root.contentGap
       width: parent.width - sidebar.listX - Theme.windowPadding
       height: parent.height - y - Theme.windowPadding
       visible: !root.searching

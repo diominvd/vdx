@@ -460,7 +460,7 @@
  },
  {
   "label": "Close when the pointer leaves",
-  "hint": "Off: it stays until Escape or a click away",
+  "hint": "Off: stays until Escape or a click away",
   "where": "Hub › BEHAVIOUR",
   "target": "hub"
  },
@@ -855,7 +855,7 @@
  },
  {
   "label": "Lid closed",
-  "hint": "Anything but Suspend is handled by the shell",
+  "hint": "Other actions are the shell's",
   "where": "Power › LID",
   "target": "power"
  },
@@ -921,7 +921,7 @@
  },
  {
   "label": "Notify when done",
-  "hint": "A notification: all updated, or what failed",
+  "hint": "A notice: all updated, or what failed",
   "where": "Updates › INSTALLING",
   "target": "updates"
  },
@@ -933,7 +933,7 @@
  },
  {
   "label": "Open Packages",
-  "hint": "Updates, installed packages and the cache",
+  "hint": "Updates, packages and the cache",
   "where": "Updates › PACKAGES",
   "target": "updates"
  },
@@ -1189,13 +1189,13 @@
  },
  {
   "label": "Export",
-  "hint": "Options, bar layout and windows; no theme",
+  "hint": "Options, bar layout, windows",
   "where": "Settings › SETTINGS",
   "target": "settings"
  },
  {
   "label": "Import",
-  "hint": "Replaces your options; the shell restarts",
+  "hint": "Replaces options; restarts the shell",
   "where": "Settings › SETTINGS",
   "target": "settings"
  },
@@ -1219,7 +1219,7 @@
  },
  {
   "label": "Recovery",
-  "hint": "Restores the last backed-up managed files",
+  "hint": "Restores the last backed-up files",
   "where": "System › SYSTEM",
   "target": "system"
  },
@@ -1513,7 +1513,7 @@
  },
  {
   "label": "Card stays for",
-  "hint": "Stay: until closed; urgent ones always stay",
+  "hint": "Stay: until closed; urgent stay",
   "where": "Notifications › NEW NOTIFICATIONS",
   "target": "notifications",
   "aliases": [
@@ -1521,12 +1521,6 @@
    "how long",
    "duration"
   ]
- },
- {
-  "label": "Arrive as a live line",
-  "hint": "In Live activities › Asks",
-  "where": "Notifications › NEW NOTIFICATIONS",
-  "target": "notifications"
  },
  {
   "label": "Notifications shown",
@@ -1559,7 +1553,7 @@
  },
  {
   "label": "Dot while tucked away",
-  "hint": "On the Folder or the pill, bell off the bar",
+  "hint": "On the Folder or pill, bell off the bar",
   "where": "Notifications › UNSEEN",
   "target": "notifications"
  },
@@ -1583,7 +1577,7 @@
  },
  {
   "label": "Add a rule",
-  "hint": "A piece of the name; the first match wins",
+  "hint": "Part of the name; first match wins",
   "where": "Notifications › APP COLOURS",
   "target": "notifications",
   "aliases": [
@@ -1612,19 +1606,19 @@
  },
  {
   "label": "Other activities",
-  "hint": "How the ones besides the shown one are marked",
+  "hint": "How the other ones are marked",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
  {
   "label": "Dots stand",
-  "hint": "In the activity's chip, or on a plate of their own",
+  "hint": "Chip, or a plate of their own",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
  {
   "label": "New one comes forward",
-  "hint": "A new activity takes the pill, then the wheel pages on",
+  "hint": "The newest takes the pill",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
@@ -1979,7 +1973,7 @@
  },
  {
   "label": "Shows",
-  "hint": "What the bar names while something plays",
+  "hint": "Named in the bar while playing",
   "where": "Bar modules › Music › BAR",
   "target": "modules:music"
  },
@@ -2003,13 +1997,13 @@
  },
  {
   "label": "Tracks shown",
-  "hint": "In the popup's queue, then it scrolls",
+  "hint": "Then the queue scrolls",
   "where": "Bar modules › Music › QUEUE",
   "target": "modules:music"
  },
  {
   "label": "Show",
-  "hint": "Hidden ones stay in their own app",
+  "hint": "Hidden stay in their own app",
   "where": "Bar modules › Music › PLAYERS",
   "target": "modules:music"
  },
@@ -2094,12 +2088,6 @@
   "target": "modules:themes"
  },
  {
-  "label": "Theme",
-  "hint": "In Themes",
-  "where": "Bar modules › Themes › POPUP",
-  "target": "modules:themes"
- },
- {
   "label": "Tray",
   "hint": "App status icons",
   "where": "Bar modules",
@@ -2174,12 +2162,6 @@
  {
   "label": "Wheel picks",
   "hint": "Over the cards or the list",
-  "where": "Bar modules › Wallpapers › POPUP",
-  "target": "modules:wallpapers"
- },
- {
-  "label": "Wallpaper",
-  "hint": "In Wallpaper",
   "where": "Bar modules › Wallpapers › POPUP",
   "target": "modules:wallpapers"
  },
@@ -2260,12 +2242,6 @@
   "target": "modules:wifi"
  },
  {
-  "label": "Wi-Fi",
-  "hint": "In Network › Wi-Fi",
-  "where": "Bar modules › Wi-Fi › BAR",
-  "target": "modules:wifi"
- },
- {
   "label": "Bluetooth",
   "hint": "Pair and manage devices",
   "where": "Bar modules",
@@ -2275,12 +2251,6 @@
   "label": "Bar",
   "hint": "",
   "where": "Bar modules › Bluetooth",
-  "target": "modules:bluetooth"
- },
- {
-  "label": "Bluetooth",
-  "hint": "In Bluetooth",
-  "where": "Bar modules › Bluetooth › BAR",
   "target": "modules:bluetooth"
  },
  {
@@ -2307,13 +2277,13 @@
  },
  {
   "label": "Compact popup",
-  "hint": "Hides the details: ping, provider, traffic",
+  "hint": "Hides ping, provider, traffic",
   "where": "Bar modules › VPN › POPUP",
   "target": "modules:mihomo"
  },
  {
   "label": "Servers shown",
-  "hint": "How many the popup lists before it scrolls",
+  "hint": "Listed before it scrolls",
   "where": "Bar modules › VPN › POPUP",
   "target": "modules:mihomo"
  },
@@ -2348,7 +2318,7 @@
  },
  {
   "label": "Compact popup",
-  "hint": "Hides the details: health, cycles, energy",
+  "hint": "Hides health, cycles, energy",
   "where": "Bar modules › Battery › BAR",
   "target": "modules:battery"
  },
@@ -2402,13 +2372,13 @@
  },
  {
   "label": "Limit",
-  "hint": "Choose the limit shown in the bar",
+  "hint": "The limit shown in the bar",
   "where": "Bar modules › AI › BAR",
   "target": "modules:ai"
  },
  {
   "label": "Colour the icon",
-  "hint": "Green, yellow, orange or red with the limit",
+  "hint": "Green to red with the limit",
   "where": "Bar modules › AI › BAR",
   "target": "modules:ai"
  },
@@ -2611,12 +2581,6 @@
   "target": "modules:folder"
  },
  {
-  "label": "Unseen dot",
-  "hint": "In Notifications › Unseen",
-  "where": "Bar modules › Folder › BAR",
-  "target": "modules:folder"
- },
- {
   "label": "Shell Manager",
   "hint": "Shell settings",
   "where": "Apps",
@@ -2677,7 +2641,7 @@
  },
  {
   "label": "Open from the island",
-  "hint": "On: opens inside the island, not a window",
+  "hint": "On: inside the island, not a window",
   "where": "Apps › Launcher › ISLAND",
   "target": "apps:launcher"
  },
@@ -2761,7 +2725,7 @@
  },
  {
   "label": "Open from the island",
-  "hint": "On: opens inside the island, not a window",
+  "hint": "On: inside the island, not a window",
   "where": "Apps › Keybinds › ISLAND",
   "target": "apps:keybinds"
  },
@@ -3414,6 +3378,12 @@
   "target": "apps:capture"
  },
  {
+  "label": "Folders",
+  "hint": "",
+  "where": "Apps › Capture",
+  "target": "apps:capture"
+ },
+ {
   "label": "Recording",
   "hint": "",
   "where": "Apps › Capture",
@@ -3432,12 +3402,6 @@
   "target": "apps:capture"
  },
  {
-  "label": "Folders",
-  "hint": "",
-  "where": "Apps › Capture",
-  "target": "apps:capture"
- },
- {
   "label": "Delay button",
   "hint": "Off: no button in the toolbar",
   "where": "Apps › Capture › TOOLBAR",
@@ -3445,7 +3409,7 @@
  },
  {
   "label": "Grid",
-  "hint": "Thirds inside the selection, to compose by",
+  "hint": "Thirds in the selection, to compose",
   "where": "Apps › Capture › TOOLBAR",
   "target": "apps:capture"
  },
@@ -3494,12 +3458,6 @@
  {
   "label": "Notify after a recording",
   "hint": "Errors still notify",
-  "where": "Apps › Capture › NOTIFICATIONS",
-  "target": "apps:capture"
- },
- {
-  "label": "Toasts",
-  "hint": "In Notifications › New notifications",
   "where": "Apps › Capture › NOTIFICATIONS",
   "target": "apps:capture"
  },

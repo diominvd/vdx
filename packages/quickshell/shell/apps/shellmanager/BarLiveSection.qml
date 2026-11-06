@@ -31,11 +31,10 @@ Column {
     delegate: KitFoldRow {
       id: row
       // what is not here cannot run: the row says so and keeps its switch out of reach
-      readonly property string missing: key === "vpn" && !BarLayout.installed("mihomo") ? "Not installed"
-        : key === "backup" && !BarLayout.installed("backup") ? "Not installed"
-        : key === "battery" && !BatteryService.present ? "No battery in this machine"
-        : key === "radio" && !BarLayout.installed("radio") ? "Not installed"
-        : key === "music" && !BarLayout.installed("music") ? "Not installed" : ""
+      readonly property var owner: ({ vpn: "mihomo", backup: "backup", radio: "radio", music: "music" })
+      function absent(id) { return !BarLayout.installed(id) ? "Not installed" : !BarLayout.enabled(id) ? "Module is off" : ""; }
+      readonly property string missing: key === "battery" && !BatteryService.present ? "No battery in this machine"
+        : owner[key] ? absent(owner[key]) : ""
 
       label: root.info[key]?.label ?? key
       hint: missing !== "" ? missing : (root.info[key]?.hint ?? "")

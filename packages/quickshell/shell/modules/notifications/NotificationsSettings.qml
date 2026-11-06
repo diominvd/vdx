@@ -4,7 +4,7 @@ import qs.kit
 
 // Notifications options in the Shell Manager, the most used first: how a new one
 // arrives (NEW NOTIFICATIONS: how long a card stays; a live line instead of a card is
-// the Messages activity of Live activities, linked here), the history popup (POPUP:
+// the Messages activity of Live activities), the history popup (POPUP:
 // the centre), the mark for the unseen (UNSEEN: on the bell, or the dot on the
 // island's pill or the Folder while the bell is off the bar) and, last, the rules for
 // an app's avatar colour (APP COLOURS).
@@ -19,17 +19,8 @@ KitColumn {
     needs: !Theme.island || ModuleSettings.get("notifications", "appear", "card") === "card" || !ShellSettings.liveEnabled
            ? "" : "Set by Live activities › Messages"
     module: "notifications"; key: "toastSeconds"; fallback: 5
-    label: "Card stays for"; hint: "Stay: until closed; urgent ones always stay"
+    label: "Card stays for"; hint: "Stay: until closed; urgent stay"
     model: [{ label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }, { label: "Stay", value: 0 }]
-  }
-
-  // a card, or (Island style) a line in the live slot: that choice is the Messages activity's
-  // switch, kept in Live activities › Asks with its own options; a link here
-  KitLinkRow {
-    visible: Theme.island
-    label: "Arrive as a live line"
-    hint: "In Live activities › Asks"
-    target: "live:notice"
   }
 
   KitLine {}
@@ -58,7 +49,7 @@ KitColumn {
 
   KitRow {
     label: "Dot while tucked away"
-    hint: "On the Folder or the pill, bell off the bar"
+    hint: "On the Folder or pill, bell off the bar"
 
     KitSwitch {
       checked: ShellSettings.barFolderDot

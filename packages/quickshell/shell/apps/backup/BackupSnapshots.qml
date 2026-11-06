@@ -129,7 +129,7 @@ Item {
       KitRow {
         visible: root.picked !== undefined
         label: "Packages and services"
-        hint: "Repository packages, then enable and groups"
+        hint: "Packages, then enable and groups"
 
         KitButton {
           width: Theme.buttonWidth

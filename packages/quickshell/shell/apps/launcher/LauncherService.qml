@@ -125,7 +125,7 @@ Singleton {
     const term = (q ?? "").trim().toLowerCase();
     const ownModules = ShellAppsService.entries.filter(e => e.module).map(e => e.module);
     const quickPower = root.powerItems.filter(i => i.title === "Lock" || i.title === "Suspend");
-    const modules = BarLayout.modules.filter(m => BarLayout.installed(m.id) && !ownModules.includes(m.id)
+    const modules = BarLayout.modules.filter(m => BarLayout.usable(m.id) && !ownModules.includes(m.id)
       && (term === "" || (m.label + " " + m.about).toLowerCase().includes(term)))
       .map(m => ({ icon: m.icon, title: m.label, hint: m.about || "Bar module", run: () => BarLayout.openModule(m.id) }));
     const items = root.filter(root.shellItems, term)

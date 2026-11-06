@@ -74,7 +74,7 @@ Column {
         onPicked: value => ShellSettings.setLook("clockOpens", value, "island")
       }
     }
-    KitToggleRow { module: "hub"; key: "autoClose"; fallback: true; label: "Close when the pointer leaves"; hint: "Off: it stays until Escape or a click away" }
+    KitToggleRow { module: "hub"; key: "autoClose"; fallback: true; label: "Close when the pointer leaves"; hint: "Off: stays until Escape or a click away" }
     KitSliderRow {
       visible: ModuleSettings.get("hub", "autoClose", true)
       label: "Close delay"

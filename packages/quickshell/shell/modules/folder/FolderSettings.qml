@@ -16,13 +16,5 @@ Column {
     model: [{ label: "Folder", value: "folder" }, { label: "Dots", value: "dots" }]
   }
 
-  KitLine {}
-
-  KitLinkRow {
-    label: "Unseen dot"
-    hint: "In Notifications › Unseen"
-    target: "notifications"
-  }
-
   KitGrouper {}
 }

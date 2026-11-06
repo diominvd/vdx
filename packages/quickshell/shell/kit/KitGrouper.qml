@@ -12,6 +12,9 @@ import qs.config
 // KitLabel says `readonly property bool isKitLabel: true`. Sliders take the
 // row layout (`rowStyle`). Strict: a raised card in a faint line, hairlines between rows;
 // Material: a tonal section, no lines.
+// Inside an item with `kitFlat: true` (a dropdown's options, Apps / Bar modules) it draws no
+// boxes: the rows stand on the dropdown's own plate, hairlines between them and between groups,
+// the titles hidden.
 // Put it last: it is 1×1 (a Column hides a zero-size child, and its drawing
 // with it), placed at the end and taken back with a negative bottom padding;
 // it draws behind the rows in the column's coordinates.
@@ -23,6 +26,7 @@ Item {
   property int padY: Theme.settingsRowInset
   readonly property Item column: parent
 
+  property bool flat: false                 // an ancestor says kitFlat: hairlines only, no boxes
   property Item outer: null                 // the grouper of an enclosing settings column
   property var boxes: []
   property var lines: []
@@ -64,6 +68,11 @@ Item {
     return first !== undefined && first.isKitLabel === true;
   }
 
+  function findFlat() {
+    for (let p = column ? column.parent : null; p; p = p.parent) if (p.kitFlat) return true;
+    return false;
+  }
+
   function findOuter() {
     for (let p = column ? column.parent : null; p; p = p.parent) {
       if (p.kitUnboxed) return null; // independent panes own their groups
@@ -89,6 +98,7 @@ Item {
     // looked up here, not once at creation: a Loader's item completes before it is placed in the
     // page, and a grouper that took itself for the outermost would draw its own boxes over the page's
     root.outer = root.findOuter();
+    root.flat = root.findFlat();
     if (root.outer) { root.boxes = []; root.lines = []; root.outer.relayout(); return; }
     prepare(col);
     // the outermost column keeps room for its last box's lower padding (a pane's scroll reaches it)
@@ -105,13 +115,15 @@ Item {
       // (a layer's ShaderEffectSource, such as a KitLine's, is not a row)
       const items = Array.from(parent.data).filter(c => c.visible !== undefined && c.height !== undefined && !c.isKitGrouper && c.sourceItem === undefined);
       items.forEach((c, i) => {
+        // flat: a title only parts the groups, unseen
+        if (root.flat && c.isKitLabel) { c.visible = false; close(); last = "label"; return; }
         // a line ends the group; before a title it goes (the title parts the boxes),
         // before rows it stays, unseen, as the gap between two boxes
         if (c.isKitLine && c.sectionBreak) {
           const next = items.slice(i + 1).find(n => n.visible && !n.isKitLine && n.height > 0);
           c.groupManaged = true;
           // No leading/trailing gap, nor an extra interval before a heading.
-          c.groupCollapsed = !run || !next || next.isKitLabel === true
+          c.groupCollapsed = root.flat || !run || !next || next.isKitLabel === true
             || (sectionOf(next) !== null && startsTitled(sectionOf(next)));
           if (c.visible) close();
           return;
@@ -159,8 +171,9 @@ Item {
       d.item.strokeOffset = above.length && below.length
         ? (Math.max(...above) + Math.min(...below) - d.item.height) / 2 - d.y : 0;
     }
-    root.boxes = out;
-    root.lines = hair;
+    root.boxes = root.flat ? [] : out;
+    // flat: a hairline also between two groups (the box's top edge), across the full width
+    root.lines = root.flat ? hair.concat(out.slice(1).map(b => b.y)) : hair;
   }
 
   function relayout() { soon.restart(); }
@@ -199,13 +212,13 @@ Item {
 
   // Material: a tonal section's rows need no hairlines between them (Strict keeps them)
   Repeater {
-    model: Theme.material ? [] : root.lines
+    model: Theme.material && !root.flat ? [] : root.lines
 
     Rectangle {
       required property real modelData
-      x: root.padX - root.x
+      x: (root.flat ? 0 : root.padX) - root.x
       y: Math.round(modelData - root.y)    // on a whole pixel: a sharp hairline
-      width: root.column ? root.column.width - 2 * root.padX : 0
+      width: root.column ? root.column.width - (root.flat ? 0 : 2 * root.padX) : 0
       height: Theme.dividerThickness
       color: Theme.dividerColor
     }

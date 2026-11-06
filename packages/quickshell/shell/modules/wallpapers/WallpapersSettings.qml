@@ -23,13 +23,5 @@ Column {
   KitEnglishRow { module: "wallpapers" }
   KitToggleRow { module: "wallpapers"; key: "wheel"; fallback: true; label: "Wheel picks"; hint: "Over the cards or the list" }
 
-  KitLine {}
-
-  KitLinkRow {
-    label: "Wallpaper"
-    hint: "In Wallpaper"
-    target: "wallpaper"
-  }
-
   KitGrouper {}
 }

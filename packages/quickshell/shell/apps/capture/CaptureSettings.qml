@@ -22,7 +22,7 @@ Column {
   KitToggleRow {
     module: "capture"; key: "grid"; fallback: true
     label: "Grid"
-    hint: "Thirds inside the selection, to compose by"
+    hint: "Thirds in the selection, to compose"
   }
 
   KitLine {}
@@ -39,6 +39,32 @@ Column {
     module: "capture"; key: "videoTarget"; fallback: "folder"
     label: "After a recording"; hint: "Ask: Esc saves to folder"
     model: [{ label: "Save", value: "folder" }, { label: "Ask", value: "ask" }]
+  }
+
+  KitLine {}
+
+  KitLabel { text: "FOLDERS" }
+
+  Repeater {
+    model: [
+      { key: "shotDir",  label: "Screenshots", value: CaptureService.shotDir },
+      { key: "videoDir", label: "Recordings",  value: CaptureService.videoDir }
+    ]
+
+    KitRow {
+      required property var modelData
+
+      label: modelData.label
+      hint: modelData.value
+      wide: true
+
+      KitButton {
+        icon: "folder"
+        text: "Choose…"
+        onClicked: FilesService.pickFolder(modelData.label + " folder", modelData.value,
+                                           p => { if (p !== "") ModuleSettings.set("capture", modelData.key, p); })
+      }
+    }
   }
 
   KitLine {}
@@ -107,38 +133,6 @@ Column {
 
   KitToggleRow { module: "capture"; key: "notifyShot"; fallback: true; label: "Notify after a screenshot"; hint: "Errors still notify" }
   KitToggleRow { module: "capture"; key: "notifyRecord"; fallback: true; label: "Notify after a recording"; hint: "Errors still notify" }
-
-  KitLinkRow {
-    label: "Toasts"
-    hint: "In Notifications › New notifications"
-    target: "notifications"
-  }
-
-  KitLine {}
-
-  KitLabel { text: "FOLDERS" }
-
-  Repeater {
-    model: [
-      { key: "shotDir",  label: "Screenshots", value: CaptureService.shotDir },
-      { key: "videoDir", label: "Recordings",  value: CaptureService.videoDir }
-    ]
-
-    KitRow {
-      required property var modelData
-
-      label: modelData.label
-      hint: modelData.value
-      wide: true
-
-      KitButton {
-        icon: "folder"
-        text: "Choose…"
-        onClicked: FilesService.pickFolder(modelData.label + " folder", modelData.value,
-                                           p => { if (p !== "") ModuleSettings.set("capture", modelData.key, p); })
-      }
-    }
-  }
 
   KitGrouper {}
 }

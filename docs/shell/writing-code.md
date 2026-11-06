@@ -46,7 +46,7 @@ before using it; its properties are its whole API.
 | a panel app's dim / island / layout | `KitPanelOptions` | `module` |
 | a search panel's two toggles | `KitClearSearchRow`, `KitEnglishRow` | `module` |
 | a picker popup's cards or list | `KitPickerViewRow` | `module` |
-| an index of entries + one entry's page | `EntryBrowser` (`apps/shellmanager`) | Apps and Bar modules; see the recipe below |
+| a list of entries, each a dropdown of options | `EntryFolds` (`apps/shellmanager`) | Apps and Bar modules; see the recipe below |
 
 A block of rows that two settings files share is a component like the last four:
 a `KitToggleRow` / `KitOptionRow` / `Column` with the fixed parts written in it
@@ -143,14 +143,11 @@ Steps:
 5. `./install.py link`, restart, open the page in both styles (Strict, Material)
    and both corners (sharp, round).
 
-## Recipe: a browser page (Apps, Bar modules)
+## Recipe: a list of dropdowns (Apps, Bar modules)
 
-A page over many entries, each with its own options, is an `EntryBrowser`: an
-index of cards (a search, then a titled grid per section) and, once one is
-picked, that entry across the whole pane (its heading, then its options). The
-way back is the crumb in the window's header, `‹ All modules / AI`: the page gives
-`backLabel` ("" on the index), `here` and `back()`. Never a third column of navigation beside the sidebar: it
-leaves the options too narrow and every wide row stacks.
+A page over many entries, each with its own options, is an `EntryFolds`: a search, then a
+one box of rows by name like Live activities (an icon, the name, its state, an
+arrow). A row unfolds its options in place, one at a time: no page inside a page.
 
 ```qml
 Item {
@@ -158,53 +155,40 @@ Item {
   readonly property string icon: "puzzle"
   readonly property string title: "Bar modules"
   readonly property string description: "What each bar module shows and how its popup behaves."
-  readonly property var jumps: []                 // the index does the sidebar's job
+  readonly property var jumps: []                 // the list does the sidebar's job
 
-  // another page or `shell open modules:<id>` opens one
-  function jump(id) { selected = id; }
+  // another page or `shell open modules:<id>` unfolds one
+  function jump(id) { browser.open(id); }
 
-  property string selected: ""                    // "" is the index
-  // the header's crumb: "‹ All modules / AI"
-  readonly property string backLabel: selected !== "" ? "All modules" : ""
-  readonly property string here: entries.find(e => e.id === selected)?.label ?? ""
-  function back() { selected = ""; }
   readonly property var entries: BarLayout.modules.map(p => ({
-    id: p.id, label: p.label, icon: p.icon, about: p.about,
-    state: "Hub chip",                            // a card's few words
-    note: "In the hub, as a chip",                // the heading's, when longer; "" for none
-    ok: true,                                     // the state is good news: a green dot
+    id: p.id, label: p.label, icon: p.icon,
+    state: "In the hub, as a chip",               // under the name
     off: false,                                   // not installed: muted
-    section: "on"                                 // a key of `sections`
+    switchable: true, on: true                    // a switch on the row
   }))
 
-  EntryBrowser {
+  EntryFolds {
+    id: browser
     anchors.fill: parent
     model: root.entries
-    sections: [{ key: "on", label: "ON THE BAR" }, { key: "off", label: "OFF THE BAR" }]
-    selected: root.selected
     searchHint: "Search modules…"
-    // optional: segments beside the search, each a set of sections
-    filters: [{ label: "All", value: "all", sections: null },
-              { label: "On the bar", value: "on", sections: ["on"] }]
-    onPicked: id => root.selected = id
-    trailing: KitResetButton { /* … */ }          // keys, Reset: right of the heading
 
-    // the options: rows as on any page, ending with their own grouper
-    KitLinkRow { label: "Move on the bar"; hint: "In Bar › Layout"; target: "bar:layout" }
-    KitLine {}
-    Loader { width: parent.width; source: /* the entry's <Name>Settings.qml */ "" }
-    KitGrouper {}
+    // the unfolded options, built on the first unfold; the root takes the entry's id
+    options: Component {
+      Column {
+        property string entryId: ""
+        Loader { width: parent.width; source: /* the entry's <Name>Settings.qml */ "" }
+        KitGrouper {}                             // it boxes its rows on the fold's plate
+      }
+    }
   }
 }
 ```
 
 - The page is an `Item` (it fills the window; `ShellManager` lists the tab in its
   full-height pages).
-- Card words are short (`Hub chip`, `Right`); the heading may say them in full (`note`).
-- A state already shown below (the window's size on Apps) is not repeated in the
-  heading: `note: ""`.
-- Keys: Tab reaches each card, Enter / Space open it, Enter in the search opens the
-  first match; the back and arrow buttons are ordinary `KitButton`s.
+- A state is a few words under the name; the options carry the rest.
+- No Reset in a row's options.
 
 ## Recipe: a shared option block
 

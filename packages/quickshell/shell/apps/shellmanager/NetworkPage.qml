@@ -201,7 +201,7 @@ KitColumn {
       visible: ws.savedLoaded && ws.savedError === "" && ws.saved.length === 0
       icon: "wifi"
       title: "No saved networks"
-      hint: "Join from the Wi-Fi popup or by name below"
+      hint: "Join from the popup or by name"
     }
 
     KitSelect {
