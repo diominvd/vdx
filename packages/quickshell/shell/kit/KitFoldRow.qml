@@ -43,7 +43,9 @@ Item {
   readonly property real indent: flush ? 0 : 12 + Theme.gapWide   // the handle's column: the name and the options start here
 
   width: parent ? parent.width : 0
-  height: rowHeight + (unfolded ? bodyGap + fold.bodyHeight : 0)
+  // a sunken row's header plate reaches half a gap below the row (as above it): the options start there
+  readonly property real headEdge: sunken && list ? list.gap / 2 : 0
+  height: rowHeight + (unfolded ? headEdge + bodyGap + fold.bodyHeight : 0)
   z: dragging ? 5 : 0
   onHeightChanged: if (list) list.relayout()
 
@@ -194,7 +196,7 @@ Item {
   Rectangle {
     visible: root.sunken && root.list !== null
     x: -root.edge
-    y: root.rowHeight + root.bodyGap
+    y: root.rowHeight + root.headEdge + root.bodyGap
     z: -1
     width: root.fullWidth
     height: Math.max(0, root.height - y + (root.list ? root.list.gap / 2 : 0))
@@ -210,8 +212,8 @@ Item {
   Item {
     id: fold
     readonly property real bodyHeight: body.implicitHeight
-    anchors { left: parent.left; leftMargin: root.sunken ? -root.edge : root.indent; right: parent.right; rightMargin: root.sunken ? -root.edge : 0; top: parent.top; topMargin: root.rowHeight + root.bodyGap }
-    height: Math.max(0, root.height - root.rowHeight - root.bodyGap)
+    anchors { left: parent.left; leftMargin: root.sunken ? -root.edge : root.indent; right: parent.right; rightMargin: root.sunken ? -root.edge : 0; top: parent.top; topMargin: root.rowHeight + root.headEdge + root.bodyGap }
+    height: Math.max(0, root.height - root.rowHeight - root.headEdge - root.bodyGap)
     clip: true
     opacity: root.unfolded ? 1 : 0
     Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
