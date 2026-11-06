@@ -22,6 +22,73 @@ Column {
     KitGrouper {}
   }
 
+  Column {
+    width: parent.width
+    visible: ShellSettings.liveEnabled
+
+    KitLabel { text: "BEHAVIOUR" }
+
+    KitRow {
+      label: "Other activities"
+      hint: "How the ones besides the shown one are marked"
+      wide: true
+      KitSegments {
+        model: [
+          { label: "+N", value: "count" },
+          { label: "Dots", value: "dots" }
+        ]
+        current: ShellSettings.liveMore
+        onPicked: value => ShellSettings.setLook("liveMore", value, "island")
+      }
+    }
+    KitRow {
+      visible: ShellSettings.liveMore === "dots"
+      label: "Dots stand"
+      hint: "In the activity's chip, or on a plate of their own"
+      wide: true
+      KitSegments {
+        model: [
+          { label: "Left", value: "left" },
+          { label: "Right", value: "right" },
+          { label: "Apart", value: "apart" }
+        ]
+        current: ShellSettings.liveDotsAt
+        onPicked: value => ShellSettings.setLook("liveDotsAt", value, "island")
+      }
+    }
+    KitRow {
+      label: "New one comes forward"
+      hint: "A new activity takes the pill, then the wheel pages on"
+      KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
+    }
+    KitSliderRow {
+      label: "Flash lasts"
+      snaps: [0, 1/6, 2/6, 3/6, 4/6, 5/6, 1]
+      value: (ShellSettings.liveFlashMs - 1000) / 3000
+      text: ((pressed ? 1000 + Math.round(dragValue * 6) * 500 : ShellSettings.liveFlashMs) / 1000).toFixed(1) + " s"
+      onMoved: value => ShellSettings.setLook("liveFlashMs", 1000 + Math.round(value * 6) * 500, "island")
+    }
+    KitRow {
+      label: "Wheel pages through them"
+      hint: "Scrolling picks one on this monitor"
+      KitSwitch { checked: ShellSettings.liveWheel; onToggled: ShellSettings.setLook("liveWheel", !checked, "island") }
+    }
+    KitSliderRow {
+      visible: ShellSettings.liveWheel
+      label: "Scroll delay"
+      snaps: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+      value: ShellSettings.liveWheelDelayMs / 500
+      text: ShellSettings.liveWheelDelayMs === 0 ? "Off" : ShellSettings.liveWheelDelayMs + " ms"
+      onMoved: value => ShellSettings.setLook("liveWheelDelayMs", Math.round(value * 10) * 50, "island")
+    }
+    KitRow {
+      label: "Right click opens options"
+      hint: "On a live activity: its settings here"
+      KitSwitch { checked: ShellSettings.liveRightSettings; onToggled: ShellSettings.setLook("liveRightSettings", !checked, "island") }
+    }
+    KitGrouper {}
+  }
+
   KitLine { visible: ShellSettings.liveEnabled }
 
   BarLiveSection {
@@ -73,47 +140,6 @@ Column {
       layout: { label: "Keyboard layout", hint: "Shows the layout when it changes" },
       plugged: { label: "Plugged in", hint: "Shows the charge when the cable connects" }
     })
-  }
-
-  KitLine { visible: ShellSettings.liveEnabled }
-
-  Column {
-    width: parent.width
-    visible: ShellSettings.liveEnabled
-
-    KitLabel { text: "BEHAVIOUR" }
-
-    KitRow {
-      label: "New one comes forward"
-      hint: "A new activity takes the pill, then the wheel pages on"
-      KitSwitch { checked: ShellSettings.liveFront; onToggled: ShellSettings.setLook("liveFront", !checked, "island") }
-    }
-    KitSliderRow {
-      label: "Flash lasts"
-      snaps: [0, 1/6, 2/6, 3/6, 4/6, 5/6, 1]
-      value: (ShellSettings.liveFlashMs - 1000) / 3000
-      text: ((pressed ? 1000 + Math.round(dragValue * 6) * 500 : ShellSettings.liveFlashMs) / 1000).toFixed(1) + " s"
-      onMoved: value => ShellSettings.setLook("liveFlashMs", 1000 + Math.round(value * 6) * 500, "island")
-    }
-    KitRow {
-      label: "Wheel pages through them"
-      hint: "Scrolling picks one on this monitor"
-      KitSwitch { checked: ShellSettings.liveWheel; onToggled: ShellSettings.setLook("liveWheel", !checked, "island") }
-    }
-    KitSliderRow {
-      visible: ShellSettings.liveWheel
-      label: "Scroll delay"
-      snaps: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-      value: ShellSettings.liveWheelDelayMs / 500
-      text: ShellSettings.liveWheelDelayMs === 0 ? "Off" : ShellSettings.liveWheelDelayMs + " ms"
-      onMoved: value => ShellSettings.setLook("liveWheelDelayMs", Math.round(value * 10) * 50, "island")
-    }
-    KitRow {
-      label: "Right click opens options"
-      hint: "On a live activity: its settings here"
-      KitSwitch { checked: ShellSettings.liveRightSettings; onToggled: ShellSettings.setLook("liveRightSettings", !checked, "island") }
-    }
-    KitGrouper {}
   }
 
   KitGrouper {}

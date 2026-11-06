@@ -172,7 +172,7 @@ Item {
       spacing: Theme.gapMedium
       LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "public"; tint: Theme.green }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: ShellSettings.liveVpnServer; text: "Finland"; color: Theme.material ? Theme.foreground1 : Theme.foreground2; font.weight: Theme.material ? Font.Medium : Font.Normal }
-      LiveCap { surface: chip.color; text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48 ms"; plainTint: Theme.muted; plainBold: false }
+      LiveCap { visible: ShellSettings.liveVpnPing; surface: chip.color; text: "48 ms"; tint: Theme.green; size: root.coverSize; corner: root.badgeRadius; plainText: "48 ms"; plainTint: Theme.muted; plainBold: false }
     }
   }
 

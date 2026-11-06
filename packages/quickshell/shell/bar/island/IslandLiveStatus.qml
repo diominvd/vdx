@@ -49,7 +49,7 @@ Row {
     width: Math.min(implicitWidth, 110)
     elide: Text.ElideRight
   }
-  LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "vpn" && MihomoService.currentDelay > 0; text: MihomoService.currentDelay + " ms"; tint: Theme.green; plainText: MihomoService.currentDelay + " ms"; plainTint: Theme.muted; plainBold: false }
+  LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "vpn" && ShellSettings.liveVpnPing && MihomoService.currentDelay > 0; text: MihomoService.currentDelay + " ms"; tint: Theme.green; plainText: MihomoService.currentDelay + " ms"; plainTint: Theme.muted; plainBold: false }
 
   // radio: the station on air, the sound
   LiveGlyph { corner: face.badgeRadius; visible: face.kind === "radio" && Theme.material; size: face.coverSize; name: "radio"; tint: Theme.yellow; opacity: RadioService.active && MpdService.playing ? 1 : 0.5 }

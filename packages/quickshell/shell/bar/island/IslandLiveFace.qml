@@ -13,6 +13,7 @@ Row {
   property int chipHeight: 24
   property int chipRadius: 0
   property int inset: 3
+  property real shift: 0                 // the dots' column at the chip's left (IslandLive)
   readonly property bool track: kind === "music" || kind === "media"
   readonly property var faceComponent: ["recording", "update", "backup"].includes(kind) ? taskFace
     : kind === "notice" ? noticeFace
@@ -47,7 +48,7 @@ Row {
   readonly property int leadPad: padFor(ends[0])
   readonly property int trailPad: padFor(ends[1])
 
-  x: leadPad
+  x: shift + leadPad
   anchors.verticalCenter: parent.verticalCenter
   visible: kind !== ""
 

@@ -39,17 +39,29 @@ Item {
   readonly property Item sizedFace: sliding ? backFace : frontFace
   // the slot's width is moving: the island follows it as it goes, without a glide of its own
   readonly property bool moving: targetAnim.running
-  // the other activities that run besides the shown one: a "+3" plate after the chip
+  // the other activities that run besides the shown one (Bar › Live › Behaviour): a "+3" plate after
+  // the chip, or a column of dots (one per activity, the shown one lit, as many as fit the
+  // chip's height) at the chip's left or right, or on a plate of their own
   readonly property int others: kind === "" ? 0 : Math.max(0, IslandService.activities.length - 1)
-  readonly property int moreWidth: others > 0 ? Math.max(chipHeight, more.implicitWidth + 2 * Theme.gapLoose) : 0
-  implicitWidth: kind === "" ? 0 : target + (others > 0 ? edge + moreWidth : 0)
+  readonly property bool dotted: ShellSettings.liveMore === "dots"
+  readonly property string dotsAt: ShellSettings.liveDotsAt
+  readonly property bool apart: others > 0 && (!dotted || dotsAt === "apart")     // a plate after the chip
+  readonly property bool dotsIn: others > 0 && dotted && dotsAt !== "apart"       // dots inside the chip
+  readonly property int dotSize: 5
+  readonly property int dotGap: 4
+  readonly property int dotCount: Math.min(IslandService.activities.length, Math.max(2, Math.floor((chipHeight - 8 + dotGap) / (dotSize + dotGap))))
+  readonly property int dotLit: Math.min(dotCount - 1, Math.max(0, IslandService.activities.indexOf(kind)))
+  readonly property int dotsWidth: dotsIn ? dotSize + Theme.gapMedium + 2 : 0
+  readonly property int dotsShift: dotsAt === "left" ? dotsWidth : 0                // the face makes room at the left
+  readonly property int moreWidth: !apart ? 0 : dotted ? dotSize + 2 * Theme.gapMedium : Math.max(chipHeight, more.implicitWidth + 2 * Theme.gapLoose)
+  implicitWidth: kind === "" ? 0 : target + (apart ? edge + moreWidth : 0)
   implicitHeight: Theme.islandHeight
   width: implicitWidth
   height: implicitHeight
   visible: kind !== "" || opacity > 0
   opacity: kind === "" ? 0 : 1
   Behavior on opacity { enabled: Motion.island; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
-  property real target: sizedFace.implicitWidth + sizedFace.leadPad + sizedFace.trailPad
+  property real target: dotsWidth + sizedFace.implicitWidth + sizedFace.leadPad + sizedFace.trailPad
   Behavior on target { enabled: Motion.island; NumberAnimation { id: targetAnim; duration: Motion.normal; easing.type: Motion.easing } }
 
   function place() {
@@ -104,9 +116,9 @@ Item {
     color: Theme.background1
   }
 
-  // a click pages to the next one, as the wheel does
+  // the "+3" plate, or the dots' own plate; a click pages to the next one, as the wheel does
   Rectangle {
-    visible: root.others > 0
+    visible: root.apart
     x: root.target + root.edge
     anchors.verticalCenter: parent.verticalCenter
     width: root.moreWidth
@@ -116,6 +128,7 @@ Item {
 
     KitText {
       id: more
+      visible: !root.dotted
       anchors.centerIn: parent
       text: "+" + root.others
       color: Theme.muted
@@ -129,8 +142,43 @@ Item {
     }
   }
 
-  IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; inputEnabled: !root.sliding && !root.moving }
-  IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; inputEnabled: !root.sliding && !root.moving }
+  // the dots: inside the chip at its left or right, or centred on their plate
+  Item {
+    visible: root.others > 0 && root.dotted
+    anchors.verticalCenter: parent.verticalCenter
+    x: root.dotsAt === "left" ? Theme.gapMedium
+     : root.dotsAt === "right" ? root.target - root.dotSize - Theme.gapMedium
+     : root.target + root.edge + (root.moreWidth - root.dotSize) / 2
+    width: root.dotSize
+    height: dots.height
+
+    Column {
+      id: dots
+      spacing: root.dotGap
+
+      Repeater {
+        model: root.dotCount
+
+        Rectangle {
+          required property int index
+          width: root.dotSize
+          height: root.dotSize
+          radius: width / 2
+          color: index === root.dotLit ? Theme.foreground0 : Theme.dim
+          Behavior on color { enabled: Motion.island; ColorAnimation { duration: Motion.quick } }
+        }
+      }
+    }
+
+    MouseArea {
+      anchors { fill: parent; margins: -Theme.gapSmall }
+      cursorShape: Qt.PointingHandCursor
+      onClicked: IslandService.liveStep(1, root.screen)
+    }
+  }
+
+  IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; shift: root.dotsShift; inputEnabled: !root.sliding && !root.moving }
+  IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; shift: root.dotsShift; inputEnabled: !root.sliding && !root.moving }
 
   Component.onCompleted: { faceA.kind = kind; place(); }
 

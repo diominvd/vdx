@@ -1611,113 +1611,15 @@
   "target": "live"
  },
  {
-  "label": "Messages",
-  "hint": "Shows a new message as a line",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live",
-  "aliases": [
-   "notification",
-   "live",
-   "chat"
-  ]
- },
- {
-  "label": "Low battery",
-  "hint": "Shows the charge when it runs low",
-  "where": "Live activities › LIVE ACTIVITIES",
+  "label": "Other activities",
+  "hint": "How the ones besides the shown one are marked",
+  "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
  {
-  "label": "Device connected",
-  "hint": "Shows a connected Bluetooth device",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Recording",
-  "hint": "Shows a timer while the screen records",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Updates",
-  "hint": "Shows the progress of an update",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Backup",
-  "hint": "Shows the progress of a backup",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Timer",
-  "hint": "Shows the time left or the stopwatch",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "VPN",
-  "hint": "Shows the server and the ping",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live",
-  "aliases": [
-   "mihomo",
-   "proxy"
-  ]
- },
- {
-  "label": "Focus",
-  "hint": "Shows that Focus mode is on",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Radio",
-  "hint": "Shows the station on air",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Music",
-  "hint": "Shows the track playing in Music",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live",
-  "aliases": [
-   "player",
-   "song",
-   "track"
-  ]
- },
- {
-  "label": "Media",
-  "hint": "Shows the track playing in other apps",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Volume and brightness",
-  "hint": "Shows the level while you change it",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Microphone",
-  "hint": "Shows when the mic is muted or unmuted",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Keyboard layout",
-  "hint": "Shows the layout when it changes",
-  "where": "Live activities › LIVE ACTIVITIES",
-  "target": "live"
- },
- {
-  "label": "Plugged in",
-  "hint": "Shows the charge when the cable connects",
-  "where": "Live activities › LIVE ACTIVITIES",
+  "label": "Dots stand",
+  "hint": "In the activity's chip, or on a plate of their own",
+  "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },
  {
@@ -1747,6 +1649,116 @@
  {
   "label": "Right click opens options",
   "hint": "On a live activity: its settings here",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Messages",
+  "hint": "Shows a new message as a line",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live",
+  "aliases": [
+   "notification",
+   "live",
+   "chat"
+  ]
+ },
+ {
+  "label": "Low battery",
+  "hint": "Shows the charge when it runs low",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Device connected",
+  "hint": "Shows a connected Bluetooth device",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Recording",
+  "hint": "Shows a timer while the screen records",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Updates",
+  "hint": "Shows the progress of an update",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Backup",
+  "hint": "Shows the progress of a backup",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Timer",
+  "hint": "Shows the time left or the stopwatch",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "VPN",
+  "hint": "Shows the server and the ping",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live",
+  "aliases": [
+   "mihomo",
+   "proxy"
+  ]
+ },
+ {
+  "label": "Focus",
+  "hint": "Shows that Focus mode is on",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Radio",
+  "hint": "Shows the station on air",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Music",
+  "hint": "Shows the track playing in Music",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live",
+  "aliases": [
+   "player",
+   "song",
+   "track"
+  ]
+ },
+ {
+  "label": "Media",
+  "hint": "Shows the track playing in other apps",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Volume and brightness",
+  "hint": "Shows the level while you change it",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Microphone",
+  "hint": "Shows when the mic is muted or unmuted",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Keyboard layout",
+  "hint": "Shows the layout when it changes",
+  "where": "Live activities › BEHAVIOUR",
+  "target": "live"
+ },
+ {
+  "label": "Plugged in",
+  "hint": "Shows the charge when the cable connects",
   "where": "Live activities › BEHAVIOUR",
   "target": "live"
  },

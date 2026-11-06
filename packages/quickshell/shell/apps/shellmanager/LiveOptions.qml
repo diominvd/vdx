@@ -139,6 +139,15 @@ Column {
       KitSwitch { checked: ShellSettings.liveVpnServer; onToggled: ShellSettings.setLook("liveVpnServer", !checked, "island") }
     }
 
+    Rectangle { visible: root.kind === "vpn"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+    KitRow {
+      visible: root.kind === "vpn"
+      label: "Show ping"
+      hint: "The delay to the server, in ms"
+      KitSwitch { checked: ShellSettings.liveVpnPing; onToggled: ShellSettings.setLook("liveVpnPing", !checked, "island") }
+    }
+
     Rectangle { visible: root.kind === "music" || root.kind === "media"; x: -root.inset; width: root.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
     KitRow {
