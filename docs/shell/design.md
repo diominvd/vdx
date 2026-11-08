@@ -170,8 +170,8 @@ uses tonal layers and more spacious controls.
   both corners), and a Lucide twin in `lucide/`, outline only,
   `stroke="#ffffff"` (`icons/lucide.txt`). Tabler twins in `tabler/` are also
   outline only, `stroke="#ffffff"` (`icons/tabler.txt`).
-  The VPN glyph is Tabler's `brand-openvpn` in every set, shared by its bar,
-  popup, settings and Hub appearances.
+  The VPN glyph uses each set's shield, or Tabler's `brand-openvpn`, shared
+  by its bar, popup, settings and Hub appearances.
   Icons picks the set; Lucide and Tabler use outlines, so a state an icon shows
   by `solid` also needs a tint.
 - Refactors keep the look; a new look is prototyped on one popup first.

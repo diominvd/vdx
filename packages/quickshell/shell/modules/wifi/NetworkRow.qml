@@ -2,8 +2,8 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// One nearby network: name, lock for secured ones, check on the current one,
-// signal bars. The current row sits in the raised tone; click connects.
+// Nearby network: signal on the left, name, then a check for the current
+// network or a lock for a secured one. Click connects.
 Rectangle {
   radius: Theme.radiusControl
   id: root
@@ -43,23 +43,13 @@ Rectangle {
 
   KitText {
     id: name
-    x: 10
-    anchors.verticalCenter: parent.verticalCenter
-    width: Math.min(implicitWidth, check.x - x - 8 - (lock.visible ? lock.width + 6 : 0))
+    objectName: "networkName"
+    anchors { left: bars.right; leftMargin: Theme.gapLoose; right: networkState.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
     text: root.modelData.ssid
     elide: Text.ElideRight
     color: root.current ? Theme.selectedText : hover.hovered ? Theme.foreground0 : Theme.foreground2
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
     font.weight: root.current ? Font.ExtraBold : Font.DemiBold
-  }
-
-  KitIcon {
-    id: lock
-    visible: root.modelData.secure
-    anchors { left: name.right; leftMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
-    name: "lock"
-    tint: Theme.muted
-    size: 12
   }
 
   MouseArea {
@@ -69,17 +59,19 @@ Rectangle {
   }
 
   KitIcon {
-    id: check
-    anchors { right: bars.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
-    opacity: root.current ? 1 : 0
-    name: "check"
-    tint: Theme.green
+    id: networkState
+    objectName: "networkState"
+    anchors { right: parent.right; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
+    visible: root.current || root.modelData.secure
+    name: root.current ? "check" : "lock"
+    tint: root.current ? Theme.green : Theme.muted
     size: Theme.iconSmall
   }
 
   Item {
     id: bars
-    anchors { right: parent.right; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
+    objectName: "networkSignal"
+    anchors { left: parent.left; leftMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
     width: 18
     height: 14
 

@@ -48,8 +48,13 @@ PopupWindow {
   // child bar's the module sits in (Bar.popupHost). Set on every show (the
   // module may have moved between bars) and kept until the popup is hidden.
   property Item host: null
+  property Item originHost: null
   readonly property bool inIsland: !!host
-  function place() { host = Theme.island ? root.bar.popupHost(root.anchorItem) : null; }
+  function openFrom(origin) { originHost = origin; visible = true; }
+  function place() {
+    originHost = originHost ?? root.bar.requestedPopupHost ?? null;
+    host = Theme.island ? (originHost ?? root.bar.popupHost(root.anchorItem)) : null;
+  }
 
   anchor.window: root.bar
   anchor.edges: Edges.Bottom | (alignLeft ? Edges.Left : Edges.Right)
@@ -99,6 +104,7 @@ PopupWindow {
       underline.stop();
       PopupManager.close(root);
       if (root.inIsland) root.host.hidePopup(root);
+      root.originHost = null;
       root.hidden();
     }
   }

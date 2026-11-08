@@ -231,7 +231,7 @@ Item {
         MouseArea {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
-          onClicked: BarLayout.openModule(IslandService.family === "radio" ? "tuner" : IslandService.family === "music" ? "music" : "media")
+          onClicked: BarLayout.openModule(IslandService.family === "radio" ? "tuner" : IslandService.family === "music" ? "music" : "media", root.bar.islandItem)
         }
 
         IslandCover {

@@ -231,6 +231,12 @@ still loads, so it must tolerate missing binaries.
 the focused monitor. `BarPopup` owns outside-click and default Escape closing;
 nested module views may handle Escape first. Island owns its local view stack:
 Escape returns to the Hub when a view came from there, otherwise to compact.
+Repeated attachment of the same popup preserves its existing Hub return route.
+While the Hub is open, module popups stay in its island even if the module's
+face belongs to a child bar, preserving the back bubble and return route.
+The Hub player passes its island explicitly to `BarLayout.openModule`; the
+origin is preserved through both existing popups and modules loaded on demand,
+so return navigation does not depend on the Hub remaining visible until IPC finishes.
 `BarLayout.openModule(id)` is the shared route to a module popup or its options:
 a module drawn somewhere answers through its popup's IPC; one drawn nowhere (a hub
 tile, a live activity's target) is made on demand by the focused monitor's bar

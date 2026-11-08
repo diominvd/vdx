@@ -71,14 +71,16 @@ Singleton {
   // island style is made for the moment by the focused monitor's bar (`hostRequested`,
   // Bar.qml), which calls its `openPopup()` and lets it go when no popup is open; a module
   // without `openPopup()` opens its options instead.
-  signal hostRequested(string id, string screen)
+  signal hostRequested(string id, string screen, var origin)
   readonly property var popupTargets: ({ music: "player", backup: "backups", cleaner: "clean", virustotal: "scan",
                                          taskmanager: "tasks", display: "monitors", packages: "updates", clipboard: "clip" })
   function popupTarget(id) { return popupTargets[id] ?? id; }
-  function openModule(id) {
+  function openModule(id, origin) {
     const target = popupTarget(id);
-    if (PopupManager.ipcOwner(target)) ShellIpc.call(target, "toggle");
-    else if (Theme.island && usable(id)) hostRequested(id, Hyprland.focusedMonitor?.name ?? "");
+    const popup = PopupManager.ipcOwner(target);
+    if (popup && origin) popup.openFrom(origin);
+    else if (popup) ShellIpc.call(target, "toggle");
+    else if (Theme.island && usable(id)) hostRequested(id, Hyprland.focusedMonitor?.name ?? "", origin ?? null);
     else if (modules.find(p => p.id === id)?.settings) ShellIpc.call("shell", "open", ["modules:" + id]);
   }
 

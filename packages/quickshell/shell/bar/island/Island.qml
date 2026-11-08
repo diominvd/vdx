@@ -70,7 +70,9 @@ Item {
 
   function showPopup(p) {
     restoreTimer.stop();
-    fromHub = view === "hub";
+    // The popup can announce itself again after its content is reparented.
+    // Reattaching the same popup must preserve its original parent route.
+    fromHub = p.originHost === root || view === "hub" || (view === "module" && popup === p && fromHub);
     moduleHost.attach(p);
     flash = "";
     view = "module";

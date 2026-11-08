@@ -207,6 +207,9 @@ PanelWindow {
   // island style: where a module's popup opens — the child bar's island it
   // sits in (IslandChild), or the island
   function popupHost(item) {
+    // A Hub action can target a module drawn on a child bar. Keep the popup
+    // in the Hub's island so its parent route and back bubble survive.
+    if (root.islandItem?.view === "hub") return root.islandItem;
     for (let p = item; p; p = p.parent)
       if (p.hostsPopups === true) return p;
     return root.islandItem;
@@ -396,16 +399,21 @@ PanelWindow {
   // open by BarLayout.openModule, it is made here, its `openPopup()` is called (every module
   // with a popup has one; without it, its options open), and it is let go once no popup is open.
   property var hosted: []
+  property var hostedOrigins: ({})
+  property Item requestedPopupHost: null
   Connections {
     target: BarLayout
-    function onHostRequested(id, screen) {
+    function onHostRequested(id, screen, origin) {
       if (screen !== "" && screen !== root.modelData.name) return;
+      root.hostedOrigins[id] = origin;
       if (!root.hosted.includes(id)) root.hosted = root.hosted.concat([id]);
     }
   }
   Connections {
     target: PopupManager
-    function onCurrentChanged() { if (PopupManager.current === null) root.hosted = []; }
+    function onCurrentChanged() {
+      if (PopupManager.current === null) { root.hosted = []; root.hostedOrigins = ({}); }
+    }
   }
   // an `openPopup()` that opens no popup (the capture overlay) leaves nothing to wait for
   Timer { id: hostedSettle; interval: 100; onTriggered: if (PopupManager.current === null) root.hosted = [] }
@@ -416,7 +424,11 @@ PanelWindow {
       visible: false
       sourceComponent: root.modules[modelData] ?? null
       onLoaded: {
-        if (item.openPopup) { item.openPopup(); hostedSettle.restart(); }
+        if (item.openPopup) {
+          root.requestedPopupHost = root.hostedOrigins[modelData] ?? null;
+          try { item.openPopup(); } finally { root.requestedPopupHost = null; }
+          hostedSettle.restart();
+        }
         else { root.hosted = root.hosted.filter(h => h !== modelData); root.openSettings(modelData); }
       }
     }

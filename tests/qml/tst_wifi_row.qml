@@ -16,6 +16,7 @@ TestCase {
   }
 
   function init() {
+    row.modelData = ({ssid: "fixture-network", secure: true, signal: 80, saved: false});
     TestWifiService.connected = false;
     TestWifiService.radioOn = true;
     TestWifiService.ssid = "";
@@ -23,6 +24,29 @@ TestCase {
     TestWifiService.hiddenBusy = false;
     TestWifiService.calls = [];
     row.forceActiveFocus();
+  }
+
+  function test_signal_name_and_single_trailing_state() {
+    const signal = findChild(row, "networkSignal");
+    const name = findChild(row, "networkName");
+    const mark = findChild(row, "networkState");
+    verify(signal.x + signal.width < name.x);
+    verify(name.x + name.width < mark.x);
+    compare(mark.x + mark.width, row.width - 10);
+    compare(mark.name, "lock");
+    verify(mark.visible);
+    TestWifiService.connected = true;
+    TestWifiService.ssid = "fixture-network";
+    compare(mark.name, "check");
+    verify(mark.visible);
+    TestWifiService.connected = false;
+    row.modelData = ({ssid: "open-network", secure: false, signal: 20});
+    verify(!mark.visible);
+    row.width = 180;
+    row.modelData = ({ssid: "a very long network name which must be elided", secure: true, signal: 20});
+    verify(name.width > 0);
+    verify(name.x + name.width < mark.x);
+    row.width = 300;
   }
 
   function test_keyboard_and_mouse_activate_network() {

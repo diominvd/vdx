@@ -107,4 +107,4 @@ x x
 zap bolt
 icons icons
 assembly assembly
-vpn brand-openvpn (Tabler, MIT; see tabler/LICENSE)
+vpn brand-openvpn

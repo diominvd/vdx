@@ -104,4 +104,4 @@ curve (drawn here: an easing curve, no Material twin)
 bell-off notifications_off
 icons star
 assembly extension
-vpn brand-openvpn (Tabler, MIT; see tabler/LICENSE)
+vpn shield

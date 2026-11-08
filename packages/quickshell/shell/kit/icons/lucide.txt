@@ -105,4 +105,4 @@ curve (drawn here: an easing curve)
 bell-off bell-off
 icons star
 assembly puzzle
-vpn brand-openvpn (Tabler, MIT; see tabler/LICENSE)
+vpn shield
