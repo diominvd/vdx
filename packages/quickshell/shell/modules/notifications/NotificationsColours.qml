@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.config
 import qs.kit
 
@@ -21,6 +22,8 @@ Column {
   }
 
   // the heard apps no rule covers yet
+  readonly property var appNames: Array.from(new Set(heard.concat(DesktopEntries.applications.values.map(a => a.name)))).filter(a => a !== "").sort((a, b) => a.localeCompare(b))
+
   readonly property var unruled: heard.filter(a => !rules.some(r => (r.app ?? "") !== "" && a.toLowerCase().includes(r.app.toLowerCase())))
 
   function save(list) { ModuleSettings.set("notifications", "appColours", list); }
@@ -42,7 +45,7 @@ Column {
     width: root.width
     keys: ["colours"]
     rowHeight: Theme.rowHeight
-    bodyGap: Theme.settingsRowInset
+    bodyGap: 0
 
     delegate: KitFoldRow {
       id: row
@@ -51,8 +54,14 @@ Column {
       draggable: false
       hasSwitch: false
       flush: true
+      sunken: true
       checked: true
       foldable: true
+
+      Column {
+        x: row.edge
+        width: parent.width - row.edge - Theme.gapLoose
+        spacing: Theme.settingsRowInset
 
       Repeater {
         model: root.rules.length
@@ -71,7 +80,8 @@ Column {
 
           Rectangle {
             visible: rule.index > 0
-            width: parent.width
+            x: -row.edge
+            width: parent.width + row.edge + Theme.gapLoose
             height: Theme.dividerThickness
             color: Theme.dividerColor
           }
@@ -94,7 +104,7 @@ Column {
           }
 
           // the name: the app as its notifications call it; a rule for another app is typed once, kept
-          // in the field until Enter or leaving it (a rule saved per letter would swap the field for text)
+          // in the field until Enter or Save (saving per letter would swap the field for text)
           Item {
             id: field
             property bool typing: rule.rl.app === ""
@@ -109,6 +119,12 @@ Column {
               else { typing = false; root.edit(rule.index, { app: name }); }
             }
 
+            MouseArea {
+              anchors.fill: parent
+              enabled: !field.typing
+              cursorShape: Qt.PointingHandCursor
+              onClicked: { typer.text = rule.rl.app; field.typing = true; typer.input.forceActiveFocus(); }
+            }
             KitText {
               visible: !field.typing
               anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
@@ -121,9 +137,22 @@ Column {
               anchors.fill: parent
               placeholder: "App name"
               Component.onCompleted: if (field.typing) input.forceActiveFocus()
+              completions: field.typing ? root.appNames : []
+              passKeys: [Qt.Key_Escape]
               onAccepted: field.commit()
-              input.onActiveFocusChanged: if (!input.activeFocus) field.commit()
+              onKeyPassed: key => {
+                if (key === Qt.Key_Escape) { typer.text = rule.rl.app; field.commit(); }
+              }
             }
+          }
+
+          KitButton {
+            id: saveName
+            visible: field.typing
+            anchors { right: away.left; rightMargin: Theme.gapSmall; verticalCenter: line.verticalCenter }
+            icon: "check"
+            Accessible.name: "Save app name"
+            onClicked: field.commit()
           }
 
           KitButton {
@@ -135,7 +164,7 @@ Column {
           }
 
           KitColourRow {
-            anchors { left: field.right; leftMargin: Theme.gapWide; right: away.left; rightMargin: Theme.gapWide; verticalCenter: line.verticalCenter }
+            anchors { left: field.right; leftMargin: Theme.gapWide; right: saveName.visible ? saveName.left : away.left; rightMargin: Theme.gapWide; verticalCenter: line.verticalCenter }
             always: true
             names: Theme.colourSet
             picked: rule.rl.colour
@@ -145,7 +174,7 @@ Column {
         }
       }
 
-      Rectangle { visible: root.rules.length > 0; width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+      Rectangle { visible: root.rules.length > 0; x: -row.edge; width: parent.width + row.edge + Theme.gapLoose; height: Theme.dividerThickness; color: Theme.dividerColor }
 
       // an app that has notified (its name is exact), or another one typed by hand; with nobody
       // to pick from the list would hold one choice, so a button says it
@@ -164,6 +193,7 @@ Column {
         model: root.unruled.map(a => ({ label: a, value: a })).concat([{ label: "Another app…", value: "" }])
         current: "\u0000"
         onPicked: value => root.add(value)
+      }
       }
     }
   }

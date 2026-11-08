@@ -103,3 +103,6 @@ thermometer thermometer
 user user
 curve (drawn here: an easing curve)
 bell-off bell-slash
+icons star
+assembly puzzle-piece
+vpn brand-openvpn (Tabler, MIT; see tabler/LICENSE)

@@ -19,6 +19,7 @@ Item {
   property string selected: ""
   property string searchHint: "Search…"
   property Component options: null
+  property real viewportRightInset: Theme.windowPadding
 
   signal switched(string id, bool on)
 
@@ -42,7 +43,7 @@ Item {
 
   Flickable {
     id: pane
-    anchors { left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom; rightMargin: -Theme.windowPadding }   // to the window's edge: the scrollbar sits there
+    anchors { left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom; rightMargin: -root.viewportRightInset }
     Controls.ScrollBar.vertical: KitScrollBar {}
     contentHeight: page.implicitHeight
     bottomMargin: Theme.windowPadding
@@ -52,7 +53,7 @@ Item {
 
     Column {
       id: page
-      width: pane.width - Theme.windowPadding
+      width: root.width
 
       // the page's own rhythm (KitGrouper) spaces the search and the list, as on every page
       Item {

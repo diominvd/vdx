@@ -61,14 +61,14 @@ Rectangle {
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
     { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "fonts",      label: "Fonts",      icon: "text" },
-    { value: "icons",      label: "Icons",      icon: "star" },
+    { value: "icons",      label: "Icons",      icon: "icons" },
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
     { value: "animations", label: "Motion",     icon: "curve" },
     { value: "bar",        label: "Bar",        icon: "columns",     caption: "BAR",
       page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
     { value: "barlook",    label: "Bar look",   icon: "layout",
       page: "bar", pageTab: "appearance", description: "The bar's style, size and spacing." },
-    { value: "modules",    label: "Bar modules", icon: "puzzle" },
+    { value: "modules",    label: "Bar modules", icon: "assembly" },
     { value: "hub",        label: "Hub",        icon: "home",    island: true },
     { value: "live",       label: "Live activities", icon: "activity", island: true },
     { value: "barmonitor", label: "Bar monitors", icon: "laptop",
@@ -78,7 +78,7 @@ Rectangle {
     { value: "lockscreen", label: "Lock screen", icon: "lock" },
     { value: "network",    label: "Network",    icon: "public",       caption: "CONNECT" },
     { value: "bluetooth",  label: "Bluetooth",  icon: "bluetooth" },
-    { value: "vpn",        label: "VPN",        icon: "shield", module: "mihomo" },
+    { value: "vpn",        label: "VPN",        icon: "vpn", module: "mihomo" },
     { value: "sound",      label: "Sound",      icon: "volume",     caption: "DEVICES" },
     { value: "displays",   label: "Displays",   icon: "monitor" },
     { value: "power",      label: "Power",      icon: "zap" },
@@ -598,11 +598,13 @@ Rectangle {
     // a new page comes in: a fade and a short move from the right
     Item {
       id: pages
-      x: Theme.windowPadding
+      readonly property real availableWidth: Math.max(0, page.width - 2 * Theme.windowPadding)
+      x: Theme.windowPadding + (availableWidth - width) / 2
       opacity: pageIn.shown
       transform: Translate { x: (1 - pageIn.shown) * 18 }     // a short move in from the right
       y: root.contentGap
-      width: page.width - 2 * Theme.windowPadding
+      // Themes is a two-pane gallery; all settings pages share the form width.
+      width: root.tab === "themes" ? availableWidth : Math.min(availableWidth, Theme.settingsMaxWidth)
       height: Math.max(implicitHeight, page.height - y)
       implicitHeight: pageContent.item?.implicitHeight ?? 0
 
@@ -637,7 +639,7 @@ Rectangle {
       Component { id: wallpaperComponent; WallpaperPage { width: pages.width } }
       Component { id: cursorComponent; CursorPage { width: pages.width } }
       Component { id: animationsComponent; AnimationsPage { width: pages.width } }
-      Component { id: appsComponent; ShellAppsPage { width: pages.width; height: page.height - pages.y } }
+      Component { id: appsComponent; ShellAppsPage { width: pages.width; height: page.height - pages.y; viewportRightInset: page.width - pages.x - pages.width } }
       Component { id: windowsComponent; WindowsPage { width: pages.width } }
       Component { id: networkComponent; NetworkPage { width: pages.width } }
       Component { id: soundComponent; SoundPage { width: pages.width } }
@@ -652,7 +654,7 @@ Rectangle {
       Component { id: aboutComponent; AboutPage { width: pages.width } }
       Component { id: lockscreenComponent; LockScreenPage { width: pages.width } }
       Component { id: notificationsComponent; NotificationsPage { width: pages.width } }
-      Component { id: modulesComponent; ModulesPage { width: pages.width; height: page.height - pages.y } }
+      Component { id: modulesComponent; ModulesPage { width: pages.width; height: page.height - pages.y; viewportRightInset: page.width - pages.x - pages.width } }
     }
   }
 

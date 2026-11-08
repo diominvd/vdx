@@ -40,6 +40,7 @@ def main():
         config = work / "qs/config"
         config.mkdir(parents=True)
         shutil.copytree(SHELL / "kit", work / "qs/kit")
+        shutil.copy(SHELL / "bar/island/hub/HubLayout.js", work / "qs/kit/HubLayout.js")
         for name in ("EntryFolds.qml",):
             shutil.copy(SHELL / "apps/shellmanager" / name, work / "qs/kit" / name)
         shutil.copy(SHELL / "apps/shellmanager/BarArrangement.qml", work / "qs/kit/BarArrangement.qml")

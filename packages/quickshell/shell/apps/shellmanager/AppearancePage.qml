@@ -2,8 +2,8 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Interface (style, fields, corners) and Colours: sidebar pages on one
-// full-width form. Icons, Fonts and Wallpaper are pages of their own.
+// Interface (style, fields, corners) and Colours share the bounded settings form.
+// Icons, Fonts and Wallpaper are pages of their own.
 KitSettingsWorkspace {
   id: root
   readonly property bool fillsViewport: true
@@ -38,13 +38,12 @@ KitSettingsWorkspace {
     Column {
       width: parent.width
       Column {
-  spacing: Theme.sectionGap
-
+        spacing: Theme.sectionGap
         width: parent.width
         visible: root.tab === "style"
         KitLabel { text: "STYLE" }
         StyleCards { width: parent.width }
-        KitLabel { text: "SHAPE"; about: "What the two samples above redraw" }
+        KitLabel { text: "SHAPE"; about: "Corners used throughout the shell" }
         CornersSection { width: parent.width }
         KitLine {}
         KitLabel { text: "CONTROLS" }

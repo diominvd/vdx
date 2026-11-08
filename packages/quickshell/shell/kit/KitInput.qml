@@ -10,6 +10,25 @@ Rectangle {
   id: root
 
   property string placeholder: ""
+  // Optional prefix completion. The suffix is a hint until Tab accepts it.
+  property var completions: []
+  readonly property string completion: {
+    if (!textInput.activeFocus || echoMode !== TextInput.Normal || textInput.text === ""
+        || textInput.cursorPosition !== textInput.text.length || textInput.selectedText !== ""
+        || textInput.preeditText !== "") return "";
+    const prefix = textInput.text.toLowerCase();
+    return completions.find(value => value.length > prefix.length && value.toLowerCase().startsWith(prefix)) ?? "";
+  }
+  readonly property string completionSuffix: completion.slice(textInput.text.length)
+  function acceptCompletion() {
+    const value = completion;
+    if (value === "") return false;
+    textInput.text = value;
+    textInput.cursorPosition = value.length;
+    textEdited();
+    return true;
+  }
+
   property string icon: ""             // kit/icons name, before the text
   property alias text: textInput.text
   property alias input: textInput
@@ -111,9 +130,26 @@ Rectangle {
     onTextEdited: root.textEdited()
     onAccepted: root.accepted()
     Keys.onPressed: event => {
+      if (event.key === Qt.Key_Tab && event.modifiers === Qt.NoModifier && root.acceptCompletion()) {
+        event.accepted = true;
+        return;
+      }
       if (!root.passKeys.includes(event.key)) return;
       event.accepted = true;
       root.keyPassed(event.key);
+    }
+
+    Loader {
+      active: root.completionSuffix !== ""
+      x: Math.round(textInput.cursorRectangle.x)
+      y: Math.round(textInput.baselineOffset - (item?.baselineOffset ?? 0))
+      sourceComponent: Text {
+        text: root.completionSuffix
+        textFormat: Text.PlainText
+        font: textInput.font
+        color: Theme.mix(textInput.color, root.color, 0.6)
+        Accessible.ignored: true
+      }
     }
 
     cursorDelegate: Rectangle {

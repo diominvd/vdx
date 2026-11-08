@@ -3,7 +3,7 @@ import qs.config
 import qs.kit
 
 // Icons: the icon set for the whole shell — Material or Phosphor (outline or
-// solid), or Lucide (outline only) — and the style.
+// solid), or Lucide / Tabler (outline only) — and the style.
 KitColumn {
   spacing: Theme.gapGroup
 
@@ -16,7 +16,8 @@ KitColumn {
       model: [
         { label: "Material", value: "material" },
         { label: "Phosphor", value: "phosphor" },
-        { label: "Lucide",   value: "lucide" }
+        { label: "Lucide",   value: "lucide" },
+        { label: "Tabler",   value: "tabler" }
       ]
       current: ShellSettings.iconSet
       onPicked: value => ShellSettings.set("iconSet", value)
@@ -25,7 +26,7 @@ KitColumn {
 
   KitRow {
     wide: true
-    visible: ShellSettings.iconSet !== "lucide"
+    visible: !["lucide", "tabler"].includes(ShellSettings.iconSet)
     label: "Icon style"
 
     KitSegments {

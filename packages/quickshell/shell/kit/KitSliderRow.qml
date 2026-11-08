@@ -62,11 +62,11 @@ Item {
   KitText {
     id: rowValue
     visible: rowCaption.visible && !root.plate
-    anchors {
-      right: parent.right
-      verticalCenter: root.inlineCaption ? parent.verticalCenter : undefined
-      baseline: root.inlineCaption ? undefined : rowCaption.baseline
-    }
+    anchors.right: parent.right
+    // One position binding avoids briefly combining baseline and centre
+    // anchors when switching between Strict and Material.
+    y: root.inlineCaption ? Math.round((parent.height - height) / 2)
+                          : rowCaption.y + rowCaption.baselineOffset - baselineOffset
     text: root.text
     color: root.dimmed ? Theme.gray : Theme.foreground2
   }

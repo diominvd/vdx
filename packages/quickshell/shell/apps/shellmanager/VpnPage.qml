@@ -12,7 +12,7 @@ KitColumn {
   readonly property bool listed: vpn.serviceOn && vpn.providers.length > 0
 
   // the window's fixed header shows these; the page under it scrolls
-  readonly property string icon: "public"
+  readonly property string icon: "vpn"
   readonly property string title: "VPN"
   readonly property string description: "The Mihomo proxy: the tunnel, its subscription and its files."
 

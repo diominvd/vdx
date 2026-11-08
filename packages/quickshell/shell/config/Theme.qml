@@ -278,6 +278,7 @@ QtObject {
   readonly property int modulePopupWidth: 340  // ordinary module popups; wider views opt into their needed width
   // a window's frame: the gap to its edges on every side, and the space the
   // title's line keeps above its capitals (the header draws that far into its box)
+  readonly property int settingsMaxWidth: 720  // readable width for settings forms
   readonly property int windowPadding: 24
   readonly property int headerInset: 3
   readonly property int controlHeight: material ? 36 : 34       // buttons, selects, fields: one height side by side

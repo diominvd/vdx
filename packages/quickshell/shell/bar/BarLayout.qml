@@ -31,7 +31,7 @@ Singleton {
     { id: "audio",         label: "Audio",         zone: "right",  icon: "volume", settings: "AudioSettings.qml", about: "Devices, volumes, app streams" },
     { id: "wifi",          label: "Wi-Fi",         zone: "right",  tile: true, icon: "wifi", settings: "WifiSettings.qml", about: "Networks, DNS, speed test" },
     { id: "bluetooth",     label: "Bluetooth",     zone: "right",  tile: true, icon: "bluetooth", settings: "BluetoothSettings.qml", about: "Pair and manage devices" },
-    { id: "mihomo",        label: "VPN",           zone: "right",  tile: true, icon: "public", settings: "MihomoSettings.qml", about: "Mihomo proxy and servers" },
+    { id: "mihomo",        label: "VPN",           zone: "right",  tile: true, icon: "vpn", settings: "MihomoSettings.qml", about: "Mihomo proxy and servers" },
     { id: "battery",       label: "Battery",       zone: "right",  icon: "battery-full", settings: "BatterySettings.qml", about: "Charge, limit, power profile, GPU" },
     { id: "timer",         label: "Timer",         zone: "right",  tile: true, icon: "clock", settings: "TimerSettings.qml", about: "Countdown and stopwatch" },
     { id: "media",         label: "Media",         zone: "left",   icon: "play", about: "What plays in other apps" },

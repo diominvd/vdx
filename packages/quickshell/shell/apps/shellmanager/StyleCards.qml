@@ -3,333 +3,190 @@ import Quickshell.Widgets
 import qs.config
 import qs.kit
 
-// Interface › Style: the two styles as cards, each a miniature desktop drawn in its own
-// way — the island, a window (sidebar, a card of rows, buttons) and a toast, text as grey
-// skeleton lines — at 0.6 of the real size, with the real corners (Shape), slider style
-// and input text; the one in use has a check.
+// One shared preview follows the chosen style and the shape/control settings.
+// The illustrated controls have no input handlers or background work.
 Item {
   id: root
 
-  property bool kitUnboxed: true               // the cards stand on the page, not in the section's box
-  readonly property int spacing: Theme.gapMedium
+  property bool kitUnboxed: true
+  implicitHeight: choices.y + choices.height
+  readonly property bool m3: ShellSettings.material
+  readonly property int corner: Theme.radiusCard
+  readonly property color paper: Theme.background0
+  readonly property color panel: m3 ? Theme.surfaceContainer : Theme.mix(paper, Theme.foreground0, 0.025)
+  readonly property color fill: m3 ? Theme.surfaceHigh : Theme.mix(paper, Theme.foreground0, 0.04)
+  readonly property color stroke: Theme.mix(paper, Theme.foreground0, 0.17)
+  readonly property color selectedFill: m3 ? Theme.secondaryContainer : Theme.mix(paper, Theme.foreground0, 0.14)
+  readonly property color accent: m3 ? Theme.primary : Theme.foreground0
+  readonly property int controlRadius: Theme.scaled(19, Theme.cornerOf("controls") * Theme.softness)
+  readonly property int windowRadius: Theme.round ? Math.round(Theme.cornerOf("windows") * 0.7) : 0
 
-  // the gap under the cards: the group's own spacing, as under any other item that stands on the page
-  implicitHeight: cards.height
-
-  readonly property var styles: [
-    { value: false, name: "Strict", hint: "Clean outlines, compact controls" },
-    { value: true, name: "Material 3", hint: "Tonal surfaces, soft controls" }
-  ]
-
-  // a text line of the miniature
   component Skel: Rectangle {
-    height: 3
-    radius: Theme.pill(height)
+    height: 4
+    radius: height / 2
     color: Theme.muted
+    opacity: 0.55
+  }
+
+  ClippingRectangle {
+    id: picture
+    width: root.width
+    height: Math.round(Math.max(170, Math.min(208, width * 0.29)))
+    radius: root.corner
+    color: root.m3 ? Theme.mix(root.paper, Theme.primary, 0.13) : Theme.background1
+    // Draw at native size so text and strokes stay sharp on the pixel grid.
+    Item {
+      x: 16; y: 14
+      width: picture.width - 32
+      height: 220
+
+      ClippingRectangle {
+        id: window
+        anchors.fill: parent
+        radius: root.windowRadius
+        color: root.paper
+        Rectangle {
+          id: sidebar
+          width: 69
+          height: parent.height
+          color: root.panel
+
+          Row {
+            x: 12; y: 13
+            spacing: 5
+            Repeater { model: 3; Rectangle { width: 4; height: 4; radius: 2; color: Theme.muted; opacity: 0.55 } }
+          }
+          Column {
+            x: 8; y: 36
+            spacing: 6
+            Repeater {
+              model: 4
+              Rectangle {
+                required property int index
+                width: 53; height: 17
+                radius: root.controlRadius
+                color: index === 1 ? root.selectedFill : Theme.clear
+                Skel { x: 7; y: Math.round((parent.height - height) / 2); width: index === 1 ? 32 : 23; color: index === 1 ? Theme.foreground0 : Theme.muted }
+              }
+            }
+          }
+        }
+
+        Rectangle { x: sidebar.width; width: 1; height: parent.height; color: root.stroke; visible: !root.m3 }
+
+        Column {
+          x: sidebar.width + 17; y: 17
+          width: window.width - x - 17
+          spacing: 9
+          KitText { text: "Appearance"; font.weight: Font.Medium }
+          KitText { text: "Make it yours"; color: Theme.hint; font.pixelSize: Theme.fontSize - 1 }
+
+          Rectangle {
+            width: parent.width; height: 102
+            radius: root.m3 && Theme.round ? 10 : root.controlRadius
+            color: root.panel
+            border.width: root.m3 ? 0 : 1
+            border.color: root.stroke
+
+            Column {
+              anchors { fill: parent; margins: 11 }
+              spacing: 10
+              Item {
+                width: parent.width; height: 19
+                KitText { y: Math.round((parent.height - height) / 2); text: "Notifications" }
+                Rectangle {
+                  anchors.right: parent.right
+                  y: Math.round((parent.height - height) / 2)
+                  width: root.m3 ? 33 : 29; height: root.m3 ? 19 : 15
+                  radius: root.controlRadius
+                  color: root.accent
+                  Rectangle {
+                    anchors { right: parent.right; rightMargin: 3 }
+                    y: Math.round((parent.height - height) / 2)
+                    width: root.m3 ? 13 : 9; height: width
+                    radius: root.controlRadius
+                    color: root.m3 ? Theme.inkOn(root.accent) : root.paper
+                  }
+                }
+              }
+              Item {
+                width: parent.width; height: 19
+                KitText { text: "Volume"; y: Math.round((parent.height - height) / 2) }
+                Rectangle {
+                  anchors.right: parent.right
+                  y: Math.round((parent.height - height) / 2)
+                  width: 69; height: root.m3 ? 8 : ShellSettings.segmentedSliders ? 6 : 3
+                  radius: root.controlRadius
+                  color: root.selectedFill
+                  Rectangle { width: Math.round(parent.width * 0.6); height: parent.height; radius: parent.radius; color: root.accent }
+                  Rectangle {
+                    visible: !root.m3 && ShellSettings.segmentedSliders
+                    x: Math.round(parent.width * 0.6 - width / 2)
+                    width: 4; height: parent.height
+                    color: root.panel
+                  }
+                  Rectangle {
+                    visible: root.m3 || !ShellSettings.segmentedSliders
+                    x: Math.round(parent.width * 0.6 - width / 2)
+                    y: Math.round((parent.height - height) / 2)
+                    width: root.m3 ? 3 : 7; height: root.m3 ? 15 : 7
+                    radius: root.m3 ? 1 : 4
+                    color: root.accent
+                  }
+                }
+              }
+              Item {
+                width: parent.width; height: 19
+                KitText { text: "Search"; y: Math.round((parent.height - height) / 2) }
+                Rectangle {
+                  anchors.right: parent.right
+                  width: 69; height: 19
+                  radius: root.controlRadius
+                  color: root.fill
+                  border.width: root.m3 ? 0 : 1
+                  border.color: root.stroke
+                  Skel { x: ShellSettings.inputAlign === "center" ? Math.round((parent.width - width) / 2) : 7; width: 31; height: 3; y: Math.round((parent.height - height) / 2) }
+                  Rectangle { visible: root.m3; anchors.bottom: parent.bottom; width: parent.width; height: 1; color: root.stroke }
+                }
+              }
+            }
+          }
+
+        }
+      }
+    }
+  }
+
+  Rectangle {
+    anchors.fill: picture
+    radius: picture.radius
+    color: Theme.clear
+    border.width: Theme.hairline
+    border.color: root.stroke
   }
 
   Row {
-    id: cards
-    width: parent.width
-    spacing: root.spacing
+    id: choices
+    y: picture.height + Theme.gapWide
+    width: Math.min(root.width, 320)
+    spacing: Theme.gapSmall
+    Keys.onLeftPressed: ShellSettings.set("material", false)
+    Keys.onRightPressed: ShellSettings.set("material", true)
 
     Repeater {
-      model: root.styles
-
-      Rectangle {
-        id: card
+      model: [{ label: "Strict", value: false }, { label: "Material 3", value: true }]
+      KitButton {
         required property var modelData
-        readonly property bool picked: ShellSettings.material === modelData.value
-        readonly property bool m3: modelData.value
-
-        // ---- the miniature's measures: real size x k, corners in the real proportion ----
-        readonly property real k: 0.6
-        readonly property real soft: m3 ? 2 : 1
-        readonly property int ctlH: m3 ? 36 : 34
-        function rad(h, part) { return Math.round(Theme.scaled(h, Theme.cornerOf(part) * soft) * k); }
-        readonly property int winPx: Theme.round ? Theme.cornerOf("windows") : 0
-        readonly property int cardPx: Theme.round ? Math.round(Theme.cornerOf("cards") * (m3 ? 1 : 0.6)) : 0
-        readonly property int ctlPx: Theme.scaled(ctlH, Theme.cornerOf("controls") * soft)
-        readonly property int winR: Math.round(winPx * k)
-        readonly property int cardR: Math.round(cardPx * k)
-        readonly property int ctlR: Math.round(ctlPx * k)
-        readonly property int ctlMini: Math.round(ctlH * k)
-        readonly property color plate: m3 ? Theme.surfaceHigh : Theme.mix(Theme.background0, Theme.foreground0, 0.085)
-        readonly property color line: Theme.controlLine
-        readonly property color ink: m3 ? Theme.inkOn(Theme.primary) : Theme.background0
-
-        width: (root.width - root.spacing) / 2
-        height: mock.height + footer.height
-        radius: Theme.radiusCard
-        color: picked ? Theme.pickFill : Theme.controlFill
-        border.width: Theme.frameWidth
-        border.color: picked ? Theme.foreground2 : area.containsMouse ? Theme.controlLineHover : Theme.controlLine
-        Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
-
-        // ---- the picture ----
-        ClippingRectangle {
-          id: mock
-          x: Theme.frameWidth; y: Theme.frameWidth
-          width: parent.width - 2 * Theme.frameWidth
-          height: 214
-          topLeftRadius: Theme.radiusCard - Theme.frameWidth
-          topRightRadius: topLeftRadius
-          color: Theme.background1
-
-          // the island
-          Rectangle {
-            id: island
-            anchors { top: parent.top; topMargin: 10; horizontalCenter: parent.horizontalCenter }
-            width: 92; height: Math.round(34 * card.k)
-            radius: Math.round(Theme.scaled(34, Theme.cornerOf("bar")) * card.k)
-            color: Theme.groupFill
-            border.width: Theme.hairline
-            border.color: card.line
-            Row {
-              anchors { left: parent.left; leftMargin: 10; verticalCenter: parent.verticalCenter }
-              spacing: 8
-              Rectangle { width: 16; height: 8; radius: Math.round(Theme.scaled(22, Theme.cornerOf("bar")) * card.k); color: card.plate }
-              Skel { width: 22; anchors.verticalCenter: parent.verticalCenter }
-            }
-            Rectangle { anchors { right: parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter } width: 6; height: 6; radius: 3; color: Theme.green }
-          }
-
-          // the window
-          Rectangle {
-            id: win
-            anchors { left: parent.left; right: parent.right; top: island.bottom; bottom: parent.bottom; margins: 10 }
-            anchors.topMargin: 8
-            radius: card.winR
-            color: Theme.background0
-            border.width: Theme.hairline
-            border.color: Theme.background3
-            clip: true
-
-            // sidebar
-            Rectangle {
-              id: side
-              anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
-              width: 54
-              color: card.m3 ? Theme.surfaceContainer : Theme.mix(Theme.background0, Theme.foreground0, 0.03)
-              Column {
-                anchors { fill: parent; margins: 6 }
-                spacing: 4
-                Repeater {
-                  model: 5
-                  Rectangle {
-                    required property int index
-                    width: parent.width
-                    height: Math.round(30 * card.k)
-                    radius: card.rad(30, "controls")
-                    color: index === 1 ? (card.m3 ? Theme.secondaryContainer : Theme.pickFill) : Theme.clear
-                    border.width: index === 1 && !card.m3 ? Theme.hairline : 0
-                    border.color: card.line
-                    Skel { x: 6; width: index === 1 ? parent.width * 0.6 : parent.width * 0.48; anchors.verticalCenter: parent.verticalCenter; color: index === 1 ? Theme.foreground0 : Theme.muted }
-                  }
-                }
-              }
-            }
-            Rectangle { anchors { left: side.right; top: parent.top; bottom: parent.bottom } width: Theme.hairline; color: Theme.background3 }
-
-            // content
-            Column {
-              anchors { left: side.right; right: parent.right; top: parent.top; margins: 8 }
-              anchors.leftMargin: 12
-              spacing: 6
-
-              Skel { width: parent.width * 0.38; height: 5; color: Theme.foreground0 }
-
-              // the card of rows
-              Rectangle {
-                width: parent.width
-                height: rows.height + 12
-                radius: card.cardR
-                color: card.m3 ? Theme.surfaceContainer : Theme.groupFill
-                border.width: card.m3 ? 0 : Theme.hairline
-                border.color: card.line
-
-                Column {
-                  id: rows
-                  anchors { left: parent.left; right: parent.right; top: parent.top; margins: 6 }
-                  spacing: 4
-
-                  // switch
-                  Item {
-                    width: parent.width; height: card.ctlMini
-                    Column { anchors { left: parent.left; verticalCenter: parent.verticalCenter } spacing: 3; Skel { width: 40; height: 4; color: Theme.foreground2 } Skel { width: 62 } }
-                    Rectangle {
-                      anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                      width: Math.round((card.m3 ? 44 : 38) * card.k); height: Math.round((card.m3 ? 26 : 20) * card.k)
-                      radius: card.rad(card.m3 ? 26 : 20, "controls")
-                      color: card.m3 ? Theme.primary : Theme.foreground0
-                      Rectangle {
-                        anchors { right: parent.right; rightMargin: Math.round((card.m3 ? 4 : 3) * card.k); verticalCenter: parent.verticalCenter }
-                        width: Math.round((card.m3 ? 18 : 14) * card.k); height: width
-                        radius: card.rad(card.m3 ? 18 : 14, "controls")
-                        color: card.ink
-                      }
-                    }
-                  }
-
-                  // slider
-                  Item {
-                    width: parent.width; height: card.ctlMini
-                    Column { anchors { left: parent.left; verticalCenter: parent.verticalCenter } spacing: 3; Skel { width: 34; height: 4; color: Theme.foreground2 } Skel { width: 52 } }
-                    Item {
-                      id: slider
-                      readonly property real h: card.m3 ? 10 : ShellSettings.segmentedSliders ? 8 : 3
-                      anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                      width: 66; height: 14
-                      // fill
-                      Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width * 0.55 - (card.m3 ? 2 : ShellSettings.segmentedSliders ? 3 : 0); height: slider.h
-                        radius: card.m3 ? card.rad(16, "controls") : ShellSettings.segmentedSliders ? card.rad(14, "controls") : height / 2
-                        color: card.m3 ? Theme.primary : Theme.foreground0
-                      }
-                      // remainder
-                      Rectangle {
-                        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                        width: parent.width * 0.45 - (card.m3 ? 2 : ShellSettings.segmentedSliders ? 3 : 0); height: slider.h
-                        radius: card.m3 ? card.rad(16, "controls") : ShellSettings.segmentedSliders ? card.rad(14, "controls") : height / 2
-                        color: card.m3 ? Theme.secondaryContainer : card.plate
-                      }
-                      // the handle: Material's bar, Classic's dot
-                      Rectangle {
-                        visible: card.m3 || !ShellSettings.segmentedSliders
-                        x: parent.width * 0.55 - width / 2
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: card.m3 ? 3 : 8; height: card.m3 ? 16 : 8
-                        radius: Theme.pill(Math.min(width, height))
-                        color: Theme.foreground0
-                      }
-                    }
-                  }
-
-                  // segments
-                  Item {
-                    width: parent.width; height: card.ctlMini
-                    Column { anchors { left: parent.left; verticalCenter: parent.verticalCenter } spacing: 3; Skel { width: 30; height: 4; color: Theme.foreground2 } Skel { width: 48 } }
-                    Rectangle {
-                      anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                      width: segRow.width + (card.m3 ? 0 : 4); height: card.m3 ? segRow.height : card.ctlMini
-                      radius: card.m3 ? 0 : card.ctlR
-                      color: card.m3 ? Theme.clear : Theme.background1
-                      border.width: card.m3 ? 0 : Theme.hairline
-                      border.color: card.line
-                      Row {
-                        id: segRow
-                        anchors.centerIn: parent
-                        spacing: card.m3 ? 1 : 0
-                        Repeater {
-                          model: 3
-                          Rectangle {
-                            required property int index
-                            width: 20; height: card.m3 ? card.ctlMini - 2 : card.ctlMini - 6
-                            radius: card.m3 ? card.rad(card.ctlH, "controls") : Math.max(0, card.ctlR - 2)
-                            color: index === 1 ? (card.m3 ? Theme.secondaryContainer : Theme.pickFill) : card.m3 ? card.plate : Theme.clear
-                            Skel { anchors.centerIn: parent; width: 10; color: index === 1 ? Theme.foreground0 : Theme.muted }
-                          }
-                        }
-                      }
-                    }
-                  }
-
-                  // input
-                  Item {
-                    width: parent.width; height: card.ctlMini
-                    Column { anchors { left: parent.left; verticalCenter: parent.verticalCenter } spacing: 3; Skel { width: 26; height: 4; color: Theme.foreground2 } Skel { width: 44 } }
-                    Rectangle {
-                      anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                      width: 66; height: card.ctlMini
-                      radius: card.ctlR
-                      color: card.m3 ? card.plate : Theme.background1
-                      border.width: card.m3 ? 0 : Theme.hairline
-                      border.color: card.line
-                      Skel {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 30
-                        x: ShellSettings.inputAlign === "center" ? (parent.width - width) / 2 : 7
-                      }
-                    }
-                  }
-                }
-              }
-
-              // buttons, and a toast at the other end
-              Item {
-                width: parent.width
-                height: card.ctlMini + 4
-                Row {
-                  anchors.verticalCenter: parent.verticalCenter
-                  spacing: 6
-                  Repeater {
-                    model: 2
-                    Rectangle {
-                      required property int index
-                      width: 42; height: card.ctlMini
-                      radius: card.ctlR
-                      color: index === 1 ? (card.m3 ? Theme.primary : Theme.foreground0) : card.m3 ? card.plate : Theme.clear
-                      border.width: index === 0 && !card.m3 ? Theme.hairline : 0
-                      border.color: card.line
-                      Skel { anchors.centerIn: parent; width: 18; color: index === 1 ? card.ink : Theme.foreground0 }
-                    }
-                  }
-                }
-                Rectangle {
-                  anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                  width: 96; height: parent.height
-                  radius: card.winR
-                  color: Theme.groupFill
-                  border.width: Theme.hairline
-                  border.color: card.line
-                  Rectangle {
-                    id: toastIcon
-                    anchors { left: parent.left; leftMargin: 6; verticalCenter: parent.verticalCenter }
-                    width: 12; height: 12
-                    radius: Math.min(6, Math.round(Theme.cornerOf("hub") * 1.5 * card.k))
-                    color: card.m3 ? Theme.primary : Theme.foreground0
-                  }
-                  Column {
-                    anchors { left: toastIcon.right; leftMargin: 6; verticalCenter: parent.verticalCenter }
-                    spacing: 3
-                    Skel { width: 40; height: 3; color: Theme.foreground2 }
-                    Skel { width: 28 }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // ---- name and hint ----
-        Item {
-          id: footer
-          anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-          height: 44
-
-          Column {
-            anchors { left: parent.left; leftMargin: Theme.gapLoose; right: mark.left; rightMargin: Theme.gapSmall; verticalCenter: parent.verticalCenter }
-            spacing: Theme.gapHair
-            KitText { width: parent.width; elide: Text.ElideRight; text: card.modelData.name; color: card.picked ? Theme.foreground0 : Theme.foreground2; font.weight: card.picked ? Theme.pickWeight : Font.Normal }
-            KitText { width: parent.width; elide: Text.ElideRight; text: card.modelData.hint; color: Theme.muted; font.pixelSize: Theme.fontSize - 1 }
-          }
-
-          Item {
-            id: mark
-            anchors { right: parent.right; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
-            width: 16; height: 16
-            KitIcon { anchors.centerIn: parent; visible: card.picked; name: "check"; tint: Theme.green; size: Theme.iconSmall }
-          }
-        }
-
-        MouseArea {
-          id: area
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: ShellSettings.set("material", card.modelData.value)
-        }
+        readonly property bool current: ShellSettings.material === modelData.value
+        width: (choices.width - choices.spacing) / 2
+        text: modelData.label
+        selected: current
+        icon: current ? "check" : ""
+        iconWithText: true
+        iconTint: Theme.green
+        Accessible.role: Accessible.RadioButton
+        Accessible.checked: current
+        onClicked: ShellSettings.set("material", modelData.value)
       }
     }
   }

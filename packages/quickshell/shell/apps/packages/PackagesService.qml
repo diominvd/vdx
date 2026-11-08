@@ -165,7 +165,8 @@ Singleton {
     interval: 500
     repeat: true
     running: root.stage === "downloading"
-    onTriggered: progressProc.running = true
+    triggeredOnStart: true
+    onTriggered: if (!progressProc.running) progressProc.running = true
   }
 
   Process {
@@ -174,7 +175,7 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const r = root.parse(text);
-        if (r.ok) root.stageDone = r.bytes;
+        if (r.ok && root.stage === "downloading") root.stageDone = r.bytes;
       }
     }
   }

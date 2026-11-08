@@ -10,6 +10,7 @@ import qs.kit
 // (values in ModuleSettings).
 Item {
   id: root
+  property real viewportRightInset: Theme.windowPadding
 
   // the window's fixed header shows these; the page fills the window and scrolls its views
   readonly property string icon: "grid"
@@ -50,6 +51,7 @@ Item {
 
   EntryFolds {
     id: browser
+    viewportRightInset: root.viewportRightInset
     anchors.fill: parent
     model: root.entries
     searchHint: "Search apps…"

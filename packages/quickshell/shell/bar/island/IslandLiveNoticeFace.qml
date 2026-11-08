@@ -21,7 +21,7 @@ Row {
     color: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.appColour(IslandService.noticeItem?.app)
   }
   Rectangle {
-    visible: face.kind === "notice" && ShellSettings.liveNoticeMark === "avatar"
+    visible: face.kind === "notice" && ShellSettings.liveNoticeMark !== "dot"
     anchors.verticalCenter: parent.verticalCenter
     width: face.coverSize
     height: face.coverSize
@@ -35,9 +35,9 @@ Row {
       anchors.centerIn: parent
       implicitSize: parent.width - 4
       source: parent.appIcon
-      visible: parent.appIcon !== ""
+      visible: ShellSettings.liveNoticeMark === "avatar" && parent.appIcon !== ""
     }
-    KitText { anchors.centerIn: parent; visible: parent.appIcon === ""; text: (IslandService.noticeItem?.app ?? "").slice(0, 1).toUpperCase(); color: parent.tone; font.pixelSize: Theme.fontSize - 2; font.weight: Font.Medium }
+    KitText { anchors.centerIn: parent; visible: ShellSettings.liveNoticeMark === "initial" || parent.appIcon === ""; text: (IslandService.noticeItem?.app ?? "").slice(0, 1).toUpperCase(); color: parent.tone; font.pixelSize: Theme.fontSize - 2; font.weight: Font.Medium }
   }
   KitText {
     visible: face.kind === "notice"

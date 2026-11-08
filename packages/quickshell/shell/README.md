@@ -219,7 +219,7 @@ Fonts, Icons, Cursor, Motion.
 - **Shape › Corners**: sharp, or round with one radius — popups, controls,
   the island, Hyprland's windows and mako follow, and the icons switch to
   Material Symbols Rounded.
-- **Icons**: Material Symbols or Phosphor (outline or solid), or Lucide
+- **Icons**: Material Symbols or Phosphor (outline or solid), or Lucide / Tabler
   (outline only).
 - Password fields use dots; there is no separate appearance option.
 
@@ -296,9 +296,11 @@ above a divider. Module layout offers compact semantic groups (the default), equ
 grid tiles and content-sized chips. The profile
 shows the user's initial or chosen image and current system uptime.
 
-Interface and Colours are sidebar pages of one form; Interface holds the
-style, input text and corners.
+Interface and Colours are sidebar pages of a centred, bounded form; Interface
+holds one preview of the selected style, input text and corners.
 Wallpaper is a separate page. Fonts
 and Cursor use searchable lists and a single preview, with explicit Apply.
 The colour picker offers named palette choices with keyboard activation.
 Scrollbars hide while idle.
+Notification colour rules offer app-name completion: Tab accepts the hint,
+Enter or Save stores the name, and Escape cancels the edit.

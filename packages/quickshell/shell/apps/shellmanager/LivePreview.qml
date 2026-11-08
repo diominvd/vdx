@@ -92,11 +92,15 @@ Item {
       spacing: Theme.gapMedium
       // messages
       Rectangle {
-        visible: root.kind === "notice" && ShellSettings.liveNoticeMark === "avatar"
+        visible: root.kind === "notice" && ShellSettings.liveNoticeMark !== "dot"
         anchors.verticalCenter: parent.verticalCenter
-        width: 20; height: 20; radius: Theme.pill(width)
+        readonly property string liveEnd: "badge"
+        width: root.coverSize
+        height: root.coverSize
+        radius: root.badgeRadius
         color: Theme.tonalOn(Theme.blue, chip.color)
-        KitText { anchors.centerIn: parent; text: "N"; color: Theme.blue; font.pixelSize: Theme.fontSize - 2; font.weight: Font.Medium }
+        KitIcon { anchors.centerIn: parent; visible: ShellSettings.liveNoticeMark === "avatar"; name: "bell"; size: 16; tint: Theme.blue }
+        KitText { anchors.centerIn: parent; visible: ShellSettings.liveNoticeMark === "initial"; text: "N"; color: Theme.blue; font.pixelSize: Theme.fontSize - 2; font.weight: Font.Medium }
       }
       Rectangle { visible: root.kind === "notice" && ShellSettings.liveNoticeMark === "dot"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.blue; }
       KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "notice"; text: "Nikita: скину"; font.pixelSize: Theme.fontSize - 1 }

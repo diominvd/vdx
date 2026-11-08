@@ -55,10 +55,10 @@ Column {
     KitRow {
       visible: root.kind === "notice"
       label: "Marked by"
-      hint: "App avatar, or a coloured dot"
+      hint: "App icon, first letter, or a coloured dot"
       wide: true
       KitSegments {
-        model: [{label: "Avatar", value: "avatar"}, {label: "Dot", value: "dot"}]
+        model: [{label: "Icon", value: "avatar"}, {label: "Initial", value: "initial"}, {label: "Dot", value: "dot"}]
         current: ShellSettings.liveNoticeMark
         onPicked: value => ShellSettings.setLook("liveNoticeMark", value, "island")
       }

@@ -22,7 +22,7 @@ uses tonal layers and more spacious controls.
   (windows, cards, controls, the bar, the hub), each R read the
   same way (`Theme.cornerOf(part)`), so one tick looks alike on every part; the
   one slider hides while they show. Interface reads top down: Style (two miniature
-  desktops, each in its own style over the real shape), Shape, Controls (slider style, input text).
+  desktop preview that follows the selected style), Shape, Controls (slider style, input text).
   A settings page's scroll ends a window padding above the window's edge (`KitSettingsWorkspace`).
   No literal `height / 2` for a corner.
   An image in a rounded tile sits in a `ClippingRectangle`.
@@ -168,8 +168,11 @@ uses tonal layers and more spacious controls.
   `round/` and `round/solid/` (Material names: `icons/material.txt`), Phosphor
   twins in `phosphor/` and `phosphor/solid/` (`icons/phosphor.txt`, one set for
   both corners), and a Lucide twin in `lucide/`, outline only,
-  `stroke="#ffffff"` (`icons/lucide.txt`).
-  Icons picks the set; Lucide has no solid, so a state an icon shows
+  `stroke="#ffffff"` (`icons/lucide.txt`). Tabler twins in `tabler/` are also
+  outline only, `stroke="#ffffff"` (`icons/tabler.txt`).
+  The VPN glyph is Tabler's `brand-openvpn` in every set, shared by its bar,
+  popup, settings and Hub appearances.
+  Icons picks the set; Lucide and Tabler use outlines, so a state an icon shows
   by `solid` also needs a tint.
 - Refactors keep the look; a new look is prototyped on one popup first.
 - Motion: every animation goes through `config/Motion.qml` — a Behavior takes
@@ -192,7 +195,9 @@ Pages by the user's area; the look follows macOS System Settings.
   hairline between rows. A title that is not a KitLabel declares
   `readonly property bool isKitLabel: true`; a visual that stands on the page
   (a preview, a board of chips, theme cards) declares `property bool kitUnboxed: true`.
-  No page width cap: the box links a label to its control.
+  Settings forms are centred and capped at `Theme.settingsMaxWidth`; Themes
+  keeps its full-width gallery. Apps and Bar modules keep their scrollbars at
+  the window edge independently of the form width.
 - MUST — controls in a box take their fill one step up (`Theme.fillOn(boxed)`,
   `hoverOn`); a well inside a box (list, preview, sample) is `background0`.
 - MUST — Themes, Fonts and Cursor are pages of their own in the sidebar. There

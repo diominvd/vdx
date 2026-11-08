@@ -10,7 +10,7 @@ import Quickshell.Io
 Singleton {
   id: root
 
-  readonly property string iconSet: state.iconSet                 // material | phosphor | lucide (Appearance › Shape)
+  readonly property string iconSet: state.iconSet                 // material | phosphor | lucide | tabler (Icons)
   readonly property bool solidIcons: state.solidIcons             // Material and Phosphor: the filled twins
   readonly property bool iconTiles: state.iconTiles               // list icons in framed tiles (Appearance › Icons)
   readonly property bool menuIcons: state.menuIcons               // an icon before each page in the Shell Manager's list
@@ -79,7 +79,7 @@ Singleton {
   readonly property bool liveMusicPaused: look("liveMusicPaused", "island")  // the music stays in the live slot on pause
   readonly property bool liveMediaCover: look("liveMediaCover", "island")  // show artwork in the media live activity
   readonly property bool liveMusicCover: look("liveMusicCover", "island")  // show the album cover in its live activity
-  readonly property string liveNoticeMark: look("liveNoticeMark", "island")  // avatar | dot: what marks a message in the live slot
+  readonly property string liveNoticeMark: look("liveNoticeMark", "island")  // avatar (icon) | initial | dot: what marks a message in the live slot
   readonly property bool liveVpnServer: look("liveVpnServer", "island")  // the VPN activity names the server
   readonly property bool liveVpnPing: look("liveVpnPing", "island")      // ... and shows the ping
   readonly property bool liveTrackTitle: look("liveTrackTitle", "island")        // the track's name in a music / media activity

@@ -66,7 +66,7 @@ Column {
     }
     return { label: kind, value: "", unit: "", fraction: -1, tint: Theme.gray };
   }
-  function icon(kind) { return ({ recording: "camera", update: "download", backup: "history", timer: "clock", vpn: "public", focus: "moon" })[kind]; }
+  function icon(kind) { return ({ recording: "camera", update: "download", backup: "history", timer: "clock", vpn: "vpn", focus: "moon" })[kind]; }
   function open(kind) { BarLayout.openModule(IslandService.liveTarget[kind]); }
 
   width: parent ? parent.width : 0

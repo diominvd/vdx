@@ -11,9 +11,10 @@ import qs.kit
 // its own: a jump there. Where a module sits is set on the Bar page; a module's switch (`enabled`) takes it off every bar.
 Item {
   id: root
+  property real viewportRightInset: Theme.windowPadding
 
   // the window's fixed header shows these; the page fills the window and scrolls its views
-  readonly property string icon: "puzzle"
+  readonly property string icon: "assembly"
   readonly property string title: "Bar modules"
   readonly property string description: "What each bar module shows and how its popup behaves."
 
@@ -55,6 +56,7 @@ Item {
 
   EntryFolds {
     id: browser
+    viewportRightInset: root.viewportRightInset
     anchors.fill: parent
     model: root.entries
     searchHint: "Search modules…"

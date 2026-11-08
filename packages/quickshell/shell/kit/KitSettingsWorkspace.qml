@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import qs.config
 
-// A full-width settings viewport. Section buttons live in the window header.
+// A settings viewport with a centred, bounded form. Section buttons live in the window header.
 Item {
   id: root
   readonly property alias viewport: controls
@@ -32,7 +32,8 @@ Item {
     Controls.ScrollBar.vertical: KitScrollBar { visible: root.showScrollBar }
     Loader {
       id: settingsLoader
-      width: root.width            // the scrollbar sits past it, at the window's edge
+      width: Math.min(root.width, Theme.settingsMaxWidth)
+      x: (root.width - width) / 2   // the scrollbar stays at the viewport edge
       sourceComponent: root.settings
       opacity: sectionIn.shown
       height: item ? item.implicitHeight : 0

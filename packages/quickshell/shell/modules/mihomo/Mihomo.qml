@@ -4,7 +4,7 @@ import qs.bar
 import qs.config
 import qs.kit
 
-// Bar module: the proxy state (shield + VPN, green while mihomo.service runs).
+// Bar module: the proxy state (VPN glyph + label, green while mihomo.service runs).
 Item {
   id: root
 
@@ -25,7 +25,7 @@ Item {
 
   KitBarItem {
     id: label
-    icon: "public"
+    icon: "vpn"
     text: BarLayout.faceText("mihomo", MihomoService.serviceOn && MihomoService.current !== "" ? root.shortCurrent() : "--")
     tint: MihomoService.serviceOn ? Theme.green : Theme.gray
   }

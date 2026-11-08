@@ -72,7 +72,7 @@ def updates():
 
 def temp_db():
     # the copy of the databases checkupdates syncs (no root needed); it names it by the user id
-    return os.environ.get("CHECKUPDATES_DB") or f"/tmp/checkup-db-{os.getuid()}"
+    return os.environ.get("CHECKUPDATES_DB") or str(Path(os.environ.get("TMPDIR") or "/tmp") / f"checkup-db-{os.getuid()}")
 
 
 def download_sizes(names):
@@ -82,12 +82,13 @@ def download_sizes(names):
     r = run(["pacman", "-Si", "--dbpath", temp_db()] + names)
     if r is None or r.returncode != 0:
         return {}
-    out = {}
+    sizes = {}
     for block in r.stdout.strip().split("\n\n"):
-        f = {k.strip(): v.strip() for k, v in (l.split(" : ", 1) for l in block.splitlines() if " : " in l)}
-        if f.get("Name"):
-            out[f["Name"]] = size_bytes(f.get("Download Size", ""))
-    return out
+        fields = {k.strip(): v.strip() for k, v in
+                  (line.split(" : ", 1) for line in block.splitlines() if " : " in line)}
+        if fields.get("Name"):
+            sizes[fields["Name"]] = size_bytes(fields.get("Download Size", ""))
+    return sizes
 
 
 def progress(args):
@@ -108,7 +109,10 @@ def progress(args):
         if CACHE.is_dir():
             for f in CACHE.iterdir():
                 if pat.match(f.name) and f.is_file():
-                    sizes[f.name.removesuffix(".part")] = f.stat().st_size
+                    try:
+                        sizes[f.name.removesuffix(".part")] = f.stat().st_size
+                    except FileNotFoundError:
+                        pass
         for fname, size in watched.items():
             if pat.match(fname):
                 sizes[fname] = max(size, sizes.get(fname, 0))
@@ -292,9 +296,11 @@ def plan_names(names, label, what, template):
 # script copies the sizes of what is there into a readable file (WATCH) while
 # it runs; the watcher ends with the script's shell, also when it is killed
 WATCH = Path("/run/vdx-progress")
-WATCHER = (f"( while kill -0 $$ 2>/dev/null; do "
-           f"find {CACHE} -mindepth 2 -maxdepth 2 -type f -printf '%s %f\\n' > {WATCH}.tmp 2>/dev/null; "
-           f"chmod 644 {WATCH}.tmp; mv -f {WATCH}.tmp {WATCH}; sleep 0.5; done; rm -f {WATCH} ) &\n")
+WATCHER = (f"( while :; do "
+           f"find {CACHE} -maxdepth 2 -type f -printf '%s %f\\n' > {WATCH}.tmp 2>/dev/null; "
+           f"chmod 644 {WATCH}.tmp; mv -f {WATCH}.tmp {WATCH}; sleep 0.5; done ) &\n"
+           "watcher_pid=$!\n"
+           f"trap 'kill \"$watcher_pid\" 2>/dev/null; wait \"$watcher_pid\" 2>/dev/null; rm -f {WATCH} {WATCH}.tmp' EXIT\n")
 
 
 def plan_download(names):

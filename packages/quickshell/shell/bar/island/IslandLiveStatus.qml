@@ -39,7 +39,7 @@ Row {
   LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "bluetooth" && BluetoothService.mainDevice?.battery != null; text: BluetoothService.mainDevice?.battery + "%"; tint: Theme.blue; plainBold: false }
 
   // vpn: the server and the ping
-  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "vpn"; size: face.coverSize; name: "public"; tint: Theme.green }
+  LiveGlyph { corner: face.badgeRadius; visible: face.kind === "vpn"; size: face.coverSize; name: "vpn"; tint: Theme.green }
   KitText {
     visible: face.kind === "vpn" && ShellSettings.liveVpnServer
     anchors.verticalCenter: parent.verticalCenter
