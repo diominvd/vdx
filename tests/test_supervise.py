@@ -34,6 +34,47 @@ FAKE_QS = textwrap.dedent("""\
     """)
 
 
+class SessionEnvironment(unittest.TestCase):
+    def select(self, sessions, display="wayland-1", inherited="old-session"):
+        source = SUPERVISE.read_text()
+        body = source.split("resolve_hyprland_session() {", 1)[1].split("\n}\n", 1)[0]
+        with tempfile.TemporaryDirectory() as temporary:
+            runtime = Path(temporary)
+            for signature, pid, wayland in sessions:
+                directory = runtime / "hypr" / signature
+                directory.mkdir(parents=True)
+                (directory / "hyprland.lock").write_text(f"{pid}\n{wayland}\n")
+            env = dict(os.environ, WAYLAND_DISPLAY=display,
+                       HYPRLAND_INSTANCE_SIGNATURE=inherited, TEST_RUNTIME=str(runtime))
+            result = subprocess.run(
+                ["bash", "-uc", 'runtime=$TEST_RUNTIME; resolve_hyprland_session() {' + body
+                 + '\n}\nresolve_hyprland_session\nprintf "%s" "$HYPRLAND_INSTANCE_SIGNATURE"'],
+                env=env, capture_output=True, text=True, check=True)
+            return result.stdout
+
+    def test_stale_signature_is_replaced_by_the_live_display_session(self):
+        self.assertEqual(self.select([("new-session", os.getpid(), "wayland-1")]), "new-session")
+
+    def test_other_display_and_dead_sessions_do_not_win(self):
+        self.assertEqual(self.select([
+            ("a-dead", 999999999, "wayland-1"),
+            ("b-other-display", os.getpid(), "wayland-2"),
+            ("c-current", os.getpid(), "wayland-1"),
+        ]), "c-current")
+
+    def test_missing_matching_session_preserves_the_environment(self):
+        self.assertEqual(self.select([("unrelated", os.getpid(), "wayland-2")]), "old-session")
+        self.assertEqual(self.select([]), "old-session")
+
+    def test_absolute_display_path_matches_its_socket_name(self):
+        self.assertEqual(self.select([("new-session", os.getpid(), "wayland-1")],
+                                     display="/run/user/1000/wayland-1"), "new-session")
+
+    def test_no_display_keeps_the_inherited_signature(self):
+        self.assertEqual(self.select([("new-session", os.getpid(), "wayland-1")], display=""),
+                         "old-session")
+
+
 class Supervise(unittest.TestCase):
     def run_with(self, codes):
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))

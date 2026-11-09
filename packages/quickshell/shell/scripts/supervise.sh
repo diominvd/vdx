@@ -46,6 +46,29 @@ clear_toasts() {
   rm -f "$toasts"
 }
 
+# A terminal or a previous shell may still carry the signature from before
+# Hyprland restarted. Match the live compositor to this Wayland display before
+# Quickshell constructs its Hyprland singleton and opens the event socket.
+resolve_hyprland_session() {
+  local display=${WAYLAND_DISPLAY:-} lock compositor_pid compositor_display
+  [[ -n $display ]] || return 0
+  display=${display##*/}
+  for lock in "$runtime"/hypr/*/hyprland.lock; do
+    [[ -f $lock ]] || continue
+    {
+      read -r compositor_pid
+      read -r compositor_display
+    } < "$lock"
+    [[ $compositor_pid =~ ^[1-9][0-9]*$ && $compositor_display == "$display" ]] || continue
+    kill -0 "$compositor_pid" 2>/dev/null || continue
+    local directory=${lock%/hyprland.lock}
+    export HYPRLAND_INSTANCE_SIGNATURE=${directory##*/}
+    return 0
+  done
+}
+
+resolve_hyprland_session
+
 # the session is still there (after logout there is nothing to start)
 session() {
   local display=${WAYLAND_DISPLAY:-}
