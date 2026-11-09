@@ -242,7 +242,7 @@ Column {
 
   KitRow {
     label: "Import"
-    hint: "Replaces options; restarts the shell"
+    hint: "Replaces options, restarts the shell"
 
     KitButton {
       width: Theme.buttonWidth
@@ -255,7 +255,7 @@ Column {
 
   KitRow {
     label: "Reset everything"
-    hint: "Defaults; the old set is kept as a file"
+    hint: "Defaults, the old set kept as a file"
 
     KitResetButton {
       width: Theme.buttonWidth
@@ -294,6 +294,37 @@ Column {
     hint: "Files, services and the running desktop"
     KitButton { width: Theme.buttonWidth; icon: "activity"; text: "Run check"; busy: doctorProc.running; onClicked: root.checkHealth() }
   }
+  KitRow {
+    label: "Shell resources"
+    hint: "A one-time snapshot of the shell process"
+    KitButton { width: Theme.buttonWidth; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
+  }
+  KitRow {
+    label: "Recovery"
+    hint: "Restores the last backed-up files"
+    KitButton {
+      width: Theme.buttonWidth
+      icon: "rotate-ccw"
+      text: "Rollback…"
+      onClicked: Quickshell.execDetached(["kitty", "-e", "python3", ThemeService.dotfiles + "/install.py", "rollback"])
+    }
+  }
+
+  // a fresh process: this one is killed, Hyprland starts a new one (through
+  // the supervisor, as at login: FontService.restartShell)
+  KitRow {
+    label: "Restart the shell"
+    hint: "Kills Quickshell and starts it anew"
+
+    KitButton {
+      width: Theme.buttonWidth
+      icon: "refresh"
+      text: "Restart"
+      onClicked: FontService.restartShell()
+    }
+  }
+
+  // what a check or a measure found stands under the rows: between them it splits the group's box
   Column {
     visible: root.healthItems.length > 0
     width: parent.width
@@ -320,11 +351,6 @@ Column {
 
     KitGrouper {}
   }
-  KitRow {
-    label: "Shell resources"
-    hint: "A one-time snapshot of the shell process"
-    KitButton { width: Theme.buttonWidth; text: "Measure"; busy: measureProc.running; onClicked: root.measureShell() }
-  }
   KitNotice {
     shown: root.resourceMetrics.length > 0 || (!measureProc.running && root.resourceReport !== "")
     width: parent.width
@@ -334,30 +360,6 @@ Column {
     text: root.resourceMetrics.length > 0
       ? root.resourceMetrics.map(metric => metric.label + " " + metric.value).join(" · ")
       : root.resourceReport
-  }
-  KitRow {
-    label: "Recovery"
-    hint: "Restores the last backed-up files"
-    KitButton {
-      width: Theme.buttonWidth
-      icon: "rotate-ccw"
-      text: "Rollback…"
-      onClicked: Quickshell.execDetached(["kitty", "-e", "python3", ThemeService.dotfiles + "/install.py", "rollback"])
-    }
-  }
-
-  // a fresh process: this one is killed, Hyprland starts a new one (through
-  // the supervisor, as at login: FontService.restartShell)
-  KitRow {
-    label: "Restart the shell"
-    hint: "Kills Quickshell and starts it anew"
-
-    KitButton {
-      width: Theme.buttonWidth
-      icon: "refresh"
-      text: "Restart"
-      onClicked: FontService.restartShell()
-    }
   }
 
     KitGrouper {}
