@@ -3,8 +3,9 @@ import qs.apps.files
 import qs.config
 import qs.kit
 
-// Capture's options in the Shell Manager: the toolbar's delay, where
-// screenshots and recordings go, the codec and what it can cost. What, as and
+// Capture's options in the Shell Manager, in the order they are used: the toolbar,
+// where and how things are saved, notices, then the recording's quality and, last,
+// the encoder and what it can cost (an app's dropdown hides the titles). What, as and
 // the sound are the overlay's toolbar (kept as last picked); the bar face is
 // the module's (Bar modules › Capture).
 Column {
@@ -41,14 +42,10 @@ Column {
     model: [{ label: "Save", value: "folder" }, { label: "Ask", value: "ask" }]
   }
 
-  KitLine {}
-
-  KitLabel { text: "FOLDERS" }
-
   Repeater {
     model: [
-      { key: "shotDir",  label: "Screenshots", value: CaptureService.shotDir },
-      { key: "videoDir", label: "Recordings",  value: CaptureService.videoDir }
+      { key: "shotDir",  label: "Screenshots folder", value: CaptureService.shotDir },
+      { key: "videoDir", label: "Recordings folder",  value: CaptureService.videoDir }
     ]
 
     KitRow {
@@ -61,11 +58,18 @@ Column {
       KitButton {
         icon: "folder"
         text: "Choose…"
-        onClicked: FilesService.pickFolder(modelData.label + " folder", modelData.value,
+        onClicked: FilesService.pickFolder(modelData.label, modelData.value,
                                            p => { if (p !== "") ModuleSettings.set("capture", modelData.key, p); })
       }
     }
   }
+
+  KitLine {}
+
+  KitLabel { text: "NOTIFICATIONS" }
+
+  KitToggleRow { module: "capture"; key: "notifyShot"; fallback: true; label: "Notify after a screenshot"; hint: "Errors still notify" }
+  KitToggleRow { module: "capture"; key: "notifyRecord"; fallback: true; label: "Notify after a recording"; hint: "Errors still notify" }
 
   KitLine {}
 
@@ -84,6 +88,10 @@ Column {
     model: [{ label: "30 fps", value: 30 }, { label: "60 fps", value: 60 }]
   }
 
+  KitLine {}
+
+  KitLabel { text: "ENCODER" }
+
   KitOptionRow {
     module: "capture"; key: "codec"; fallback: "auto"
     label: "Codec"
@@ -99,8 +107,6 @@ Column {
   }
 
   // every problem the current codec, encoder and quality can cause
-  KitLabel { text: "PROBLEMS"; value: CaptureService.codecIssues.length === 0 ? "NONE" : "" }
-
   Repeater {
     model: CaptureService.codecIssues
 
@@ -126,13 +132,6 @@ Column {
       }
     }
   }
-
-  KitLine {}
-
-  KitLabel { text: "NOTIFICATIONS" }
-
-  KitToggleRow { module: "capture"; key: "notifyShot"; fallback: true; label: "Notify after a screenshot"; hint: "Errors still notify" }
-  KitToggleRow { module: "capture"; key: "notifyRecord"; fallback: true; label: "Notify after a recording"; hint: "Errors still notify" }
 
   KitGrouper {}
 }

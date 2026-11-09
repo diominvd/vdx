@@ -75,20 +75,20 @@ Item {
           labelColor: Theme.foreground2
         }
 
-        // how its window opens: the preview and its choices, in sight at once
-        Loader {
-          width: parent.width
-          visible: active
-          active: body.installed && body.window !== null
-          sourceComponent: WindowOptions { app: body.window }
-        }
-
         // its own options
         Loader {
           width: parent.width
           visible: active
           active: body.installed && !!body.entry?.settings
           source: active ? Quickshell.shellPath(body.entry.settings) : ""
+        }
+
+        // how its window opens, last: it is set once and rarely changed
+        Loader {
+          width: parent.width
+          visible: active
+          active: body.installed && body.window !== null
+          sourceComponent: WindowOptions { app: body.window }
         }
 
         // an app with nothing to set gets a row in their place, like one

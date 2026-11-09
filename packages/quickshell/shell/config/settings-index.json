@@ -3468,7 +3468,7 @@
   "target": "apps:capture"
  },
  {
-  "label": "Folders",
+  "label": "Notifications",
   "hint": "",
   "where": "Apps › Capture",
   "target": "apps:capture"
@@ -3480,13 +3480,7 @@
   "target": "apps:capture"
  },
  {
-  "label": "Problems",
-  "hint": "",
-  "where": "Apps › Capture",
-  "target": "apps:capture"
- },
- {
-  "label": "Notifications",
+  "label": "Encoder",
   "hint": "",
   "where": "Apps › Capture",
   "target": "apps:capture"
@@ -3516,6 +3510,18 @@
   "target": "apps:capture"
  },
  {
+  "label": "Notify after a screenshot",
+  "hint": "Errors still notify",
+  "where": "Apps › Capture › NOTIFICATIONS",
+  "target": "apps:capture"
+ },
+ {
+  "label": "Notify after a recording",
+  "hint": "Errors still notify",
+  "where": "Apps › Capture › NOTIFICATIONS",
+  "target": "apps:capture"
+ },
+ {
   "label": "Quality",
   "hint": "Low tints flat greys",
   "where": "Apps › Capture › RECORDING",
@@ -3530,25 +3536,13 @@
  {
   "label": "Codec",
   "hint": "Auto: HEVC on the GPU",
-  "where": "Apps › Capture › RECORDING",
+  "where": "Apps › Capture › ENCODER",
   "target": "apps:capture"
  },
  {
   "label": "Encoder",
   "hint": "Auto: iGPU on battery",
-  "where": "Apps › Capture › RECORDING",
-  "target": "apps:capture"
- },
- {
-  "label": "Notify after a screenshot",
-  "hint": "Errors still notify",
-  "where": "Apps › Capture › NOTIFICATIONS",
-  "target": "apps:capture"
- },
- {
-  "label": "Notify after a recording",
-  "hint": "Errors still notify",
-  "where": "Apps › Capture › NOTIFICATIONS",
+  "where": "Apps › Capture › ENCODER",
   "target": "apps:capture"
  },
  {
