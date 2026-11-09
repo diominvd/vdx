@@ -1,5 +1,6 @@
 import QtQuick
 import qs.config
+import qs.modules.notifications
 import qs.kit
 import "../../kit/markup.js" as Markup
 
@@ -20,7 +21,7 @@ Item {
     width: 40
     height: 40
     radius: Theme.radiusCard
-    readonly property color tone: root.critical ? Theme.red : Theme.appColour(root.n?.app)
+    readonly property color tone: NotificationsService.toneOf(root.n)
     color: Theme.mix(Theme.background0, tone, 0.22)
 
     KitText {

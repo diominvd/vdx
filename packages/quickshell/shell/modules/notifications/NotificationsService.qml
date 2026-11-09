@@ -20,7 +20,7 @@ Singleton {
   readonly property int historyMax: 100  // kept in history
   readonly property string script: Paths.scriptsDir + "/notifications.sh"
 
-  readonly property var items: state.items     // newest first: [{key, app, desktop, summary, body, urgency, time}]
+  readonly property var items: state.items     // newest first: [{key, app, desktop, summary, body, urgency, category, time}]
   readonly property int unseen: items.filter(n => n.time > state.seenAt).length
 
   property real openedSeenAt: 0                // seenAt before the popup opened: marks fresh rows
@@ -99,6 +99,12 @@ Singleton {
   // place and comes back as news. Any other known or cleared id is left alone,
   // so a cleared history stays clear. The first run on a fresh state only
   // notes where the ids are: what mako already holds is not news.
+  // the colour of a notification: a warning (category "warning": an agent waiting for a
+  // yes) yellow, a critical one red, the rest their app's
+  function toneOf(n) {
+    return n?.category === "warning" ? Theme.yellow : n?.urgency === "critical" ? Theme.red : Theme.appColour(n?.app);
+  }
+
   function ingest(list) {
     const top = list.reduce((m, n) => Math.max(m, n.id), 0);
     if (!state.tracked) {
@@ -119,7 +125,7 @@ Singleton {
       if (row ? row.summary === n.summary && row.body === n.body && row.urgency === n.urgency
               : n.id <= state.lastId) continue;
       news.push({ key: key, app: n.app, desktop: n.desktop, summary: n.summary, body: n.body,
-                  urgency: n.urgency, time: now });
+                  urgency: n.urgency, category: n.category ?? "", time: now });
     }
     state.lastId = Math.max(state.lastId, top);
     if (news.length > 0)

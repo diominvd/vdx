@@ -16,31 +16,31 @@ SPEC.loader.exec_module(notify)
 
 class Compose(unittest.TestCase):
     def test_permission_names_the_project_and_the_request(self):
-        app, title, body, urgency = notify.compose(
+        app, title, body, urgency, category = notify.compose(
             "claude-permission",
             {"cwd": "/home/me/.dotfiles/", "notification_type": "permission_prompt",
              "message": "Claude needs your permission to use Bash"})
-        self.assertEqual((app, urgency), ("Claude Code", "critical"))
+        self.assertEqual((app, urgency, category), ("Claude Code", "critical", "warning"))
         self.assertEqual(title, "Claude Code needs permission · .dotfiles")
         self.assertEqual(body, "Claude needs your permission to use Bash")
 
     def test_permission_without_a_message_says_the_tool_and_its_command(self):
-        _, _, body, _ = notify.compose(
+        _, _, body, _, _ = notify.compose(
             "codex-permission", {"tool_name": "Bash", "tool_input": {"command": "rm -rf build\nls"}})
         self.assertEqual(body, "Bash: rm -rf build")
-        _, _, body, _ = notify.compose("codex-permission", {})
+        _, _, body, _, _ = notify.compose("codex-permission", {})
         self.assertEqual(body, "A command is waiting for your approval")
 
     def test_claude_idle_notifications_are_not_permission_prompts(self):
         self.assertIsNone(notify.compose("claude-permission", {"notification_type": "idle_prompt"}))
 
     def test_complete_quotes_the_first_line_of_the_last_message(self):
-        _, title, body, urgency = notify.compose(
+        _, title, body, urgency, _ = notify.compose(
             "codex-complete", {"cwd": "/srv/app", "last_assistant_message": "\n## Done\nmore"})
         self.assertEqual((title, body, urgency), ("Codex finished · app", "Done", "normal"))
 
     def test_complete_without_a_message_and_a_stop_hook_continuation(self):
-        _, _, body, _ = notify.compose("claude-complete", {})
+        _, _, body, _, _ = notify.compose("claude-complete", {})
         self.assertEqual(body, "The task is complete")
         self.assertIsNone(notify.compose("claude-complete", {"stop_hook_active": True}))
 

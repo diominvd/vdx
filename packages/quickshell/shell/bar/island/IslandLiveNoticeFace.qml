@@ -3,6 +3,7 @@ import Quickshell.Widgets
 import qs.components
 import qs.config
 import qs.kit
+import qs.modules.notifications
 
 Row {
   id: face
@@ -18,7 +19,7 @@ Row {
     visible: face.kind === "notice" && ShellSettings.liveNoticeMark === "dot"
     anchors.verticalCenter: parent.verticalCenter
     width: 8; height: 8; radius: Theme.pill(height)
-    color: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.appColour(IslandService.noticeItem?.app)
+    color: NotificationsService.toneOf(IslandService.noticeItem)
   }
   Rectangle {
     visible: face.kind === "notice" && ShellSettings.liveNoticeMark !== "dot"
@@ -27,7 +28,7 @@ Row {
     height: face.coverSize
     radius: face.badgeRadius
     readonly property string liveEnd: "badge"      // IslandLiveFace.padFor
-    readonly property color tone: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.appColour(IslandService.noticeItem?.app)
+    readonly property color tone: NotificationsService.toneOf(IslandService.noticeItem)
     color: Theme.tonalOn(tone, Theme.background1)
     readonly property string appIcon: Hypr.iconOfApp(IslandService.noticeItem?.desktop, IslandService.noticeItem?.app)
     // the app's own icon; an app with none gets its initial
@@ -52,6 +53,6 @@ Row {
       const message = n.body !== "" ? head + ": " + n.body : head;
       return (n.repeats > 1 ? "(" + n.repeats + ") " : "") + message;
     }
-    color: IslandService.noticeItem?.urgency === "critical" ? Theme.red : Theme.foreground1
+    color: IslandService.noticeItem?.urgency === "critical" ? NotificationsService.toneOf(IslandService.noticeItem) : Theme.foreground1
   }
 }

@@ -6,7 +6,7 @@ import "../../kit/markup.js" as Markup
 
 // Notification history, newest first, in day groups under filter tabs (all, unread,
 // urgent); the header switch is Focus mode (off = on). A card: the app's avatar in its colour rule, summary, app and time, the
-// body in an inset block; unread ones carry a red dot, critical summaries are red,
+// body in an inset block; unread ones carry a red dot, critical summaries are red (a warning: yellow),
 // a hover brings up a cross that dismisses the one. Footer: mark all as read, clear.
 KitFrame {
   id: root
@@ -151,7 +151,7 @@ KitFrame {
 
               readonly property bool fresh: NotificationsService.isFresh(modelData)
               readonly property bool critical: modelData.urgency === "critical"
-              readonly property color tone: critical ? Theme.red : Theme.appColour(modelData.app)
+              readonly property color tone: NotificationsService.toneOf(modelData)
               readonly property bool hasBody: modelData.body !== ""
 
               KitAppear { target: item; seen: root.seen; key: item.modelData.key }
@@ -249,7 +249,7 @@ KitFrame {
                   text: Markup.plain(item.modelData.summary)
                   textFormat: Text.PlainText
                   elide: Text.ElideRight
-                  color: item.critical ? Theme.red : Theme.foreground0
+                  color: item.critical ? item.tone : Theme.foreground0
                   font.weight: Font.Bold
                 }
 

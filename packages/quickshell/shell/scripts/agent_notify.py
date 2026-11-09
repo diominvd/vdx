@@ -67,8 +67,8 @@ def request(data: dict) -> str:
     return "A command is waiting for your approval"
 
 
-def compose(event: str, data: dict) -> tuple[str, str, str, str] | None:
-    """(app, title, body, urgency) of the notice, or None when there is nothing to say."""
+def compose(event: str, data: dict) -> tuple[str, str, str, str, str] | None:
+    """(app, title, body, urgency, category) of the notice, or None when there is nothing to say."""
     agent, _, kind = event.partition("-")
     app = APPS.get(agent)
     if app is None:
@@ -79,12 +79,13 @@ def compose(event: str, data: dict) -> tuple[str, str, str, str] | None:
         # Claude's Notification hook also fires for idle waits: only a permission prompt is ours
         if agent == "claude" and data.get("notification_type", "permission_prompt") != "permission_prompt":
             return None
-        return app, f"{app} needs permission{suffix}", request(data), "critical"
+        # critical: it gets through Focus; category warning: the shell paints it yellow, not red
+        return app, f"{app} needs permission{suffix}", request(data), "critical", "warning"
     if kind == "complete":
         if data.get("stop_hook_active"):           # a stop hook's own continuation, not the end
             return None
         body = one_line(data.get("last_assistant_message")) or "The task is complete"
-        return app, f"{app} finished{suffix}", body, "normal"
+        return app, f"{app} finished{suffix}", body, "normal", "info"
     return None
 
 
@@ -94,10 +95,10 @@ def main() -> int:
     notice = compose(sys.argv[1], payload(sys.argv))
     if notice is None:
         return 0
-    app, title, body, urgency = notice
+    app, title, body, urgency, category = notice
     try:
         subprocess.run(
-            ["notify-send", "-a", app, "-u", urgency, "-i", "utilities-terminal", "-t", "8000", title, body],
+            ["notify-send", "-a", app, "-u", urgency, "-c", category, "-i", "utilities-terminal", "-t", "8000", title, body],
             check=False, timeout=3, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except (OSError, subprocess.TimeoutExpired):
         pass
