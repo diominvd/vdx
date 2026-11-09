@@ -167,13 +167,14 @@ uses tonal layers and more spacious controls.
   has a filled twin of the same name in `solid/` and Rounded twins in
   `round/` and `round/solid/` (Material names: `icons/material.txt`), Phosphor
   twins in `phosphor/` and `phosphor/solid/` (`icons/phosphor.txt`, one set for
-  both corners), and a Lucide twin in `lucide/`, outline only,
+  both corners), Mingcute twins in `mingcute/regular/` and `mingcute/filled/`
+  (`icons/mingcute.txt`, one set for both corners), and a Lucide twin in `lucide/`, outline only,
   `stroke="#ffffff"` (`icons/lucide.txt`). Tabler twins in `tabler/` are also
   outline only, `stroke="#ffffff"` (`icons/tabler.txt`).
   The VPN glyph uses each set's shield, or Tabler's `brand-openvpn`, shared
   by its bar, popup, settings and Hub appearances.
   Icons picks the set; Lucide and Tabler use outlines, so a state an icon shows
-  by `solid` also needs a tint.
+  by `solid` also needs a tint. Mingcute uses its Regular and Filled SVGs.
 - Refactors keep the look; a new look is prototyped on one popup first.
 - Motion: every animation goes through `config/Motion.qml` — a Behavior takes
   `enabled: Motion.<part>` (popups, panels, controls, bar, pages, lock, island) and a

@@ -567,6 +567,21 @@ Item {
       compare(picker.pairOf("red")[0], "#ff0000");
       compare(picker.pairOf("#112233")[0], "#112233");
     }
+    function test_modules_page_in_shell_manager() {
+      const manager = Qt.createQmlObject('import QtQuick; import qs.kit; ShellManager { width: 1280; height: 800 }', parent);
+      manager.navigate("modules", "");
+      wait(100);
+      const modulePage = manager.currentPage;
+      compare(modulePage.title, "Bar modules");
+      verify(modulePage.width > 500, "page width=" + modulePage.width);
+      verify(modulePage.height > 400);
+      const pane = modulePage.children[0].children[0];
+      verify(pane.width > 500, "viewport width=" + pane.width);
+      const column = pane.contentItem.children[0];
+      verify(column.width > 500, "column width=" + column.width);
+      verify(column.implicitHeight > 1000, "column height=" + column.implicitHeight);
+      manager.destroy();
+    }
     function test_entry_folds_order_search_and_open() {
       entries.query = ""; entries.selected = "";
       compare(entries.ordered.map(e => e.id), ["ai", "audio", "clock"]);   // by name
@@ -670,7 +685,7 @@ Item {
     }
     function test_styles(data) {
       ShellSettings.material=data.material; ShellSettings.corners=data.corners;
-      compare(Theme.controlHeight, Theme.aired(data.material ? 36 : 34));
+      compare(Theme.controlHeight, (data.material ? 36 : 34));
       compare(button.height, Theme.controlHeight);
       verify(Theme.contrast(Theme.onSurfaceVariant, Theme.surfaceHighest) >= 4.5);
       verify(Theme.contrast(Theme.inkOn(Theme.accent), Theme.accent) >= 4.5);

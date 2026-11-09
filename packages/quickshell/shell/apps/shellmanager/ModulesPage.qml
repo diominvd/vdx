@@ -25,12 +25,12 @@ Item {
 
   // another page names a module (Media's pause is Audio's, a right click on the bar): it opens here
   function jump(id) {
-    if (pages[id]) navigate(pages[id], "");
+    if (dedicatedPages[id]) navigate(dedicatedPages[id], "");
     else if (BarLayout.modules.some(p => p.id === id)) browser.open(id);
   }
 
   // modules whose options live on a page of their own (no card here: a right click goes there)
-  readonly property var pages: ({ notifications: "notifications" })
+  readonly property var dedicatedPages: ({ notifications: "notifications" })
 
   // the app a module belongs to (apps/apps.json), if any: its options page is the app's `moduleSettings`
   function appOf(id) { return ShellAppsService.entries.find(a => a.module === id) ?? null; }
@@ -43,7 +43,7 @@ Item {
   }
 
   readonly property string screen: BarLayout.mainScreen()
-  readonly property var entries: BarLayout.modules.filter(p => !pages[p.id]).map(p => {
+  readonly property var entries: BarLayout.modules.filter(p => !dedicatedPages[p.id]).map(p => {
     const installed = BarLayout.installed(p.id);
     const enabled = BarLayout.enabled(p.id);
     const place = installed && enabled ? BarLayout.placeOf(p.id, screen) : "";

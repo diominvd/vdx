@@ -10,8 +10,10 @@ are accessed.
 """
 from pathlib import Path
 import os
+import re
 import shutil
 import subprocess
+import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,8 +43,23 @@ def main():
         config.mkdir(parents=True)
         shutil.copytree(SHELL / "kit", work / "qs/kit")
         shutil.copy(SHELL / "bar/island/hub/HubLayout.js", work / "qs/kit/HubLayout.js")
-        for name in ("EntryFolds.qml",):
+        for name in ("EntryFolds.qml", "NavRow.qml", "RailButton.qml"):
             shutil.copy(SHELL / "apps/shellmanager" / name, work / "qs/kit" / name)
+        manager_source = (SHELL / "apps/shellmanager/ShellManager.qml").read_text()
+        (work / "qs/kit/ShellManager.qml").write_text(manager_source.replace("import Quickshell\n", "").replace("import Quickshell.Io\n", ""))
+        for page_type in re.findall(r"Component \{ id: \w+; (\w+) \{", manager_source):
+            if page_type == "ModulesPage":
+                continue
+            (work / "qs/kit" / (page_type + ".qml")).write_text(
+                'import QtQuick\nItem { property string tab: ""; property real viewportRightInset: 0; readonly property var jumps: [] }\n')
+        (work / "qs/kit/SettingsIndex.qml").write_text(
+            'pragma Singleton\nimport QtQuick\nQtObject { function load() {} function search(words) { return []; } }\n')
+        # Keep the real page root and the caller's width binding: property
+        # names on a loaded page can shadow ids from its creation context.
+        modules_page = (SHELL / "apps/shellmanager/ModulesPage.qml").read_text()
+        (work / "qs/kit/ModulesPage.qml").write_text(modules_page.replace("import Quickshell\n", "import TestQuickshell\n"))
+        (work / "qs/kit/ShellAppsService.qml").write_text(
+            'pragma Singleton\nimport QtQuick\nQtObject { readonly property var entries: [] }\n')
         shutil.copy(SHELL / "apps/shellmanager/BarArrangement.qml", work / "qs/kit/BarArrangement.qml")
         for name in ("Theme.qml", "Motion.qml"):
             text = (SHELL / "config" / name).read_text()
@@ -59,7 +76,7 @@ def main():
         look_properties = "\n".join(line for line in source.splitlines()
                                     if line.startswith("  readonly property ") and ": look(" in line)
         look_defaults += "\n" + look_properties
-        settings = settings.replace("QtObject {", "QtObject {\n  id: state\n" + look_defaults + "\n" + qml_function(source, "look") + "\n" + qml_function(source, "setLook"), 1)
+        settings = settings.replace("QtObject {", "QtObject {\n  id: state\n  property bool managerOpen: false\n" + look_defaults + "\n" + qml_function(source, "look") + "\n" + qml_function(source, "setLook"), 1)
         (config / "ShellSettings.qml").write_text("pragma Singleton\n" + settings)
         # The real selection model has no portal, filesystem or process dependencies.
         shutil.copy(SHELL / "apps/files/FilesSelection.qml", work / "qs/kit/FilesSelection.qml")
@@ -75,6 +92,15 @@ def main():
             'pragma Singleton\nimport QtQuick\nQtObject {\n'
             'property bool powered: true\nproperty string busyMac: ""\nproperty var calls: []\n'
             'function toggleDevice(device) { calls = calls.concat([device.mac]); }\n}\n')
+        # The real ModuleSettings logic over an in-memory store (no FileView).
+        module_settings = (SHELL / "config/ModuleSettings.qml").read_text()
+        module_settings = re.sub(r"  FileView \{.*?\n  \}\n", "", module_settings, flags=re.S)
+        module_settings = module_settings.rstrip().removesuffix("}")
+        module_settings = (module_settings.replace("state.values", "store.values")
+                           .replace("import Quickshell\nimport Quickshell.Io\n", "").replace('"settings_data.js"', '"../../settings_data.js"').replace("Singleton {", "QtObject {"))
+        (work / "qs/kit/TestModuleSettings.qml").write_text(
+            "pragma Singleton\n" + module_settings
+            + "  property QtObject state: QtObject { id: store; property var values: ({}) }\n}\n")
         shutil.copy(SHELL / "modules/wifi/SignalBars.qml", work / "qs/kit/SignalBars.qml")
         network_row = (SHELL / "modules/wifi/NetworkRow.qml").read_text()
         (work / "qs/kit/TestNetworkRow.qml").write_text(
@@ -150,7 +176,7 @@ def main():
         layout = (SHELL / "bar/BarLayout.qml").read_text().split("  // written by `./install.py link`;")[0]
         layout = layout.replace("import Quickshell\n", "import TestQuickshell\n").replace("import Quickshell.Io\n", "").replace("Singleton {", "QtObject {")
         # Popup IPC is outside these memory-only layout tests.
-        layout = layout.replace("import qs.components\n", "")
+        layout = layout.replace("import qs.components\n", "").replace("import Quickshell.Hyprland\n", "")
         layout += """  property QtObject store: QtObject {
           id: state
           property var zones: null
@@ -191,10 +217,11 @@ def main():
         widgets.mkdir(parents=True)
         (widgets / "qmldir").write_text("module Quickshell.Widgets\nClippingRectangle 1.0 ClippingRectangle.qml\n")
         (widgets / "ClippingRectangle.qml").write_text("import QtQuick\nRectangle { clip: true }\n")
+        shutil.copy(SHELL / "config/settings_data.js", work / "settings_data.js")
         for test in (ROOT / "tests/qml").glob("tst_*.qml"):
             shutil.copy(test, work)
         env = dict(os.environ, QT_QPA_PLATFORM="offscreen", QT_QUICK_BACKEND="software")
-        return subprocess.run([runner, "-input", tmp, "-import", tmp], env=env).returncode
+        return subprocess.run([runner, "-input", tmp, "-import", tmp, *sys.argv[1:]], env=env).returncode
 
 
 if __name__ == "__main__":

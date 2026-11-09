@@ -31,10 +31,11 @@ it can be tested independently.
 ## Shell runtime checks (manual)
 
 - Log: `qs log -c shell | grep -E 'ERROR|WARN'` — empty after the change.
-- Restart (new files, IPC changes): see `packages/quickshell/shell/CLAUDE.md` › Work. From a terminal
-  opened before Hyprland restarted, `HYPRLAND_INSTANCE_SIGNATURE` is stale: a shell
-  started from it has no Hyprland (start it through `hyprctl -i <instance> eval …`,
-  the instance from `hyprctl instances -j`).
+- Restart (new files, IPC changes): see `packages/quickshell/shell/CLAUDE.md` › Work.
+  `supervise.sh` resolves the live Hyprland session for `WAYLAND_DISPLAY` before
+  launching Quickshell. This replaces an inherited signature from before a
+  compositor restart; a bare `qs` launched from that old terminal still has the
+  stale signature and receives no Hyprland events.
 - Open a surface: `qs -c shell ipc call <target> toggle`.
 - Screenshot: `grim -g "X,Y WxH" out.png`.
 - A Settings page: `qs -c shell ipc call shell open <page>[:<target>]` (`bar:look`,

@@ -193,6 +193,7 @@ names still open the new places (`resolve()` in ShellManager.qml).
 | Feature | Code | Depends on | Notes |
 |---|---|---|---|
 | Notifications | `modules/notifications/`, `scripts/notifications.sh`, `bar/island/IslandNotice.qml`, `IslandService` › notice | mako (server), `dbus-monitor`, `makoctl` | Solid: mako toasts; Island: island toasts, mako `island` mode invisible |
+| Coding agent notices | `scripts/agent_notify.py`; Claude user hooks and Codex project hooks | Claude Code `Notification` / `Stop`; Codex `PermissionRequest` / `Stop` | permission prompts and completed turns use the desktop notification path |
 | Wallpaper | `apps/shellmanager/Wallpaper.qml` (in `shell.qml`), `WallpaperService.qml` | `awww`, `wallpapers/` in the repo | modes theme / custom / image (`ShellSettings.wallpaperMode`) |
 | Displays | Shell Manager › Displays (`DisplaysPage`), `apps/display/` (service, layout), `scripts/display.py` | `hyprctl` | restore at login |
 | Audio | `modules/audio/`, `scripts/audio.sh` | Quickshell Pipewire, `pactl` (ports) | one list entry per port |
@@ -243,6 +244,8 @@ tile, a live activity's target) is made on demand by the focused monitor's bar
 (`Bar.hosted`), which calls its `openPopup()` and lets it go once no popup is open.
 A module with a popup has `openPopup()` (a click on it does the same); without it,
 its options open. No component keeps hosts of other modules for their popups.
+Right click on a module or live activity opens its options; the matching dropdown
+unfolds and receives keyboard focus.
 `KitInput` owns text focus; pages pass navigation keys explicitly so typing,
 selection and parent-level Escape do not compete.
 

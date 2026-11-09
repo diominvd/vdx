@@ -187,6 +187,9 @@ Item {
 
 - The page is an `Item` (it fills the window; `ShellManager` lists the tab in its
   full-height pages).
+- Keep page properties distinct from the caller’s `page` / `pages` ids. A property
+  named `pages` shadows the Shell Manager’s container in creation bindings; the
+  viewport inset becomes NaN and the clipped list has zero width.
 - A state is a few words under the name; the options carry the rest.
 - No Reset in a row's options.
 
@@ -220,7 +223,9 @@ or a `KitLabel`: KitGrouper walks into it and its rows join the page's groups.
 ## Recipe: a module's options (`<Name>Settings.qml`)
 
 Rows bound to `ModuleSettings`; the default is written at the row and in the
-module, and they must agree.
+module, and they must agree. A list option is read with `ModuleSettings.array()`
+or `strings()` (another shape gives the default): a hand-edited `modules.json`
+can hold anything.
 
 ```qml
 KitColumn {
