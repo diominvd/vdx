@@ -33,7 +33,7 @@ KitColumn {
 
   KitToggleRow {
     module: "ai"; key: "compact"; fallback: false
-    label: "Compact popup"; hint: "Limits only; hide tokens and sessions"
+    label: "Compact popup"; hint: "Limits only, no tokens or sessions"
   }
 
   KitGrouper {}

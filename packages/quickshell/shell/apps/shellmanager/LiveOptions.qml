@@ -201,7 +201,7 @@ Column {
     KitRow {
       visible: root.kind === "radio"
       label: "Always show"
-      hint: "Stays in the slot; click opens it"
+      hint: "Stays in the slot, click opens it"
       KitSwitch { checked: ShellSettings.liveRadioAlways; onToggled: ShellSettings.setLook("liveRadioAlways", !checked, "island") }
     }
 

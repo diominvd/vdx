@@ -244,7 +244,7 @@ Item {
 
       KitRow {
         label: "Add a folder"
-        hint: "Extra folders; a missing one stops a run"
+        hint: "Extra folders, a missing one stops a run"
 
         KitButton {
           width: Theme.buttonWidth

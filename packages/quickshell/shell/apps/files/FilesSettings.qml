@@ -112,7 +112,7 @@ KitColumn {
 
   KitToggleRow { module: "files"; key: "showDate"; fallback: true; label: "Modified"; hint: "Trash: when it was deleted" }
 
-  KitToggleRow { module: "files"; key: "folderCounts"; fallback: true; label: "Folder sizes"; hint: "Its items; off: --" }
+  KitToggleRow { module: "files"; key: "folderCounts"; fallback: true; label: "Folder sizes"; hint: "Items inside, or -- when off" }
 
   KitLine {}
 

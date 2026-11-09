@@ -29,7 +29,7 @@ KitColumn {
 
   KitRow {
     label: "Mihomo"
-    hint: "The proxy service; off: nothing uses it"
+    hint: "The proxy service, Off: not used"
 
     KitSwitch {
       checked: vpn.serviceOn

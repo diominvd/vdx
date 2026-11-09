@@ -154,7 +154,7 @@ KitColumn {
   KitRow {
     wide: true
     label: "Size"
-    hint: "Pixels at scale 1; Apply to use"
+    hint: "Pixels at scale 1, Apply to use"
 
     KitSegments {
       model: [20, 24, 28, 32, 40].map(n => ({ label: String(n), value: n }))

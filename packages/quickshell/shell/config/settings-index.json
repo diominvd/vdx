@@ -31,7 +31,7 @@
  },
  {
   "label": "Input text",
-  "hint": "Where text stands in a field; Auto: left",
+  "hint": "Text position, Auto is left",
   "where": "Interface › CONTROLS",
   "target": "appearance"
  },
@@ -153,7 +153,7 @@
  },
  {
   "label": "Size",
-  "hint": "Pixels at scale 1; Apply to use",
+  "hint": "Pixels at scale 1, Apply to use",
   "where": "Cursor › STYLE",
   "target": "cursor:style"
  },
@@ -628,7 +628,7 @@
  },
  {
   "label": "Window previews",
-  "hint": "Window pictures; off shows their icons",
+  "hint": "Off shows icons, not pictures",
   "where": "Windows › OVERVIEW",
   "target": "windows:overview"
  },
@@ -783,7 +783,7 @@
  },
  {
   "label": "Music service",
-  "hint": "MPD and Yandex Music; off stops playback",
+  "hint": "MPD and Yandex Music, off stops them",
   "where": "Sound › MUSIC",
   "target": "sound"
  },
@@ -897,7 +897,7 @@
  },
  {
   "label": "Background check",
-  "hint": "How often to check; Off: only on request",
+  "hint": "How often to check, Off: on request",
   "where": "Updates › CHECKING",
   "target": "updates"
  },
@@ -1017,7 +1017,7 @@
  },
  {
   "label": "Blocked",
-  "hint": "Refused; a connected one drops",
+  "hint": "Refused, and dropped if connected",
   "where": "Bluetooth › PAIRED",
   "target": "bluetooth:paired"
  },
@@ -1063,7 +1063,7 @@
  },
  {
   "label": "Mihomo",
-  "hint": "The proxy service; off: nothing uses it",
+  "hint": "The proxy service, Off: not used",
   "where": "VPN › TUNNEL",
   "target": "vpn:tunnel"
  },
@@ -1195,13 +1195,13 @@
  },
  {
   "label": "Import",
-  "hint": "Replaces options; restarts the shell",
+  "hint": "Replaces options, restarts the shell",
   "where": "Settings › SETTINGS",
   "target": "settings"
  },
  {
   "label": "Reset everything",
-  "hint": "Defaults; the old set is kept as a file",
+  "hint": "Defaults, the old set kept as a file",
   "where": "Settings › SETTINGS",
   "target": "settings"
  },
@@ -1519,7 +1519,7 @@
  },
  {
   "label": "Card stays for",
-  "hint": "Stay: until closed; urgent stay",
+  "hint": "Stay: until closed, urgent too",
   "where": "Notifications › NEW NOTIFICATIONS",
   "target": "notifications",
   "aliases": [
@@ -1583,7 +1583,7 @@
  },
  {
   "label": "Add a rule",
-  "hint": "Part of the name; first match wins",
+  "hint": "Part of the name, first match wins",
   "where": "Notifications › APP COLOURS",
   "target": "notifications",
   "aliases": [
@@ -2390,7 +2390,7 @@
  },
  {
   "label": "Compact popup",
-  "hint": "Limits only; hide tokens and sessions",
+  "hint": "Limits only, no tokens or sessions",
   "where": "Bar modules › AI › BAR",
   "target": "modules:ai"
  },
@@ -3325,7 +3325,7 @@
  },
  {
   "label": "Folder sizes",
-  "hint": "Its items; off: --",
+  "hint": "Items inside, or -- when off",
   "where": "Apps › Files › COLUMNS",
   "target": "apps:files"
  },

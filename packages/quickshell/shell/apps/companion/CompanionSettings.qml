@@ -200,7 +200,7 @@ Column {
   KitToggleRow {
     module: "companion"; key: "sound"; fallback: true
     label: "Sounds"
-    hint: "Soft blips; none when muted or in Focus"
+    hint: "Soft blips, off when muted or in Focus"
   }
 
   KitOptionRow {

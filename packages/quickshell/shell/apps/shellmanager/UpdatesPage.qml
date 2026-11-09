@@ -27,7 +27,7 @@ Column {
 
   KitOptionRow {
     module: "packages"; key: "interval"; fallback: 30
-    label: "Background check"; hint: "How often to check; Off: only on request"
+    label: "Background check"; hint: "How often to check, Off: on request"
     model: [{ label: "Off", value: 0 }, { label: "30 min", value: 30 }, { label: "1 h", value: 60 }]
   }
 

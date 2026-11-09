@@ -25,7 +25,7 @@ Column {
   KitRow {
     visible: BarLayout.installed("files")
     label: "Music service"
-    hint: "MPD and Yandex Music; off stops playback"
+    hint: "MPD and Yandex Music, off stops them"
 
     KitSwitch {
       checked: MpdService.service

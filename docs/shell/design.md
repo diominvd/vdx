@@ -110,7 +110,7 @@ uses tonal layers and more spacious controls.
 - Header: icon, title in normal case, subtitle in caps joined by ` · `. Tabs are `KitChoices` on its right; a Shell Manager page lists them as `tabs` + `tab` (none does now: a tab is a sidebar section, `page` + `pageTab`, or a group of one page).
 - Group: `KitLabel` in caps (a noun, current value on the right), then rows.
 - Row: `KitRow` — label (capitalised) and hint (sentence case, no full stop)
-  left, control right. A hint is one line: ≤ ~40 chars (≤ ~30 beside a button
+  left, control right. A hint is one line, no semicolon: ≤ ~40 chars (≤ ~30 beside a button
   or a wide control). A wide row (`wide`, `KitSelect`) puts its control under
   the text when its width is under `Theme.rowStackBelow`, whatever the text:
   every wide row of a page sits one way, never some inline and some under.

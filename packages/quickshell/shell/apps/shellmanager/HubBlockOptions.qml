@@ -39,7 +39,7 @@ Column {
   KitRow {
     visible: root.block === "modules"
     label: "Fill each row"
-    hint: "Chips stretch to the width; extras wrap"
+    hint: "Chips fill the width, extras wrap"
     KitSwitch {
       checked: ModuleSettings.get("hub", "chipsFill", true)
       onToggled: ModuleSettings.set("hub", "chipsFill", !checked)

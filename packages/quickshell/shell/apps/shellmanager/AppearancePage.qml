@@ -59,7 +59,7 @@ KitSettingsWorkspace {
           }
         }
         KitRow {
-          wide: true; label: "Input text"; hint: "Where text stands in a field; Auto: left"
+          wide: true; label: "Input text"; hint: "Text position, Auto is left"
           KitSegments { model: [{ label: "Auto", value: "auto" }, { label: "Left", value: "left" }, { label: "Centre", value: "center" }]; current: ShellSettings.inputAlign; onPicked: value => ShellSettings.set("inputAlign", value) }
         }
         KitGrouper {}

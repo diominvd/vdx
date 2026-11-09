@@ -175,7 +175,7 @@ KitColumn {
   KitRow {
     visible: root.chosen !== null
     label: "Blocked"
-    hint: "Refused; a connected one drops"
+    hint: "Refused, and dropped if connected"
 
     KitSwitch {
       checked: root.chosen?.blocked ?? false

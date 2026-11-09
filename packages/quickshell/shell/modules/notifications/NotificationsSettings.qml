@@ -19,7 +19,7 @@ KitColumn {
     needs: !Theme.island || ModuleSettings.get("notifications", "appear", "card") === "card" || !ShellSettings.liveEnabled
            ? "" : "Set by Live activities › Messages"
     module: "notifications"; key: "toastSeconds"; fallback: 5
-    label: "Card stays for"; hint: "Stay: until closed; urgent stay"
+    label: "Card stays for"; hint: "Stay: until closed, urgent too"
     model: [{ label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }, { label: "Stay", value: 0 }]
   }
 

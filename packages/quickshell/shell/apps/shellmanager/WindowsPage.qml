@@ -227,7 +227,7 @@ KitColumn {
 
     KitLabel { id: overviewGroup; text: "OVERVIEW" }
 
-    KitToggleRow { module: "overview"; key: "previews"; label: "Window previews"; hint: "Window pictures; off shows their icons" }
+    KitToggleRow { module: "overview"; key: "previews"; label: "Window previews"; hint: "Off shows icons, not pictures" }
     KitToggleRow { module: "overview"; key: "names"; label: "Window names"; hint: "The app's name on each window" }
     KitToggleRow { module: "overview"; key: "dim"; label: "Dim other workspaces"; hint: "Only the one in the middle is bright" }
 

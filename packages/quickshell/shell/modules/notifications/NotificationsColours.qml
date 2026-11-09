@@ -181,7 +181,7 @@ Column {
       KitRow {
         visible: root.unruled.length === 0
         label: "Add a rule"
-        hint: "Part of the name; first match wins"
+        hint: "Part of the name, first match wins"
         KitButton { icon: "plus"; text: "Add rule"; onClicked: root.add("") }
       }
 
