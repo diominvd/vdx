@@ -74,8 +74,8 @@ Column {
 
   KitLabel { text: "ADVANCED" }
 
-  // the rest unfolds under one row on a plate of its own (a Live activity's dropdown: a KitReorderList
-  // of one KitFoldRow); built when first opened
+  // the rest unfolds under one row, a card of its own inside the app's dropdown (a KitReorderList of
+  // one nested KitFoldRow); built when first opened
   KitReorderList {
     id: more
     boxTop: false
@@ -89,7 +89,7 @@ Column {
       draggable: false
       hasSwitch: false
       flush: true
-      sunken: true
+      nested: true
       checked: true
       foldable: true
 
@@ -101,8 +101,7 @@ Column {
         height: item ? item.implicitHeight : 0
         active: row.built
         sourceComponent: Column {
-          x: row.edge
-          width: parent.width - row.edge - Theme.gapLoose
+          width: parent.width - row.nestInset
           spacing: Theme.settingsRowInset
 
           KitOptionRow {
