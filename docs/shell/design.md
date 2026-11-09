@@ -288,7 +288,10 @@ Pages by the user's area; the look follows macOS System Settings.
   controls cannot activate. Switches inherit `Accessible.name` from their row;
   icon buttons fall back to their icon's name. Lists and custom app actions
   should supply descriptive names and keyboard handling as they adopt the kit.
-- SHOULD — no "Advanced" fold: rarely used groups go last on their page.
+- SHOULD — rarely used groups go last on their page. A page with more than about eight rows
+  keeps the ones everyone needs in sight and puts the rest behind one `More options` row
+  (a `Show` / `Hide` button; Capture): never a fold inside a fold. A window's own rows (App
+  window: floating, size, position) are one `Custom window` switch until asked for.
 - SHOULD — a page header's subtitle holds at most three parts; group labels
   carry their own values.
 - MUST — search: every row's label and hint is a literal string where it can be

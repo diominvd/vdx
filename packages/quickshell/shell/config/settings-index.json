@@ -1865,6 +1865,12 @@
   "target": "apps"
  },
  {
+  "label": "Custom window",
+  "hint": "",
+  "where": "Apps › WINDOW",
+  "target": "apps"
+ },
+ {
   "label": "Window",
   "hint": "",
   "where": "Apps › WINDOW",
@@ -3456,19 +3462,7 @@
   "target": "apps:capture"
  },
  {
-  "label": "Toolbar",
-  "hint": "",
-  "where": "Apps › Capture",
-  "target": "apps:capture"
- },
- {
   "label": "Saving",
-  "hint": "",
-  "where": "Apps › Capture",
-  "target": "apps:capture"
- },
- {
-  "label": "Notifications",
   "hint": "",
   "where": "Apps › Capture",
   "target": "apps:capture"
@@ -3480,21 +3474,9 @@
   "target": "apps:capture"
  },
  {
-  "label": "Encoder",
+  "label": "Advanced",
   "hint": "",
   "where": "Apps › Capture",
-  "target": "apps:capture"
- },
- {
-  "label": "Delay button",
-  "hint": "Off: no button in the toolbar",
-  "where": "Apps › Capture › TOOLBAR",
-  "target": "apps:capture"
- },
- {
-  "label": "Grid",
-  "hint": "Thirds in the selection, to compose",
-  "where": "Apps › Capture › TOOLBAR",
   "target": "apps:capture"
  },
  {
@@ -3510,39 +3492,51 @@
   "target": "apps:capture"
  },
  {
-  "label": "Notify after a screenshot",
-  "hint": "Errors still notify",
-  "where": "Apps › Capture › NOTIFICATIONS",
-  "target": "apps:capture"
- },
- {
-  "label": "Notify after a recording",
-  "hint": "Errors still notify",
-  "where": "Apps › Capture › NOTIFICATIONS",
-  "target": "apps:capture"
- },
- {
   "label": "Quality",
   "hint": "Low tints flat greys",
   "where": "Apps › Capture › RECORDING",
   "target": "apps:capture"
  },
  {
+  "label": "Notify when saved",
+  "hint": "Errors still notify",
+  "where": "Apps › Capture › RECORDING",
+  "target": "apps:capture"
+ },
+ {
+  "label": "More options",
+  "hint": "",
+  "where": "Apps › Capture › ADVANCED",
+  "target": "apps:capture"
+ },
+ {
+  "label": "Delay button",
+  "hint": "Off: no button in the toolbar",
+  "where": "Apps › Capture › ADVANCED",
+  "target": "apps:capture"
+ },
+ {
+  "label": "Grid",
+  "hint": "Thirds in the selection, to compose",
+  "where": "Apps › Capture › ADVANCED",
+  "target": "apps:capture"
+ },
+ {
   "label": "Frame rate",
   "hint": "Smoother, bigger files",
-  "where": "Apps › Capture › RECORDING",
+  "where": "Apps › Capture › ADVANCED",
   "target": "apps:capture"
  },
  {
   "label": "Codec",
   "hint": "Auto: HEVC on the GPU",
-  "where": "Apps › Capture › ENCODER",
+  "where": "Apps › Capture › ADVANCED",
   "target": "apps:capture"
  },
  {
   "label": "Encoder",
   "hint": "Auto: iGPU on battery",
-  "where": "Apps › Capture › ENCODER",
+  "where": "Apps › Capture › ADVANCED",
   "target": "apps:capture"
  },
  {

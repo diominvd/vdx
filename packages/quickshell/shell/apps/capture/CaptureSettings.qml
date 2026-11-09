@@ -3,30 +3,15 @@ import qs.apps.files
 import qs.config
 import qs.kit
 
-// Capture's options in the Shell Manager, in the order they are used: the toolbar,
-// where and how things are saved, notices, then the recording's quality and, last,
-// the encoder and what it can cost (an app's dropdown hides the titles). What, as and
-// the sound are the overlay's toolbar (kept as last picked); the bar face is
-// the module's (Bar modules › Capture).
+// Capture's options in the Shell Manager: what happens to a shot or a recording, where it
+// goes, its quality and whether it says so; the rest (the toolbar, frame rate, codec and
+// encoder with what they can cost) is behind Advanced. What, as and the sound are the
+// overlay's toolbar (kept as last picked); the bar face is the module's (Bar modules › Capture).
 Column {
+  id: root
   spacing: Theme.sectionGap
 
-  KitLabel { text: "TOOLBAR" }
-
-  KitOptionRow {
-    module: "capture"; key: "delay"; fallback: 0
-    label: "Delay button"
-    hint: "Off: no button in the toolbar"
-    model: [{ label: "Off", value: 0 }, { label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }]
-  }
-
-  KitToggleRow {
-    module: "capture"; key: "grid"; fallback: true
-    label: "Grid"
-    hint: "Thirds in the selection, to compose"
-  }
-
-  KitLine {}
+  property bool advanced: false
 
   KitLabel { text: "SAVING" }
 
@@ -66,13 +51,6 @@ Column {
 
   KitLine {}
 
-  KitLabel { text: "NOTIFICATIONS" }
-
-  KitToggleRow { module: "capture"; key: "notifyShot"; fallback: true; label: "Notify after a screenshot"; hint: "Errors still notify" }
-  KitToggleRow { module: "capture"; key: "notifyRecord"; fallback: true; label: "Notify after a recording"; hint: "Errors still notify" }
-
-  KitLine {}
-
   KitLabel { text: "RECORDING" }
 
   KitOptionRow {
@@ -82,17 +60,56 @@ Column {
     model: [{ label: "Low", value: "low" }, { label: "Medium", value: "medium" }, { label: "High", value: "high" }]
   }
 
+  // one switch for both notices; each still has its own key (a saved setting of either stays)
+  KitRow {
+    id: notify
+    readonly property bool on: ModuleSettings.get("capture", "notifyShot", true) || ModuleSettings.get("capture", "notifyRecord", true)
+    label: "Notify when saved"
+    hint: "Errors still notify"
+    KitSwitch {
+      checked: notify.on
+      onToggled: { ModuleSettings.set("capture", "notifyShot", !checked); ModuleSettings.set("capture", "notifyRecord", !checked); }
+    }
+  }
+
+  KitLine {}
+
+  KitLabel { text: "ADVANCED" }
+
+  KitRow {
+    label: "More options"
+    hint: root.advanced ? "Toolbar, frame rate, codec, encoder" : "Toolbar, frame rate, encoder"
+    KitButton {
+      width: Theme.buttonWidth
+      text: root.advanced ? "Hide" : "Show"
+      onClicked: root.advanced = !root.advanced
+    }
+  }
+
   KitOptionRow {
+    visible: root.advanced
+    module: "capture"; key: "delay"; fallback: 0
+    label: "Delay button"
+    hint: "Off: no button in the toolbar"
+    model: [{ label: "Off", value: 0 }, { label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }]
+  }
+
+  KitToggleRow {
+    visible: root.advanced
+    module: "capture"; key: "grid"; fallback: true
+    label: "Grid"
+    hint: "Thirds in the selection, to compose"
+  }
+
+  KitOptionRow {
+    visible: root.advanced
     module: "capture"; key: "fps"; fallback: 60
     label: "Frame rate"; hint: "Smoother, bigger files"
     model: [{ label: "30 fps", value: 30 }, { label: "60 fps", value: 60 }]
   }
 
-  KitLine {}
-
-  KitLabel { text: "ENCODER" }
-
   KitOptionRow {
+    visible: root.advanced
     module: "capture"; key: "codec"; fallback: "auto"
     label: "Codec"
     hint: "Auto: HEVC on the GPU"
@@ -100,6 +117,7 @@ Column {
   }
 
   KitOptionRow {
+    visible: root.advanced
     module: "capture"; key: "encoder"; fallback: "auto"
     label: "Encoder"
     hint: "Auto: iGPU on battery"
@@ -108,7 +126,7 @@ Column {
 
   // every problem the current codec, encoder and quality can cause
   Repeater {
-    model: CaptureService.codecIssues
+    model: root.advanced ? CaptureService.codecIssues : []
 
     Column {
       required property var modelData

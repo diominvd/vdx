@@ -3,8 +3,8 @@ import Quickshell
 import qs.config
 import qs.kit
 
-// How one of the shell's windows opens (Apps › WINDOW): Window (floating / tiled)
-// and, floating, Size (its own, a preset share of the screen, custom pixels) and
+// How one of the shell's windows opens (Apps › WINDOW): by default as the app made it
+// (one row, "Custom window"); switched on, Window (floating / tiled) and, floating, Size (its own, a preset share of the screen, custom pixels) and
 // Position (a spot on the screen, at the pointer, custom x, y). Choices apply at once, numbers on Enter; it shows the next
 // time the window opens.
 KitColumn {
@@ -17,6 +17,12 @@ KitColumn {
   readonly property bool floating: s.mode !== "tiled"
   readonly property bool screenSpot: s.position !== "cursor" && s.position !== "custom"
   readonly property var px: ShellAppsService.sizeOf(app, s)
+
+  // the app's own way (floating, its size, the screen's centre) is the default: its rows stay
+  // folded until asked for, or while the window is set otherwise
+  readonly property bool customised: s.mode !== "floating" || s.size !== "default" || s.position !== "center"
+  property bool asked: false
+  readonly property bool showAll: asked || customised
 
   // the numbers being typed, until Enter
   property string wDraft: String(s.width)
@@ -35,6 +41,19 @@ KitColumn {
   }
 
   KitRow {
+    label: "Custom window"
+    hint: root.showAll ? (root.floating ? "Floating, " + root.px[0] + " × " + root.px[1] : "Tiled") : "Opens as the app made it"
+    KitSwitch {
+      checked: root.showAll
+      onToggled: {
+        if (checked) { root.asked = false; root.set({ mode: "floating", size: "default", position: "center" }); }
+        else root.asked = true;
+      }
+    }
+  }
+
+  KitRow {
+    visible: root.showAll
     wide: true
     label: "Window"
     hint: root.floating ? "Over others, where you put it" : "Takes its place in the layout"
@@ -47,7 +66,7 @@ KitColumn {
   }
 
   KitRow {
-    visible: root.floating
+    visible: root.showAll && root.floating
     wide: true
     label: "Size"
     hint: root.s.size === "preset" ? "A share of the screen"
@@ -61,7 +80,7 @@ KitColumn {
   }
 
   KitRow {
-    visible: root.floating && root.s.size === "preset"
+    visible: root.showAll && root.floating && root.s.size === "preset"
     wide: true
     label: "Preset"
     hint: {
@@ -77,7 +96,7 @@ KitColumn {
   }
 
   PairRow {
-    visible: root.floating && root.s.size === "custom"
+    visible: root.showAll && root.floating && root.s.size === "custom"
     label: "Width × height"
     hint: valid ? "Press Enter to apply" : "At least " + ShellAppsService.minWidth + " × " + ShellAppsService.minHeight
     first: root.wDraft
@@ -87,7 +106,7 @@ KitColumn {
   }
 
   KitRow {
-    visible: root.floating
+    visible: root.showAll && root.floating
     wide: true
     label: "Position"
     hint: root.s.position === "cursor" ? "Centred on the pointer"
@@ -102,7 +121,7 @@ KitColumn {
 
   // the nine spots, in reading order
   KitSelect {
-    visible: root.floating && root.screenSpot
+    visible: root.showAll && root.floating && root.screenSpot
     label: "Spot"
     hint: "Where on the screen it opens"
     model: [["top-left", "Top left"], ["top", "Top"], ["top-right", "Top right"],
@@ -114,7 +133,7 @@ KitColumn {
   }
 
   PairRow {
-    visible: root.floating && root.s.position === "custom"
+    visible: root.showAll && root.floating && root.s.position === "custom"
     label: "X, Y"
     hint: valid ? "Enter applies; kept on screen" : "Whole pixels"
     separator: ","
