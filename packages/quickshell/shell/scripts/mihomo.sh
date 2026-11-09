@@ -76,12 +76,17 @@ cmd_status() {
     if [[ -n "$group" ]]; then
         node="$(api "/proxies/$group" | jq -r '.now // ""' 2>/dev/null || true)"
     fi
-    # /proxies carries both the provider-name and the node's ping history;
-    # reading it once avoids URL-encoding the (unicode) node name.
-    proxies="$(api /proxies)"
+    # A server of a provider is not in /proxies: its name, ping history and the
+    # provider that owns it come from /providers/proxies (one call, no URL-encoding).
     if [[ -n "$node" ]]; then
-        provider="$(printf '%s' "$proxies" | jq -r --arg n "$node" '.proxies[$n]["provider-name"] // ""' 2>/dev/null || true)"
-        delay="$(printf '%s' "$proxies" | jq -r --arg n "$node" '((.proxies[$n].history // []) | last | .delay) // 0' 2>/dev/null || true)"
+        proxies="$(api /providers/proxies)"
+        provider="$(printf '%s' "$proxies" | jq -r --arg n "$node" '
+            .providers | to_entries[] | select(any(.value.proxies[]?; .name == $n)) | .key' 2>/dev/null | head -n1 || true)"
+        delay="$(printf '%s' "$proxies" | jq -r --arg n "$node" '
+            [.providers[].proxies[]? | select(.name == $n) | ((.history // []) | last | .delay) // 0] | first // 0' 2>/dev/null || true)"
+        if [[ -z "$provider" ]]; then   # a built-in or a group: /proxies has it
+            delay="$(api /proxies | jq -r --arg n "$node" '((.proxies[$n].history // []) | last | .delay) // 0' 2>/dev/null || true)"
+        fi
     fi
     [[ -z "$delay" || ! "$delay" =~ ^[0-9]+$ ]] && delay=0
     jq -nc --arg s "$svc" --arg m "${mode:-rule}" --arg g "${group:-}" \
