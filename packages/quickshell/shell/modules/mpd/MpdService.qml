@@ -75,12 +75,14 @@ Singleton {
     control(["--seek", String(elapsed)]);
   }
 
-  // Replaces the queue (likes, a station or a folder); errors land in `error`.
+  // Replaces the queue (likes, a station or a folder); errors are dismissed after six seconds.
   function load(value, args) {
     busy = value;
     error = "";
     run(loadProc, args);
   }
+
+  function clearError() { error = ""; }
 
   // a folder of the local files, played from `file` (else its first track)
   function playFolder(dir, file) {
@@ -114,6 +116,16 @@ Singleton {
   }
 
   Timer { id: settle; interval: 500; onTriggered: root.refresh() }
+
+  Timer {
+    id: errorExpiry
+    interval: 6000
+    onTriggered: root.clearError()
+  }
+  onErrorChanged: {
+    if (error !== "") errorExpiry.restart();
+    else errorExpiry.stop();
+  }
 
   Process {
     id: statusProc
