@@ -222,7 +222,7 @@ Pages by the user's area; the look follows macOS System Settings.
   (`ModuleSettings` `enabled`, `BarLayout.enabled` / `usable`): off, it is on no bar, island,
   Folder or Bar page list and the launcher, and its row stays in its place, dimmed and
   folded. Its place is set on the Bar page, not here. The options inside a row are flat
-  (`kitFlat`: `KitGrouper` draws hairlines only), as Live activities' are.
+  (`kitFlat`: `KitGrouper` draws hairlines only), as Live activities' are. A long one keeps its group captions (`KitLabel keepInFlat: true`, Capture): a rule under each.
 - Themes keeps its side list (a picker with a preview, not options): a search
   field, then the entries in one box (`Theme.groupFill`, `radiusCard`) to the
   pane's foot; rows `radiusControl`, picked `Theme.pickFill` + `Theme.pickWeight`, hover
@@ -288,10 +288,9 @@ Pages by the user's area; the look follows macOS System Settings.
   controls cannot activate. Switches inherit `Accessible.name` from their row;
   icon buttons fall back to their icon's name. Lists and custom app actions
   should supply descriptive names and keyboard handling as they adopt the kit.
-- SHOULD — rarely used groups go last on their page. A page with more than about eight rows
-  keeps the ones everyone needs in sight and puts the rest behind one `More options` row
-  (a switchless `KitFoldRow` in a one-row `KitReorderList`, built when first opened; Capture). A dropdown inside a dropdown is `nested: true`: a card of its own (`foldHeader`, a hairline) with a rail down its left edge that lights while open and a right-pointing arrow that turns down, so the eye reads it as a child of the dropdown it stands in: never a fold inside a fold. A window's own rows (App
-  window: floating, size, position) are one `Custom window` switch until asked for.
+- SHOULD — rarely used groups go last on their page; no "Advanced" fold (a fold inside a
+  fold read as clutter). A window's own rows (App window: floating, size, position) are one
+  `Custom window` switch until asked for.
 - SHOULD — a page header's subtitle holds at most three parts; group labels
   carry their own values.
 - MUST — search: every row's label and hint is a literal string where it can be

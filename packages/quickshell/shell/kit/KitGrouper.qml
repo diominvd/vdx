@@ -14,7 +14,7 @@ import qs.config
 // Material: a tonal section, no lines.
 // Inside an item with `kitFlat: true` (a dropdown's options, Apps / Bar modules) it draws no
 // boxes: the rows stand on the dropdown's own plate, hairlines between them and between groups,
-// the titles hidden.
+// the titles hidden (a KitLabel with `keepInFlat` stays, a rule under it: a long dropdown, Capture).
 // Put it last: it is 1×1 (a Column hides a zero-size child, and its drawing
 // with it), placed at the end and taken back with a negative bottom padding;
 // it draws behind the rows in the column's coordinates.
@@ -107,6 +107,7 @@ Item {
     const out = [], hair = [], surfaces = [], dividers = [];
     let run = null;
     let last = "";          // what came before: "label", "box" (a boxed row), "free" (an unboxed item), "line"
+    let kept = false;       // flat: a caption stayed in sight (KitLabel keepInFlat)
     let title = null;       // the label just seen, until the next item
     const close = () => { if (run) out.push({ y: run.top - root.padY, h: run.bottom - run.top + 2 * root.padY }); run = null; };
 
@@ -116,7 +117,8 @@ Item {
       const items = Array.from(parent.data).filter(c => c.visible !== undefined && c.height !== undefined && !c.isKitGrouper && c.sourceItem === undefined);
       items.forEach((c, i) => {
         // flat: a title only parts the groups, unseen
-        if (root.flat && c.isKitLabel) { c.visible = false; close(); last = "label"; return; }
+        if (root.flat && c.isKitLabel && !c.keepInFlat) { c.visible = false; close(); last = "label"; return; }
+        if (root.flat && c.isKitLabel) kept = true;
         // a line ends the group; before a title it goes (the title parts the boxes),
         // before rows it stays, unseen, as the gap between two boxes
         if (c.isKitLine && c.sectionBreak) {
@@ -173,7 +175,9 @@ Item {
     }
     root.boxes = root.flat ? [] : out;
     // flat: a hairline also between two groups (the box's top edge), across the full width
-    root.lines = root.flat ? hair.concat(out.slice(1).map(b => b.y)) : hair;
+    // (a dropdown that keeps its captions rules under each one, the first group's too)
+    const captioned = root.flat && kept;
+    root.lines = root.flat ? hair.concat(out.slice(captioned ? 0 : 1).map(b => b.y)) : hair;
   }
 
   function relayout() { soon.restart(); }

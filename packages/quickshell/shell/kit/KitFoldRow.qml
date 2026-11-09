@@ -22,7 +22,6 @@ Item {
   property bool draggable: true
   property bool hasSwitch: true               // false: a row that only unfolds (an arrow, no switch)
   property bool foldable: false
-  property bool nested: false                  // a dropdown inside a dropdown: a card of its own with a rail, a right-pointing arrow
   property bool sunken: false                  // the unfolded options on a darker plate, the full row wide (Live activities)
   property Component leading: null
   signal toggled()
@@ -41,8 +40,7 @@ Item {
   property real slotY: 0                       // where the list puts it
   property real dragY: 0                       // where the pointer holds it
   property bool flush: false                   // no handle column: the name and the options start at the left edge
-  readonly property real nestInset: nested ? Theme.gapWide : 0
-  readonly property real indent: (flush ? 0 : 12 + Theme.gapWide) + nestInset   // the handle's column: the name and the options start here
+  readonly property real indent: flush ? 0 : 12 + Theme.gapWide   // the handle's column: the name and the options start here
 
   width: parent ? parent.width : 0
   // a sunken row's header plate reaches half a gap below the row (as above it): the options start there
@@ -56,29 +54,6 @@ Item {
   // in a list the list places it; the slot it takes is animated when the order changes
   Binding { when: root.list !== null; target: root; property: "y"; value: root.dragging ? root.dragY : root.slotY }
   Behavior on y { enabled: Motion.controls && root.list !== null && !root.dragging && root.list.settling; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
-
-  // nested: the whole row is a raised card (header and options), its left edge a rail that takes the
-  // accent colour while open: the eye reads it as a child of the dropdown it stands in
-  Rectangle {
-    visible: root.nested
-    anchors.fill: parent
-    z: -1
-    radius: Theme.radiusCard
-    color: Theme.foldHeader
-    border.width: Theme.frameWidth
-    border.color: root.unfolded ? Theme.controlLineHover : Theme.controlLineRest
-    Behavior on border.color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
-  }
-  Rectangle {
-    visible: root.nested
-    x: Theme.gapSmall
-    y: Theme.gapWide
-    width: 2
-    height: Math.max(0, root.height - 2 * Theme.gapWide)
-    radius: 1
-    color: root.unfolded ? Theme.foreground2 : Theme.dividerColor
-    Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
-  }
 
   // the hairline between rows, in the middle of the gap above
   Rectangle {
@@ -189,11 +164,11 @@ Item {
   KitIcon {
     id: more
     visible: root.foldable && root.checked && root.list !== null
-    anchors { right: sw.visible ? sw.left : parent.right; rightMargin: sw.visible ? Theme.gapWide : root.nestInset; top: parent.top; topMargin: (root.rowHeight - height) / 2 }
-    name: root.nested ? "chevron-right" : "chevron-down"
+    anchors { right: sw.visible ? sw.left : parent.right; rightMargin: sw.visible ? Theme.gapWide : 0; top: parent.top; topMargin: (root.rowHeight - height) / 2 }
+    name: "chevron-down"
     size: Theme.iconSmall
     tint: root.unfolded ? Theme.foreground0 : Theme.foreground2
-    rotation: root.nested ? (root.unfolded ? 90 : 0) : (root.unfolded ? 180 : 0)
+    rotation: root.unfolded ? 180 : 0
     Behavior on rotation { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
   }
 

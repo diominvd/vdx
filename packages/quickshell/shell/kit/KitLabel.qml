@@ -11,6 +11,7 @@ Item {
   property string value: ""
   property color valueColor: Theme.muted
   property string about: ""
+  property bool keepInFlat: false           // a long dropdown that wants its captions: KitGrouper does not hide it there
   // KitGrouper: what the caption gives back to a neighbour that is not boxed, so the gap to
   // the surface above and below it is the same as beside a box (whose edge lies padY out)
   property int trimTop: 0
