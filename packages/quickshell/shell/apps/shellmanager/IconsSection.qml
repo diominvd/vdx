@@ -2,8 +2,8 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Icons: the icon set for the whole shell — Material or Phosphor (outline or
-// solid), or Lucide / Tabler (outline only) — and the style.
+// Icons: the icon set for the whole shell — Material, Phosphor or Mingcute
+// (outline or solid), or Lucide / Tabler (outline only) — and the style.
 KitColumn {
   spacing: Theme.gapGroup
 
@@ -17,7 +17,8 @@ KitColumn {
         { label: "Material", value: "material" },
         { label: "Phosphor", value: "phosphor" },
         { label: "Lucide",   value: "lucide" },
-        { label: "Tabler",   value: "tabler" }
+        { label: "Tabler",   value: "tabler" },
+        { label: "Mingcute", value: "mingcute" }
       ]
       current: ShellSettings.iconSet
       onPicked: value => ShellSettings.set("iconSet", value)

@@ -10,8 +10,8 @@ import Quickshell.Io
 Singleton {
   id: root
 
-  readonly property string iconSet: state.iconSet                 // material | phosphor | lucide | tabler (Icons)
-  readonly property bool solidIcons: state.solidIcons             // Material and Phosphor: the filled twins
+  readonly property string iconSet: state.iconSet                 // material | phosphor | lucide | tabler | mingcute (Icons)
+  readonly property bool solidIcons: state.solidIcons             // filled twins for Material, Phosphor and Mingcute
   readonly property bool iconTiles: state.iconTiles               // list icons in framed tiles (Appearance › Icons)
   readonly property bool menuIcons: state.menuIcons               // an icon before each page in the Shell Manager's list
   readonly property string managerStart: state.managerStart        // main | last: the page the Shell Manager opens on

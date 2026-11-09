@@ -219,8 +219,8 @@ Fonts, Icons, Cursor, Motion.
 - **Shape › Corners**: sharp, or round with one radius — popups, controls,
   the island, Hyprland's windows and mako follow, and the icons switch to
   Material Symbols Rounded.
-- **Icons**: Material Symbols or Phosphor (outline or solid), or Lucide / Tabler
-  (outline only).
+- **Icons**: Material Symbols, Phosphor or Mingcute (outline or solid), or
+  Lucide / Tabler (outline only).
 - Password fields use dots; there is no separate appearance option.
 
 ## Settings

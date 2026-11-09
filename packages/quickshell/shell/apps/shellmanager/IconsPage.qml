@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Icons: the set (Material, Phosphor, Lucide, Tabler) and the style, for the whole shell.
+// Icons: the set (Material, Phosphor, Lucide, Tabler, Mingcute) and the style, for the whole shell.
 // The icon section was Appearance › Shape; its keys are the same.
 Column {
   id: root
@@ -17,7 +17,7 @@ Column {
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
-  KitLabel { text: "ICONS"; about: "One set for everything; Lucide and Tabler use outline icons" }
+  KitLabel { text: "ICONS"; about: "One set for everything; Lucide and Tabler are outline only" }
   IconsSection { width: parent.width }
 
   KitLabel { text: "MENU"; about: "The Shell Manager's page list; the rail's group buttons keep theirs" }

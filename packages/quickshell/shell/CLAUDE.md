@@ -14,7 +14,7 @@ bar/           Bar (zones, child bars), ModuleFaces (the modules' Components), B
                IslandChild — a child bar's own island (Bar.popupHost picks one)
 modules/<id>/  bar modules: <Name>.qml, <Name>Popup.qml, <Name>Service.qml
 kit/           UI components, icons/ (Material outline, solid/, round/; phosphor/,
-               lucide/, tabler/), reply.js (a backend's JSON reply), markup.js (an app's markup as plain text), colour.js (hex / HSV)
+               mingcute/, lucide/, tabler/), reply.js (a backend's JSON reply), markup.js (an app's markup as plain text), colour.js (hex / HSV)
 components/    Hypr (helpers), ShellIpc (the shell's own IPC from inside it), ScrimWindow,
                PopupManager, PopupCatcher, Separator, ThemeCurtain
 config/        Theme (the look only), Colors (from the active theme), Format (text of
@@ -100,7 +100,8 @@ How to write a page, a module's options, a service, and the review checklist:
   It also writes `config/settings-keys.json` (each app / app-module settings file's keys):
   an app and its bar module share a ModuleSettings id and reset apart by it.
 - A right click on a bar module opens its options page (Bar › Behaviour › Right
-  click opens options, `bar/Bar.qml` `openSettings`): a module needs no code for it.
+  click opens options, `bar/Bar.qml` `openSettings`); the destination unfolds and
+  takes keyboard focus.
 
 ## Work
 

@@ -10,7 +10,8 @@ import qs.config
 // icons/material.txt); Phosphor in icons/phosphor, `solid` from phosphor/solid,
 // one set for both corners (icons/phosphor.txt); or Lucide in icons/lucide,
 // outline only (icons/lucide.txt); or Tabler in icons/tabler, outline only
-// (icons/tabler.txt).
+// (icons/tabler.txt); or Mingcute in icons/mingcute, Regular / Filled
+// (icons/mingcute.txt).
 Item {
   id: root
 
@@ -35,6 +36,7 @@ Item {
       : ShellSettings.iconSet === "tabler" ? Qt.resolvedUrl("icons/tabler/" + root.name + ".svg")
       : ShellSettings.iconSet === "lucide" ? Qt.resolvedUrl("icons/lucide/" + root.name + ".svg")
       : ShellSettings.iconSet === "phosphor" ? Qt.resolvedUrl("icons/phosphor/" + (root.solid ? "solid/" : "") + root.name + ".svg")
+      : ShellSettings.iconSet === "mingcute" ? Qt.resolvedUrl("icons/mingcute/" + (root.solid ? "filled/" : "regular/") + root.name + ".svg")
       : Qt.resolvedUrl("icons/" + (Theme.round ? "round/" : "") + (root.solid ? "solid/" : "") + root.name + ".svg")
     sourceSize { width: root.implicitWidth * 2; height: root.implicitHeight * 2 }
     smooth: true
