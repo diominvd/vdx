@@ -3505,7 +3505,7 @@
  },
  {
   "label": "More options",
-  "hint": "",
+  "hint": "Toolbar, frame rate, codec, encoder",
   "where": "Apps › Capture › ADVANCED",
   "target": "apps:capture"
  },

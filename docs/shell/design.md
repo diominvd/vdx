@@ -290,7 +290,7 @@ Pages by the user's area; the look follows macOS System Settings.
   should supply descriptive names and keyboard handling as they adopt the kit.
 - SHOULD — rarely used groups go last on their page. A page with more than about eight rows
   keeps the ones everyone needs in sight and puts the rest behind one `More options` row
-  (a `Show` / `Hide` button; Capture): never a fold inside a fold. A window's own rows (App
+  (a switchless `KitFoldRow` in a one-row `KitReorderList`, built when first opened; Capture): never a fold inside a fold. A window's own rows (App
   window: floating, size, position) are one `Custom window` switch until asked for.
 - SHOULD — a page header's subtitle holds at most three parts; group labels
   carry their own values.

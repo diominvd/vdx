@@ -11,8 +11,6 @@ Column {
   id: root
   spacing: Theme.sectionGap
 
-  property bool advanced: false
-
   KitLabel { text: "SAVING" }
 
   KitOptionRow {
@@ -76,77 +74,105 @@ Column {
 
   KitLabel { text: "ADVANCED" }
 
-  KitRow {
-    label: "More options"
-    hint: root.advanced ? "Toolbar, frame rate, codec, encoder" : "Toolbar, frame rate, encoder"
-    KitButton {
-      width: Theme.buttonWidth
-      text: root.advanced ? "Hide" : "Show"
-      onClicked: root.advanced = !root.advanced
-    }
-  }
+  // the rest unfolds under one row on a plate of its own (a Live activity's dropdown: a KitReorderList
+  // of one KitFoldRow); built when first opened
+  KitReorderList {
+    id: more
+    boxTop: false
+    rowHeight: Theme.rowHeight
+    keys: ["more"]
 
-  KitOptionRow {
-    visible: root.advanced
-    module: "capture"; key: "delay"; fallback: 0
-    label: "Delay button"
-    hint: "Off: no button in the toolbar"
-    model: [{ label: "Off", value: 0 }, { label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }]
-  }
+    delegate: KitFoldRow {
+      id: row
+      label: "More options"
+      hint: "Toolbar, frame rate, codec, encoder"
+      draggable: false
+      hasSwitch: false
+      flush: true
+      sunken: true
+      checked: true
+      foldable: true
 
-  KitToggleRow {
-    visible: root.advanced
-    module: "capture"; key: "grid"; fallback: true
-    label: "Grid"
-    hint: "Thirds in the selection, to compose"
-  }
+      property bool built: false
+      onUnfoldedChanged: if (unfolded) built = true
 
-  KitOptionRow {
-    visible: root.advanced
-    module: "capture"; key: "fps"; fallback: 60
-    label: "Frame rate"; hint: "Smoother, bigger files"
-    model: [{ label: "30 fps", value: 30 }, { label: "60 fps", value: 60 }]
-  }
+      Loader {
+        width: parent ? parent.width : 0
+        height: item ? item.implicitHeight : 0
+        active: row.built
+        sourceComponent: Column {
+          x: row.edge
+          width: parent.width - row.edge - Theme.gapLoose
+          spacing: Theme.settingsRowInset
 
-  KitOptionRow {
-    visible: root.advanced
-    module: "capture"; key: "codec"; fallback: "auto"
-    label: "Codec"
-    hint: "Auto: HEVC on the GPU"
-    model: [{ label: "Auto", value: "auto" }, { label: "H.264", value: "h264" }, { label: "HEVC", value: "hevc" }]
-  }
+          KitOptionRow {
+            module: "capture"; key: "delay"; fallback: 0
+            label: "Delay button"
+            hint: "Off: no button in the toolbar"
+            model: [{ label: "Off", value: 0 }, { label: "3 s", value: 3 }, { label: "5 s", value: 5 }, { label: "10 s", value: 10 }]
+          }
 
-  KitOptionRow {
-    visible: root.advanced
-    module: "capture"; key: "encoder"; fallback: "auto"
-    label: "Encoder"
-    hint: "Auto: iGPU on battery"
-    model: [{ label: "Auto", value: "auto" }, { label: "iGPU", value: "igpu" }, { label: "GPU", value: "gpu" }, { label: "CPU", value: "cpu" }]
-  }
+          Rectangle { width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
-  // every problem the current codec, encoder and quality can cause
-  Repeater {
-    model: root.advanced ? CaptureService.codecIssues : []
+          KitToggleRow {
+            module: "capture"; key: "grid"; fallback: true
+            label: "Grid"
+            hint: "Thirds in the selection, to compose"
+          }
 
-    Column {
-      required property var modelData
+          Rectangle { width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
-      width: parent.width
-      spacing: Theme.gapHair
+          KitOptionRow {
+            module: "capture"; key: "fps"; fallback: 60
+            label: "Frame rate"; hint: "Smoother, bigger files"
+            model: [{ label: "30 fps", value: 30 }, { label: "60 fps", value: 60 }]
+          }
 
-      KitText {
-        width: parent.width
-        wrapMode: Text.WordWrap
-        font.weight: Font.ExtraBold
-        color: modelData.warn ? Theme.yellow : Theme.foreground0
-        text: modelData.title
-      }
+          Rectangle { width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
 
-      KitText {
-        width: parent.width
-        wrapMode: Text.WordWrap
-        color: modelData.warn ? Theme.yellow : Theme.muted
-        text: modelData.text
+          KitOptionRow {
+            module: "capture"; key: "codec"; fallback: "auto"
+            label: "Codec"
+            hint: "Auto: HEVC on the GPU"
+            model: [{ label: "Auto", value: "auto" }, { label: "H.264", value: "h264" }, { label: "HEVC", value: "hevc" }]
+          }
+
+          Rectangle { width: parent.width; height: Theme.dividerThickness; color: Theme.dividerColor }
+
+          KitOptionRow {
+            module: "capture"; key: "encoder"; fallback: "auto"
+            label: "Encoder"
+            hint: "Auto: iGPU on battery"
+            model: [{ label: "Auto", value: "auto" }, { label: "iGPU", value: "igpu" }, { label: "GPU", value: "gpu" }, { label: "CPU", value: "cpu" }]
+          }
+
+          // every problem the current codec, encoder and quality can cause
+          Repeater {
+            model: CaptureService.codecIssues
+
+            Column {
+              required property var modelData
+
+              width: parent.width
+              spacing: Theme.gapHair
+
+              KitText {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                font.weight: Font.ExtraBold
+                color: modelData.warn ? Theme.yellow : Theme.foreground0
+                text: modelData.title
+              }
+
+              KitText {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                color: modelData.warn ? Theme.yellow : Theme.muted
+                text: modelData.text
+              }
+            }
+          }
+        }
       }
     }
   }
