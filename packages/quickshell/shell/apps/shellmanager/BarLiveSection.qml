@@ -21,6 +21,7 @@ Column {
 
   // `live:<kind>` from a right click on the pill: unfold that activity's options
   function jump(kind) { if (kinds.includes(kind)) list.open = kind; }
+  function rowOf(kind) { return kinds.includes(kind) ? list.rowOf(kind) : null; }
 
   KitReorderList {
     id: list

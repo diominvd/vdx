@@ -215,7 +215,24 @@ Rectangle {
     if (!p) return;
     const j = p.jumps.find(x => x.key === r.target);
     if (j) Qt.callLater(() => root.jumpTo(j));
-    else if (r.target && typeof p.jump === "function") p.jump(r.target);
+    else if (r.target && typeof p.jump === "function") {
+      p.jump(r.target);
+      // an option that unfolds out of view: scroll to it once it has opened
+      if (typeof p.rowOf === "function") { revealKey = r.target; reveal.restart(); }
+    }
+  }
+
+  property string revealKey: ""
+  Timer {
+    id: reveal
+    interval: Motion.normal + 60
+    onTriggered: {
+      const row = root.currentPage?.rowOf?.(root.revealKey);
+      if (!row) return;
+      const y = row.mapToItem(page.contentItem, 0, 0).y - Theme.gapWide;
+      scroll.to = Math.min(Math.max(0, page.contentHeight - page.height), Math.max(0, y));
+      scroll.restart();
+    }
   }
 
   readonly property Item currentPage: pageContent.item

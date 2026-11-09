@@ -9,6 +9,10 @@ Column {
   id: root
 
   function jump(kind) { for (const s of [asks, held, flash]) s.jump(kind); }
+  function rowOf(kind) {
+    for (const s of [asks, held, flash]) { const r = s.rowOf(kind); if (r) return r; }
+    return null;
+  }
 
   Column {
     width: parent.width

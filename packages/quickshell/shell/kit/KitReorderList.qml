@@ -77,6 +77,12 @@ Item {
   }
   Timer { id: settleOff; interval: Motion.normal + 50; onTriggered: root.settling = false }
 
+  // the row of a key (null when there is none): a page scrolls to it
+  function rowOf(key) {
+    for (let i = 0; i < order.count; i++) if (order.get(i).key === key) return rows.itemAt(i);
+    return null;
+  }
+
   Repeater {
     id: rows
     model: root.order

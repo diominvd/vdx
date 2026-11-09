@@ -101,7 +101,7 @@ How to write a page, a module's options, a service, and the review checklist:
   an app and its bar module share a ModuleSettings id and reset apart by it.
 - A right click on a bar module opens its options page (Bar › Behaviour › Right
   click opens options, `bar/Bar.qml` `openSettings`); the destination unfolds and
-  takes keyboard focus.
+  scrolls into view (a page with `jump` and `rowOf`).
 
 ## Work
 
