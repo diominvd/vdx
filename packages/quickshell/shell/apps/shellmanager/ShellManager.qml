@@ -418,17 +418,20 @@ Rectangle {
       interactive: contentHeight > height
       boundsBehavior: Flickable.StopAtBounds
       spacing: Theme.gapHair
-      model: root.visibleNavItems
-      Behavior on x { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
-      Behavior on y { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
-      Behavior on width { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
-      Behavior on height { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
+      // Populate after the window's first frame, so opening uses the same
+      // visible transition as changing sections. Stops after one frame.
+      property bool ready: false
+      model: ready ? root.visibleNavItems : []
+      FrameAnimation {
+        running: !nav.ready && nav.visible && root.Window.window !== null && root.Window.window.visible
+        onTriggered: nav.ready = true
+      }
+      // Replacing the JS-array model runs populate, not add.
+      populate: navAppear
       add: Transition {
+        id: navAppear
         enabled: Motion.pages
-        ParallelAnimation {
-          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.ms(180); easing.type: Motion.easing }
-          NumberAnimation { property: "x"; from: 10; to: 0; duration: Motion.ms(180); easing.type: Motion.easing }
-        }
+        NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.normal; easing.type: Motion.easing }
       }
       remove: Transition {
         enabled: Motion.pages
