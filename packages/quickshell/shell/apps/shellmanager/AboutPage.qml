@@ -162,6 +162,21 @@ Column {
 
     width: parent.width; visible: root.tab === "about"
     opacity: sectionIn.shown
+  Item {
+    property bool kitUnboxed: true
+    width: parent.width
+    height: 112
+
+    Image {
+      anchors.centerIn: parent
+      width: 96; height: 96
+      source: Qt.resolvedUrl("../../kit/logo.png")
+      sourceSize: Qt.size(192, 192)
+      fillMode: Image.PreserveAspectFit
+      smooth: true
+    }
+  }
+
   // ---- philosophy ----
   KitLabel { id: philosophy; text: "PHILOSOPHY" }
 

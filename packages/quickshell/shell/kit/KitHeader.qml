@@ -16,6 +16,7 @@ Item {
   property string description: ""           // a page: one or two lines on what it is for
   property color subtitleColor: Theme.muted
   property bool page: false
+  property bool logo: false                 // the shell's logo (kit/logo.png) instead of the icon
   readonly property bool large: page
   readonly property Item kitCaption: caption
   readonly property bool isKitHeader: true       // KitFrame: stands on the surface, never in a section
@@ -32,7 +33,7 @@ Item {
     id: icon
     anchors { left: parent.left; verticalCenter: caption.verticalCenter }
     visible: !root.large
-    width: !visible ? 0 : root.m3 ? Theme.controlHeight : 30
+    width: !visible ? 0 : root.logo ? 34 : root.m3 ? Theme.controlHeight : 30
     height: root.m3 ? Theme.controlHeight : 24
 
     Rectangle {
@@ -42,7 +43,17 @@ Item {
       color: Theme.tonal(root.iconColor, 0.2)
     }
 
+    Image {
+      visible: root.logo
+      anchors.verticalCenter: parent.verticalCenter
+      width: 28; height: 28
+      source: root.logo ? Qt.resolvedUrl("logo.png") : ""
+      sourceSize: Qt.size(56, 56)
+      smooth: true
+    }
+
     KitIcon {
+      visible: !root.logo
       anchors.verticalCenter: parent.verticalCenter
       anchors.horizontalCenter: root.m3 ? parent.horizontalCenter : undefined
       name: root.icon
