@@ -227,7 +227,7 @@ QtObject {
   // tracks, knobs, switches: the same proportion (a pill only at the largest radius)
   function pill(h) { return radiusFor(h); }
 
-  // ---- Material 3 (Appearance › Style › Material) ----
+  // ---- Material 3 (Style) ----
   // what Material draws that Strict does not; Strict reads none of these. A popup is one
   // soft surface (radiusPopup), its groups tonal sections (KitFrame: the runs between its
   // KitLines) with concentric corners; the main action is filled (KitButton primary)

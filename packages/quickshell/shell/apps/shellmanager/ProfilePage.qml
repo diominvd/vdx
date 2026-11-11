@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Widgets
 import qs.apps.files
 import qs.config
 import qs.kit
@@ -19,20 +20,70 @@ Column {
   function reset() { ModuleSettings.reset("profile"); }
 
   readonly property string picture: ModuleSettings.get("profile", "avatar", "")
+  readonly property string displayName: ModuleSettings.get("profile", "name", "") || Quickshell.env("USER") || "User"
 
   spacing: Theme.sectionGap
 
-  Column {
-    width: parent.width
+  KitLabel { text: "PICTURE" }
 
-    KitLabel { text: "PICTURE" }
-    KitRow {
-      label: "Picture"
-      hint: root.picture.split("/").pop() || "None: your initial"
-      KitButton { text: "Choose…"; onClicked: FilesService.pick("Choose a profile picture", FilesService.home, false, ["image/*"], path => { if (path) ModuleSettings.set("profile", "avatar", path); }) }
-      KitButton { visible: root.picture !== ""; icon: "x"; Accessible.name: "Clear the picture"; onClicked: ModuleSettings.set("profile", "avatar", "") }
+  Item {
+    id: pictureArea
+    property bool kitUnboxed: true
+    width: parent.width
+    height: Math.max(avatar.height, pictureSection.y + pictureSection.implicitHeight)
+
+    ClippingRectangle {
+      id: avatar
+      x: 0
+      y: pictureSection.y + pictureCard.y + pictureCard.height / 2 - height / 2
+      width: 56
+      height: width
+      radius: Theme.radiusFor(height)
+      color: Theme.pickFill
+
+      Image {
+        id: avatarImage
+        anchors.fill: parent
+        source: root.picture
+        sourceSize: Qt.size(112, 112)
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
+        visible: status === Image.Ready
+      }
+
+      KitText {
+        anchors.centerIn: parent
+        visible: !avatarImage.visible
+        text: root.displayName.slice(0, 1).toUpperCase()
+        font.weight: Font.Medium
+      }
     }
-    KitGrouper {}
+
+    Column {
+      id: pictureSection
+      x: avatar.width + Theme.gapGroup
+      y: Theme.settingsRowInset
+      width: parent.width - x
+
+      KitRow {
+        id: pictureCard
+        label: "Picture"
+        hint: root.picture.split("/").pop() || "None: your initial"
+        KitButton {
+          text: "Choose…"
+          onClicked: FilesService.pick("Choose a profile picture", FilesService.home, false, ["image/*"], path => {
+            if (path) ModuleSettings.set("profile", "avatar", path);
+          })
+        }
+        KitButton {
+          visible: root.picture !== ""
+          icon: "x"
+          Accessible.name: "Clear the picture"
+          onClicked: ModuleSettings.set("profile", "avatar", "")
+        }
+      }
+      KitGrouper {}
+    }
   }
 
   KitLine {}

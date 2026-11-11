@@ -52,7 +52,7 @@ Rectangle {
 // the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
   readonly property var allSections: [
     { value: "appearance", label: "Interface",  icon: "sliders",    caption: "APPEARANCE",
-      page: "appearance", pageTab: "style", description: "Style, fields and corners." },
+      page: "appearance", pageTab: "interface", description: "Style, fields and corners." },
     { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "colours",    label: "Colours",    icon: "paint-bucket",
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
@@ -668,7 +668,7 @@ Rectangle {
       opacity: Math.max(pageIn.shown, root.pageWait > 0 ? 0.002 : 0)
       transform: Translate { x: (1 - pageIn.shown) * 18 }     // a short move in from the right
       y: root.contentGap
-      // Themes is a two-pane gallery; all settings pages share the form width.
+      // Picker and preview pages use the full area; settings forms stay bounded.
       width: ["themes", "fonts", "cursor", "icons"].includes(root.tab) ? availableWidth : Math.min(availableWidth, Theme.settingsMaxWidth)
       height: Math.max(implicitHeight, page.height - y)
       implicitHeight: pageContent.item?.implicitHeight ?? 0

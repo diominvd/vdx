@@ -21,12 +21,11 @@ uses tonal layers and more spacious controls.
   Set each part (a fold row, its hint the px one R makes of each part): a slider per part
   (windows, cards, controls, the bar, the hub), each R read the
   same way (`Theme.cornerOf(part)`), so one tick looks alike on every part; the
-  one slider hides while they show. Interface reads top down: Style (two miniature
-  desktop preview that follows the selected style), Shape, Controls (slider style, input text).
+  one slider hides while they show. Interface holds Style (Strict | Material 3), Shape and Controls (slider style, input text).
   A settings page's scroll ends a window padding above the window's edge (`KitSettingsWorkspace`).
   No literal `height / 2` for a corner.
   An image in a rounded tile sits in a `ClippingRectangle`.
-- Controls: Appearance › Style (Strict | Material, a select). A control's frame is
+- Controls: Appearance › Interface › Style (Strict | Material 3). A control's frame is
   `Theme.frameWidth` (0 in material) in `Theme.controlLineRest` (`controlLineHover`
   under the pointer, focused or open), its fill `Theme.controlFill` /
   `controlHover`, a popup's frame `Theme.popupFrame`. Never a literal 1.
@@ -127,7 +126,7 @@ uses tonal layers and more spacious controls.
   An exact number or text → `KitInput` (Enter). A folder or file → `KitInput` + a
   `Choose…` button (`FilesService.pickFolder` / `pick`, the file picker's own window's
   A password → `KitInput { echoMode: TextInput.Password }`: it carries its own eye, and where text
-  stands (left, centre) is the user's (Interface › Style › Input text), never set per field.
+  stands (left, centre) is the user's (Interface › Input text), never set per field.
   picker). A long list to preview + Apply → a searchable list and a preview, as
   on Themes. A slider of 3–4 stops is chips.
   On a Settings page the choices are `KitSegments` (one track, the picked segment

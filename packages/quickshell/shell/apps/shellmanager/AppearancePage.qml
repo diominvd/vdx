@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Interface (style, fields, corners) and Colours share the bounded settings form.
+// Interface (style, fields and corners) and Colours share the bounded settings form.
 // Icons, Fonts and Wallpaper are pages of their own.
 KitSettingsWorkspace {
   id: root
@@ -11,26 +11,26 @@ KitSettingsWorkspace {
   readonly property var tabs: sections
   readonly property string icon: "sliders"
   readonly property string title: "Appearance"
-  readonly property string description: "The colour, shape and style of the shell."
-  property string tab: "style"
+  readonly property string description: "Style, shape and control layout preferences."
+  property string tab: "interface"
   readonly property var jumps: [
-    { key: "style", label: "Interface", y: 0 },
+    { key: "interface", label: "Interface", y: 0 },
     { key: "accent", label: "Colours", y: 0 },
     { key: "shape", label: "Shape", y: 0 }
-  ].filter(j => tab === "style" ? ["style", "shape"].includes(j.key) : j.key === tab)   // the open tab's: a sidebar page each
+  ].filter(j => tab === "interface" ? ["interface", "shape"].includes(j.key) : j.key === tab)   // the open tab's: a sidebar page each
   function jump(key) {
-    tab = key === "accent" ? key : "style";
+    tab = key === "accent" ? key : "interface";
   }
   // the header's Reset: the keys of the sidebar page shown (Interface or Colours), not the other
   readonly property var tabKeys: ({
-    style: ["corners", "cornerRadius", "cornerSplit", "cornerRadii", "material", "segmentedSliders", "inputAlign"],
+    interface: ["material", "corners", "cornerRadius", "cornerSplit", "cornerRadii", "segmentedSliders", "inputAlign"],
     accent: ["accent", "accentStops", "customColours", "shareColours", "customColoursMax", "accentWhere"]
   })
   readonly property var resetKeys: tabKeys[tab] ?? []
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
-  sections: [{label: "Interface", value: "style"}, {label: "Colours", value: "accent"}]
+  sections: [{label: "Interface", value: "interface"}, {label: "Colours", value: "accent"}]
   current: tab
   onPicked: value => tab = value
 
@@ -40,9 +40,19 @@ KitSettingsWorkspace {
       Column {
         spacing: Theme.sectionGap
         width: parent.width
-        visible: root.tab === "style"
+        visible: root.tab === "interface"
         KitLabel { text: "STYLE" }
-        StyleCards { width: parent.width }
+        KitRow {
+          label: "Interface style"
+          hint: "Strict outlines or Material 3 surfaces"
+          wide: true
+          KitSegments {
+            model: [{ label: "Strict", value: "strict" }, { label: "Material 3", value: "material" }]
+            current: ShellSettings.material ? "material" : "strict"
+            onPicked: value => ShellSettings.set("material", value === "material")
+          }
+        }
+        KitLine {}
         KitLabel { text: "SHAPE"; about: "Corners used throughout the shell" }
         CornersSection { width: parent.width }
         KitLine {}

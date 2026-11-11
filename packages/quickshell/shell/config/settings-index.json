@@ -24,6 +24,12 @@
   "target": "appearance"
  },
  {
+  "label": "Interface style",
+  "hint": "Strict outlines or Material 3 surfaces",
+  "where": "Interface › STYLE",
+  "target": "appearance"
+ },
+ {
   "label": "Slider style",
   "hint": "",
   "where": "Interface › CONTROLS",
@@ -3462,12 +3468,6 @@
   "target": "apps:capture"
  },
  {
-  "label": "Toolbar",
-  "hint": "",
-  "where": "Apps › Capture",
-  "target": "apps:capture"
- },
- {
   "label": "Saving",
   "hint": "",
   "where": "Apps › Capture",
@@ -3494,13 +3494,13 @@
  {
   "label": "Delay button",
   "hint": "Off: no button in the toolbar",
-  "where": "Apps › Capture › TOOLBAR",
+  "where": "Apps › Capture",
   "target": "apps:capture"
  },
  {
   "label": "Grid",
   "hint": "Thirds in the selection, to compose",
-  "where": "Apps › Capture › TOOLBAR",
+  "where": "Apps › Capture",
   "target": "apps:capture"
  },
  {

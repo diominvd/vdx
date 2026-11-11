@@ -33,6 +33,7 @@ Scope {
     Bar {}
   }
 
+  // Super+S opens the manager and its independently loaded settings pages.
   ShellManagerWindow {}
   TaskManagerWindow {}
   CleanerWindow {}
