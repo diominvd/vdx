@@ -18,8 +18,9 @@ keybinds {
     // Zen: toggle the focused pane without bars or other panes, in every mode.
     shared {
         bind "Alt z" { ToggleFocusNoUiFullscreen; }
+        bind "Alt f" { LaunchOrFocusPlugin "forgot" { floating true; move_to_focused_tab true; }; SwitchToMode "Normal"; }
     }
-    shared_except "tmux" "locked" {
+    shared_except "tmux" {
         bind "Ctrl a" { SwitchToMode "Tmux"; }
     }
     normal {
@@ -89,4 +90,17 @@ keybinds {
         bind "g" { ScrollToTop; }
         bind "G" { ScrollToBottom; }
     }
+}
+
+// Pinned upstream releases; only autolock runs headless at startup.
+plugins {
+    autolock location="file:~/.config/zellij/plugins/zellij-autolock.wasm" {
+        is_enabled true
+        lock_regex "^(vim|nvim|hx|helix|fzf|less|more|man|lazygit|yazi|btop|htop|codex|claude)$"
+        log_level "error"
+    }
+    forgot location="file:~/.config/zellij/plugins/zellij_forgot.wasm"
+}
+load_plugins {
+    autolock
 }

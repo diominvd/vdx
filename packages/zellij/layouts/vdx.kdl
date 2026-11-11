@@ -3,6 +3,18 @@ layout {
     default_tab_template {
         pane size=1 borderless=true { plugin location="zellij:tab-bar"; }
         children
+        pane size=1 borderless=true {
+            plugin location="file:~/.config/zellij/plugins/showy-quota-zellij.wasm" {
+                serve_url "http://127.0.0.1:8080"
+                session_broker true
+                manage_serve true
+                serve_command "codexbar"
+                cli_command "codexbar"
+                interval_seconds 120
+                serve_refresh_seconds 120
+                cli_interval_seconds 120
+            }
+        }
         pane size=2 borderless=true {
             plugin location="zellij:status-bar" { classic true; }
         }
