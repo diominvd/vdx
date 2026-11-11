@@ -149,7 +149,9 @@ PanelWindow {
   // otherwise the bar never does
   WlrLayershell.keyboardFocus: PopupManager.current || (islandItem?.takesKeys ?? false)
     ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
-  color: Theme.island || morphing ? "transparent" : Theme.background0
+  // Surface format is fixed at creation, even when Solid later becomes Island.
+  surfaceFormat.opaque: false
+  color: Theme.island || morphing ? Theme.clear : Theme.background0
 
   mask: Theme.island ? islandMask : null
 

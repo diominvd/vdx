@@ -1,12 +1,13 @@
 """Live face measurements must survive the compact bar being hidden by a popup."""
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import unittest
 
-from tests.qml_runtime import SHELL
+from tests.qml_runtime import SHELL, run_quickshell
 
 
 class BarGeometry(unittest.TestCase):
@@ -68,3 +69,53 @@ Item {
             result = subprocess.run([runner, "-input", str(work), "-import", str(work)],
                                     env=env, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+@unittest.skipUnless(shutil.which("qs"), "Quickshell is not installed")
+class BarSurfaceFormat(unittest.TestCase):
+    def test_solid_start_keeps_alpha_when_switching_styles(self):
+        source = (SHELL / "bar/Bar.qml").read_text()
+        # Exercise the production surface request and colour binding on a real
+        # Quickshell window, without constructing modules or a desktop panel.
+        properties = "\n".join(re.findall(r"^  (?:surfaceFormat\.opaque|color):.*$", source, re.M))
+        self.assertIn("surfaceFormat.opaque:", properties, "The bar must request alpha explicitly before window creation")
+        with tempfile.TemporaryDirectory(prefix="bar-alpha-") as directory:
+            root = Path(directory)
+            config = root / "config"
+            config.mkdir(parents=True)
+            (config / "qmldir").write_text("module qs.config\nsingleton Theme 1.0 Theme.qml\n")
+            (config / "Theme.qml").write_text(
+                "pragma Singleton\nimport QtQuick\nQtObject { property bool island: false; "
+                "readonly property color background0: Qt.rgba(0.1, 0.1, 0.1, 1); readonly property color clear: Qt.rgba(0, 0, 0, 0) }\n")
+            (root / "shell.qml").write_text('''import QtQuick
+import Quickshell
+import qs.config
+Scope {
+  FloatingWindow {
+    id: panel
+    property bool morphing: false
+    implicitWidth: 100
+    implicitHeight: 40
+''' + properties + '''
+  }
+  Timer {
+    interval: 20; running: true
+    onTriggered: {
+      if (panel.color.a !== 1 || panel.surfaceFormat.opaque !== false)
+        throw new Error("Solid startup did not request an alpha-capable surface");
+      Theme.island = true;
+      if (panel.color.a !== 0 || panel.surfaceFormat.opaque !== false)
+        throw new Error("Island lost transparency after Solid startup");
+      Theme.island = false;
+      panel.morphing = true;
+      if (panel.color.a !== 0 || panel.surfaceFormat.opaque !== false)
+        throw new Error("Style morph lost transparency");
+      panel.morphing = false;
+      if (panel.color.a !== 1 || panel.surfaceFormat.opaque !== false)
+        throw new Error("Returning to Solid changed the surface format");
+      Qt.quit();
+    }
+  }
+}
+''')
+            run_quickshell(root)

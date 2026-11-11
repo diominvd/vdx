@@ -40,6 +40,10 @@ until the supervisor's new `qs` locks again (marker in
 | Config | `config/` (`Theme`, `Colors`, `Motion`, `Format`, `Paths`, `ShellSettings`, `ModuleSettings`) | tokens and settings stores | — |
 | Components | `components/` (`Hypr`, `ShellIpc`, `PopupManager`, `PopupCatcher`, `ScrimWindow`, …) | Hyprland helpers, the shell's own IPC, popup arbitration | — |
 
+`bar/Bar.qml` requests `surfaceFormat.opaque: false` before window creation.
+The same surface switches between Solid, its morph animation and transparent
+Island; its initial Solid colour must not select an opaque-only format.
+
 Island and child bars borrow popup items through
 `components/PopupContentHost.qml`. It restores only the items it moved, keeps
 other host children in place, and returns the content and closes the popup
