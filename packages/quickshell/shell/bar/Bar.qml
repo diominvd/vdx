@@ -64,15 +64,22 @@ PanelWindow {
     }
 
     spacing: Theme.moduleSpacing
-    onIdsChanged: root.scheduleFold()
+    onIdsChanged: { root.scheduleFold(); BarLayout.syncFaceModel(faceModel, ids); }
+    Component.onCompleted: BarLayout.syncFaceModel(faceModel, ids)
+    ListModel { id: faceModel }
+    move: Transition {
+      enabled: Motion.bar
+      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    }
 
     Repeater {
-      model: zone.ids
+      model: faceModel
 
       Row {
         id: cell
 
-        required property string modelData
+        required property string moduleId
+        readonly property string modelData: moduleId
         readonly property bool custom: BarLayout.isSeparator(modelData)
         // folded: hidden, and no face here — the Folder makes it (one popup, one IPC target)
         readonly property bool folded: zone.folded.includes(modelData)

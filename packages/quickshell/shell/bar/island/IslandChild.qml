@@ -71,11 +71,20 @@ Rectangle {
     opacity: root.popupShown ? 0 : 1
     Behavior on opacity { enabled: Motion.island && Theme.island; NumberAnimation { duration: Motion.quick } }
 
+    readonly property var ids: BarLayout.barModules(root.bar.modelData.name, root.modelData.id)
+    onIdsChanged: BarLayout.syncFaceModel(faceModel, ids)
+    Component.onCompleted: BarLayout.syncFaceModel(faceModel, ids)
+    ListModel { id: faceModel }
+    move: Transition {
+      enabled: Motion.bar
+      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    }
     Repeater {
-      model: BarLayout.barModules(root.bar.modelData.name, root.modelData.id)
+      model: faceModel
 
       Row {
-        required property string modelData
+        required property string moduleId
+        readonly property string modelData: moduleId
         required property int index
 
         spacing: Theme.moduleSpacing

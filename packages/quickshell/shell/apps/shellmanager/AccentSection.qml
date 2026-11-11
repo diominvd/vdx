@@ -4,7 +4,7 @@ import qs.kit
 
 // One accent colour, independently enabled for each UI target. The windows' frame
 // (its place "window") is chosen in Windows › Look (Frames: off | theme | accent).
-KitColumn {
+Column {
   id: root
 
   spacing: Theme.sectionGap
@@ -30,46 +30,69 @@ KitColumn {
     hint: "Active and selected controls"
     KitSwitch { checked: ShellSettings.accent; onToggled: ShellSettings.set("accent", !checked) }
   }
-  KitColourRow {
-    visible: ShellSettings.accent
-    label: "Colour"
-    hint: "A named one, or your own"
-    always: true
-    names: root.names
-    picked: root.selected
-    colours: name => Theme.accentColour(name)
-    onChosen: value => root.choose(value)
-    onCustomRemoved: hex => { if (root.selected === hex) root.choose("theme"); }
-  }
-
-  KitLabel { text: "ACCENT TARGETS"; visible: ShellSettings.accent }
+  // One clipped section owns its geometry, including its card backgrounds.
   Item {
-    id: tiles
-    property bool kitUnboxed: true               // KitGrouper: stands on the page
-    visible: ShellSettings.accent
+    id: accentOptions
+    property bool kitUnboxed: true
+    property real reveal: ShellSettings.accent ? 1 : 0
     width: parent.width
-    height: visible ? grid.height : 0
-    readonly property int columns: width >= 560 ? 4 : 2
+    // Keep a minimal layout slot: removing a zero-height child also removes
+    // Column spacing and changes the following caption's group inset.
+    height: Math.max(1, (Theme.settingsRowInset + options.implicitHeight) * reveal)
+    enabled: ShellSettings.accent
+    clip: true
+    opacity: reveal
+    Behavior on reveal { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
 
-    Grid {
-      id: grid
+    Column {
+      id: options
+      // The grouper draws the first card above its row by this inset.
+      y: Theme.settingsRowInset
       width: parent.width
-      columns: tiles.columns
-      spacing: Theme.gapMedium
-      readonly property real cell: (width - (tiles.columns - 1) * spacing) / tiles.columns
+      spacing: Theme.sectionGap
+      KitColourRow {
+        label: "Colour"
+        hint: "A named one, or your own"
+        always: true
+        names: root.names
+        picked: root.selected
+        colours: name => Theme.accentColour(name)
+        onChosen: value => root.choose(value)
+        onCustomRemoved: hex => { if (root.selected === hex) root.choose("theme"); }
+      }
 
-      Repeater {
-        model: root.targets
-        delegate: KitTargetTile {
-          required property var modelData
-          width: grid.cell
-          sample: modelData.sample
-          label: modelData.label
-          hint: modelData.hint
-          checked: ShellSettings.accentWhere[modelData.value] === true
-          onToggled: root.setTarget(modelData.value, !checked)
+      KitLabel {
+        text: "ACCENT TARGETS"
+      }
+      Item {
+        id: tiles
+        property bool kitUnboxed: true               // KitGrouper: stands on the page
+        width: parent.width
+        height: grid.height
+        readonly property int columns: width >= 560 ? 4 : 2
+
+        Grid {
+          id: grid
+          width: parent.width
+          columns: tiles.columns
+          spacing: Theme.gapMedium
+          readonly property real cell: (width - (tiles.columns - 1) * spacing) / tiles.columns
+
+          Repeater {
+            model: root.targets
+            delegate: KitTargetTile {
+              required property var modelData
+              width: grid.cell
+              sample: modelData.sample
+              label: modelData.label
+              hint: modelData.hint
+              checked: ShellSettings.accentWhere[modelData.value] === true
+              onToggled: root.setTarget(modelData.value, !checked)
+            }
+          }
         }
       }
+      KitGrouper {}
     }
   }
   KitLine {}

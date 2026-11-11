@@ -108,8 +108,15 @@ Rectangle {
     id: textInput
     // centred (Text › Input text; a password by default): the right margin matches the icon's side
     readonly property bool masked: root.echoMode === TextInput.Password
-    readonly property bool centred: root.centerMasked && (ShellSettings.inputAlign === "center" || ShellSettings.inputAlign === "auto" && masked)
-    anchors { left: lead.visible ? lead.right : parent.left; leftMargin: lead.visible ? Theme.gapMedium : Theme.gapWide; right: eye.visible ? eye.left : parent.right; rightMargin: eye.visible ? 4 : centred ? (lead.visible ? lead.width + 18 : Theme.gapWide) : 10; top: parent.top; bottom: parent.bottom }
+    readonly property bool centred: ShellSettings.inputAlign === "center" || ShellSettings.inputAlign === "auto" && masked && root.centerMasked
+    readonly property real centreInset: Math.max(Theme.gapWide,
+      lead.visible ? Theme.gapLoose + lead.width + Theme.gapMedium : 0,
+      eye.visible ? Theme.gapSmall + eye.width + Theme.gapHair : 0)
+    anchors {
+      left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom
+      leftMargin: centred ? centreInset : lead.visible ? lead.x + lead.width + Theme.gapMedium : Theme.gapWide
+      rightMargin: centred ? centreInset : eye.visible ? Theme.gapSmall + eye.width + Theme.gapHair : Theme.gapLoose
+    }
     echoMode: root.eyed && root.revealed ? TextInput.Normal : root.echoMode
     verticalAlignment: TextInput.AlignVCenter
     horizontalAlignment: centred ? TextInput.AlignHCenter : TextInput.AlignLeft

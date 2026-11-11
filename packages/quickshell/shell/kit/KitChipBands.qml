@@ -72,7 +72,7 @@ Column {
   // into a band) fades in. `scope` (a monitor) starts it afresh.
   property string scope: ""
   property KitSeen seen: KitSeen {}
-  onScopeChanged: { seen.reset(); cancelDrag(); }
+  onScopeChanged: { dropPositions = ({}); seen.reset(); cancelDrag(); }
 
   signal dropped(string id, string zone, int index)
   signal removed(string id)
@@ -105,11 +105,25 @@ Column {
     dropZone = "";
   }
 
+  // Capture only on a drop; rebuilt delegates can continue from their old place.
+  property var dropPositions: ({})
   function release() {
+    const positions = {};
+    if (Motion.controls) {
+      for (let i = 0; i < bands.count; i++) {
+        const chips = bands.itemAt(i).chips;
+        for (let j = 0; j < chips.count; j++) {
+          const chip = chips.itemAt(j);
+          positions[chip.modelData] = chip.mapToItem(board, 0, 0);
+        }
+      }
+    }
+    dropPositions = positions;
     if (dragId !== "" && dropZone !== "" && accepts(dragId, dropZone)) dropped(dragId, dropZone, dropIndex);
     dragId = "";
     dropZone = "";
     dropIndex = -1;
+    Qt.callLater(() => { dropPositions = ({}); });
   }
 
   spacing: 0
@@ -221,6 +235,10 @@ Column {
           id: flow
           width: parent.width
           spacing: Theme.gapSmall
+          move: Transition {
+            enabled: Motion.controls
+            NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+          }
 
           Repeater {
             id: chipRepeater
@@ -253,7 +271,30 @@ Column {
               opacity: dim * grown
               scale: 0.85 + 0.15 * grown
               NumberAnimation { id: chipIn; target: chip; property: "grown"; from: 0; to: 1; duration: Motion.normal; easing.type: Motion.easing }
-              Component.onCompleted: if (board.seen.arrived(band.zone + "/" + modelData)) chipIn.start()
+              transform: Translate { id: dropOffset }
+              ParallelAnimation {
+                id: dropMove
+                NumberAnimation { target: dropOffset; property: "x"; to: 0; duration: Motion.normal; easing.type: Motion.easing }
+                NumberAnimation { target: dropOffset; property: "y"; to: 0; duration: Motion.normal; easing.type: Motion.easing }
+              }
+              Component.onCompleted: {
+                const previous = board.dropPositions[modelData];
+                if (previous && Motion.controls) {
+                  Qt.callLater(() => {
+                    if (!Motion.controls) return;
+                    const here = chip.mapToItem(board, 0, 0);
+                    dropOffset.x = previous.x - here.x;
+                    dropOffset.y = previous.y - here.y;
+                    dropMove.start();
+                  });
+                } else if (board.seen.arrived(band.zone + "/" + modelData)) chipIn.start();
+              }
+              Connections {
+                target: Motion
+                function onControlsChanged() {
+                  if (!Motion.controls) { dropMove.stop(); dropOffset.x = 0; dropOffset.y = 0; }
+                }
+              }
 
               TextMetrics {
                 id: chipLabelMetrics

@@ -13,6 +13,19 @@ import qs.config
 Singleton {
   id: root
 
+  // Preserve live module instances when a zone is reordered.
+  function syncFaceModel(model, ids) {
+    if (!model) return;
+    for (let i = model.count - 1; i >= 0; --i)
+      if (!ids.includes(model.get(i).moduleId)) model.remove(i);
+    for (let i = 0; i < ids.length; ++i) {
+      let at = i;
+      while (at < model.count && model.get(at).moduleId !== ids[i]) ++at;
+      if (at === model.count) model.insert(i, {moduleId: ids[i]});
+      else if (at !== i) model.move(at, i, 1);
+    }
+  }
+
   // Registry, in default order. A new module: an entry here + its Component in
   // ModuleFaces.qml. `icon` names a kit/icons SVG, `about` is the manager's one-liner,
   // `settings` its options page in the module's folder (Shell Manager › Modules),

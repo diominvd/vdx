@@ -42,8 +42,8 @@ Item {
   // the slot's width is moving: the island follows it as it goes, without a glide of its own
   readonly property bool moving: targetAnim.running
   // the other activities that run besides the shown one (Bar › Live › Behaviour): a "+3" plate after
-  // the chip, or a column of dots (one per activity, the shown one lit, as many as fit the
-  // chip's height) at the chip's left or right, or on a plate of their own
+  // the chip, or two dots (the second lit only for the last activity)
+  // at the chip's left or right, or on a plate of their own
   readonly property int others: kind === "" ? 0 : Math.max(0, IslandService.activities.length - 1)
   readonly property bool dotted: ShellSettings.liveMore === "dots"
   readonly property string dotsAt: ShellSettings.liveDotsAt
@@ -51,8 +51,8 @@ Item {
   readonly property bool dotsIn: others > 0 && dotted && dotsAt !== "apart"       // dots inside the chip
   readonly property int dotSize: 5
   readonly property int dotGap: 4
-  readonly property int dotCount: Math.min(IslandService.activities.length, Math.max(2, Math.floor((chipHeight - 8 + dotGap) / (dotSize + dotGap))))
-  readonly property int dotLit: Math.min(dotCount - 1, Math.max(0, IslandService.activities.indexOf(kind)))
+  readonly property int dotCount: Math.min(IslandService.activities.length, 2)
+  readonly property int dotLit: IslandService.activities.indexOf(kind) === IslandService.activities.length - 1 ? dotCount - 1 : 0
   readonly property int dotsWidth: dotsIn ? dotSize + Theme.gapMedium + 2 : 0
   readonly property int dotsShift: dotsAt === "left" ? dotsWidth : 0                // the face makes room at the left
   readonly property int moreWidth: !apart ? 0 : dotted ? dotSize + 2 * Theme.gapMedium : Math.max(chipHeight, more.implicitWidth + 2 * Theme.gapLoose)

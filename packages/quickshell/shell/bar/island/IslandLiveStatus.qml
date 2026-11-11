@@ -17,6 +17,7 @@ Row {
   property string kind: ""
   property int coverSize: 18
   property int badgeRadius: 4
+  height: Math.max(coverSize, Theme.fontSize)
   spacing: kind === "volume" || kind === "timer" ? Theme.gapSmall : Theme.gapMedium
   visible: kind !== ""
 
@@ -41,13 +42,13 @@ Row {
   // vpn: the server and the ping
   LiveGlyph { corner: face.badgeRadius; visible: face.kind === "vpn"; size: face.coverSize; name: "vpn"; tint: Theme.green }
   KitText {
+    id: vpnServer
     visible: face.kind === "vpn" && ShellSettings.liveVpnServer
     anchors.verticalCenter: parent.verticalCenter
-    text: MihomoService.current
+    text: vpnName.elidedText
     color: Theme.material ? Theme.foreground1 : Theme.foreground2
     font.weight: Theme.material ? Font.Medium : Font.Normal
-    width: Math.min(implicitWidth, 110)
-    elide: Text.ElideRight
+    TextMetrics { id: vpnName; font: vpnServer.font; text: MihomoService.current; elide: Text.ElideRight; elideWidth: 110 }
   }
   LiveCap { size: face.coverSize; corner: face.badgeRadius; visible: face.kind === "vpn" && ShellSettings.liveVpnPing && MihomoService.currentDelay > 0; text: MihomoService.currentDelay + " ms"; tint: Theme.green; plainText: MihomoService.currentDelay + " ms"; plainTint: Theme.muted; plainBold: false }
 

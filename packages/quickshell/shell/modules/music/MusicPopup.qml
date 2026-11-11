@@ -72,6 +72,8 @@ KitFrame {
 
   KitNotice {
     id: playbackError
+    border.width: Theme.hairline
+    border.color: Theme.red
     shown: MpdService.error !== ""
     icon: "info"
     tone: Theme.red

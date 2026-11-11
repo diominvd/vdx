@@ -49,6 +49,7 @@ Row {
   readonly property int leadPad: padFor(ends[0])
   readonly property int trailPad: padFor(ends[1])
 
+  height: coverSize
   x: shift + leadPad
   anchors.verticalCenter: parent.verticalCenter
   visible: kind !== ""

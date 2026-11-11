@@ -18,7 +18,6 @@ Item {
   signal settings(string id)                   // a module's right click: its options
   signal clockClicked()                        // the clock's click, when the hub opens on a click
   ClockTime { id: time }
-
   // the dot: unseen notices while the centre sits in the hub (Bar › Style › Notifications dot)
   readonly property bool unseen: NotificationsService.unseen > 0 && ShellSettings.barFolderDot && !BarLayout.bellOnPill(screen)
   readonly property bool clockOn: BarLayout.islandClock(screen)
@@ -38,18 +37,32 @@ Item {
   // a side with nothing in it is zero wide: the Row skips it and its gap
   Row {
     id: line
+    height: Theme.islandHeight
     anchors.centerIn: parent
     spacing: Theme.gapGroup
+    move: Transition {
+      enabled: Motion.bar
+      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    }
 
   Row {
     id: left
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.gapWide
+    move: Transition {
+      enabled: Motion.bar
+      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    }
 
+    readonly property var ids: BarLayout.islandIn("start", root.screen)
+    onIdsChanged: BarLayout.syncFaceModel(leftModel, ids)
+    Component.onCompleted: BarLayout.syncFaceModel(leftModel, ids)
+    ListModel { id: leftModel }
     Repeater {
-      model: BarLayout.islandIn("start", root.screen)
+      model: leftModel
       Loader {
-        required property string modelData
+        required property string moduleId
+        readonly property string modelData: moduleId
         anchors.verticalCenter: parent.verticalCenter
         sourceComponent: BarLayout.isSeparator(modelData) ? separatorFace : (root.modules[modelData] ?? null)
 
@@ -98,11 +111,20 @@ Item {
     id: right
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.gapWide
+    move: Transition {
+      enabled: Motion.bar
+      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    }
 
+    readonly property var ids: BarLayout.islandIn("end", root.screen)
+    onIdsChanged: BarLayout.syncFaceModel(rightModel, ids)
+    Component.onCompleted: BarLayout.syncFaceModel(rightModel, ids)
+    ListModel { id: rightModel }
     Repeater {
-      model: BarLayout.islandIn("end", root.screen)
+      model: rightModel
       Loader {
-        required property string modelData
+        required property string moduleId
+        readonly property string modelData: moduleId
         anchors.verticalCenter: parent.verticalCenter
         sourceComponent: BarLayout.isSeparator(modelData) ? separatorFace : (root.modules[modelData] ?? null)
 
