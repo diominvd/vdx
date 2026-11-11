@@ -12,9 +12,9 @@ the nine spots of the screen (top-left … bottom-right, center), cursor or cust
 Kept in ~/.local/state/dotfiles/shell-apps.json; the Hyprland rules they make
 go to shell-apps.lua next to it, which hypr/components/rules.lua loads. Errors:
 {"ok": false, "error": "..."}."""
-import json, subprocess, sys
+import json, sys
 from pathlib import Path
-from backend import out
+from backend import fail, out, run
 
 STATE = Path.home() / ".local/state/dotfiles/shell-apps.json"
 RULES = STATE.with_suffix(".lua")
@@ -42,7 +42,15 @@ def load():
         saved = json.loads(STATE.read_text())
     except (OSError, ValueError):
         saved = {}
-    return {a["id"]: {**DEFAULT, "width": a["width"], "height": a["height"], **saved.get(a["id"], {})} for a in APPS}
+    if not isinstance(saved, dict):
+        saved = {}
+    settings = {}
+    for app in APPS:
+        defaults = {**DEFAULT, "width": app["width"], "height": app["height"]}
+        stored = saved.get(app["id"])
+        merged = {**defaults, **{k: v for k, v in stored.items() if k in DEFAULT}} if isinstance(stored, dict) else defaults
+        settings[app["id"]] = defaults if valid(merged) else merged
+    return settings
 
 
 def rule(app, s):
@@ -85,13 +93,16 @@ def write(all_settings):
 
 
 def valid(s):
+    for key in ("mode", "size", "preset", "position"):
+        if not isinstance(s[key], str):
+            return f"bad {key}"
     checks = [
         (s["mode"] in ("floating", "tiled"), "mode"),
         (s["size"] in ("default", "preset", "custom"), "size"),
         (s["preset"] in PRESETS, "preset"),
         (s["position"] in SPOTS or s["position"] in ("cursor", "custom"), "position"),
-        (isinstance(s["width"], int) and isinstance(s["height"], int), "size must be whole pixels"),
-        (isinstance(s["x"], int) and isinstance(s["y"], int), "position must be whole pixels"),
+        (type(s["width"]) is int and type(s["height"]) is int, "size must be whole pixels"),
+        (type(s["x"]) is int and type(s["y"]) is int, "position must be whole pixels"),
     ]
     bad = [what for ok, what in checks if not ok]
     if bad:
@@ -103,6 +114,14 @@ def valid(s):
     return ""
 
 
+def reload_rules():
+    result = run(["hyprctl", "reload"])
+    if result is None:
+        fail("hyprctl reload is unavailable or timed out")
+    if result.returncode:
+        fail("hyprctl reload: " + (result.stderr.strip() or "failed"))
+
+
 def cmd_set(app_id, raw):
     all_settings = load()
     if app_id not in all_settings:
@@ -111,31 +130,38 @@ def cmd_set(app_id, raw):
         change = json.loads(raw)
     except ValueError:
         out({"ok": False, "error": "bad settings"})
+    if not isinstance(change, dict):
+        fail("bad settings")
     s = {**all_settings[app_id], **{k: v for k, v in change.items() if k in DEFAULT}}
     error = valid(s)
     if error:
         out({"ok": False, "error": error})
     all_settings[app_id] = s
     write(all_settings)
-    reload = subprocess.run(["hyprctl", "reload"], capture_output=True, text=True)
-    if reload.returncode != 0:
-        out({"ok": False, "error": "hyprctl reload: " + (reload.stderr.strip() or "failed")})
+    reload_rules()
     out({"ok": True})
 
 
+def main(args):
+    try:
+        if args == ["list"]:
+            settings = load()
+            out({"ok": True, "presets": PRESETS, "minWidth": MIN_W, "minHeight": MIN_H, "spots": SPOTS,
+                 "gap": GAP, "top": TOP,
+                 "apps": [{**a, "settings": settings[a["id"]]} for a in APPS]})
+        elif args == ["ensure"]:
+            # an app added to the registry since the last write has no rule yet
+            existing = RULES.read_text() if RULES.exists() else ""
+            if any(f'name = "{a["id"]}"' not in existing for a in APPS):
+                write(load())
+                reload_rules()
+            out({"ok": True})
+        elif len(args) == 3 and args[0] == "set":
+            cmd_set(args[1], args[2])
+        out({"ok": False, "error": "usage: shellapps.py list | ensure | set <id> <json>"})
+    except OSError as e:
+        fail(str(e))
+
+
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    if args == ["list"]:
-        settings = load()
-        out({"ok": True, "presets": PRESETS, "minWidth": MIN_W, "minHeight": MIN_H, "spots": SPOTS,
-             "gap": GAP, "top": TOP,
-             "apps": [{**a, "settings": settings[a["id"]]} for a in APPS]})
-    elif args == ["ensure"]:
-        # an app added to the registry since the last write has no rule yet
-        if not RULES.exists() or any(f'name = "{a["id"]}"' not in RULES.read_text() for a in APPS):
-            write(load())
-            subprocess.run(["hyprctl", "reload"], capture_output=True)
-        out({"ok": True})
-    elif len(args) == 3 and args[0] == "set":
-        cmd_set(args[1], args[2])
-    out({"ok": False, "error": "usage: shellapps.py list | ensure | set <id> <json>"})
+    main(sys.argv[1:])

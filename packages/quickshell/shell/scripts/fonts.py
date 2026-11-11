@@ -10,9 +10,9 @@ name itself in ~/.config/kitty/font.conf, it reloads that live):
 ~/.config/fontconfig/fonts.conf (packages/fontconfig) includes the choice,
 ~/.local/state/dotfiles/font.conf, ahead of its own default. Errors:
 {"ok": false, "error": "..."}."""
-import shutil, subprocess, sys, tarfile, tempfile, urllib.request
+import shutil, sys, tarfile, tempfile, urllib.request
 from pathlib import Path
-from backend import out
+from backend import fail, out, run, run_checked
 
 FONTS = Path.home() / ".local/share/fonts"
 CHOICE = Path.home() / ".local/state/dotfiles/font.conf"
@@ -40,15 +40,19 @@ CURATED = {
 
 def families():
     """Installed monospace families: the first name of each fc-list entry."""
-    text = subprocess.run(["fc-list", ":spacing=mono", "family"], capture_output=True, text=True).stdout
+    text = run_checked(["fc-list", ":spacing=mono", "family"]).stdout
     names = {line.split(",")[0].strip() for line in text.splitlines() if line.strip()}
     # not the Nerd Font Mono / Propo variants, not emoji
     return {n for n in names if (not n.endswith((" Mono", " Propo")) or "Nerd Font" not in n) and "Emoji" not in n}
 
 
 def current():
-    text = subprocess.run(["fc-match", "-f", "%{family[0]}", "monospace"], capture_output=True, text=True).stdout
-    return text.strip()
+    return run_checked(["fc-match", "-f", "%{family[0]}", "monospace"]).stdout.strip()
+
+
+def refresh_cache():
+    """Refresh fontconfig after installing files; this is required for success."""
+    run_checked(["fc-cache", "-f", str(FONTS)], timeout=60)
 
 
 def cmd_list():
@@ -79,7 +83,7 @@ def cmd_install(fid):
         for f in (Path(tmp) / "x").rglob("*"):
             if f.suffix.lower() in (".ttf", ".otf") and "NerdFontMono" not in f.name and "NerdFontPropo" not in f.name:
                 shutil.move(str(f), dst / f.name)
-    subprocess.run(["fc-cache", "-f", str(FONTS)], capture_output=True)
+    refresh_cache()
     out({"ok": True, "family": CURATED[fid]})
 
 
@@ -96,17 +100,23 @@ def cmd_set(family):
     KITTY.parent.mkdir(parents=True, exist_ok=True)
     KITTY.write_text(f"# written by the Shell Manager (fonts.py set)\nfont_family {family}\n")
     # running programs that can reload; the rest pick it up when they start
-    subprocess.run(["pkill", "-USR1", "-x", "kitty"], capture_output=True)
-    subprocess.run(["makoctl", "reload"], capture_output=True)
+    run(["pkill", "-USR1", "-x", "kitty"], timeout=3)
+    run(["makoctl", "reload"], timeout=3)
     out({"ok": True})
 
 
+def main(args):
+    try:
+        if args == ["list"]:
+            cmd_list()
+        elif len(args) == 2 and args[0] == "install":
+            cmd_install(args[1])
+        elif len(args) == 2 and args[0] == "set":
+            cmd_set(args[1])
+        fail("usage: fonts.py list | install <id> | set <family>")
+    except (OSError, RuntimeError) as e:
+        fail(str(e))
+
+
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    if args == ["list"]:
-        cmd_list()
-    elif len(args) == 2 and args[0] == "install":
-        cmd_install(args[1])
-    elif len(args) == 2 and args[0] == "set":
-        cmd_set(args[1])
-    out({"ok": False, "error": "usage: fonts.py list | install <id> | set <family>"})
+    main(sys.argv[1:])

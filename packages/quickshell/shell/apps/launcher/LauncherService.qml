@@ -21,6 +21,9 @@ Singleton {
   property var files: []                    // [path] of the last search
   property bool searching: false
   property string fileQuery: ""
+  property string fileError: ""
+  property string pendingFileQuery: ""
+  property int fileGeneration: 0
 
   // ---- tabs: every tab, the order the Shell Manager's Launcher page sets, the hidden ones ----
   readonly property var allTabs: [
@@ -30,12 +33,17 @@ Singleton {
     { label: "Power", value: "power", icon: "power" }
   ]
   readonly property var defaultOrder: allTabs.map(t => t.value)
+  function validTabList(value) {
+    const strings = ModuleSettings.strings("launcher", value, []);
+    const seen = new Set();
+    return strings.filter(v => defaultOrder.includes(v) && !seen.has(v) && seen.add(v));
+  }
   // the stored order, a tab added since missing at the end
   readonly property var orderAll: {
-    const o = ModuleSettings.get("launcher", "order", defaultOrder);
+    const o = validTabList("order");
     return o.concat(defaultOrder.filter(v => !o.includes(v)));
   }
-  readonly property var hiddenTabs: ModuleSettings.get("launcher", "hidden", [])
+  readonly property var hiddenTabs: validTabList("hidden")
   // the tabs shown, in order (at least one: the first)
   readonly property var tabs: {
     const shown = orderAll.filter(v => !hiddenTabs.includes(v)).map(v => allTabs.find(t => t.value === v)).filter(t => t);
@@ -69,14 +77,70 @@ Singleton {
 
   // ---- files ----
   function searchFiles(q) {
+    q = typeof q === "string" ? q : "";
+    fileGeneration++;
     fileQuery = q;
-    filesProc.running = false;
+    files = [];
+    fileError = "";
+    pendingFileQuery = q.length >= 2 ? q : "";
+    searching = pendingFileQuery !== "";
+    if (filesProc.running) {
+      filesProc.signal(9);
+      return;
+    }
+    startFileSearch();
+  }
+
+  function startFileSearch() {
+    if (filesProc.running || pendingFileQuery.length < 2) return;
+    const query = pendingFileQuery;
+    pendingFileQuery = "";
+    filesProc.requestQuery = query;
+    filesProc.requestGeneration = fileGeneration;
+    filesProc.command = ["fd", "--max-results", "60", "--ignore-case", "--hidden", "--fixed-strings", "--print0", "--exclude", ".git", "--exclude", ".cache", "--", query, home];
+    filesProc.started = false;
+    filesProc.running = true;
+  }
+
+  function finishFileStartFailure() {
+    const query = filesProc.requestQuery;
+    const generation = filesProc.requestGeneration;
+    filesProc.requestQuery = "";
+    if (query.length >= 2 && query === fileQuery && generation === fileGeneration) {
+      searching = false;
+      fileError = "could not start file search";
+    }
+    startFileSearch();
+  }
+
+  function finishFileSearch(code) {
+    const query = filesProc.requestQuery;
+    const generation = filesProc.requestGeneration;
+    filesProc.requestQuery = "";
+    if (query.length >= 2 && query === fileQuery && generation === fileGeneration) {
+      if (code !== 0) {
+        searching = false;
+        fileError = "file search failed";
+      }
+    }
+    startFileSearch();
+  }
+
+  function acceptFiles(query, generation, text) {
+    if (query.length < 2 || query !== fileQuery || generation !== fileGeneration) return;
+    files = text.split("\u0000").filter(l => l !== "");
+    searching = false;
+    fileError = "";
+  }
+
+  function cancelFileSearch() {
+    fileGeneration++;
+    pendingFileQuery = "";
+    fileQuery = "";
     files = [];
     searching = false;
-    if (q.length < 2) return;
-    filesProc.command = ["fd", "--max-results", "60", "--ignore-case", "--hidden", "--fixed-strings", "--print0", "--exclude", ".git", "--exclude", ".cache", "--", q, home];
-    searching = true;
-    filesProc.running = true;
+    fileError = "";
+    if (filesProc.running) filesProc.signal(9);
   }
   function fileItems() {
     return files.map(p => ({ icon: p.endsWith("/") ? "folder" : "file", title: p.replace(/\/$/, "").split("/").pop(),
@@ -85,12 +149,23 @@ Singleton {
 
   Process {
     id: filesProc
-    stdout: StdioCollector {
-      onStreamFinished: {
-        if (root.fileQuery.length < 2) return;
-        root.files = text.split("\u0000").filter(l => l !== "");
-        root.searching = false;
+    property string requestQuery: ""
+    property int requestGeneration: -1
+    property bool started: false
+    property int exitCode: -1
+    onStarted: { started = true; exitCode = -1; }
+    onExited: code => exitCode = code
+    onRunningChanged: {
+      if (running) return;
+      if (started) {
+        started = false;
+        root.finishFileSearch(exitCode);
+        return;
       }
+      root.finishFileStartFailure();
+    }
+    stdout: StdioCollector {
+      onStreamFinished: root.acceptFiles(filesProc.requestQuery, filesProc.requestGeneration, text)
     }
   }
 

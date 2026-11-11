@@ -79,6 +79,105 @@ Singleton {
     return Reply.parse(text, "packages.py");
   }
 
+  function replyError(r, fallback) {
+    return typeof r?.error === "string" && r.error.trim() !== "" ? r.error : fallback;
+  }
+
+  function finiteNonnegative(n) { return typeof n === "number" && isFinite(n) && n >= 0; }
+  function stringField(row, key) { return typeof row?.[key] === "string"; }
+
+  function validUpdates(rows, aurRows) {
+    return Array.isArray(rows) && rows.every(p => p && stringField(p, "name")
+      && stringField(p, "from") && stringField(p, "to") && stringField(p, "desc")
+      && stringField(p, "repo") && (aurRows || finiteNonnegative(p.size)));
+  }
+
+  function acceptCheck(r) {
+    if (r?.ok !== true) { done(false, replyError(r, "could not check package updates")); checking = false; return false; }
+    if (!validUpdates(r.pacman, false) || !validUpdates(r.aur, true) || typeof r.aurError !== "string") {
+      done(false, "bad package update reply"); checking = false; return false;
+    }
+    pacman = r.pacman;
+    aur = r.aur;
+    aurError = r.aurError;
+    checkedAt = Date.now();
+    checking = false;
+    return true;
+  }
+
+  function validInstalled(rows) {
+    return Array.isArray(rows) && rows.every(p => p && stringField(p, "name")
+      && stringField(p, "version") && stringField(p, "desc") && finiteNonnegative(p.size)
+      && finiteNonnegative(p.date) && typeof p.aur === "boolean" && stringField(p, "repo")
+      && typeof p.explicit === "boolean" && Array.isArray(p.apps) && p.apps.every(a => typeof a === "string"));
+  }
+
+  function acceptInstalled(r) {
+    if (r?.ok !== true) { done(false, replyError(r, "could not read installed packages")); loading = false; return false; }
+    if (!validInstalled(r.packages)) { done(false, "bad installed packages reply"); loading = false; return false; }
+    installed = r.packages;
+    loading = false;
+    return true;
+  }
+
+  function validCache(rows) {
+    return Array.isArray(rows) && rows.every(p => p && stringField(p, "name")
+      && stringField(p, "installed") && Array.isArray(p.versions) && p.versions.every(v => v
+        && stringField(v, "version") && stringField(v, "file")
+        && finiteNonnegative(v.size) && finiteNonnegative(v.date)));
+  }
+
+  function acceptCache(r) {
+    if (r?.ok !== true) { done(false, replyError(r, "could not read package cache")); return false; }
+    if (!validCache(r.packages)) { done(false, "bad package cache reply"); return false; }
+    cache = r.packages;
+    return true;
+  }
+
+  function validLast(r) {
+    const validRows = rows => Array.isArray(rows) && rows.every(p => p && stringField(p, "name")
+      && stringField(p, "from"));
+    return stringField(r, "date") && validRows(r.packages) && r.packages.every(p =>
+      stringField(p, "to") && stringField(p, "file")) && validRows(r.missing);
+  }
+
+  function acceptLast(r) {
+    if (r?.ok !== true) { done(false, replyError(r, "could not read last package update")); return false; }
+    if (!validLast(r)) { done(false, "bad last package update reply"); return false; }
+    lastUpdate = r;
+    return true;
+  }
+
+  function acceptProgress(r) {
+    if (r?.ok !== true || !finiteNonnegative(r.bytes)) return false;
+    if (stage === "downloading") stageDone = r.bytes;
+    return true;
+  }
+
+  function validPlan(r) {
+    return r?.ok === true && Array.isArray(r.steps) && r.steps.length > 0
+      && r.steps.every(s => s && stringField(s, "label") && stringField(s, "what")
+        && stringField(s, "command")) && stringField(r, "script") && r.script.trim() !== "";
+  }
+
+  function acceptPlan(r, plan) {
+    if (!r || r.ok !== true) { failPlan(replyError(r, "could not prepare package action")); return false; }
+    if (!validPlan(r) || !plan || !stringField(plan, "title") || !stringField(plan, "tag")) {
+      failPlan("bad package plan reply"); return false;
+    }
+    if (!RootService.request("Packages", plan.title, r.steps, r.script, plan.tag, skipPanel(plan.tag))) {
+      failPlan("another root action is waiting");
+      return false;
+    }
+    return true;
+  }
+
+  function failPlan(text) {
+    if (stage !== "") { endStage(false, text); return; }
+    done(false, text);
+    busy = false;
+  }
+
   // ---- checks ----
   function check() {
     if (checking) return;
@@ -172,11 +271,15 @@ Singleton {
   Process {
     id: progressProc
     command: ["python3", root.script, "progress"].concat(root.stageList.map(p => p.name + "=" + p.to))
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      if (root.stage === "downloading") root.stageDone = 0;
+    }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const r = root.parse(text);
-        if (r.ok && root.stage === "downloading") root.stageDone = r.bytes;
-      }
+      onStreamFinished: root.acceptProgress(root.parse(text));
     }
   }
 
@@ -225,14 +328,16 @@ Singleton {
   Process {
     id: planProc
     property var plan: null
+    property var reply: null
+    property bool started: false
+    onStarted: { started = true; reply = null; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; root.acceptPlan(reply, plan); return; }
+      root.failPlan("could not start package action plan");
+    }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const r = root.parse(text);
-        if (!r.ok) { root.endStage(false, r.error); return; }
-        if (!RootService.request("Packages", planProc.plan.title, r.steps, r.script, planProc.plan.tag, root.skipPanel(planProc.plan.tag))) {
-          root.endStage(false, "another root action is waiting");
-        }
-      }
+      onStreamFinished: planProc.reply = root.parse(text);
     }
   }
 
@@ -240,10 +345,10 @@ Singleton {
   function endStage(ok, text) {
     if (opt("notify", true) && text !== "Download cancelled" && text !== "Install cancelled")
       notify(ok, text);
-    stage = "";
-    busy = false;
     done(ok, text);
     freshen(true);
+    stage = "";
+    busy = false;
   }
 
   // the update stages run without the confirmation panel when the options say so
@@ -274,80 +379,77 @@ Singleton {
         root.endStage(ok, ok ? "Updated " + root.stageList.length + " packages" : cancelled ? "Install cancelled" : error);
         return;
       }
-      root.busy = false;
-      if (!ok) { root.done(false, cancelled ? "cancelled" : error); return; }
+      if (!ok) { root.done(false, cancelled ? "cancelled" : error); root.busy = false; return; }
       if (tag === "packages-remove") root.picked = ({});
       root.done(true, tag === "packages-remove" ? "Removed" : "Rolled back");
       root.freshen();
+      root.busy = false;
     }
   }
 
   Process {
     id: checkProc
     command: ["python3", root.script, "updates"]
+    property var reply: null
     property bool started: false
-    onStarted: started = true
+    onStarted: { started = true; reply = null; }
     onRunningChanged: {
       if (running) return;
-      if (started) { started = false; return; }
-      root.checking = false;
+      if (started) { started = false; root.acceptCheck(reply); return; }
       root.done(false, "could not start package update check");
+      root.checking = false;
     }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const r = root.parse(text);
-        root.checking = false;
-        if (!r.ok) { root.done(false, r.error); return; }
-        root.pacman = r.pacman;
-        root.aur = r.aur;
-        root.aurError = r.aurError;
-        root.checkedAt = Date.now();
-      }
+      onStreamFinished: checkProc.reply = root.parse(text);
     }
   }
 
   Process {
     id: installedProc
     command: ["python3", root.script, "installed"]
+    property var reply: null
     property bool started: false
-    onStarted: started = true
+    onStarted: { started = true; reply = null; }
     onRunningChanged: {
       if (running) return;
-      if (started) { started = false; return; }
-      root.loading = false;
+      if (started) { started = false; root.acceptInstalled(reply); return; }
       root.done(false, "could not start installed package query");
+      root.loading = false;
     }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const r = root.parse(text);
-        root.loading = false;
-        if (!r.ok) { root.done(false, r.error); return; }
-        root.installed = r.packages;
-      }
+      onStreamFinished: installedProc.reply = root.parse(text);
     }
   }
 
   Process {
     id: cacheProc
     command: ["python3", root.script, "cache"]
+    property var reply: null
+    property bool started: false
+    onStarted: { started = true; reply = null; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; root.acceptCache(reply); return; }
+      root.done(false, "could not start package cache query");
+    }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const r = root.parse(text);
-        if (!r.ok) { root.done(false, r.error); return; }
-        root.cache = r.packages;
-      }
+      onStreamFinished: cacheProc.reply = root.parse(text);
     }
   }
 
   Process {
     id: lastProc
     command: ["python3", root.script, "last-update"]
+    property var reply: null
+    property bool started: false
+    onStarted: { started = true; reply = null; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; root.acceptLast(reply); return; }
+      root.done(false, "could not start last package update query");
+    }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const r = root.parse(text);
-        if (!r.ok) { root.done(false, r.error); return; }
-        root.lastUpdate = r;
-      }
+      onStreamFinished: lastProc.reply = root.parse(text);
     }
   }
 }

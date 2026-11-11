@@ -62,18 +62,98 @@ Singleton {
   property string status: ""                // "" | ok | error
   property string message: ""               // what the last action did, or its error
 
-  function scan() {
-    if (scanProc.running) return;
+  property bool systemScanPending: false
+
+  function scan(systemSnapshot) {
+    const forSystem = systemSnapshot === true;
+    if (scanProc.running || !scanProc.responseReceived) {
+      if (forSystem) systemScanPending = true;
+      return;
+    }
     scanning = true;
+    scanProc.afterSystemSnapshot = forSystem;
+    scanProc.responseReceived = false;
+    scanProc.processStopped = false;
     scanProc.running = true;
+  }
+
+  function scanStopped() {
+    if (systemScanPending && afterSystem && scanProc.processStopped && scanProc.responseReceived
+        && !scanProc.running) {
+      systemScanPending = false;
+      scan(true);
+    }
+  }
+
+  function finite(value) { return typeof value === "number" && isFinite(value); }
+
+  function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+
+  function replyError(r, fallback) {
+    return typeof r?.error === "string" && r.error !== "" ? r.error : fallback;
+  }
+
+  function failScan(text, systemSnapshot) {
+    if (systemSnapshot) {
+      afterSystem = false;
+      systemScanPending = false;
+      pendingRoot = [];
+      planIds = [];
+      planSize = 0;
+    }
+    done(false, text);
+    scanning = false;
+    if (systemSnapshot) busy = false;
+  }
+
+  function acceptScan(r, systemSnapshot) {
+    if (r?.ok !== true) {
+      failScan(replyError(r, "could not read cleanup categories"), systemSnapshot);
+      return false;
+    }
+    if (!Array.isArray(r.categories) || !r.categories.every(c => record(c)
+        && typeof c.id === "string" && typeof c.label === "string" && typeof c.hint === "string"
+        && finite(c.size) && c.size >= 0 && typeof c.root === "boolean" && typeof c.safe === "boolean"
+        && (c.command === undefined || typeof c.command === "string"))
+        || !finite(r.total) || r.total < 0) {
+      failScan("bad cleanup category reply", systemSnapshot);
+      return false;
+    }
+    const first = categories.length === 0;
+    categories = r.categories;
+    total = r.total;
+    scannedAt = Date.now();
+    if (first) {
+      const p = {};
+      for (const c of r.categories) p[c.id] = c.safe && c.size > 0;
+      picked = p;
+    }
+    if (systemSnapshot) {
+      const ids = planIds.slice();
+      const size = planSize;
+      const left = r.categories.filter(c => ids.includes(c.id)).reduce((sum, c) => sum + c.size, 0);
+      afterSystem = false;
+      systemScanPending = false;
+      pendingRoot = [];
+      planIds = [];
+      planSize = 0;
+      done(true, "Freed " + Format.shortSize(Math.max(0, size - left)) + " from the system");
+      scanning = false;
+      busy = false;
+    } else {
+      scanning = false;
+    }
+    return true;
   }
 
   // a scan older than a minute is redone (the module's popup, the window)
   function freshen() { if (Date.now() - scannedAt > 60000) scan(); }
 
   function run(args) {
+    if (busy) return;
     busy = true;
     status = "";
+    actProc.replyReady = false;
     actProc.command = ["python3", script].concat(args);
     actProc.running = true;
   }
@@ -93,36 +173,165 @@ Singleton {
   // the system part: its plan, then RootService runs it after a confirmation
   property var planIds: []
   property real planSize: 0
-  function plan(ids) {
-    busy = true;
-    planIds = ids;
+  function plan(ids, chained) {
+    if (busy && !chained) return;
+    const requestIds = ids.slice();
+    pendingRoot = [];
+    planIds = requestIds;
+    planSize = 0;
+    if (!chained) busy = true;
+    planProc.replyReady = false;
     planProc.command = ["python3", script, "plan"].concat(ids);
     planProc.running = true;
+  }
+
+  function failPlan(text) {
+    pendingRoot = [];
+    planIds = [];
+    planSize = 0;
+    afterSystem = false;
+    done(false, text);
+    busy = false;
+  }
+
+  function acceptPlan(r) {
+    if (r?.ok !== true) {
+      failPlan(replyError(r, "could not plan system cleanup"));
+      return false;
+    }
+    if (!Array.isArray(r.steps) || !r.steps.every(step => record(step)
+        && typeof step.label === "string" && typeof step.what === "string" && typeof step.command === "string")
+        || typeof r.script !== "string" || r.script.trim() === ""
+        || !finite(r.size) || r.size < 0) {
+      failPlan("bad system cleanup plan reply");
+      return false;
+    }
+    const steps = r.steps;
+    const command = r.script;
+    planSize = r.size;
+    pendingRoot = [];
+    if (!RootService.request("Cleaner", "Clean the system", steps, command, "cleaner")) {
+      failPlan("another root action is waiting");
+      return false;
+    }
+    return true;
+  }
+
+  function finishRoot(tag, ok, error) {
+    if (tag !== "cleaner") return;
+    if (!ok) {
+      pendingRoot = [];
+      planIds = [];
+      planSize = 0;
+      afterSystem = false;
+      systemScanPending = false;
+      done(false, error === "cancelled" ? "System part cancelled" : replyError({error}, "system cleanup failed"));
+      scan();
+      busy = false;
+      return;
+    }
+    afterSystem = true;
+    scan(true);
+  }
+
+  function failAction(text) {
+    pendingRoot = [];
+    done(false, text);
+    busy = false;
+  }
+
+  function acceptAction(what, r, submittedPaths) {
+    if (what !== "clean" && what !== "trash") {
+      failAction("unknown cleanup action");
+      return false;
+    }
+    if (r?.ok !== true) {
+      failAction(replyError(r, "cleanup action failed"));
+      return false;
+    }
+    if (!finite(r.freed) || r.freed < 0) {
+      failAction("bad cleanup action reply");
+      return false;
+    }
+    const nextRoot = pendingRoot.slice();
+    pendingRoot = [];
+    if (what === "clean" && nextRoot.length > 0) {
+      done(true, "Freed " + Format.shortSize(r.freed) + " · now the system part");
+      plan(nextRoot, true);
+      return true;
+    }
+    if (what === "clean") done(true, "Freed " + Format.shortSize(r.freed));
+    else if (what === "trash") {
+      done(true, "Moved " + Format.shortSize(r.freed) + " to trash");
+      const removed = submittedPaths || [];
+      suggestions = suggestions.filter(s => !removed.includes(s.path));
+      const remaining = Object.assign({}, aiPicked);
+      for (const path of removed) delete remaining[path];
+      aiPicked = remaining;
+    }
+    scan();
+    busy = false;
+    return true;
+  }
+
+  function failAi(text) {
+    done(false, text);
+    analyzing = false;
+  }
+
+  function acceptAi(r) {
+    if (r?.ok !== true) {
+      failAi(replyError(r, "could not analyze cleanup suggestions"));
+      return false;
+    }
+    if (!Array.isArray(r.suggestions) || !r.suggestions.every(s => record(s)
+        && typeof s.path === "string" && s.path !== "" && typeof s.why === "string"
+        && typeof s.kind === "string" && typeof s.risk === "string"
+        && finite(s.size) && s.size >= 0 && finite(s.days))) {
+      failAi("bad cleanup suggestion reply");
+      return false;
+    }
+    suggestions = r.suggestions;
+    const p = {};
+    for (const s of r.suggestions) p[s.path] = s.risk === "low";
+    aiPicked = p;
+    if (r.suggestions.length === 0) done(true, "Nothing Claude would remove");
+    analyzing = false;
+    return true;
   }
 
   Process {
     id: planProc
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        if (!r.ok) { root.busy = false; root.done(false, r.error); return; }
-        root.planSize = r.size;
-        if (!RootService.request("Cleaner", "Clean the system", r.steps, r.script, "cleaner")) {
-          root.busy = false;
-          root.done(false, "another root action is waiting");
-        }
+        planProc.pendingReply = root.parse(text);
+        planProc.replyReady = true;
+        root.consumePlanReply();
       }
     }
+    property bool started: false
+    property bool processStopped: true
+    property bool replyReady: false
+    property var pendingReply: null
+    onStarted: { started = true; processStopped = false; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; processStopped = true; root.consumePlanReply(); return; }
+      root.failPlan("could not start cleanup plan");
+    }
+  }
+
+  function consumePlanReply() {
+    if (!planProc.processStopped || !planProc.replyReady) return;
+    const reply = planProc.pendingReply;
+    planProc.replyReady = false;
+    acceptPlan(reply);
   }
 
   Connections {
     target: RootService
     function onFinished(tag, ok, error) {
-      if (tag !== "cleaner") return;
-      root.busy = false;
-      if (!ok) { root.done(false, error === "cancelled" ? "System part cancelled" : error); root.scan(); return; }
-      root.afterSystem = true;
-      root.scan();
+      root.finishRoot(tag, ok, error);
     }
   }
   // the scan after a system clean tells how much went
@@ -134,6 +343,7 @@ Singleton {
     if (analyzing || !aiOn) return;
     analyzing = true;
     status = "";
+    aiProc.replyReady = false;
     aiProc.command = ["python3", script, "ai", model];
     aiProc.running = true;
   }
@@ -161,27 +371,27 @@ Singleton {
 
   Process {
     id: scanProc
+    property bool afterSystemSnapshot: false
+    property bool responseReceived: true
+    property bool processStopped: true
     command: ["python3", root.script, "scan"]
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        root.scanning = false;
-        if (!r.ok) { root.done(false, r.error); return; }
-        const first = root.categories.length === 0;
-        root.categories = r.categories;
-        root.total = r.total;
-        root.scannedAt = Date.now();
-        if (root.afterSystem) {
-          root.afterSystem = false;
-          const left = r.categories.filter(c => root.planIds.includes(c.id)).reduce((s, c) => s + c.size, 0);
-          root.done(true, "Freed " + Format.shortSize(Math.max(0, root.planSize - left)) + " from the system");
-        }
-        if (first) {
-          const p = {};
-          for (const c of r.categories) p[c.id] = c.safe && c.size > 0;
-          root.picked = p;
-        }
+        const systemSnapshot = scanProc.afterSystemSnapshot;
+        scanProc.responseReceived = true;
+        root.acceptScan(root.parse(text), systemSnapshot);
+        root.scanStopped();
       }
+    }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; processStopped = true; root.scanStopped(); return; }
+      processStopped = true;
+      responseReceived = true;
+      root.failScan("could not start cleanup scan", afterSystemSnapshot);
+      root.scanStopped();
     }
   }
 
@@ -189,40 +399,57 @@ Singleton {
     id: actProc
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        const what = actProc.command[2];
-        root.busy = false;
-        if (what === "clean" && r.ok && root.pendingRoot.length > 0) {
-          root.done(true, "Freed " + Format.shortSize(r.freed) + " · now the system part");
-          root.plan(root.pendingRoot);
-          root.pendingRoot = [];
-          return;
-        }
-        if (!r.ok) root.done(false, r.error);
-        else if (what === "clean") root.done(true, "Freed " + Format.shortSize(r.freed));
-        else if (what === "trash") {
-          root.done(true, "Moved " + Format.shortSize(r.freed) + " to trash");
-          root.suggestions = root.suggestions.filter(s => !root.aiPicked[s.path]);
-          root.aiPicked = ({});
-        }
-        root.scan();
+        actProc.pendingReply = root.parse(text);
+        actProc.replyReady = true;
+        root.consumeActionReply();
       }
     }
+    property bool started: false
+    property bool processStopped: true
+    property bool replyReady: false
+    property var pendingReply: null
+    onStarted: { started = true; processStopped = false; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; processStopped = true; root.consumeActionReply(); return; }
+      root.failAction("could not start cleanup action");
+    }
+  }
+
+  function consumeActionReply() {
+    if (!actProc.processStopped || !actProc.replyReady) return;
+    const reply = actProc.pendingReply;
+    const what = actProc.command[2];
+    const submitted = what === "trash" ? actProc.command.slice(3) : [];
+    actProc.replyReady = false;
+    acceptAction(what, reply, submitted);
   }
 
   Process {
     id: aiProc
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        root.analyzing = false;
-        if (!r.ok) { root.done(false, r.error); return; }
-        root.suggestions = r.suggestions;
-        const p = {};
-        for (const s of r.suggestions) p[s.path] = s.risk === "low";
-        root.aiPicked = p;
-        if (r.suggestions.length === 0) root.done(true, "Nothing Claude would remove");
+        aiProc.pendingReply = root.parse(text);
+        aiProc.replyReady = true;
+        root.consumeAiReply();
       }
     }
+    property bool started: false
+    property bool processStopped: true
+    property bool replyReady: false
+    property var pendingReply: null
+    onStarted: { started = true; processStopped = false; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; processStopped = true; root.consumeAiReply(); return; }
+      root.failAi("could not start cleanup analysis");
+    }
+  }
+
+  function consumeAiReply() {
+    if (!aiProc.processStopped || !aiProc.replyReady) return;
+    const reply = aiProc.pendingReply;
+    aiProc.replyReady = false;
+    acceptAi(reply);
   }
 }

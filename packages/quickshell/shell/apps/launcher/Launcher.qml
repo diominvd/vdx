@@ -24,13 +24,41 @@ ScrimWindow {
   dim: ModuleSettings.get("launcher", "dim", true)
   namespace: "launcher"
   onDismissed: close()
+  onOpenChanged: if (open) app.opened(); else app.closed()
+
+  // Keep only the small navigation snapshot between opens. The apps model and
+  // list delegates are created while the scrim is visible, including its fade.
+  QtObject {
+    id: app
+    property var navigation: null
+    property bool openPending: false
+
+    function opened() {
+      openPending = true;
+      restore();
+    }
+
+    function loaded() { restore(); }
+
+    function restore() {
+      if (!openPending || !root.open || !panelLoader.item) return;
+      panelLoader.item.reset(navigation);
+      openPending = false;
+    }
+
+    function closed() {
+      openPending = false;
+      if (!panelLoader.item) return;
+      navigation = panelLoader.item.saveState();
+      panelLoader.item.closePanel();
+    }
+  }
 
   Connections {
     target: root.ls
     function onOpenChanged() {
       if (!root.ls.open) return;
       if (root.fromIsland) { root.ls.open = false; IslandService.requested("launcher", Hyprland.focusedMonitor?.name ?? ""); return; }
-      panel.reset();
     }
   }
 
@@ -38,17 +66,24 @@ ScrimWindow {
     anchors.fill: parent
 
     // clicks on the panel don't reach the dimmed screen
-    MouseArea { anchors.fill: panel }
+    MouseArea { anchors.fill: panelLoader }
 
-    LauncherPanel {
-      id: panel
+    Loader {
+      id: panelLoader
       anchors.horizontalCenter: parent.horizontalCenter
       y: root.position === "center" ? (parent.height - height) / 2
        : root.position === "bottom" ? parent.height * 0.82 - height
        : parent.height * 0.18
       width: root.panelWidth
-      onBack: root.close()
-      onFinished: root.close()
+      active: root.visible
+      sourceComponent: Component {
+        LauncherPanel {
+          width: root.panelWidth
+          onBack: root.close()
+          onFinished: root.close()
+        }
+      }
+      onLoaded: app.loaded()
     }
   }
 }

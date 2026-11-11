@@ -25,6 +25,17 @@ Singleton {
   readonly property real fetchedAt: usage.at ? new Date(usage.at).getTime() : 0
   readonly property bool refreshing: proc.running
 
+  function finite(value) { return typeof value === "number" && isFinite(value); }
+  function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+
+  function validUsage(o) {
+    if (!record(o) || o.ok !== true || typeof o.plan !== "string" || typeof o.at !== "string"
+        || !finite(Date.parse(o.at)) || !Array.isArray(o.limits)) return false;
+    return o.limits.every(limit => record(limit) && typeof limit.kind === "string"
+      && finite(limit.percent) && limit.percent >= 0 && limit.percent <= 100
+      && typeof limit.resets_at === "string");
+  }
+
   function refresh() {
     if (proc.running) return;
     proc.command = ["bash", root.script, "--usage"];
@@ -46,9 +57,16 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const o = Reply.parse(text, "codex.sh", { ok: false, error: "no answer" });
-        if (o.ok) { root.usage = o; root.error = ""; }
-        else root.error = o.error;
+        if (root.validUsage(o)) { root.usage = o; root.error = ""; }
+        else root.error = typeof o?.error === "string" && o.error ? o.error : "bad Codex usage reply";
       }
+    }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.error = "could not start Codex usage query";
     }
   }
 }

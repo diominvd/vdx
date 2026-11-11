@@ -33,8 +33,10 @@ and agents. A rule that is in the way is changed in its file.
 
 ## Asking an agent
 
-Rules load by themselves (`CLAUDE.md` → this index), so a request says only
-what to do, where, and when to stop. Templates (any language):
+Start with applicable agent instructions and this index; explicitly read the
+topic rules for the work. Do not assume every agent automatically loads
+`CLAUDE.md`. A request says what to do, where, and when to stop. Templates
+(any language):
 
 A bug or a small change without a plan:
 

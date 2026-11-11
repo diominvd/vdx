@@ -26,6 +26,37 @@ Singleton {
   readonly property var models: status.models ?? []
   readonly property var loaded: status.loaded ?? []
 
+  function finite(value) { return typeof value === "number" && isFinite(value); }
+  function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+
+  function validStatus(o) {
+    if (!record(o) || typeof o.installed !== "boolean" || typeof o.running !== "boolean") return false;
+    if (o.version !== undefined && typeof o.version !== "string") return false;
+    if (o.running && typeof o.version !== "string") return false;
+    if (o.running && (!Array.isArray(o.models) || !Array.isArray(o.loaded))) return false;
+    if (o.models !== undefined) {
+      if (!Array.isArray(o.models)) return false;
+      for (const m of o.models) {
+        if (!record(m) || typeof m.name !== "string"
+            || (m.size !== undefined && (!finite(m.size) || m.size < 0))) return false;
+      }
+    }
+    if (o.loaded !== undefined) {
+      if (!Array.isArray(o.loaded)) return false;
+      for (const m of o.loaded) {
+        if (!record(m) || typeof m.name !== "string"
+            || (m.vram !== undefined && (!finite(m.vram) || m.vram < 0))) return false;
+      }
+    }
+    return true;
+  }
+
+  function acceptStatus(o) {
+    if (!validStatus(o)) return false;
+    status = o;
+    return true;
+  }
+
   function vramOf(name) { return loaded.find(m => m.name === name)?.vram ?? 0; }
   function hasModel(name) { return models.some(m => m.name === name); }
 
@@ -36,9 +67,10 @@ Singleton {
   function unload(name) { act(name, ["--unload", name]); }
 
   function act(what, args) {
-    if (actionProc.running) return;
+    if (busy !== null || actionProc.running) return;
     busy = what;
     error = "";
+    actionProc.replyReady = false;
     run(actionProc, args);
   }
 
@@ -62,7 +94,7 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const o = Reply.parse(text, "ollama.sh", null);
-        if (o) root.status = o;
+        if (o) root.acceptStatus(o);
       }
     }
   }
@@ -71,11 +103,32 @@ Singleton {
     id: actionProc
     stdout: StdioCollector {
       onStreamFinished: {
-        const o = Reply.parse(text, "ollama.sh");
-        root.busy = null;
-        if (!o?.ok) root.error = o?.error ?? "action failed";
-        root.refresh();
+        actionProc.pendingReply = Reply.parse(text, "ollama.sh");
+        actionProc.replyReady = true;
+        root.consumeActionReply();
       }
     }
+    property bool started: false
+    property bool processStopped: true
+    property bool replyReady: false
+    property var pendingReply: null
+    onStarted: { started = true; processStopped = false; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; processStopped = true; root.consumeActionReply(); return; }
+      root.error = "could not start Ollama action";
+      root.refresh();
+      root.busy = null;
+    }
+  }
+
+  function consumeActionReply() {
+    if (!actionProc.processStopped || !actionProc.replyReady) return;
+    const o = actionProc.pendingReply;
+    actionProc.replyReady = false;
+    if (o?.ok !== true) error = typeof o?.error === "string" && o.error ? o.error : "action failed";
+    else error = "";
+    refresh();
+    busy = null;
   }
 }

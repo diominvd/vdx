@@ -50,7 +50,13 @@ def call(method, path, body=None, headers=None):
         req.add_header(k, v)
     try:
         with urllib.request.urlopen(req, timeout=60) as r:
-            return json.loads(r.read() or b"{}")
+            try:
+                response = json.loads(r.read())
+            except ValueError as e:
+                raise RuntimeError("invalid response from VirusTotal") from e
+            if not isinstance(response, dict):
+                raise RuntimeError("invalid response from VirusTotal")
+            return response
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise NotFound() from e
@@ -67,6 +73,14 @@ def call(method, path, body=None, headers=None):
         raise RuntimeError(f"no connection to VirusTotal: {e.reason}") from e
 
 
+def response_field(response, field, kind):
+    data = response.get("data") if isinstance(response, dict) else None
+    value = data.get(field) if isinstance(data, dict) else None
+    if not isinstance(value, kind):
+        raise RuntimeError("invalid response from VirusTotal")
+    return value
+
+
 def sha256_file(path):
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -76,12 +90,12 @@ def sha256_file(path):
 
 
 def wait_analysis(aid):
-    end = time.time() + WAIT
+    end = time.monotonic() + WAIT
     while True:
-        attrs = call("GET", f"/analyses/{aid}")["data"]["attributes"]
+        attrs = response_field(call("GET", f"/analyses/{aid}"), "attributes", dict)
         if attrs.get("status") == "completed":
             return attrs
-        if time.time() > end:
+        if time.monotonic() >= end:
             raise RuntimeError("VirusTotal is still analysing: look again in a minute")
         time.sleep(3)
 
@@ -89,6 +103,10 @@ def wait_analysis(aid):
 def report(kind, target, sha, attrs, link):
     stats = attrs.get("last_analysis_stats") or attrs.get("stats") or {}
     results = attrs.get("last_analysis_results") or attrs.get("results") or {}
+    if not isinstance(stats, dict) or not isinstance(results, dict) or any(not isinstance(r, dict) for r in results.values()):
+        raise RuntimeError("invalid response from VirusTotal")
+    if any(type(stats.get(k, 0)) is not int or stats.get(k, 0) < 0 for k in STATS):
+        raise RuntimeError("invalid response from VirusTotal")
     found = [{"engine": e, "category": r.get("category"), "result": r.get("result") or ""}
              for e, r in results.items() if r.get("category") in ("malicious", "suspicious")]
     found.sort(key=lambda d: (d["category"] != "malicious", d["engine"]))
@@ -100,7 +118,7 @@ def report(kind, target, sha, attrs, link):
 
 def file_lookup(sha, target, size):
     try:
-        attrs = call("GET", f"/files/{sha}")["data"]["attributes"]
+        attrs = response_field(call("GET", f"/files/{sha}"), "attributes", dict)
     except NotFound:
         return {"ok": True, "known": False, "kind": "file", "target": target, "sha256": sha, "size": size}
     return report("file", target, sha, attrs, f"{GUI}/file/{sha}")
@@ -110,10 +128,10 @@ def url_scan(url):
     uid = base64.urlsafe_b64encode(url.encode()).decode().rstrip("=")
     link = f"{GUI}/url/{hashlib.sha256(url.encode()).hexdigest()}"
     try:
-        attrs = call("GET", f"/urls/{uid}")["data"]["attributes"]
+        attrs = response_field(call("GET", f"/urls/{uid}"), "attributes", dict)
     except NotFound:
         body = urllib.parse.urlencode({"url": url}).encode()
-        aid = call("POST", "/urls", body, {"Content-Type": "application/x-www-form-urlencoded"})["data"]["id"]
+        aid = response_field(call("POST", "/urls", body, {"Content-Type": "application/x-www-form-urlencoded"}), "id", str)
         attrs = wait_analysis(aid)
     return report("url", url, None, attrs, link)
 
@@ -134,16 +152,20 @@ def upload(target):
     path = Path(os.path.expanduser(target))
     if not path.is_file():
         fail(f"no such file: {target}")
-    size = path.stat().st_size
-    if size > MAX_UPLOAD:
+    if path.stat().st_size > MAX_UPLOAD:
         fail("over 32 MB: the upload limit here")
+    with path.open("rb") as source:
+        content = source.read(MAX_UPLOAD + 1)
+    if len(content) > MAX_UPLOAD:
+        fail("over 32 MB: the upload limit here")
+    sha = hashlib.sha256(content).hexdigest()
     boundary = uuid.uuid4().hex
-    name = path.name.replace('"', "")
+    name = path.name.replace('"', "").replace("\r", "").replace("\n", "")
     body = (f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{name}"\r\n'
-            f"Content-Type: application/octet-stream\r\n\r\n").encode() + path.read_bytes() \
+            f"Content-Type: application/octet-stream\r\n\r\n").encode() + content \
            + f"\r\n--{boundary}--\r\n".encode()
-    aid = call("POST", "/files", body, {"Content-Type": f"multipart/form-data; boundary={boundary}"})["data"]["id"]
-    sha = sha256_file(path)
+    del content
+    aid = response_field(call("POST", "/files", body, {"Content-Type": f"multipart/form-data; boundary={boundary}"}), "id", str)
     return report("file", str(path), sha, wait_analysis(aid), f"{GUI}/file/{sha}")
 
 

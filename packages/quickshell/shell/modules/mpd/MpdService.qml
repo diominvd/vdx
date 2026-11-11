@@ -77,9 +77,10 @@ Singleton {
 
   // Replaces the queue (likes, a station or a folder); errors are dismissed after six seconds.
   function load(value, args) {
+    if (loadProc.running) return false;
     busy = value;
     error = "";
-    run(loadProc, args);
+    return run(loadProc, args);
   }
 
   function clearError() { error = ""; }
@@ -98,11 +99,43 @@ Singleton {
 
   // ---- internals ----
   function run(proc, args) {
+    if (proc.running) return false;
     proc.command = ["bash", root.script].concat(args);
     proc.running = true;
+    return true;
   }
 
-  function parseList(text) { return Reply.parseList(text); }
+  function parseList(text) { return Reply.parseList(text, null); }
+
+  function finiteNonnegative(value) { return typeof value === "number" && isFinite(value) && value >= 0; }
+
+  function validStatus(o) {
+    if (o?.service === false) return true;
+    return o?.service === true && ["playing", "paused", "stop", "stopped"].includes(o.state)
+      && Number.isInteger(o.pos) && o.pos >= 0 && Number.isInteger(o.length) && o.length >= 0
+      && finiteNonnegative(o.elapsed) && finiteNonnegative(o.duration)
+      && typeof o.random === "boolean" && ["off", "all", "one"].includes(o.repeat)
+      && ["", "likes", "radio", "files"].includes(o.source)
+      && ["file", "title", "artist", "album", "year", "station"].every(k => typeof o[k] === "string");
+  }
+
+  function acceptStatus(o) {
+    if (!validStatus(o)) return false;
+    player = o;
+    elapsed = o.elapsed ?? 0;
+    return true;
+  }
+
+  function validQueue(rows) {
+    return Array.isArray(rows) && rows.every(row => row && Number.isInteger(row.pos) && row.pos > 0
+      && typeof row.artist === "string" && typeof row.title === "string");
+  }
+
+  function acceptQueue(rows) {
+    if (!validQueue(rows)) return false;
+    queue = rows;
+    return true;
+  }
 
   function parse(text) {
     return Reply.parse(text, "music.sh", null);
@@ -130,12 +163,7 @@ Singleton {
   Process {
     id: statusProc
     stdout: StdioCollector {
-      onStreamFinished: {
-        const o = root.parse(text);
-        if (!o) return;
-        root.player = o;
-        root.elapsed = o.elapsed ?? 0;
-      }
+      onStreamFinished: root.acceptStatus(root.parse(text));
     }
   }
 
@@ -148,13 +176,19 @@ Singleton {
   Process {
     id: listenProc
     command: ["bash", root.script, "--listen"]
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      if (root.needed) listenRestart.start();
+    }
     stdout: SplitParser {
       onRead: line => {
         const o = root.parse(line);
-        if (!o) return;
-        const changed = o.length !== root.player.length;
-        root.player = o;
-        root.elapsed = o.elapsed ?? 0;
+        const previous = root.player;
+        if (!root.acceptStatus(o)) return;
+        const changed = o.file !== previous.file || o.source !== previous.source || o.length !== previous.length;
         if (changed) root.refreshQueue();
       }
     }
@@ -164,20 +198,34 @@ Singleton {
   Process {
     id: queueProc
     stdout: StdioCollector {
-      onStreamFinished: root.queue = root.parseList(text)
+      onStreamFinished: root.acceptQueue(root.parseList(text))
     }
   }
 
   Process {
     id: loadProc
-    stdout: StdioCollector {
-      onStreamFinished: {
-        const o = root.parse(text);
-        root.busy = null;
-        if (!o?.ok) root.error = o?.error ?? "could not start playback";
-        root.refreshQueue();
-        root.refresh();
-      }
+    property var reply: null
+    property bool started: false
+    onStarted: { started = true; reply = null; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) {
+        started = false;
+        root.finishLoad(reply, false);
+      } else root.finishLoad(null, true);
     }
+    stdout: StdioCollector {
+      onStreamFinished: loadProc.reply = root.parse(text);
+    }
+  }
+
+  function finishLoad(o, startFailure) {
+    if (startFailure) error = "could not start playback";
+    else if (o?.ok !== true) error = typeof o?.error === "string" && o.error !== ""
+      ? o.error : "could not start playback";
+    else error = "";
+    refreshQueue();
+    refresh();
+    busy = null;
   }
 }

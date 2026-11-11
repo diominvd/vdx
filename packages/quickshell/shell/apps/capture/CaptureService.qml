@@ -122,6 +122,13 @@ Singleton {
   readonly property bool notifyRecord: ModuleSettings.get("capture", "notifyRecord", true)
   readonly property string cacheDir: Quickshell.env("HOME") + "/.cache/quickshell-capture"
   readonly property string saveScript: Paths.scriptsDir + "/capture.py"
+  property var trashQueue: []
+  property var trashCurrent: []
+  property bool trashBusy: false
+  property string trashError: ""
+  property var trashLastResult: ({ ok: true, moved: [], failed: [] })
+  readonly property bool trashPending: trashBusy || trashQueue.length > 0
+  signal trashFinished(var result)
   // a capture waiting for its Save as answer: {kind: shot | video, tmp, path}
   readonly property var pending: saveSession.pending
   readonly property bool saveBusy: saveSession.busy
@@ -317,6 +324,65 @@ Singleton {
     run(["notify-send", "-a", "Capture", "-u", "critical", title, message]);
   }
 
+  // Trash operations outlive the library view, so the service owns their FIFO.
+  function moveToTrash(paths) {
+    const unique = Array.isArray(paths) ? [...new Set(paths.filter(p => typeof p === "string" && p !== ""))] : [];
+    if (unique.length === 0) return false;
+    trashError = "";
+    trashQueue = trashQueue.concat([unique]);
+    startTrash();
+    return true;
+  }
+
+  function startTrash() {
+    if (trashBusy || trashQueue.length === 0) return;
+    trashCurrent = trashQueue[0];
+    trashQueue = trashQueue.slice(1);
+    trashBusy = true;
+    trashProc.started = false;
+    trashProc.exitCode = -1;
+    trashProc.replyText = "";
+    trashProc.command = ["python3", saveScript, "trash"].concat(trashCurrent);
+    trashProc.running = true;
+  }
+
+  function finishTrash(text, code) {
+    let result;
+    try {
+      result = JSON.parse(text);
+      if (!result || typeof result.ok !== "boolean" || !Array.isArray(result.moved) || !Array.isArray(result.failed)
+          || result.moved.some(p => typeof p !== "string")
+          || result.failed.some(f => !f || typeof f.path !== "string" || typeof f.error !== "string"))
+        throw new Error("malformed trash reply");
+      const requested = trashCurrent;
+      const seen = new Set();
+      const paths = result.moved.concat(result.failed.map(f => f.path));
+      if (result.ok !== (result.failed.length === 0)
+          || paths.length !== requested.length
+          || paths.some(path => !requested.includes(path) || seen.has(path) || !seen.add(path)))
+        throw new Error("trash reply does not match request");
+    } catch (e) {
+      result = { ok: false, moved: [], failed: trashCurrent.map(path => ({ path, error: "invalid trash reply" })) };
+    }
+    if (code !== 0 && result.ok === true) {
+      result = { ok: false, moved: [], failed: trashCurrent.map(path => ({ path, error: "trash command failed" })) };
+    }
+    result.ok = result.failed.length === 0 && result.ok === true;
+    trashLastResult = result;
+    trashError = result.failed.length
+      ? result.failed.map(f => f.path.split("/").pop() + ": " + f.error).join("; ")
+      : result.ok ? "" : "Capture trash operation failed";
+    trashFinished(result);
+    trashCurrent = [];
+    trashBusy = false;
+    startTrash();
+  }
+
+  function failTrashStart() {
+    const failed = trashCurrent.map(path => ({ path, error: "could not start capture trash operation" }));
+    finishTrash(JSON.stringify({ ok: false, moved: [], failed }), 1);
+  }
+
   // the pointer is hidden once hyprctl returns; then the overlays redraw
   Process {
     id: hideProc
@@ -383,6 +449,23 @@ Singleton {
         }
       }
     }
+  }
+
+  Process {
+    id: trashProc
+    property bool started: false
+    property int exitCode: -1
+    property string replyText: ""
+    onStarted: { started = true; exitCode = -1; replyText = ""; }
+    onExited: code => exitCode = code
+    onRunningChanged: {
+      if (running) return;
+      if (started) {
+        started = false;
+        root.finishTrash(replyText, exitCode);
+      } else root.failTrashStart();
+    }
+    stdout: StdioCollector { onStreamFinished: trashProc.replyText = text }
   }
 
   // ---- recording ----

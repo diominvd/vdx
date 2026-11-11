@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.config
+import "../../kit/reply.js" as Reply
 
 // Clipboard history (scripts/clipboard.sh): a `wl-paste --watch` runs for the
 // whole session and stores every new selection; the popup reads the list and
@@ -16,22 +17,91 @@ Singleton {
   property int limit: 100
   readonly property var limits: [25, 50, 100, 250, 500]
   property string error: ""
+  property bool actionFailed: false
+  signal copied(string id)
 
-  function refresh() { run(listProc, ["list"]); }
+  property var actionQueue: []
+  property var activeAction: null
+  property var actionReply: null
+  property bool listQueued: false
 
-  function copy(id) { run(actionProc, ["copy", id]); }
-  function remove(id) { run(actionProc, ["delete", id]); }
-  function clear() { run(actionProc, ["clear"]); }
-  function setLimit(n) { limit = n; run(actionProc, ["limit", String(n)]); }
-
-  function run(proc, args) {
-    if (proc.running) return;
-    proc.command = ["bash", Paths.scriptsDir + "/clipboard.sh"].concat(args);
-    proc.running = true;
+  function refresh() {
+    if (listProc.running) { listQueued = true; return; }
+    listProc.running = true;
   }
 
-  function parse(text, fallback) {
-    try { return JSON.parse(text); } catch (e) { return fallback; }
+  function copy(id) { enqueueAction("copy", [String(id)]); }
+  function remove(id) { enqueueAction("delete", [String(id)]); }
+  function clear() { enqueueAction("clear", []); }
+  function setLimit(n) {
+    if (!Number.isInteger(n) || n < 1 || n > 10000) {
+      error = "limit must be from 1 to 10000";
+      actionFailed = true;
+      return;
+    }
+    enqueueAction("limit", [String(n)], n);
+  }
+
+  function enqueueAction(action, args, newLimit) {
+    error = "";
+    actionFailed = false;
+    actionQueue = actionQueue.concat([{action, args: args.slice(), newLimit}]);
+    startNextAction();
+  }
+
+  function startNextAction() {
+    if (activeAction || actionProc.running || actionQueue.length === 0) return;
+    activeAction = actionQueue[0];
+    actionQueue = actionQueue.slice(1);
+    actionReply = null;
+    actionProc.command = ["bash", Paths.scriptsDir + "/clipboard.sh", activeAction.action]
+      .concat(activeAction.args);
+    actionProc.running = true;
+  }
+
+  function parse(text) { return Reply.parse(text, "clipboard.sh"); }
+  function parseList(text) { return Reply.parseList(text, null); }
+
+  function validList(list) {
+    return Array.isArray(list) && list.every(e => e && typeof e.id === "string"
+      && (e.kind === "text" || e.kind === "image") && typeof e.preview === "string"
+      && typeof e.path === "string" && typeof e.time === "number" && isFinite(e.time));
+  }
+
+  function acceptList(list) {
+    if (!Array.isArray(list) || !validList(list)) {
+      if (!actionFailed) error = "bad clipboard history reply";
+      return false;
+    }
+    entries = list;
+    if (!actionFailed) error = "";
+    return true;
+  }
+
+  function actionError(reply) {
+    return typeof reply?.error === "string" && reply.error.trim() !== ""
+      ? reply.error : "clipboard action failed";
+  }
+
+  function finishAction(reply, startFailure, processSuccess) {
+    const action = activeAction;
+    activeAction = null;
+    actionReply = null;
+    if (!action) { startNextAction(); return; }
+
+    const ok = !startFailure && processSuccess !== false && reply?.ok === true;
+    if (ok) {
+      error = "";
+      actionFailed = false;
+      if (action.action === "limit") limit = action.newLimit;
+    } else {
+      error = startFailure ? "could not start clipboard action" : actionError(reply);
+      actionFailed = true;
+    }
+
+    refresh();
+    startNextAction();
+    if (ok && action.action === "copy") copied(action.args[0]);
   }
 
   // every new selection lands in the history; a line after each store
@@ -61,37 +131,39 @@ Singleton {
 
   Process {
     id: listProc
+    command: ["bash", Paths.scriptsDir + "/clipboard.sh", "list"]
     property bool started: false
     onStarted: started = true
     onRunningChanged: {
       if (running) return;
-      if (started) { started = false; return; }
-      root.error = "could not start clipboard history query";
+      if (started) {
+        started = false;
+        if (root.listQueued) { root.listQueued = false; root.refresh(); }
+        return;
+      }
+      if (!root.actionFailed) root.error = "could not start clipboard history query";
+      if (root.listQueued) { root.listQueued = false; root.refresh(); }
     }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const list = root.parse(text, null);
-        if (Array.isArray(list)) { root.entries = list; root.error = ""; }
-        else root.error = "could not read the history";
-      }
+      onStreamFinished: root.acceptList(root.parseList(text));
     }
   }
 
   Process {
     id: actionProc
     property bool started: false
-    onStarted: started = true
+    property int exitCode: -1
+    onStarted: { started = true; exitCode = -1; }
+    onExited: code => exitCode = code
     onRunningChanged: {
       if (running) return;
-      if (started) { started = false; return; }
-      root.error = "could not start clipboard action";
+      if (started) {
+        started = false;
+        root.finishAction(root.actionReply, false, exitCode === 0);
+      } else root.finishAction(null, true);
     }
     stdout: StdioCollector {
-      onStreamFinished: {
-        const o = root.parse(text, { ok: false, error: "no answer" });
-        root.error = o.ok ? "" : o.error;
-        root.refresh();
-      }
+      onStreamFinished: root.actionReply = root.parse(text);
     }
   }
 }

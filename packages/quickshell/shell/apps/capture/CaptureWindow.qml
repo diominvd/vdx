@@ -18,7 +18,46 @@ FloatingWindow {
 
   // Hyprland closing the window hides it but leaves FloatingWindow's own
   // visible set, so the next `visible = true` would do nothing: reset it.
-  onVisibleChanged: if (visible) library.refresh(); else visible = false;
+  onVisibleChanged: if (visible) app.shown(); else { visible = false; app.hidden(); }
+
+  QtObject {
+    id: app
+
+    property string query: ""
+    property string sortKey: "date"
+    property bool sortDesc: true
+    property string selectedPath: ""
+    property bool openPending: false
+
+    function shown() {
+      openPending = true;
+      library.active = true;
+      restore();
+    }
+
+    function loaded() { restore(); }
+
+    function restore() {
+      if (!openPending || !root.visible || !library.item) return;
+      openPending = false;
+      library.item.query = query;
+      library.item.sortKey = sortKey;
+      library.item.sortDesc = sortDesc;
+      library.item.selectedPath = selectedPath;
+      library.item.refresh();
+    }
+
+    function hidden() {
+      openPending = false;
+      if (library.item) {
+        query = library.item.query;
+        sortKey = library.item.sortKey;
+        sortDesc = library.item.sortDesc;
+        selectedPath = library.item.selectedPath;
+      }
+      library.active = false;
+    }
+  }
 
   KitHeader {
     id: header
@@ -35,21 +74,22 @@ FloatingWindow {
 
     anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: Theme.windowPadding; bottomMargin: Theme.windowPadding }
     spacing: Theme.sectionGap
-    visible: library.items.length > 0
+    visible: library.item !== null && library.item.items.length > 0
 
     KitLine {}
 
     KitButton {
       width: parent.width
       icon: "trash"
-      iconTint: library.confirming ? Theme.red : Theme.foreground0
-      text: library.confirming ? "Move all " + library.items.length + " to trash?" : "Clear library"
-      onClicked: library.clearAll()
+      iconTint: library.item && library.item.confirming ? Theme.red : Theme.foreground0
+      text: library.item && library.item.confirming
+        ? "Move all " + library.item.items.length + " to trash?" : "Clear library"
+      onClicked: if (library.item) library.item.clearAll()
     }
   }
 
   // fills the room between the header and the foot; only its rows scroll
-  CaptureLibrary {
+  Loader {
     id: library
 
     anchors {
@@ -58,6 +98,12 @@ FloatingWindow {
       bottom: foot.visible ? foot.top : parent.bottom
       leftMargin: Theme.windowPadding; rightMargin: Theme.windowPadding
       bottomMargin: foot.visible ? Theme.gapGroup : Theme.windowPadding
+    }
+
+    active: false
+    onLoaded: app.loaded()
+    sourceComponent: Component {
+      CaptureLibrary { anchors.fill: parent }
     }
   }
 

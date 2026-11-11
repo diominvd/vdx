@@ -20,7 +20,7 @@ components/    Hypr (helpers), ShellIpc (the shell's own IPC from inside it), Sc
 config/        Theme (the look only), Colors (from the active theme), Format (text of
                numbers), Paths, ShellSettings, ModuleSettings, Motion
 scripts/       backends: one JSON object per command, commands in the header;
-               out / fail / run come from backend.py (the folder is on sys.path);
+               out / fail / run / run_checked come from backend.py (the folder is on sys.path);
                not backends: supervise.sh (runs qs, starts it again after a crash),
                listen.sh (sourced by a backend's --listen: it ends with the shell),
                settings_*.py (tools with their own main and tests), files_portal.py
@@ -62,6 +62,10 @@ JSON replies use `kit/reply.js`: `Reply.parse(text, script, fallback)` accepts
 objects only; `Reply.parseList(text, fallback)` accepts arrays only (default
 `[]`). Legacy shell list commands and array-shaped config files use the list
 parser explicitly. Never pass their replies through an object-only wrapper.
+
+Backends use `run` when they handle command failure themselves; `run_checked`
+requires success and raises `RuntimeError`. Command entry points MUST turn
+that exception and expected filesystem errors into JSON errors.
 
 ## An app
 

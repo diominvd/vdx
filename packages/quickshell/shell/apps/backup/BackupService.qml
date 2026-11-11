@@ -30,6 +30,49 @@ Singleton {
   property bool loaded: false
   property string loadError: ""
 
+  function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+  function finite(value) { return typeof value === "number" && isFinite(value) && value >= 0; }
+  function strings(value) { return Array.isArray(value) && value.every(v => typeof v === "string"); }
+
+  function validConfig(value) {
+    return record(value) && typeof value.repo === "string" && strings(value.extra) && strings(value.excludes)
+      && record(value.sources) && ["home", "etc", "packages", "root"].every(k => typeof value.sources[k] === "boolean")
+      && record(value.keep) && typeof value.keep.on === "boolean"
+      && ["daily", "weekly", "monthly"].every(k => Number.isInteger(value.keep[k]) && value.keep[k] >= 0 && value.keep[k] <= 999)
+      && record(value.schedule) && ["off", "daily", "weekly"].includes(value.schedule.mode)
+      && typeof value.schedule.time === "string" && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value.schedule.time)
+      && typeof value.notify === "boolean";
+  }
+
+  function acceptStatus(r) {
+    if (r.ok !== true || !validConfig(r.config) || typeof r.configured !== "boolean"
+        || typeof r.restic !== "boolean" || typeof r.claude !== "boolean"
+        || !(r.last === null || (record(r.last) && finite(r.last.ts)
+          && typeof r.last.ok === "boolean" && typeof r.last.message === "string"))) {
+      loadError = typeof r.error === "string" && r.error !== "" ? r.error : "bad backup status reply";
+      done(false, loadError);
+      return false;
+    }
+    config = r.config;
+    last = r.last;
+    configured = r.configured;
+    resticFound = r.restic;
+    claude = r.claude;
+    loaded = true;
+    loadError = "";
+    return true;
+  }
+
+  function validSnapshots(rows) {
+    return Array.isArray(rows) && rows.every(r => record(r) && typeof r.id === "string"
+      && typeof r.short === "string" && finite(r.ts) && finite(r.size) && strings(r.tags) && strings(r.paths));
+  }
+
+  function validEntries(rows) {
+    return Array.isArray(rows) && rows.every(r => record(r) && typeof r.name === "string"
+      && typeof r.path === "string" && typeof r.dir === "boolean" && finite(r.size) && finite(r.ts));
+  }
+
   function refresh() {
     if (!statusProc.running) statusProc.running = true;
   }
@@ -48,18 +91,7 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const r = Reply.parse(text, "backup.py");
-        if (!r.ok) {
-          root.loadError = r.error;
-          root.done(false, r.error);
-          return;
-        }
-        root.config = r.config;
-        root.last = r.last;
-        root.configured = r.configured;
-        root.resticFound = r.restic;
-        root.claude = r.claude === true;
-        root.loaded = true;
-        root.loadError = "";
+        root.acceptStatus(r);
       }
     }
   }
@@ -80,7 +112,7 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const r = Reply.parse(text, "backup.py");
-        if (r.ok) root.guideLines = r.lines;
+        if (r.ok === true && root.strings(r.lines)) root.guideLines = r.lines;
       }
     }
   }
@@ -100,25 +132,39 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const r = Reply.parse(text, "backup.py");
-        if (!r.ok) return;
+        if (r.ok !== true || !root.finite(r.on_disk) || !root.finite(r.restore)) return;
         root.onDisk = r.on_disk;
         root.restoreSize = r.restore;
       }
     }
   }
 
+  property string sizesSnapshot: ""
+  property var sizesNext: null
+
   function loadSizes(snap, path) {
-    if (sizesProc.running) return;
+    if (sizesSnapshot !== snap) { sizesSnapshot = snap; sizes = ({}); }
+    if (sizesProc.running) { sizesNext = {snapshot: snap, path}; return; }
     sizesProc.command = ["python3", root.script, "--json", "sizes", snap, path];
     sizesProc.running = true;
   }
 
   Process {
     id: sizesProc
+    onRunningChanged: {
+      if (running || !root.sizesNext) return;
+      const next = root.sizesNext;
+      root.sizesNext = null;
+      root.loadSizes(next.snapshot, next.path);
+    }
     stdout: StdioCollector {
       onStreamFinished: {
         const r = Reply.parse(text, "backup.py");
-        if (r.ok) root.sizes = Object.assign({}, root.sizes, r.sizes);
+        if (sizesProc.command[4] !== root.sizesSnapshot || r.ok !== true || !r.sizes
+            || typeof r.sizes !== "object" || Array.isArray(r.sizes)
+            || !Object.keys(r.sizes).every(k => typeof r.sizes[k] === "number"
+              && isFinite(r.sizes[k]) && r.sizes[k] >= 0)) return;
+        root.sizes = Object.assign({}, root.sizes, r.sizes);
       }
     }
   }
@@ -135,13 +181,21 @@ Singleton {
 
   Process {
     id: snapsProc
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.done(false, "could not start backup snapshots query");
+      root.listing = false;
+    }
     command: ["python3", root.script, "--json", "snapshots"]
     stdout: StdioCollector {
       onStreamFinished: {
-        root.listing = false;
         const r = Reply.parse(text, "backup.py");
-        if (!r.ok) { root.done(false, r.error); return; }
-        root.snapshots = r.snapshots;
+        if (r.ok !== true || !root.validSnapshots(r.snapshots)) root.done(false, r.error || "bad backup snapshots reply");
+        else root.snapshots = r.snapshots;
+        root.listing = false;
       }
     }
   }
@@ -154,9 +208,9 @@ Singleton {
   property var browseNext: null             // the latest folder asked while one is listed
 
   function browse(snap, path) {
-    if (lsProc.running) { browseNext = { snapshot: snap, path: path }; return; }
     snapshot = snap;
     folder = path;
+    if (lsProc.running) { browseNext = { snapshot: snap, path: path }; return; }
     entries = [];
     browsing = true;
     lsProc.command = ["python3", root.script, "--json", "ls", snap, path];
@@ -164,23 +218,32 @@ Singleton {
     loadSizes(snap, path);
   }
 
-  function leave() { snapshot = ""; entries = []; folder = "/"; }
+  function leave() { browseNext = null; snapshot = ""; entries = []; folder = "/"; }
 
   Process {
     id: lsProc
+    property bool started: false
+    onStarted: started = true
     stdout: StdioCollector {
       onStreamFinished: {
-        root.browsing = false;
         const r = Reply.parse(text, "backup.py");
-        if (!r.ok) { root.done(false, r.error); return; }
-        // an answer for a folder left meanwhile is dropped
-        if (r.path === root.folder) root.entries = r.entries;
+        if (lsProc.command[4] !== root.snapshot || lsProc.command[5] !== root.folder) return;
+        if (r.ok !== true || !root.validEntries(r.entries) || r.path !== root.folder) {
+          root.done(false, r.error || "bad backup folder reply");
+          return;
+        }
+        root.entries = r.entries;
       }
     }
-    onRunningChanged: if (!running && root.browseNext) {
-      const next = root.browseNext;
-      root.browseNext = null;
-      root.browse(next.snapshot, next.path);
+    onRunningChanged: {
+      if (running) return;
+      if (!started) root.done(false, "could not start backup folder query");
+      started = false;
+      if (root.browseNext) {
+        const next = root.browseNext;
+        root.browseNext = null;
+        root.browse(next.snapshot, next.path);
+      } else root.browsing = false;
     }
   }
 
@@ -194,6 +257,8 @@ Singleton {
   property string revealed: ""              // the password, shown on request
   property string restored: ""              // the folder of the last restore
   property var aiSuggestions: []            // [{path, shown, mb, days, why, risk}] from Claude
+  property var aiApplying: []
+  property var nextJob: null
   property var aiPicked: ({})               // path -> bool: what the user leaves out
 
   function job(kind, args) {
@@ -211,24 +276,72 @@ Singleton {
   function feed(line) {
     const r = Reply.parse(line, "backup.py", null);
     if (r === null) return;
-    if (r.progress !== undefined) root.progress = r.progress;
+    if (r.progress !== undefined) {
+      if (typeof r.progress === "number" && isFinite(r.progress) && r.progress >= 0 && r.progress <= 100) root.progress = r.progress;
+    }
     else root.answer = r;
+  }
+
+  function completeJob(reply) {
+    const kind = jobKind;
+    answer = null;
+    progress = -1;
+    jobKind = "";
+    finish(kind, reply);
+    const next = nextJob;
+    nextJob = null;
+    if (next) {
+      // Keep ownership while handing off an authorized follow-up.
+      jobKind = next.kind;
+      status = "";
+      jobProc.command = ["python3", root.script, "--json"].concat(next.args);
+      jobProc.running = true;
+    } else busy = false;
   }
 
   Process {
     id: jobProc
+    property bool started: false
+    property var reply: null
+    onStarted: { started = true; reply = null; }
     stdout: SplitParser { onRead: line => root.feed(line) }
     stderr: StdioCollector { id: jobErr }
-    onExited: {
-      const kind = root.jobKind;
-      const r = root.answer ?? { ok: false, error: (jobErr.text.trim().split("\n").pop() || "no reply from the backup script").slice(0, 200) };
-      root.busy = false;
-      root.progress = -1;
-      root.finish(kind, r);
+    onExited: code => {
+      const r = code === 0 && root.answer !== null ? root.answer
+        : { ok: false, error: ((typeof root.answer?.error === "string" ? root.answer.error : "") || jobErr.text.trim().split("\n").pop()
+          || "no reply from the backup script").slice(0, 200) };
+      reply = r;
+    }
+    onRunningChanged: {
+      if (running) return;
+      const r = started ? reply : {ok: false, error: "could not start backup job"};
+      started = false;
+      root.completeJob(r || {ok: false, error: "no reply from the backup script"});
     }
   }
 
+  function validJobReply(kind, r) {
+    if (r.ok !== true) return true;
+    const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
+    if (kind === "password") return typeof r.password === "string";
+    if (kind === "pick") return typeof r.path === "string" && r.path !== "";
+    if (kind === "config" || kind === "schedule") return validConfig(r.config);
+    if (kind === "restore") return typeof r.target === "string";
+    if (kind === "packages" || kind === "rootplan")
+      return typeof r.script === "string" && r.script.trim() !== "" && Array.isArray(r.steps)
+        && r.steps.length > 0 && r.steps.every(s => object(s) && typeof s.label === "string"
+          && typeof s.what === "string" && typeof s.command === "string");
+    if (kind === "aur") return Array.isArray(r.aur) && r.aur.every(n => typeof n === "string" && n !== "");
+    if (kind === "ai") return Array.isArray(r.suggestions) && r.suggestions.every(s => object(s)
+      && typeof s.path === "string" && typeof s.shown === "string" && typeof s.why === "string"
+      && typeof s.mb === "number" && isFinite(s.mb) && typeof s.days === "number" && isFinite(s.days)
+      && (s.risk === "low" || s.risk === "medium"));
+    return true;
+  }
+
   function finish(kind, r) {
+    if (r.ok !== true) r = {ok: false, error: typeof r.error === "string" && r.error !== "" ? r.error : "backup job failed"};
+    if (!validJobReply(kind, r)) r = {ok: false, error: "bad backup " + kind + " reply"};
     if (kind === "password") {
       if (r.ok) { root.revealed = r.password; hideSecret.restart(); }
       else root.done(false, r.error);
@@ -242,7 +355,7 @@ Singleton {
       return;
     }
     if (kind === "pick") {
-      if (r.ok) root.init(r.path);
+      if (r.ok) nextJob = {kind: "init", args: ["init", "--repo", r.path]};
       else root.done(false, r.error);
       return;
     }
@@ -271,13 +384,21 @@ Singleton {
       return;
     }
     if (kind === "config") {
-      if (r.ok) root.config = r.config;
-      else root.done(false, r.error);
+      if (r.ok) {
+        root.config = r.config;
+        if (aiApplying.length) {
+          root.aiSuggestions = aiSuggestions.filter(s => !aiApplying.includes(s.path));
+          const picked = Object.assign({}, aiPicked);
+          aiApplying.forEach(path => delete picked[path]);
+          aiPicked = picked;
+        }
+      } else root.done(false, r.error);
+      aiApplying = [];
       return;
     }
     if (r.ok && (kind === "schedule")) root.config = r.config;
     // a manual run also takes the root-only files, when the switch is on (the root panel asks the password)
-    if (kind === "run" && r.ok && root.config.sources && root.config.sources.root === true) job("rootplan", ["root-plan"]);
+    if (kind === "run" && r.ok && root.config.sources && root.config.sources.root === true) nextJob = {kind: "rootplan", args: ["root-plan"]};
     if (r.ok && kind === "restore") root.restored = r.target;
     done(r.ok, r.ok ? r.message : r.error);
     if (kind === "run" || kind === "init" || kind === "schedule" || kind === "forget") {
@@ -317,13 +438,13 @@ Singleton {
     p[path] = on;
     aiPicked = p;
   }
-  // the picked suggestions join the excludes; the list is cleared
+  // Remove submitted suggestions only after the excludes are saved.
   function aiApply() {
     const paths = aiSuggestions.filter(s => aiPicked[s.path]).map(s => s.path);
     if (paths.length === 0) return;
-    setConfig({ "excludes": (config.excludes ?? []).concat(paths) });
-    aiSuggestions = [];
-    aiPicked = ({});
+    if (busy) return;
+    aiApplying = paths.slice();
+    if (!setConfig({ "excludes": (config.excludes ?? []).concat(paths) })) aiApplying = [];
   }
   function forget(snaps) { return job("forget", ["forget"].concat(snaps)); }
 
@@ -338,12 +459,29 @@ Singleton {
   property bool copied: false
   function copyPassword() {
     if (copyProc.running || revealed === "") return;
-    copyProc.command = ["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", revealed];
+    copyProc.secret = revealed;
+    copyProc.stdinEnabled = true;
     copyProc.running = true;
   }
 
   Process {
     id: copyProc
+    command: ["wl-copy"]
+    property string secret: ""
+    property bool started: false
+    onStarted: {
+      started = true;
+      write(secret);
+      secret = "";
+      stdinEnabled = false;
+    }
+    onRunningChanged: {
+      if (running) return;
+      secret = "";
+      if (started) { started = false; return; }
+      root.copied = false;
+      root.done(false, "could not start clipboard command");
+    }
     stderr: StdioCollector { id: copyErr }
     onExited: code => {
       root.copied = code === 0;

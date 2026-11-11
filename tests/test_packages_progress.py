@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import unittest
 
-from tests.check_shell_ui import qml_block
+from tests.check_shell_ui import qml_block, qml_function
 from tests.qml_runtime import SHELL, run_quickshell
 
 
@@ -14,6 +14,8 @@ class PackageProgress(unittest.TestCase):
     def test_partial_download_updates_fraction_and_late_reply_does_not_reset_install(self):
         source = (SHELL / "apps/packages/PackagesService.qml").read_text()
         process = qml_block(source, "Process {\n    id: progressProc")
+        accept_progress = "\n".join(qml_function(source, name) for name in
+                                        ("finiteNonnegative", "acceptProgress"))
         with tempfile.TemporaryDirectory(prefix="package-progress-") as tmp:
             root = Path(tmp)
             cache = root / "pkg"
@@ -37,6 +39,7 @@ Scope {
   readonly property real stagePercent: stageBytes > 0 ? Math.min(1, stageDone / stageBytes) : 0
   property int replies: 0
   function parse(text) { replies++; return JSON.parse(text); }
+''' + accept_progress + '''
   ''' + process + '''
   Component.onCompleted: progressProc.running = true
   Timer { interval: 10; repeat: true; running: true; onTriggered: {

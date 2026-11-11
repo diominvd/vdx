@@ -27,10 +27,50 @@ FloatingWindow {
     app.hidden();
   }
 
-  Music {
+  // Keep navigation across opens without keeping the hidden view and its models.
+  QtObject {
     id: app
+
+    property var navigation: ({})
+    property var requestedPage: null
+
+    function shown() {
+      content.active = true;
+      for (const key of Object.keys(navigation)) content.item[key] = navigation[key];
+      if (requestedPage !== null) {
+        content.item.go(requestedPage);
+        requestedPage = null;
+      }
+      content.item.shown();
+    }
+
+    function hidden() {
+      if (!content.item) return;
+      const view = content.item;
+      navigation = { tab: view.tab, page: view.page, playlistKind: view.playlistKind,
+                     folder: view.folder, radioPage: view.radioPage };
+      view.hidden();
+      content.active = false;
+    }
+
+    function go(page) {
+      if (content.item) content.item.go(page);
+      else requestedPage = page;
+    }
+
+    function cancel() { content.item?.cancel(); }
+  }
+
+  Loader {
+    id: content
     anchors.fill: parent
-    onCloseRequested: root.visible = false
+    active: false
+    sourceComponent: Component {
+      Music {
+        anchors.fill: parent
+        onCloseRequested: root.visible = false
+      }
+    }
   }
 
   Shortcut {

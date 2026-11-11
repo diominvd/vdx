@@ -14,11 +14,11 @@ from tests.qml_runtime import SHELL, run_quickshell
 CONSUMERS = [
     ("modules/wifi/WifiService.qml", "id: networksProc", "networks", True),
     ("modules/wifi/WifiService.qml", 'path: Quickshell.shellDir + "/modules/wifi/dns_providers.json"', "dnsProviders", False),
-    ("modules/mpd/MpdService.qml", "id: queueProc", "queue", False),
-    ("modules/radio/RadioService.qml", "id: stationsProc", "stations", False),
-    ("modules/ai/ClaudeService.qml", "id: sessionsProc", "sessions", False),
+    ("modules/mpd/MpdService.qml", "id: queueProc", "queue", True),
+    ("modules/radio/RadioService.qml", "id: stationsProc", "stations", True),
+    ("modules/ai/ClaudeService.qml", "id: sessionsProc", "sessions", True),
     ("modules/mihomo/MihomoService.qml", "id: providersProc", "providers", True),
-    ("modules/mihomo/MihomoService.qml", "id: nodesProc", "nodes", False),
+    ("modules/mihomo/MihomoService.qml", "id: nodesProc", "nodes", True),
     ("modules/notifications/NotificationsService.qml", "id: listProc", "notifications", True),
 ]
 
@@ -44,17 +44,33 @@ class ListReplies(unittest.TestCase):
                 line = source[position:].splitlines()[0]
                 block = qml_block(source[position:], handler) if line.rstrip().endswith("{") else line
                 body = block.split(":", 1)[1].replace("text()", "text")
+                helpers = ""
+                if field in ("queue", "stations"):
+                    validator, acceptor = ("validQueue", "acceptQueue") if field == "queue" else ("validStations", "acceptStations")
+                    helpers = qml_function(source, validator) + "\n" + qml_function(source, acceptor)
+                    body = "root." + acceptor + "(MpdService.parseList(text));"
+                elif field == "sessions":
+                    helpers = "\n".join(qml_function(source, name) for name in ("record", "finite", "validSessions"))
+                elif field in ("providers", "nodes"):
+                    acceptor = "acceptProviders" if field == "providers" else "acceptNodes"
+                    helpers = qml_function(source, acceptor)
+                    suffix = ", provider" if field == "nodes" else ""
+                    body = "root." + acceptor + "(Reply.parseList(text, null)" + suffix + ");"
                 objects.append('''  Scope {
     QtObject {
       id: root
       property string text: ''' + json.dumps(payload) + '''
       property var ''' + field + ''': [{old: true}]
+      property string error: ""
       property string networkError: ""
+      property bool serviceOn: true
+      property string nodesWantedProvider: ""
       property string provider: ""
       property string currentProvider: ""
       function refreshNodes() {}
       function ingest(list) { notifications = list; }
       function parseList(text) { return MpdService.parseList(text); }
+      ''' + helpers + '''
       function read() { ''' + body + ''' }
     }
     Component.onCompleted: { root.read(); results.values[''' + str(index) + '''] = root.''' + field + '''; }
@@ -81,7 +97,9 @@ Scope {
 
     def test_valid_arrays_reach_all_list_consumers(self):
         rows = [{"name": "first", "ssid": "network", "key": "station", "pos": 1,
-                 "signal": 75, "secure": True, "active": False, "saved": True}]
+                 "artist": "artist", "title": "title", "genre": "genre", "about": "about",
+                 "cwd": "/project", "status": "busy", "version": "1", "started": 1,
+                 "nodes": 1, "alive": True, "delay": 10, "signal": 75, "secure": True, "active": False, "saved": True}]
         self.assertEqual(self.consume(json.dumps(rows)), [rows] * len(CONSUMERS))
 
     def test_empty_arrays_reach_each_consumer(self):

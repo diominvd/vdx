@@ -21,7 +21,7 @@ no tools; it may only suggest paths from that summary, never protected ones
 Errors: {"ok": false, "error": "..."}."""
 import json, os, re, shutil, subprocess, sys, time
 from pathlib import Path
-from backend import out
+from backend import fail, out, run, run_checked
 
 HOME = Path.home()
 CACHE = HOME / ".cache"
@@ -71,27 +71,44 @@ def size_of(path):
     return total
 
 
-def probe(kind):
+def probe(kind, required=False):
     try:
         if kind == "pacman":
             return size_of(Path("/var/cache/pacman/pkg"))
         if kind == "coredumps":
             return size_of(Path("/var/lib/systemd/coredump"))
         if kind == "journal":
-            text = subprocess.run(["journalctl", "--disk-usage"], capture_output=True, text=True).stdout
+            result = run(["journalctl", "--disk-usage"], timeout=15)
+            if result is None or result.returncode:
+                if required:
+                    raise RuntimeError("journalctl is unavailable or failed")
+                return 0
+            text = result.stdout
             m = re.search(r"take up ([\d.]+)([KMGT]?)", text)
             if m:
                 return int(float(m.group(1)) * 1024 ** "BKMGT".index(m.group(2) or "B"))
         if kind == "orphans":
-            names = subprocess.run(["pacman", "-Qdtq"], capture_output=True, text=True).stdout.split()
+            result = run(["pacman", "-Qdtq"], timeout=15)
+            if result is None or result.returncode:
+                if required:
+                    raise RuntimeError("pacman orphan query is unavailable or failed")
+                return 0
+            names = result.stdout.split()
             if not names:
                 return 0
-            info = subprocess.run(["pacman", "-Qi"] + names, capture_output=True, text=True).stdout
+            result = run(["pacman", "-Qi"] + names, timeout=30)
+            if result is None or result.returncode:
+                if required:
+                    raise RuntimeError("pacman package query is unavailable or failed")
+                return 0
+            info = result.stdout
             total = 0
             for value, unit in re.findall(r"Installed Size\s*:\s*([\d.]+)\s*(\w+)", info):
                 total += int(float(value) * {"B": 1, "KiB": 1024, "MiB": 1024 ** 2, "GiB": 1024 ** 3}.get(unit, 1))
             return total
-    except (OSError, ValueError):
+    except (OSError, ValueError, OverflowError, RuntimeError):
+        if required:
+            raise
         pass
     return 0
 
@@ -141,7 +158,7 @@ def detail(cid):
         n = sum(1 for f in pkgs.glob("*.pkg.tar.*") if not f.name.endswith(".sig")) if pkgs.is_dir() else 0
         return f"removes old versions of {n} cached packages, keeps the newest; uninstalled ones go"
     if cid == "orphans":
-        names = subprocess.run(["pacman", "-Qdtq"], capture_output=True, text=True).stdout.split()
+        names = run_checked(["pacman", "-Qdtq"], timeout=15).stdout.split()
         if not names:
             return "nothing to remove"
         shown = ", ".join(names[:8]) + (f" and {len(names) - 8} more" if len(names) > 8 else "")
@@ -162,7 +179,7 @@ def cmd_plan(ids):
         out({"ok": False, "error": f"not a system category: {bad[0] if bad else '(none)'}"})
     steps = [{"label": known[i][1], "what": detail(i), "command": known[i][4]} for i in ids]
     out({"ok": True, "steps": steps, "script": "; ".join(known[i][4] for i in ids),
-         "size": sum(probe(known[i][3]) for i in ids)})
+         "size": sum(probe(known[i][3], required=i == "orphans") for i in ids)})
 
 
 # ---- AI ----------------------------------------------------------------------------
@@ -171,16 +188,15 @@ def summary():
     """Folders of ~ three levels down from 100 MB, files from 200 MB, with ages."""
     now = time.time()
     rows = []
-    du = subprocess.run(["du", "-x", "-B1", "-d", "3", "--threshold=100M", str(HOME)],
-                        capture_output=True, text=True).stdout
+    du = run_checked(["du", "-x", "-B1", "-d", "3", "--threshold=100M", str(HOME)], timeout=120).stdout
     for line in du.splitlines():
         size, path = line.split("\t", 1)
         p = Path(path)
         if p == HOME:
             continue
         rows.append((path, int(size), "dir"))
-    found = subprocess.run(["find", str(HOME), "-xdev", "-type", "f", "-size", "+200M", "-printf", "%s\t%p\n"],
-                           capture_output=True, text=True).stdout
+    found = run_checked(["find", str(HOME), "-xdev", "-type", "f", "-size", "+200M", "-printf", "%s\t%p\n"],
+                        timeout=120).stdout
     for line in found.splitlines():
         size, path = line.split("\t", 1)
         rows.append((path, int(size), "file"))
@@ -234,42 +250,59 @@ def cmd_ai(model):
     CONTEXT.write_text(json.dumps(items))
     listing = "\n".join(f'{i["path"]}\t{i["kind"]}\t{i["mb"]} MB\t{i["days"]} d' for i in items)
     try:
-        run = subprocess.run(["claude", "-p", PROMPT + listing, "--model", model, "--output-format", "json",
-                              "--tools", "", "--no-session-persistence", "--max-budget-usd", "0.50"],
-                             capture_output=True, text=True, timeout=240, cwd=str(CACHE), env=claude_env())
+        process = subprocess.run(["claude", "-p", PROMPT + listing, "--model", model, "--output-format", "json",
+                                  "--tools", "", "--no-session-persistence", "--max-budget-usd", "0.50"],
+                                 capture_output=True, text=True, timeout=240, cwd=str(CACHE), env=claude_env())
     except FileNotFoundError:
-        out({"ok": False, "error": "claude is not installed"})
+        fail("claude is not installed")
+    except OSError as e:
+        fail(f"could not start claude: {e}")
     except subprocess.TimeoutExpired:
-        out({"ok": False, "error": "Claude took too long (4 min)"})
+        fail("Claude took too long (4 min)")
     try:
-        reply = json.loads(run.stdout)
-        text = reply.get("result", "") if isinstance(reply, dict) else ""
+        reply = json.loads(process.stdout)
+        if not isinstance(reply, dict):
+            raise TypeError("invalid Claude response")
+        text = reply.get("result", "")
         if reply.get("is_error"):
-            out({"ok": False, "error": "Claude: " + (text or "error")[:200]})
+            fail("Claude: " + (text if isinstance(text, str) and text else "error")[:200])
+        if not isinstance(text, str):
+            raise TypeError("invalid Claude result")
         text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.M).strip()
         wanted = json.loads(text[text.index("{"):text.rindex("}") + 1])["suggestions"]
+        if not isinstance(wanted, list):
+            raise TypeError("suggestions must be a list")
     except (ValueError, KeyError, TypeError, AttributeError):
-        out({"ok": False, "error": "Claude's answer wasn't the list: " + (run.stderr or run.stdout)[:200]})
+        fail("Claude's answer wasn't the list: " + (process.stderr or process.stdout)[:200])
     shown = {i["path"]: i for i in items}
     suggestions = []
     for s in wanted:
-        item = shown.get(s.get("path"))
+        if not isinstance(s, dict) or not isinstance(s.get("path"), str):
+            continue
+        item = shown.get(s["path"])
         if not item:
             continue                                     # not from the list: ignored
         real = str(HOME / item["path"][2:]) if item["path"].startswith("~/") else item["path"]
         if protected(real) or not os.path.lexists(real):
             continue
+        why = s.get("why") if isinstance(s.get("why"), str) else ""
         suggestions.append({"path": item["path"], "size": item["mb"] * 1048576, "days": item["days"],
-                            "kind": item["kind"], "why": str(s.get("why", ""))[:90],
+                            "kind": item["kind"], "why": why[:90],
                             "risk": "medium" if s.get("risk") == "medium" else "low"})
     out({"ok": True, "suggestions": suggestions})
 
 
 def cmd_trash(paths):
     try:
-        shown = {i["path"] for i in json.loads(CONTEXT.read_text())}
-    except (OSError, ValueError):
-        shown = set()
+        cached = json.loads(CONTEXT.read_text())
+    except (OSError, ValueError) as e:
+        fail(f"could not read last analysis: {e}")
+    if not isinstance(cached, list) or not all(
+        isinstance(item, dict) and isinstance(item.get("path"), str) and item["path"]
+        for item in cached
+    ):
+        fail("last analysis is invalid")
+    shown = {item["path"] for item in cached}
     freed, errors = 0, []
     for path in paths:
         if path not in shown:
@@ -280,26 +313,34 @@ def cmd_trash(paths):
             errors.append(f"{path}: protected")
             continue
         size = size_of(Path(real))
-        moved = subprocess.run(["gio", "trash", real], capture_output=True, text=True)
-        if moved.returncode == 0:
+        moved = run(["gio", "trash", real], timeout=30)
+        if moved is None:
+            errors.append(f"{path}: gio is unavailable or timed out")
+        elif moved.returncode == 0:
             freed += size
         else:
-            errors.append(f"{path}: {moved.stderr.strip()[:80]}")
+            errors.append(f"{path}: {(moved.stderr.strip() or 'gio trash failed')[:80]}")
     if errors:
         out({"ok": False, "error": "; ".join(errors[:3]), "freed": freed})
     out({"ok": True, "freed": freed})
 
 
+def main(args):
+    try:
+        if args == ["scan"]:
+            cmd_scan()
+        elif len(args) >= 2 and args[0] == "clean":
+            cmd_clean(args[1:])
+        elif len(args) >= 2 and args[0] == "plan":
+            cmd_plan(args[1:])
+        elif args[:1] == ["ai"] and len(args) <= 2:
+            cmd_ai(args[1] if len(args) == 2 else "haiku")
+        elif len(args) >= 2 and args[0] == "trash":
+            cmd_trash(args[1:])
+        fail("usage: cleaner.py scan | clean <id>… | plan <id>… | ai [model] | trash <path>…")
+    except (OSError, ValueError, RuntimeError) as e:
+        fail(str(e))
+
+
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    if args == ["scan"]:
-        cmd_scan()
-    elif len(args) >= 2 and args[0] == "clean":
-        cmd_clean(args[1:])
-    elif len(args) >= 2 and args[0] == "plan":
-        cmd_plan(args[1:])
-    elif args[:1] == ["ai"] and len(args) <= 2:
-        cmd_ai(args[1] if len(args) == 2 else "haiku")
-    elif len(args) >= 2 and args[0] == "trash":
-        cmd_trash(args[1:])
-    out({"ok": False, "error": "usage: cleaner.py scan | clean <id>… | plan <id>… | ai [model] | trash <path>…"})
+    main(sys.argv[1:])

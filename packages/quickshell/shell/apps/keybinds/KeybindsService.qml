@@ -73,7 +73,9 @@ Singleton {
 
   function keysOf(b) {
     const keys = mods.filter(m => b.modmask & m[0]).map(m => m[1]);
-    const k = keyNames[b.key.toLowerCase()] ?? (b.key.length === 1 ? b.key.toUpperCase() : b.key);
+    const name = b.key.toLowerCase();
+    const k = Object.prototype.hasOwnProperty.call(keyNames, name)
+      ? keyNames[name] : (b.key.length === 1 ? b.key.toUpperCase() : b.key);
     return keys.concat([k]);
   }
 
@@ -84,7 +86,7 @@ Singleton {
   }
 
   function build(list) {
-    const byGroup = {};
+    const byGroup = Object.create(null);
     for (const b of list) {
       const desc = b.has_description ? b.description : "";
       const cut = desc.indexOf(" · ");
@@ -94,11 +96,11 @@ Singleton {
       if (!byGroup[group]) byGroup[group] = [];
       byGroup[group].push({ what: what, keys: keysOf(b) });
     }
-    const order = Object.keys(places).concat(Object.keys(byGroup).filter(g => !(g in places)));
+    const order = Object.keys(places).concat(Object.keys(byGroup).filter(g => !Object.prototype.hasOwnProperty.call(places, g)));
     const out = [];
     for (const g of order) {
       if (!byGroup[g]) continue;
-      const place = places[g] ?? ["desktop", g];
+      const place = Object.prototype.hasOwnProperty.call(places, g) ? places[g] : ["desktop", g];
       for (const b of fold(byGroup[g])) out.push({ tab: place[0], section: place[1], what: b.what, keys: b.keys });
     }
     return out.concat(modeHints());
@@ -150,7 +152,7 @@ Singleton {
   // "Go to 1" … "Go to 10" on Super+1 … Super+0 → "Go to 1–10" on Super, 1…0
   function fold(binds) {
     const out = [];
-    const runs = {};
+    const runs = Object.create(null);
     for (const b of binds) {
       const m = b.what.match(/^(.*?)(\d+)$/);
       const last = b.keys[b.keys.length - 1];

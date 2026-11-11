@@ -105,6 +105,15 @@ Singleton {
   property string adding: ""
   property string addingTheme: ""
   property string addingOutput: ""
+
+  function failAdd(message) {
+    adding = "";
+    addingTheme = "";
+    addingOutput = "";
+    error = message || "could not start wallpaper copy";
+    busy = false;
+  }
+
   function add(path, theme, output) {
     const src = path.trim().replace(/^~(?=\/)/, Quickshell.env("HOME"));
     if (busy || src === "") return;
@@ -122,13 +131,30 @@ Singleton {
   Process {
     id: copyProc
     stderr: StdioCollector { id: copyErr }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.failAdd("could not start wallpaper copy");
+    }
     onExited: code => {
-      root.busy = false;
+      const rel = root.adding;
+      const theme = root.addingTheme;
+      const output = root.addingOutput;
+      root.adding = "";
+      root.addingTheme = "";
+      root.addingOutput = "";
       if (code === 0) {
-        root.choose(root.addingTheme, root.adding, root.addingOutput);
+        root.choose(theme, rel, output);
+        root.error = "";
+        root.busy = false;
         root.added();
       }
-      else root.error = copyErr.text.trim() || "copy failed";
+      else {
+        root.error = copyErr.text.trim() || "copy failed";
+        root.busy = false;
+      }
     }
   }
 }

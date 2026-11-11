@@ -34,6 +34,14 @@ KitFrame {
     }
   }
 
+  Connections {
+    target: ClipboardService
+    function onCopied(id) {
+      root.copiedId = id;
+      copiedTimer.restart();
+    }
+  }
+
   function when(time) {
     const d = new Date(time * 1000);
     const today = d.toDateString() === new Date().toDateString();
@@ -202,9 +210,9 @@ KitFrame {
               cursorShape: Qt.PointingHandCursor
               drag.target: dragProxy
               onClicked: {
+                root.copiedId = "";
+                copiedTimer.stop();
                 ClipboardService.copy(item.modelData.id);
-                root.copiedId = item.modelData.id;
-                copiedTimer.restart();
               }
             }
 

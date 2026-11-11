@@ -481,6 +481,7 @@ Item {
   // ---- keys ----
   property string lastView: "compact"
   onViewChanged: {
+    if (lastView === "launcher" && view !== "launcher") islandLauncher.closePanel();
     if (lastView === "root" && view !== "root") {
       if (RootService.asking) RootService.stop();
       else if (RootService.pending && !RootService.running) RootService.cancel();

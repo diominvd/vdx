@@ -63,10 +63,31 @@ Singleton {
 
   function percent(now, before) {
     const total = now[0] - before[0], idle = now[1] - before[1];
-    return total > 0 ? Math.round(100 * (total - idle) / total) : 0;
+    return total > 0 ? Math.max(0, Math.min(100, Math.round(100 * (total - idle) / total))) : 0;
+  }
+
+  function validSnapshot(s) {
+    const number = n => typeof n === "number" && isFinite(n) && n >= 0;
+    const object = o => o !== null && typeof o === "object" && !Array.isArray(o);
+    const numbers = a => Array.isArray(a) && a.every(number);
+    if (!object(s) || !Array.isArray(s.cpu) || s.cpu.length === 0
+        || !s.cpu.every(c => numbers(c) && c.length === 2 && c[1] <= c[0])
+        || !number(s.uptime)) return false;
+    if (s.mem === undefined) return true;
+    return object(s.mem) && ["total", "available", "swapTotal", "swapFree"].every(k => number(s.mem[k]))
+      && s.mem.available <= s.mem.total && s.mem.swapFree <= s.mem.swapTotal
+      && number(s.freq) && numbers(s.load) && s.load.length === 3
+      && (s.igpu === null || (object(s.igpu) && number(s.igpu.cur) && number(s.igpu.max)))
+      && object(s.dgpu) && typeof s.dgpu.state === "string"
+      && object(s.temps) && Array.isArray(s.temps.nvme) && numbers(s.fans)
+      && Array.isArray(s.disks) && s.disks.every(d => object(d) && typeof d.mount === "string"
+        && number(d.size) && number(d.used))
+      && (s.net === null || (object(s.net) && typeof s.net.iface === "string" && number(s.net.rx) && number(s.net.tx)))
+      && object(s.io) && number(s.io.read) && number(s.io.write);
   }
 
   function take(s) {
+    if (!validSnapshot(s)) return false;
     const now = Date.now();
     const prev = last;
     if (prev && prev.cpu?.length === s.cpu.length) {
@@ -98,6 +119,7 @@ Singleton {
     }
     // a cpu-only snapshot keeps the full one's other counters for the next diff
     last = s.mem ? Object.assign({}, s, { fullAt: now }) : Object.assign({}, prev ?? {}, { cpu: s.cpu });
+    return true;
   }
 
   Timer {

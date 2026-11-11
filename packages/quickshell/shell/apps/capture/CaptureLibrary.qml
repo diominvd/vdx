@@ -19,6 +19,8 @@ Item {
   property string sortKey: "date"
   property bool sortDesc: true
   property string selectedPath: ""
+  property string error: ""
+  property bool refreshPending: false
   // the first press asks again; a second press within a few seconds moves them all
   property bool confirming: false
 
@@ -80,6 +82,9 @@ Item {
   }
 
   function refresh() {
+    if (list.running || list.started) { refreshPending = true; return; }
+    refreshPending = false;
+    error = "";
     loading = true;
     list.running = true;
   }
@@ -105,28 +110,24 @@ Item {
   // every file in the library goes to the trash (gio trash keeps it recoverable),
   // not only the rows the search shows
   function clearAll() {
+    if (CaptureService.trashPending) { confirming = false; confirmTimer.stop(); return; }
     if (!confirming) { confirming = true; confirmTimer.restart(); return; }
     confirming = false;
     const paths = items.map(i => i.path);
     if (paths.length === 0) return;
-    Quickshell.execDetached(["sh", "-c", 'for f in "$@"; do gio trash -- "$f"; done; notify-send -a Capture "Library cleared" "$# files moved to trash"', "sh"].concat(paths));
-    selectedPath = "";
-    reloadTimer.restart();
+    error = "";
+    CaptureService.moveToTrash(paths);
   }
 
   // the selected file, one at a time
   function trashSelected() {
-    if (!selected) return;
-    Quickshell.execDetached(["gio", "trash", "--", selected.path]);
-    selectedPath = "";
-    reloadTimer.restart();
+    if (!selected || CaptureService.trashPending) return;
+    error = "";
+    CaptureService.moveToTrash([selected.path]);
   }
 
   function select(path) {
     selectedPath = path;
-    if (path === "") return;
-    const item = items.find(i => i.path === path);
-    if (item && item.video) probe.path = path;
   }
   onSelectedPathChanged: preview.contentY = 0
 
@@ -137,12 +138,14 @@ Item {
     onTriggered: root.confirming = false
   }
 
-  // gio trash runs outside this process, so the list is read again once it is done
-  Timer {
-    id: reloadTimer
-
-    interval: 800
-    onTriggered: root.refresh()
+  Connections {
+    target: CaptureService
+    function onTrashFinished(result) {
+      root.error = CaptureService.trashError;
+      if (result.moved.length === 0) return;
+      if (result.moved.includes(root.selectedPath)) root.selectedPath = "";
+      root.refresh();
+    }
   }
 
   Column {
@@ -159,7 +162,14 @@ Item {
 
     KitInput {
       placeholder: "Search by name…"
+      text: root.query
       onTextEdited: root.query = text
+    }
+
+    KitText {
+      visible: root.error !== "" || CaptureService.trashError !== ""
+      color: Theme.red
+      text: root.error !== "" ? root.error : CaptureService.trashError
     }
 
     // the column heads: the active one carries its direction
@@ -426,26 +436,37 @@ Item {
     property string next: ""
     property string nextVideo: ""
     property bool ready: false
+    property bool started: false
+    property int exitCode: -1
+    property string requestVideo: ""
 
     function make(video, png) {
       ready = false;
       next = png;
       nextVideo = video;
-      if (!running) start();
+      if (!running && !started) start();
     }
 
     function start() {
+      if (next === "" || running || started) return;
       target = next;
+      requestVideo = nextVideo;
       command = ["sh", "-c", 'mkdir -p "$1" && { [ -s "$2" ] || ffmpegthumbnailer -i "$3" -o "$2" -s 512 -t 10; }',
-                 "sh", root.thumbDir, next, nextVideo];
+                 "sh", root.thumbDir, target, requestVideo];
+      started = false;
+      exitCode = -1;
       running = true;
     }
 
-    // the selection moved on while it ran: make the new one; else it is in
-    // when the file is there
-    onExited: code => {
-      if (next !== target) { start(); return; }
-      ready = code === 0;
+    onStarted: started = true
+    onExited: code => exitCode = code
+    onRunningChanged: {
+      if (running) return;
+      if (started) {
+        started = false;
+        if (next === target) ready = exitCode === 0;
+      }
+      if (next !== target && next !== "") start();
     }
   }
 
@@ -455,22 +476,47 @@ Item {
 
     property string path: ""
     property real seconds: 0
+    property string requestPath: ""
+    property string replyText: ""
+    property bool started: false
+    property int exitCode: -1
+
+    function start() {
+      if (path === "" || running || started) return;
+      requestPath = path;
+      replyText = "";
+      exitCode = -1;
+      command = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", requestPath];
+      started = false;
+      running = true;
+    }
 
     stdout: StdioCollector {
-      onStreamFinished: probe.seconds = Number(text.trim()) || 0
+      onStreamFinished: probe.replyText = text
     }
-    // the command is set here, not bound: the binding would still hold the last path
+    onStarted: started = true
+    onExited: code => exitCode = code
+    onRunningChanged: {
+      if (running) return;
+      if (started) {
+        started = false;
+        if (requestPath === path) {
+          const value = Number(replyText.trim());
+          seconds = exitCode === 0 && isFinite(value) && value >= 0 ? value : 0;
+        }
+      }
+      if (requestPath !== path && path !== "") start();
+    }
     onPathChanged: {
       seconds = 0;
-      if (path === "") return;
-      command = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path];
-      running = true;
+      if (path !== "" && !running && !started) start();
     }
   }
 
   // the picture follows the selection: a recording's frame is made when it is picked
   onSelectedChanged: {
-    if (!selected || !selected.video) { thumbs.ready = false; return; }
+    probe.path = selected && selected.video ? selected.path : "";
+    if (!selected || !selected.video) { thumbs.ready = false; thumbs.next = ""; return; }
     const png = thumbDir + "/" + selected.name.replace(/\.mp4$/, "") + ".png";
     if (png === thumbs.target && thumbs.ready) return;     // the list was read again
     thumbs.make(selected.path, png);
@@ -478,6 +524,17 @@ Item {
 
   Process {
     id: list
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) started = false;
+      else {
+        root.loading = false;
+        root.error = "Could not start capture library listing";
+      }
+      if (root.refreshPending) { root.refreshPending = false; root.refresh(); }
+    }
 
     command: ["sh", "-c", 'find "$1" "$2" -maxdepth 1 -type f \\( -name "*.png" -o -name "*.mp4" \\) -printf "%T@ %s %p\\n" 2>/dev/null | sort -u | sort -rn | head -200',
               "sh", CaptureService.shotDir, CaptureService.videoDir]
@@ -491,6 +548,8 @@ Item {
                       video: m[3].endsWith(".mp4") });
         }
         root.items = rows;
+        if (root.selectedPath !== "" && !rows.some(row => row.path === root.selectedPath)) root.selectedPath = "";
+        root.error = "";
         root.loading = false;
       }
     }

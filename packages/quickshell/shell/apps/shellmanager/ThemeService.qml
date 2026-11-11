@@ -23,13 +23,79 @@ Singleton {
   property string current: ""
   property bool busy: false
   property string applying: ""              // the theme being switched to
-  property string error: ""
+  property string listError: ""
+  property string applyError: ""
+  readonly property string error: applyError || listError
   // the curtain (components/ThemeCurtain) hides the switch: up while applying and
   // until the new colours are read, in the new theme's background
   property bool covering: false
   property color coverColor: Theme.background0
 
   function refresh() { if (!listProc.running) listProc.running = true; }
+
+  function failApply(message) {
+    applying = "";
+    applyError = message || "could not start theme change";
+    covering = false;
+    coverSafety.stop();
+    busy = false;
+  }
+
+  function finishApply(code, message) {
+    applying = "";
+    if (code !== 0) {
+      applyError = message || "install.py theme set failed";
+      covering = false;
+      coverSafety.stop();
+    }
+    refresh();
+    busy = false;
+  }
+
+  function acceptList(text) {
+    const separator = "\n---\n";
+    const splitAt = text.indexOf(separator);
+    if (splitAt < 0 || splitAt !== text.lastIndexOf(separator)) {
+      listError = "bad theme list reply";
+      return false;
+    }
+
+    const listText = text.slice(0, splitAt);
+    const active = text.slice(splitAt + separator.length).trim();
+    if (!active || /[\r\n]/.test(active)) {
+      listError = "bad theme list reply";
+      return false;
+    }
+
+    const colors = Object.create(null);
+    const names = [];
+    for (const line of listText.split("\n")) {
+      if (!line) continue;
+      const fields = line.split(" ");
+      const name = fields.shift();
+      if (!name || /\s/.test(name) || fields.length !== root.roles.length
+          || names.includes(name) || !fields.every(value => /^#[0-9a-fA-F]{6}$/.test(value))) {
+        listError = "bad theme list reply";
+        return false;
+      }
+      const roleColors = {};
+      root.roles.forEach((role, i) => roleColors[role] = fields[i]);
+      colors[name] = roleColors;
+      names.push(name);
+    }
+    if (!names.includes(active)) {
+      listError = "bad theme list reply";
+      return false;
+    }
+
+    root.colors = colors;
+    // The default theme leads the list; the rest keep their order.
+    root.themes = names.filter(n => n === "default").concat(names.filter(n => n !== "default"));
+    root.current = active;
+    Theme.live = colors[active];
+    root.listError = "";
+    return true;
+  }
 
   // ---- light and dark ----
   // a theme "<name>-light" is <name>'s light twin (themes/mktheme.py); the mode is the active one's
@@ -49,7 +115,7 @@ Singleton {
     if (busy || name === current) return;
     busy = true;
     applying = name;
-    error = "";
+    applyError = "";
     coverColor = colors[name]?.background0 ?? Theme.background0;
     covering = true;
     coverSafety.restart();
@@ -76,23 +142,16 @@ Singleton {
   Process {
     id: listProc
     command: ["bash", Paths.scriptsDir + "/themes.sh"]
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.listError = "could not start theme list query";
+    }
     stdout: StdioCollector {
       onStreamFinished: {
-        const [list, active] = text.split("---\n");
-        const colors = {};
-        const names = [];
-        for (const line of list.split("\n").filter(l => l !== "")) {
-          const [name, ...values] = line.split(" ");
-          names.push(name);
-          const roleColors = {};
-          root.roles.forEach((role, i) => roleColors[role] = values[i] ?? "#000000");
-          colors[name] = roleColors;
-        }
-        root.colors = colors;
-        // the default theme leads the list, the rest keep their order
-        root.themes = names.filter(n => n === "default").concat(names.filter(n => n !== "default"));
-        root.current = (active ?? "").trim();
-        Theme.live = colors[root.current] ?? ({});
+        root.acceptList(text);
         if (!root.busy) uncover.restart();
       }
     }
@@ -101,11 +160,15 @@ Singleton {
   Process {
     id: setProc
     stderr: StdioCollector { id: setErr }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.failApply("could not start theme change");
+    }
     onExited: code => {
-      root.busy = false;
-      root.applying = "";
-      if (code !== 0) root.error = setErr.text.trim() || "install.py theme set failed";
-      root.refresh();
+      root.finishApply(code, setErr.text.trim());
     }
   }
 }

@@ -17,8 +17,16 @@ commit", "Before a push"): [repo/commits.md](../repo/commits.md) — not repeate
 | `python tests/check_shell_ui.py` | offscreen QML behaviour: shared controls, keyboard, disabled/busy states, inline selects, grouping, layout copies and backend reply parsing |
 | `python -m unittest tests.test_overview` | Overview: workspace gaps, wide/narrow insertion slots, shared placement, Lua width policy and focus restoration, production QML drag/cancel/drop/failure and card lifetime with an isolated compositor stub |
 | `python -m unittest tests.test_files_actions` | production FilesActions with real Quickshell child processes, an isolated runtime and a fake backend: FIFO, reply isolation, failure, cancellation and completion reentrancy |
+| `python -m unittest tests.test_fonts tests.test_font_service` | Fonts: required fontconfig command failures, JSON errors, optional reload failures, reply validation, process-start recovery and install/apply sequencing in isolated fixtures |
+| `python -m unittest tests.test_backend tests.test_cursors tests.test_cursor_service tests.test_themes_list tests.test_appearance_process_start tests.test_shellapps tests.test_shellapps_service` | Shared checked commands, cursor/state validation and stale previews, theme-list output, appearance process recovery and Shell apps validation |
+| `python -m unittest tests.test_tasks tests.test_taskmanager_service tests.test_virustotal tests.test_virustotal_service` | Positive PID targeting and PID reuse, atomic task samples, exact upload snapshots and API/service failures; fake processes and APIs |
+| `python -m unittest tests.test_clipboard_backend tests.test_clipboard_service tests.test_clipboard_process_start` | Temporary clipboard storage, paths with spaces, command failures, FIFO mutations, copy completion and history validation |
+| `python -m unittest tests.test_cleaner tests.test_cleaner_service tests.test_backup_service` | Cleaner command/AI validation, action ownership, backup job handoff, stale folder results, clipboard stdin and failed configuration writes |
+| `python -m unittest tests.test_music_lifecycle tests.test_music_services tests.test_capture_window_lifecycle tests.test_keybinds tests.test_markup` | Music request ownership and recovery, hidden-view construction/destruction, retained navigation, keybind grouping and literal unknown entities |
+| `python -m unittest tests.test_launcher_service tests.test_launcher_lifecycle tests.test_packages_service tests.test_packages_progress tests.test_packages_process_start tests.test_sysmon_service` | Serialized literal file search, lazy floating Launcher, retained navigation, package plan/query validation and metric snapshot validation |
 | `python -m unittest tests.test_capture_recorder` | production recorder lifecycle offscreen, with a fake recorder: delayed cancellation, request snapshots, overlap guards, output verification, pause/resume and restart |
 | `python -m unittest tests.test_capture_save tests.test_capture_saver tests.test_capture_clipboard` | Save as backend, production model and clipboard phase: retry, replacement confirmation, queued requests, discard, cross-filesystem copies and partial-output cleanup, all in temporary directories |
+| `python -m unittest tests.test_capture_library tests.test_ai_services tests.test_module_recovery` | Service-owned Capture trash with partial failures and stale preview rejection; AI reply/cache validation and failed starts; Focus confirmation, Mihomo action recovery and provider request isolation |
 | `git ls-files '*.sh' \| grep -v ^packages/nvim \| xargs shellcheck -S warning` | shell scripts |
 | `tests/fresh-machine.sh [defaults \| component…]` | clean Arch in podman: setup, doctor, verify, second setup, uninstall (slow) |
 
@@ -68,12 +76,38 @@ Each area lists the scenarios it touches; these are the shared base.
 
 ## Known limits
 
-### Audit checkpoint (2026-10-30)
+### Service and view audit (2026-11-11)
 
-Current validation: 291 Python tests and 102 QML cases. Full repository checks
-and Python lint pass.
-These counts include baseline tests; they do not imply
-that every shell function or desktop scenario has been reviewed.
+The focused fixtures above cover the changed request ownership, startup failure,
+reply validation and lazy-view paths. They use fake child processes, API replies
+and temporary state; no real clipboard, package, backup, root or upload action is
+required. This is an audit of those paths, not proof that every function or
+hardware scenario has been reviewed.
+
+The theme-list rewrite preserved the production list byte for byte across 28
+themes. In one comparable local run, elapsed time fell from 0.712 s to 0.080 s
+and child CPU time from 1.100 s to 0.080 s. These are local measurements, not a
+startup or memory guarantee for the whole shell. Lazy-view fixtures verify
+construction, destruction and retained navigation, not GPU rendering.
+
+Remaining desktop checks include floating/Island handoff and focus, animated
+close/reopen, restored Capture video previews and real music playback.
+
+Capture library trash now belongs to the service, which reports completion and
+partial failure; closing the view does not drop accepted requests. Preview
+queries discard obsolete results. AI services preserve validated state across
+query failures; Focus confirms mode changes and Mihomo recovers failed actions
+without publishing obsolete provider results. These fixtures do not exercise
+real service changes, authentication, subscriptions or media tools. Live log
+inspection supplements the fixtures but does not replace the desktop scenarios
+above.
+
+### Historical audit checkpoint (2026-10-30)
+
+The following records validation, coverage notes, and open work reported at
+this checkpoint. The test counts and results are historical; consult current
+test output before relying on them. Counts include baseline tests and do not
+show that every shell function or desktop scenario has been reviewed.
 
 | Reviewed area | Automated coverage |
 |---|---|
@@ -125,7 +159,8 @@ switch, real GPU capture and screen-copy rendering, save overlays, real
 polkit, PAM and Wayland lock-screen lifecycles, and real devices. Passing
 the automated checks does not cover these scenarios.
 
-Current remaining audit map (baseline tests are not a per-function review):
+Remaining audit map recorded at the 2026-10-30 checkpoint (baseline tests are
+not a per-function review):
 
 | Area | Status / remaining work |
 |---|---|
@@ -138,30 +173,14 @@ Current remaining audit map (baseline tests are not a per-function review):
 | Other apps and background services | Task grouping, tree traversal, Packages queries, Backup status, and Clipboard process starts reviewed; other app actions and failure states remain |
 | Final verification | Both bar styles, theme/settings combinations and measured performance |
 
-### Resume here
+### Continuing an audit
 
-Continue on `redesign/strict-style`; inspect status and recent commits before
-editing. Automated code review now covers the shared UI harness and focused
-recovery paths across Files, Packages, Backup, Capture, Clipboard and Lock.
-Remaining work is bounded to the manual environment checks below and a focused
-pass over other app actions; do not reopen the completed Wi-Fi recovery pass.
-
-Manual checks that need the owner's actual devices/session: real portal chooser
-routing and USB attach/eject; GPU capture and overlays; PAM, polkit and Wayland
-lock crash/reload; compositor focus, style transitions and monitor hotplug;
-Bluetooth discovery/device removal and battery hardware/permissions. The
-current environment has no reachable Hyprland control socket and no removable
-USB block device, so those checks could not be run here. The remaining code
-review is app actions/failure states and a final performance/theme matrix.
-
-Do not open keyboard-grabbing overlays while the owner is typing or run real
-root/device/network mutations merely to exercise a test. New production files
-must be linked before consumers reference them. Use the existing fake-backend
-fixtures and `tests/qml_runtime.py`; QML case totals include harness lifecycle
-cases. Run `./install.py check`, `ruff check`, inspect the staged diff for
-secrets, update these coverage notes, and report those results before committing.
-
-- The agent cannot see the screen unless it takes a screenshot; visual checks
-  are the owner's unless asked (token cost).
-- Overlays that grab the keyboard are not tested while the owner types.
-- `sudo` steps (`system install`) are run by the owner.
+Check the current branch, worktree status, and relevant recent changes before
+choosing the next review area. Run the checks relevant to that work and record
+their actual output; treat the checkpoint above as historical context, not a
+current audit plan. Reassess the manual scenarios against the available
+session and hardware. Do not open keyboard-grabbing overlays while the owner
+is typing or run real root/device/network mutations merely to exercise a test. Use existing
+fake-backend fixtures and `tests/qml_runtime.py` where applicable. The agent
+cannot see the screen without a screenshot, and `system install` steps require
+the owner.

@@ -12,6 +12,7 @@ function plain(text) {
       const code = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
       return code <= 0x10ffff ? String.fromCodePoint(code) : m;   // past Unicode it throws: keep it as sent
     }
-    return entities[e.toLowerCase()] || m;
+    const name = e.toLowerCase();
+    return Object.prototype.hasOwnProperty.call(entities, name) ? entities[name] : m;
   });
 }

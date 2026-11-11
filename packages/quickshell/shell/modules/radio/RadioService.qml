@@ -23,7 +23,7 @@ Singleton {
   readonly property string stationName: stations.find(s => s.key === resumeKey)?.name ?? ""
 
   // ---- favourites: the station keys starred in the Music window (music.favoriteStations) ----
-  readonly property var favorites: ModuleSettings.get("music", "favoriteStations", [])
+  readonly property var favorites: ModuleSettings.strings("music", "favoriteStations", [])
   readonly property var favoriteStations: stations.filter(s => favorites.includes(s.key))
 
   function isFavorite(key) { return favorites.includes(key); }
@@ -35,7 +35,18 @@ Singleton {
 
   function popupShown() {
     MpdService.error = "";
-    MpdService.run(stationsProc, ["--stations"]);
+    if (!stationsProc.running) MpdService.run(stationsProc, ["--stations"]);
+  }
+
+  function validStations(rows) {
+    return Array.isArray(rows) && rows.every(s => s && typeof s.key === "string"
+      && typeof s.name === "string" && typeof s.genre === "string" && typeof s.about === "string");
+  }
+
+  function acceptStations(rows) {
+    if (!validStations(rows)) return false;
+    stations = rows;
+    return true;
   }
 
   function play(key) {
@@ -55,8 +66,18 @@ Singleton {
 
   Process {
     id: stationsProc
+    property var reply: null
+    property bool started: false
+    onStarted: { started = true; reply = null; }
+    onRunningChanged: {
+      if (running) return;
+      if (started) {
+        started = false;
+        if (!root.acceptStations(reply)) MpdService.error = "bad radio stations reply";
+      } else MpdService.error = "could not start radio stations query";
+    }
     stdout: StdioCollector {
-      onStreamFinished: root.stations = MpdService.parseList(text)
+      onStreamFinished: stationsProc.reply = MpdService.parseList(text)
     }
   }
 }

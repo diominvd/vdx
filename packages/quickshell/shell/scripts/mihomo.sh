@@ -117,12 +117,25 @@ cmd_nodes() {
 
 cmd_select() {
     local node="${1:-}" group
-    [[ -z "$node" ]] && return 0
+    if [[ -z "$node" ]]; then
+        error "no node selected"
+        return 1
+    fi
     group="$(group_name)"
-    [[ -z "$group" ]] && return 0
-    curl -sf --max-time "$TIMEOUT" -X PUT "$API/proxies/$group" \
+    if [[ -z "$group" ]]; then
+        error "proxy group not found"
+        return 1
+    fi
+    local code
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time "$TIMEOUT" -X PUT "$API/proxies/$group" \
         -H 'Content-Type: application/json' \
-        -d "$(jq -nc --arg n "$node" '{name:$n}')" >/dev/null 2>&1 || true
+        -d "$(jq -nc --arg n "$node" '{name:$n}')" 2>/dev/null || true)"
+    if [[ "$code" == "200" || "$code" == "204" ]]; then
+        jq -cn '{ok:true}'
+    else
+        error "node selection failed (HTTP ${code:-000})"
+        return 1
+    fi
 }
 
 cmd_ping() {

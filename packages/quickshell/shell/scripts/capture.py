@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 
-from backend import fail, out
+from backend import fail, out, run
 
 
 def copy_exclusive(source, target):
@@ -85,6 +85,29 @@ def clipboard(source):
     return {"ok": True}
 
 
+def trash(paths):
+    if not paths:
+        raise ValueError("At least one capture path is required")
+    moved, failed = [], []
+    for raw_path in paths:
+        path = str(raw_path)
+        try:
+            if not Path(path).is_absolute():
+                raise ValueError("Use an absolute file path")
+            source = Path(path)
+            if source.is_dir() and not source.is_symlink():
+                raise ValueError("Capture path is a directory")
+            result = run(["gio", "trash", "--", path], timeout=30)
+            if result is None:
+                raise RuntimeError("gio is unavailable or timed out")
+            if result.returncode:
+                raise RuntimeError(result.stderr.strip() or "gio trash failed")
+            moved.append(path)
+        except (OSError, ValueError, RuntimeError) as error:
+            failed.append({"path": path, "error": str(error)})
+    return {"ok": not failed, "moved": moved, "failed": failed}
+
+
 def main():
     args = sys.argv[1:]
     try:
@@ -95,8 +118,10 @@ def main():
             out({"ok": True})
         elif len(args) == 2 and args[0] == "clipboard":
             out(clipboard(args[1]))
+        elif len(args) >= 2 and args[0] == "trash":
+            out(trash(args[1:]))
         else:
-            fail("usage: capture.py save <temporary> <absolute target> [replace] | discard/clipboard <temporary>")
+            fail("usage: capture.py save <temporary> <absolute target> [replace] | discard/clipboard <temporary> | trash <absolute path>...")
     except (OSError, ValueError, subprocess.TimeoutExpired) as error:
         fail(str(error))
 

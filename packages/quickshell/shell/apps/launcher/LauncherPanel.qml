@@ -20,6 +20,7 @@ KitFrame {
   readonly property bool english: ModuleSettings.get("launcher", "english", true)
   property string tab: "apps"
   property int current: 0
+  property bool closed: false
   readonly property string query: field.text.trim().toLowerCase()
   readonly property var tabs: ls.tabs
   readonly property var items: tab === "apps" ? ls.apps(query)
@@ -31,12 +32,33 @@ KitFrame {
   signal finished()
 
   // opened: the settings' list, the search cleared (if so set), the English layout, the field focused
-  function reset() {
-    if (clearOnClose) field.text = "";
+  function saveState() {
+    return { tab, query: field.text, current };
+  }
+
+  function reset(state) {
+    closed = false;
+    const keep = !clearOnClose && state && typeof state === "object";
+    if (keep) {
+      const savedTab = state.tab;
+      tab = tabs.some(t => t.value === savedTab) ? savedTab : (tabs.some(t => t.value === opens) ? opens : tabs[0].value);
+      field.text = typeof state.query === "string" ? state.query : "";
+      current = Number.isInteger(state.current) ? state.current : 0;
+    } else {
+      if (clearOnClose) field.text = "";
+      tab = tabs.some(t => t.value === opens) ? opens : tabs[0].value;
+      current = 0;
+    }
     if (english) Hypr.englishLayout();
-    tab = tabs.some(t => t.value === opens) ? opens : tabs[0].value;
-    current = 0;
+    filesTimer.stop();
+    if (tab === "files") filesTimer.restart();
     field.input.forceActiveFocus();
+  }
+
+  function closePanel() {
+    closed = true;
+    filesTimer.stop();
+    ls.cancelFileSearch();
   }
 
   function runAt(i) {
@@ -55,16 +77,17 @@ KitFrame {
   onTabChanged: {
     current = 0;
     filesTimer.stop();
+    if (closed) return;
     if (tab === "files") filesTimer.restart();
-    else ls.searchFiles("");
+    else ls.cancelFileSearch();
   }
-  onQueryChanged: { current = 0; if (tab === "files") filesTimer.restart(); }
+  onQueryChanged: { current = 0; if (!closed && tab === "files") filesTimer.restart(); }
   onCurrentChanged: list.positionViewAtIndex(current, ListView.Contain)
 
   Timer {
     id: filesTimer
     interval: 200
-    onTriggered: root.ls.searchFiles(root.query)
+    onTriggered: if (!root.closed && root.tab === "files") root.ls.searchFiles(root.query)
   }
 
   KitInput {
@@ -104,7 +127,7 @@ KitFrame {
       anchors.centerIn: parent
       visible: root.items.length === 0
       color: Theme.muted
-      text: root.tab === "files" ? (root.ls.searching ? "Searching…" : root.query.length < 2 ? "Type two letters or more." : "Nothing matches")
+      text: root.tab === "files" ? (root.ls.searching ? "Searching…" : root.ls.fileError !== "" ? root.ls.fileError : root.query.length < 2 ? "Type two letters or more." : "Nothing matches")
                                  : "Nothing matches"
     }
 

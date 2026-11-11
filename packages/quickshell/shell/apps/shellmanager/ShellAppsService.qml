@@ -77,11 +77,71 @@ Singleton {
 
   function refresh() { if (!listProc.running) listProc.running = true; }
 
+  function finite(value) { return typeof value === "number" && isFinite(value); }
+
+  function object(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+
+  function pairs(value) {
+    return object(value) && Object.keys(value).every(key => Array.isArray(value[key])
+      && value[key].length === 2 && finite(value[key][0]) && finite(value[key][1]));
+  }
+
+  function validSettings(s, presets, spots, minW, minH) {
+    if (!object(s) || !["floating", "tiled"].includes(s.mode)
+        || !["default", "preset", "custom"].includes(s.size)
+        || !["small", "medium", "large"].includes(s.preset)
+        || !Object.prototype.hasOwnProperty.call(presets, s.preset)
+        || !(Object.prototype.hasOwnProperty.call(spots, s.position)
+          || s.position === "cursor" || s.position === "custom")) return false;
+    if (![s.width, s.height, s.x, s.y].every(value => finite(value) && Number.isInteger(value))) return false;
+    if (s.size === "custom" && (s.width < minW || s.height < minH)) return false;
+    if (s.position === "custom" && (s.x < 0 || s.y < 0)) return false;
+    return true;
+  }
+
+  function acceptListReply(r) {
+    if (r?.ok !== true) {
+      if (errorApp === "")
+        error = typeof r?.error === "string" && r.error !== "" ? r.error : "could not read shell apps";
+      return false;
+    }
+    const minW = r.minWidth, minH = r.minHeight;
+    if (!Array.isArray(r.apps) || !pairs(r.presets) || !pairs(r.spots)
+        || !finite(minW) || minW <= 0 || !finite(minH) || minH <= 0
+        || !finite(r.gap) || r.gap < 0 || !finite(r.top) || r.top < 0
+        || !r.apps.every(app => app && typeof app.id === "string" && typeof app.title === "string"
+          && typeof app.icon === "string" && typeof app.ipc === "string"
+          && finite(app.width) && app.width > 0 && finite(app.height) && app.height > 0
+          && validSettings(app.settings, r.presets, r.spots, minW, minH))) {
+      if (errorApp === "") error = "bad shell apps list reply";
+      return false;
+    }
+    windows = r.apps;
+    presets = r.presets;
+    minWidth = minW;
+    minHeight = minH;
+    spots = r.spots;
+    gap = r.gap;
+    top = r.top;
+    if (errorApp === "") error = "";
+    return true;
+  }
+
+  function failSet(message) {
+    const failedApp = busyApp;
+    errorApp = failedApp;
+    busyApp = "";
+    error = typeof message === "string" && message !== "" ? message : "shell app action failed";
+    busy = false;
+    refresh();
+  }
+
   function set(app, change) {
     if (busy) return;
     busy = true;
     busyApp = app.id;
     error = "";
+    errorApp = "";
     setProc.command = ["python3", script, "set", app.id, JSON.stringify(change)];
     setProc.running = true;
   }
@@ -97,16 +157,15 @@ Singleton {
     command: ["python3", root.script, "list"]
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        if (!r.ok) { root.error = r.error; return; }
-        root.windows = r.apps;
-        root.presets = r.presets;
-        root.minWidth = r.minWidth;
-        root.minHeight = r.minHeight;
-        root.spots = r.spots;
-        root.gap = r.gap;
-        root.top = r.top;
+        root.acceptListReply(root.parse(text));
       }
+    }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      if (root.errorApp === "") root.error = "could not start shell apps list query";
     }
   }
 
@@ -115,11 +174,23 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const r = root.parse(text);
-        root.busy = false;
-        if (!r.ok) { root.error = r.error; root.errorApp = root.busyApp; }
+        if (r?.ok !== true) {
+          root.failSet(typeof r?.error === "string" && r.error !== "" ? r.error : "shell app action failed");
+          return;
+        }
         root.busyApp = "";
+        root.error = "";
+        root.errorApp = "";
+        root.busy = false;
         root.refresh();
       }
+    }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.failSet("could not start shell app action");
     }
   }
 }

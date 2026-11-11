@@ -60,7 +60,8 @@ def read_proc(pid):
     # comm may hold spaces and parens: it ends at the last ')'
     comm = stat[stat.index("(") + 1:stat.rindex(")")]
     fields = stat[stat.rindex(")") + 2:].split()
-    ppid, utime, stime, threads = int(fields[1]), int(fields[11]), int(fields[12]), int(fields[17])
+    ppid, utime, stime, threads, start = (
+        int(fields[1]), int(fields[11]), int(fields[12]), int(fields[17]), int(fields[19]))
     with open(base + "/statm") as f:
         rss = int(f.read().split()[1]) * PAGE
     with open(base + "/cmdline", "rb") as f:
@@ -74,7 +75,7 @@ def read_proc(pid):
             name = first
     return {
         "pid": pid, "ppid": ppid, "name": name, "user": user(uid), "mine": uid == ME,
-        "kernel": not argv and (ppid == 2 or pid == 2), "jiffies": utime + stime,
+        "kernel": not argv and (ppid == 2 or pid == 2), "jiffies": utime + stime, "start": start,
         "mem": rss, "threads": threads, "cmd": " ".join(argv)[:300],
     }
 
@@ -86,9 +87,14 @@ def cmd_list():
         prev = json.loads(SNAPSHOT.read_text())
     except (OSError, ValueError):
         prev = {}
+    if not isinstance(prev, dict):
+        prev = {}
     # no baseline after a reboot or when the counters did not move forward
     # (CPU hotplug): a stale snapshot would divide by a 1-jiffy window
-    if prev.get("boot") != boot or not 0 < prev.get("total", 0) < total:
+    if (type(prev.get("boot")) is not int or type(prev.get("total")) is not int
+            or type(prev.get("idle")) is not int or not isinstance(prev.get("procs"), dict)
+            or prev["boot"] != boot or not 0 < prev["total"] < total
+            or not 0 <= prev["idle"] <= prev["total"]):
         prev = {}
     d_total = total - prev["total"] if prev else 1
     d_idle = idle - prev["idle"] if prev else 0
@@ -102,18 +108,21 @@ def cmd_list():
             p = read_proc(int(entry.name))
         except (OSError, ValueError, IndexError):
             continue                                      # gone meanwhile
-        now[entry.name] = p["jiffies"]
+        now[entry.name] = {"jiffies": p["jiffies"], "start": p["start"]}
         before = old.get(entry.name)
-        # a pid that went backwards is a new process under a reused pid
-        fresh = before is not None and p["jiffies"] >= before
-        p["cpu"] = round(100 * (p["jiffies"] - before) / d_total, 1) if fresh and prev else 0.0
+        fresh = (isinstance(before, dict) and type(before.get("jiffies")) is int
+                 and type(before.get("start")) is int and before["start"] == p["start"]
+                 and p["jiffies"] >= before["jiffies"])
+        p["cpu"] = min(100.0, max(0.0, round(
+            100 * (p["jiffies"] - before["jiffies"]) / d_total, 1))) if fresh and prev else 0.0
         del p["jiffies"]
+        del p["start"]
         procs.append(p)
 
     SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
     SNAPSHOT.write_text(json.dumps({"boot": boot, "total": total, "idle": idle, "procs": now}))
     used, mem_total = meminfo()
-    machine = round(100 * (1 - d_idle / d_total), 1) if prev else 0.0
+    machine = min(100.0, max(0.0, round(100 * (1 - d_idle / d_total), 1))) if prev else 0.0
     out({"ok": True, "cpu": max(0.0, machine), "memUsed": used, "memTotal": mem_total,
          "cores": os.cpu_count(), "procs": procs})
 
@@ -125,7 +134,11 @@ def cmd_kill(sig, pids):
     killed, errors = 0, []
     for pid in pids:
         try:
-            os.kill(int(pid), signum)
+            numeric_pid = int(pid)
+            if numeric_pid <= 0:
+                errors.append(f"{pid}: not a pid")
+                continue
+            os.kill(numeric_pid, signum)
             killed += 1
         except ProcessLookupError:
             killed += 1                                   # already gone: what was wanted
@@ -133,15 +146,23 @@ def cmd_kill(sig, pids):
             errors.append(f"{pid}: not yours (needs root)")
         except ValueError:
             errors.append(f"{pid}: not a pid")
+        except (OverflowError, OSError):
+            errors.append(f"{pid}: could not signal")
     if errors:
         out({"ok": False, "error": "; ".join(errors[:3]) + ("…" if len(errors) > 3 else ""), "killed": killed})
     out({"ok": True, "killed": killed})
 
 
+def main(args):
+    try:
+        if args == ["list"]:
+            cmd_list()
+        elif len(args) >= 3 and args[0] == "kill":
+            cmd_kill(args[1].upper(), args[2:])
+        out({"ok": False, "error": "usage: tasks.py list | kill <TERM|KILL> <pid>…"})
+    except (OSError, ValueError, OverflowError, IndexError, KeyError, TypeError) as error:
+        out({"ok": False, "error": str(error) or "could not read process data"})
+
+
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    if args == ["list"]:
-        cmd_list()
-    elif len(args) >= 3 and args[0] == "kill":
-        cmd_kill(args[1].upper(), args[2:])
-    out({"ok": False, "error": "usage: tasks.py list | kill <TERM|KILL> <pid>…"})
+    main(sys.argv[1:])

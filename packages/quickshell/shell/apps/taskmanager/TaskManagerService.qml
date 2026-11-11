@@ -61,6 +61,35 @@ Singleton {
     rxHistory = keep(rxHistory, rx);
     txHistory = keep(txHistory, tx);
   }
+
+  function replyError(r, fallback) {
+    return typeof r?.error === "string" && r.error.trim() !== "" ? r.error : fallback;
+  }
+
+  function validListReply(r) {
+    const finiteNonnegative = n => typeof n === "number" && isFinite(n) && n >= 0;
+    return r?.ok === true && Array.isArray(r.procs)
+      && typeof r.cpu === "number" && isFinite(r.cpu) && r.cpu >= 0 && r.cpu <= 100
+      && finiteNonnegative(r.memUsed)
+      && typeof r.memTotal === "number" && isFinite(r.memTotal) && r.memTotal > 0
+      && r.procs.every(p => p && Number.isInteger(p.pid) && p.pid > 0
+        && Number.isInteger(p.ppid) && p.ppid >= 0
+        && typeof p.name === "string" && typeof p.user === "string" && typeof p.cmd === "string"
+        && typeof p.mine === "boolean" && typeof p.kernel === "boolean"
+        && finiteNonnegative(p.cpu) && finiteNonnegative(p.mem) && finiteNonnegative(p.threads));
+  }
+
+  function acceptListReply(r) {
+    if (r?.ok !== true) { queryError = replyError(r, "could not read task list"); return false; }
+    if (!validListReply(r)) { queryError = "bad task list reply"; return false; }
+    procs = r.procs;
+    cpu = r.cpu;
+    memUsed = r.memUsed;
+    memTotal = r.memTotal;
+    queryError = "";
+    record();
+    return true;
+  }
   property var procs: []
   property real cpu: 0                      // the machine, 0–100
   property real memUsed: 0
@@ -140,7 +169,9 @@ Singleton {
   // ---- actions ----
   property bool busy: false
   property string status: ""                // "" | ok | error
-  property string error: ""
+  property string queryError: ""
+  property string actionError: ""
+  readonly property string error: actionError || queryError
   property string notice: ""                // a line in the foot, cleared after a moment
 
   function end(force) { endRow(selectedRow, force); }
@@ -153,18 +184,38 @@ Singleton {
 
   function copyPid() {
     const row = selectedRow;
-    if (!row || grouped) return;
+    if (!row || grouped || copyProc.running) return;
+    status = "";
+    actionError = "";
+    notice = "";
     copyProc.command = ["wl-copy", String(row.pids[0])];
     copyProc.running = true;
-    notice = "PID " + row.pids[0] + " copied";
+  }
+
+  function finishKill(message) {
+    status = "error";
+    actionError = typeof message === "string" && message.trim() !== "" ? message : "task action failed";
     statusReset.restart();
+    refresh();
+    busy = false;
+  }
+
+  function acceptKillReply(r) {
+    if (r?.ok !== true) { finishKill(replyError(r, "task action failed")); return false; }
+    if (!Number.isInteger(r.killed) || r.killed < 0) { finishKill("bad task kill reply"); return false; }
+    status = "ok";
+    actionError = "";
+    statusReset.restart();
+    refresh();
+    busy = false;
+    return true;
   }
 
   // TERM (or KILL) every process of a row
   function endRow(row, force) {
     if (!row || busy) return;
     busy = true;
-    error = "";
+    actionError = "";
     killProc.command = ["python3", script, "kill", force ? "KILL" : "TERM"].concat(row.pids.map(String));
     killProc.running = true;
   }
@@ -194,29 +245,57 @@ Singleton {
     command: ["python3", root.script, "list"]
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        if (!r.ok) { root.error = r.error; return; }
-        root.procs = r.procs;
-        root.cpu = r.cpu;
-        root.memUsed = r.memUsed;
-        root.memTotal = r.memTotal;
-        root.record();
+        root.acceptListReply(root.parse(text));
       }
+    }
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.queryError = "could not start task list query";
     }
   }
 
-  Process { id: copyProc }
+  Process {
+    id: copyProc
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.status = "error";
+      root.actionError = "could not start PID copy";
+      root.notice = "";
+      statusReset.restart();
+    }
+    stderr: StdioCollector { id: copyError }
+    onExited: code => {
+      if (code === 0) {
+        root.status = "ok";
+        root.actionError = "";
+        root.notice = "PID " + String(copyProc.command[1]) + " copied";
+      } else {
+        root.status = "error";
+        root.actionError = copyError.text.trim() || "could not copy PID";
+        root.notice = "";
+      }
+      statusReset.restart();
+    }
+  }
 
   Process {
     id: killProc
+    property bool started: false
+    onStarted: started = true
+    onRunningChanged: {
+      if (running) return;
+      if (started) { started = false; return; }
+      root.finishKill("could not start task action");
+    }
     stdout: StdioCollector {
       onStreamFinished: {
-        const r = root.parse(text);
-        root.busy = false;
-        root.status = r.ok ? "ok" : "error";
-        if (!r.ok) root.error = r.error;
-        statusReset.restart();
-        root.refresh();
+        root.acceptKillReply(root.parse(text));
       }
     }
   }

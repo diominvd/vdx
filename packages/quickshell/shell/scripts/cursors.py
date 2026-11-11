@@ -17,10 +17,10 @@ to <fill>–<outline> (rrggbb), alpha kept: ~/.local/share/icons/dotfiles-cursor
 cursor (~/.local/share/icons/default/index.theme, which GTK's `default` and
 Xcursor follow), Hyprland's `setcursor` and the GNOME interface keys (GTK 4);
 kept in ~/.local/state/dotfiles/cursor.json. Errors: {"ok": false, "error": "..."}."""
-import configparser, json, shutil, struct, subprocess, sys, tarfile, tempfile, urllib.request, zlib
+import configparser, json, shutil, struct, sys, tarfile, tempfile, urllib.request, zlib
 from array import array
 from pathlib import Path
-from backend import out
+from backend import fail, out, run_checked
 
 ICONS = Path.home() / ".local/share/icons"
 STATE = Path.home() / ".local/state/dotfiles/cursor.json"
@@ -72,9 +72,27 @@ def installed():
 
 def saved():
     try:
-        return {**DEFAULT, **json.loads(STATE.read_text())}
+        data = json.loads(STATE.read_text())
     except (OSError, ValueError):
         return dict(DEFAULT)
+    if not isinstance(data, dict):
+        return dict(DEFAULT)
+    state = {**DEFAULT, **data}
+    if not isinstance(state.get("base"), str) or ("name" in state and not isinstance(state["name"], str)):
+        return dict(DEFAULT)
+    size = state.get("size")
+    if isinstance(size, bool) or not isinstance(size, int) or not 12 <= size <= 96:
+        return dict(DEFAULT)
+    if state.get("mode") not in ("original", "theme", "custom"):
+        return dict(DEFAULT)
+    if not isinstance(state.get("fill"), str) or not isinstance(state.get("outline"), str):
+        return dict(DEFAULT)
+    if state["mode"] != "original" and not all(
+        len(colour) == 6 and all(ch in "0123456789abcdefABCDEF" for ch in colour)
+        for colour in (state["fill"], state["outline"])
+    ):
+        return dict(DEFAULT)
+    return state
 
 
 # ---- xcursor ---------------------------------------------------------------------
@@ -87,12 +105,31 @@ IMAGE = 0xFFFD0002
 
 def chunks(data):
     """(nominal size, offset of the pixels, width, height) of every image."""
-    ntoc = struct.unpack_from("<I", data, 12)[0]
+    if not data.startswith(b"Xcur"):
+        return
+    if len(data) < 16:
+        raise ValueError("truncated Xcursor header")
+    header_size, _version, ntoc = struct.unpack_from("<III", data, 4)
+    if header_size < 16 or header_size > len(data):
+        raise ValueError("invalid Xcursor header size")
+    toc_end = header_size + 12 * ntoc
+    if toc_end > len(data):
+        raise ValueError("truncated Xcursor table of contents")
     for i in range(ntoc):
-        kind, size, pos = struct.unpack_from("<III", data, 16 + 12 * i)
-        if kind == IMAGE:
-            width, height = struct.unpack_from("<II", data, pos + 16)
-            yield size, pos + 36, width, height
+        kind, size, pos = struct.unpack_from("<III", data, header_size + 12 * i)
+        if kind != IMAGE:
+            continue
+        if pos < toc_end or pos + 36 > len(data):
+            raise ValueError("invalid Xcursor image offset")
+        chunk_header, chunk_type, _subtype, _version = struct.unpack_from("<IIII", data, pos)
+        if chunk_header < 36 or pos + chunk_header > len(data) or chunk_type != IMAGE:
+            raise ValueError("invalid Xcursor image header")
+        width, height = struct.unpack_from("<II", data, pos + 16)
+        pixel_offset = pos + chunk_header
+        pixel_bytes = 4 * width * height
+        if not width or not height or pixel_bytes > len(data) - pixel_offset:
+            raise ValueError("invalid Xcursor image dimensions or pixel data")
+        yield size, pixel_offset, width, height
 
 
 def hex_rgb(h):
@@ -127,8 +164,9 @@ def tinter(fill, outline):
 def tint_file(data, tint):
     if not data.startswith(b"Xcur"):
         return data
+    images = list(chunks(data))
     buf = bytearray(data)
-    for _, off, w, h in chunks(data):
+    for _, off, w, h in images:
         end = off + 4 * w * h
         buf[off:end] = tint(bytes(buf[off:end]))
     return bytes(buf)
@@ -202,6 +240,8 @@ def cmd_preview(base, fill=None, outline=None):
         if not f:
             continue
         data = f.read_bytes()
+        if not data.startswith(b"Xcur"):
+            continue
         images = list(chunks(data))
         if not images:
             continue
@@ -287,9 +327,9 @@ def build_tinted(base, fill, outline):
 
 
 def apply(name, size):
-    subprocess.run(["hyprctl", "setcursor", name, str(size)], capture_output=True)
+    run_checked(["hyprctl", "setcursor", name, str(size)], timeout=5)
     for key, value in (("cursor-theme", name), ("cursor-size", str(size))):
-        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", key, value], capture_output=True)
+        run_checked(["gsettings", "set", "org.gnome.desktop.interface", key, value], timeout=5)
 
 
 def cmd_set(base, size, mode, fill="", outline=""):
@@ -315,20 +355,27 @@ def cmd_set(base, size, mode, fill="", outline=""):
     out({"ok": True})
 
 
+def main(args):
+    args = [a.lower().lstrip("#") if i >= 3 else a for i, a in enumerate(args)]
+    try:
+        if args == ["list"]:
+            cmd_list()
+        elif args == ["restore"]:
+            s = saved()
+            if STATE.exists():
+                apply(s.get("name", s["base"]), s["size"])
+            out({"ok": True})
+        elif len(args) == 2 and args[0] == "install":
+            cmd_install(args[1])
+        elif len(args) in (2, 4) and args[0] == "preview":
+            cmd_preview(*args[1:])
+        elif len(args) in (4, 6) and args[0] == "set":
+            cmd_set(*args[1:])
+        fail("usage: cursors.py list | install <name> | preview <base> [<fill> <outline>]"
+             " | set <base> <size> <mode> [<fill> <outline>] | restore")
+    except (OSError, ValueError, RuntimeError, struct.error) as e:
+        fail(str(e))
+
+
 if __name__ == "__main__":
-    args = [a.lower().lstrip("#") if i >= 3 else a for i, a in enumerate(sys.argv[1:])]
-    if args == ["list"]:
-        cmd_list()
-    elif args == ["restore"]:
-        s = saved()
-        if STATE.exists():
-            apply(s.get("name", s["base"]), s["size"])
-        out({"ok": True})
-    elif len(args) == 2 and args[0] == "install":
-        cmd_install(args[1])
-    elif len(args) in (2, 4) and args[0] == "preview":
-        cmd_preview(*args[1:])
-    elif len(args) in (4, 6) and args[0] == "set":
-        cmd_set(*args[1:])
-    out({"ok": False, "error": "usage: cursors.py list | install <name> | preview <base> [<fill> <outline>]"
-                               " | set <base> <size> <mode> [<fill> <outline>] | restore"})
+    main(sys.argv[1:])

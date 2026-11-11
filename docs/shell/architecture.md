@@ -269,6 +269,26 @@ Manager › About › System › Shell resources in representative idle and acti
 states; RSS/VSZ are KiB and CPU is the process's lifetime average. Do not add
 permanent profiling timers.
 
+Music and Capture retain a small navigation controller while their expensive
+views are unloaded. The floating Launcher loads its panel for the scrim's
+visible lifetime, including the fade, and restores navigation through the
+panel API. Closing it cancels its replaceable file search. Mutation queues
+belong to services so closing a view does not lose an accepted action.
+
+Backend replies are parsed and validated before replacing the previous good
+state. Process owners handle failed starts as well as command failures; finish
+old request state before publishing idle or starting an authorized follow-up.
+Backup jobs retain ownership across picker/init and backup/root-plan handoffs.
+Clipboard mutations execute in order and acknowledge copying after success.
+
+Capture library trash is queued by `CaptureService`, independently of the
+library view. Each request reports moved and failed paths; the library refreshes
+on completion instead of waiting a guessed delay. Duration and thumbnail reads
+follow the latest selection and discard obsolete results. AI services validate
+cached and incoming state; Focus confirms a mode change by reading it back, and
+Mihomo keeps node replies scoped to the requested provider. Existing background
+polls retain their shared bar, hub and notification consumers.
+
 Shell Manager › About › System can run `./install.py doctor` on demand. The
 session supervisor restarts crashes and waits for config edits after a failed
 load; inspect `qs log -c shell` before restarting manually. `./install.py
