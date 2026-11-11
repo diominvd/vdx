@@ -37,9 +37,10 @@ Column {
       hint: HubBlocks.notes[key]
       checked: HubBlocks.shown(key)
       foldable: options.any
+      sunken: true
       onToggled: HubBlocks.setShown(key, !checked)
 
-      HubBlockOptions { id: options; block: row.key; onArrange: root.arrange() }
+      HubBlockOptions { id: options; block: row.key; shown: row.unfolded; inset: row.indent + row.edge; onArrange: root.arrange() }
     }
   }
 
