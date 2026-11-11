@@ -106,3 +106,4 @@ bell-off bell-off
 icons star
 assembly puzzle
 vpn shield
+terminal terminal

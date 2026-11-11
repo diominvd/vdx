@@ -105,3 +105,4 @@ bell-off notifications_off
 icons star
 assembly extension
 vpn shield
+terminal terminal

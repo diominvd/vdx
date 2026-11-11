@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import tempfile
 import unittest
 
@@ -12,6 +13,7 @@ import unittest
 SCRIPT = Path(__file__).resolve().parents[1] / "packages/quickshell/shell/scripts/bluetooth.sh"
 
 
+@unittest.skipUnless(shutil.which("jq"), "jq is installed by setup; backend tests need it")
 class BluetoothScanBackend(unittest.TestCase):
     def run_scan(self, reply: str) -> tuple[dict, str]:
         with tempfile.TemporaryDirectory() as tmp:

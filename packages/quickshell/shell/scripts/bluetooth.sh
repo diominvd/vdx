@@ -80,7 +80,7 @@ cmd_scan() {
   grep -q 'Discovery started' <<<"$out" && ok || error "${out:-could not start bluetooth scan}"
 }
 
-# Pairs with an agent that answers without a PIN (AirPods, most headsets). bluetoothctl
+# Pairs with an agent that answers without a PIN (most headsets). bluetoothctl
 # stays up on a FIFO until the device reports Paired, the pairing fails, or 30 s pass.
 pair() {
   local mac=$1 fifo log pid paired=no

@@ -72,6 +72,7 @@ Rectangle {
     { value: "hub",        label: "Hub",        icon: "home",    island: true },
     { value: "live",       label: "Live activities", icon: "activity", island: true },
     { value: "notifications", label: "Notifications", icon: "bell", caption: "SESSION" },
+    { value: "terminal", label: "Terminal", icon: "terminal" },
     { value: "lockscreen", label: "Lock screen", icon: "lock" },
     { value: "profile",    label: "Profile",    icon: "user" },
     { value: "network",    label: "Network",    icon: "public",       caption: "CONNECTIVITY" },
@@ -444,7 +445,7 @@ Rectangle {
           visible: navItem.modelData.kind === "heading"
           x: Theme.gapLoose
           anchors.verticalCenter: parent.verticalCenter
-          text: navItem.modelData.label
+          text: navItem.modelData.label ?? ""
           color: Theme.muted
           font.pixelSize: Theme.fontSize - 2
           font.weight: Font.DemiBold
@@ -452,7 +453,7 @@ Rectangle {
 
         NavRow {
           visible: navItem.modelData.kind === "page"
-          entry: navItem.modelData.entry
+          entry: navItem.modelData.entry ?? ({ value: "", label: "", icon: "" })
           current: root.tab
           width: navItem.width
           onPicked: root.select(entry.value)
@@ -693,7 +694,7 @@ Rectangle {
                   network: networkComponent, sound: soundComponent, power: powerComponent, updates: updatesComponent,
                   hub: hubComponent, live: liveComponent, profile: profileComponent, bluetooth: bluetoothComponent,
                   vpn: vpnComponent, displays: displaysComponent, modules: modulesComponent, apps: appsComponent,
-                  about: aboutComponent, lockscreen: lockscreenComponent, notifications: notificationsComponent })[value] ?? appearanceComponent;
+                  terminal: terminalComponent, about: aboutComponent, lockscreen: lockscreenComponent, notifications: notificationsComponent })[value] ?? appearanceComponent;
       }
 
       Component { id: appearanceComponent; AppearancePage { width: pages.width; height: page.height - pages.y - Theme.windowPadding } }
@@ -705,6 +706,7 @@ Rectangle {
       Component { id: cursorComponent; CursorPage { width: pages.width; height: page.height - pages.y } }
       Component { id: animationsComponent; AnimationsPage { width: pages.width } }
       Component { id: appsComponent; ShellAppsPage { width: pages.width; height: page.height - pages.y; viewportRightInset: page.width - pages.x - pages.width } }
+      Component { id: terminalComponent; TerminalPage { width: pages.width } }
       Component { id: windowsComponent; WindowsPage { width: pages.width } }
       Component { id: networkComponent; NetworkPage { width: pages.width } }
       Component { id: soundComponent; SoundPage { width: pages.width } }

@@ -276,3 +276,8 @@ preserve the previous option files as backups.
 
 A change to a flow or a boundary above updates this file in the same
 commit; a new boundary or store is agreed with the owner first.
+
+Session › Terminal uses `scripts/terminal.py` on page opening and changes
+only. It writes the launcher override in `dotfiles/terminal.json` under the
+state directory; kitty reads it before the installer default. No polling
+or persistent process is added.

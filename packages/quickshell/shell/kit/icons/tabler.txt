@@ -108,3 +108,4 @@ zap bolt
 icons icons
 assembly assembly
 vpn brand-openvpn
+terminal terminal

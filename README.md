@@ -50,7 +50,7 @@ cd ~/.dotfiles
 ```
 
 The wizard shows the machine, the detected hardware, every component by group
-(desktop, terminal, editor, apps, music, network, AI), the theme and the
+(desktop, terminal, editor, apps, music, network, AI), tmux or Zellij, the theme and the
 keyboard, then a summary. Nothing is written before that. Then `setup`
 installs the packages (yay is built when missing), links the configs, copies
 the `/etc` files (a diff first) and enables the services; each step skips
@@ -102,7 +102,7 @@ Destructive commands ask first; `-y` answers yes. All of them:
 | Desktop | Hyprland (Lua config), Quickshell, mako |
 | Shell | zsh, Oh My Zsh, Starship |
 | Editor | Neovim |
-| Terminal | kitty, tmux |
+| Terminal | kitty, tmux or Zellij |
 | Music | MPD, ncmpcpp; Yandex Music and radio CLIs (optional) |
 | VPN | Mihomo + `vpn` (optional) |
 

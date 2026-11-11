@@ -36,6 +36,7 @@ exit 0
 """
 
 
+@unittest.skipUnless(shutil.which("jq"), "jq is installed by setup; backend tests need it")
 class MusicScript(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())

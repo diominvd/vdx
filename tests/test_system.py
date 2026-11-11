@@ -45,7 +45,7 @@ class Selection(unittest.TestCase):
 
     def test_a_desktop_gets_no_laptop_files(self):
         cat = components.load()
-        got = self.files(set(cat) - {"laptop", "nvidia-laptop", "asus-fx516pm-headset-mic", "vpn", "ollama", "airpods"})
+        got = self.files(set(cat) - {"laptop", "nvidia-laptop", "asus-fx516pm-headset-mic", "vpn", "ollama"})
         self.assertEqual(got, {"etc/polkit-1/rules.d/50-pkexec-keep.rules"})
 
 

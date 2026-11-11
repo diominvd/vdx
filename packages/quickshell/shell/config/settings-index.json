@@ -651,6 +651,24 @@
   "target": "windows:overview"
  },
  {
+  "label": "Terminal",
+  "hint": "",
+  "where": "",
+  "target": "terminal"
+ },
+ {
+  "label": "Opening",
+  "hint": "",
+  "where": "Terminal",
+  "target": "terminal"
+ },
+ {
+  "label": "Multiplexer",
+  "hint": "Applies to new terminal windows",
+  "where": "Terminal › OPENING",
+  "target": "terminal"
+ },
+ {
   "label": "Network",
   "hint": "",
   "where": "",

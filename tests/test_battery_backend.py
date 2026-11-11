@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import tempfile
 import unittest
 
@@ -11,6 +12,7 @@ import unittest
 SCRIPT = Path(__file__).resolve().parents[1] / "packages/quickshell/shell/scripts/battery.sh"
 
 
+@unittest.skipUnless(shutil.which("jq"), "jq is installed by setup; backend tests need it")
 class BatteryBackend(unittest.TestCase):
     def run_backend(self, root: Path, *args: str) -> dict:
         script = root / "battery.sh"

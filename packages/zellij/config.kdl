@@ -1,0 +1,88 @@
+// Native Zellij modes and classic two-line hints; Ctrl+A remains available.
+default_shell "zsh"
+default_mode "normal"
+default_layout "vdx"
+theme "vdx"
+mouse_mode true
+pane_frames true
+pane_frame_style "full"
+simplified_ui false
+scroll_buffer_size 10000
+session_serialization true
+serialize_pane_viewport false
+on_force_close "detach"
+show_startup_tips false
+show_release_notes false
+keybinds {
+    unbind "Ctrl b"
+    shared_except "tmux" "locked" {
+        bind "Ctrl a" { SwitchToMode "Tmux"; }
+    }
+    normal {
+        bind "Alt 1" { GoToTab 1; }
+        bind "Alt 2" { GoToTab 2; }
+        bind "Alt 3" { GoToTab 3; }
+        bind "Alt 4" { GoToTab 4; }
+        bind "Alt 5" { GoToTab 5; }
+        bind "Alt 6" { GoToTab 6; }
+        bind "Alt 7" { GoToTab 7; }
+        bind "Alt 8" { GoToTab 8; }
+        bind "Alt 9" { GoToTab 9; }
+        bind "Alt h" { MoveTab "Left"; }
+        bind "Alt l" { MoveTab "Right"; }
+    }
+    // Keep native bindings so the built-in status bar remains useful.
+    pane {
+        bind "|" { NewPane "Right"; SwitchToMode "Normal"; }
+        bind "-" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "P" { CloseFocus; SwitchToMode "Normal"; }
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+    }
+    tab {
+        bind "n" "w" { NewTab { layout "vdx"; }; SwitchToMode "Normal"; }
+        bind "W" { CloseTab; SwitchToMode "Normal"; }
+    }
+    resize {
+        // Stay in Resize mode so repeated presses keep resizing.
+        bind "H" { Resize "Increase Left"; }
+        bind "J" { Resize "Increase Down"; }
+        bind "K" { Resize "Increase Up"; }
+        bind "L" { Resize "Increase Right"; }
+    }
+    session {
+        bind "s" { Run "sh" "-c" "exec python3 \"$HOME/.config/zellij/session.py\" new" { close_on_exit true; }; SwitchToMode "Normal"; }
+        bind "t" { LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }; SwitchToMode "Normal"; }
+    }
+    tmux {
+        bind "r" { OverrideLayout { layout "vdx"; retain_existing_terminal_panes true; apply_only_to_active_tab true; }; SwitchToMode "Normal"; }
+        bind "Ctrl a" { Write 1; SwitchToMode "Normal"; }
+        bind "|" { NewPane "Right"; SwitchToMode "Normal"; }
+        bind "-" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "w" { NewTab { layout "vdx"; }; SwitchToMode "Normal"; }
+        bind "d" { Detach; }
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "P" { CloseFocus; SwitchToMode "Normal"; }
+        bind "W" { CloseTab; SwitchToMode "Normal"; }
+        bind "[" { SwitchToMode "Scroll"; }
+        bind "s" { Run "sh" "-c" "exec python3 \"$HOME/.config/zellij/session.py\" new" { close_on_exit true; }; SwitchToMode "Normal"; }
+        bind "t" { LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }; SwitchToMode "Normal"; }
+        bind "Esc" "Enter" { SwitchToMode "Normal"; }
+        bind "h" { MoveFocus "Left"; SwitchToMode "Normal"; }
+        bind "H" { Resize "Increase Left"; SwitchToMode "Normal"; }
+        bind "j" { MoveFocus "Down"; SwitchToMode "Normal"; }
+        bind "J" { Resize "Increase Down"; SwitchToMode "Normal"; }
+        bind "k" { MoveFocus "Up"; SwitchToMode "Normal"; }
+        bind "K" { Resize "Increase Up"; SwitchToMode "Normal"; }
+        bind "l" { MoveFocus "Right"; SwitchToMode "Normal"; }
+        bind "L" { Resize "Increase Right"; SwitchToMode "Normal"; }
+    }
+    scroll {
+        bind "Esc" "q" "Enter" { SwitchToMode "Normal"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "Ctrl d" "PageDown" { PageScrollDown; }
+        bind "Ctrl u" "PageUp" { PageScrollUp; }
+        bind "g" { ScrollToTop; }
+        bind "G" { ScrollToBottom; }
+    }
+}

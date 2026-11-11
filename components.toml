@@ -120,6 +120,13 @@ about = "tmux with TPM"
 pacman = ["tmux"]
 links = ["tmux"]
 
+[zellij]
+group = "terminal"
+about = "Zellij with tmux-style keys and built-in hints"
+default = false
+pacman = ["zellij"]
+links = ["zellij"]
+
 [btop]
 group = "terminal"
 about = "btop, the resource monitor"
@@ -162,13 +169,6 @@ submodules = ["packages/nvim"]
 links = ["nvim"]
 
 # ---- apps ----
-
-[elio]
-group = "apps"
-about = "elio, the terminal file manager"
-default = false
-aur = ["elio"]
-links = ["elio"]
 
 [telegram]
 group = "apps"
@@ -229,12 +229,6 @@ user_units = ["packages/scripts/vpn/mihomo.service"]
 user_services = ["mihomo.service"]
 secrets = ["mihomo/subscriptions.json"]
 
-[wifitui]
-group = "network"
-about = "wifitui, a Wi-Fi TUI"
-default = false
-aur = ["wifitui"]
-
 # ---- ai ----
 
 [ollama]
@@ -273,14 +267,6 @@ secrets = ["opencode/service.json"]
 group = "personal"
 about = "Restore secret files from the private repo (private/)"
 default = false
-
-[airpods]
-group = "personal"
-about = "AirPods over Bluetooth: no adapter autosuspend, no ERTM, AAC that adapts to the link"
-default = false
-pacman = ["libfdk-aac"]
-links = ["wireplumber"]
-system = ["etc/modprobe.d/btusb-airpods.conf", "etc/bluetooth/main.conf"]
 
 # ---- hardware ----
 

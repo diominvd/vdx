@@ -26,4 +26,4 @@ windows and popups (`gray` at rest, `foreground2` focused); selection is a fill
 plus bold, not a colour; colour carries meaning only.
 
 Files: hypr `components/colors.lua`, kitty `colors.conf`, mako `config`, gtk
-`gtk.css`, elio `theme.toml`, tmux and btop (from the packages).
+`gtk.css`, Zellij `themes/vdx.kdl`, tmux and btop (from the packages).

@@ -28,7 +28,8 @@ def render(on: set[str], cat: dict) -> str:
         for m in c["modules"]:
             bring.setdefault(m, []).append(name)
     off = {m: names for m, names in bring.items() if not any(n in on for n in names)}
-    return json.dumps({"off": off}, indent=2, ensure_ascii=False) + "\n"
+    multiplexer = next((n for n in ("zellij", "tmux") if n in on), "none")
+    return json.dumps({"off": off, "multiplexer": multiplexer}, indent=2, ensure_ascii=False) + "\n"
 
 
 def apply(target: Path = FILE) -> bool:

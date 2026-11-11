@@ -49,7 +49,7 @@ Singleton {
 
 
   // ---- apps ----
-  // a Terminal=true entry (nvim, elio…) runs in kitty, the terminal Super + Q opens
+  // a Terminal=true entry (nvim…) runs in kitty, the terminal Super + Q opens
   function runApp(e) {
     if (!e.runInTerminal) return e.execute();
     exec(["kitty", "-e"].concat(e.command.filter(a => !/^%[fFuUdDnNickvm]$/.test(a))));

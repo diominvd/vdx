@@ -1,0 +1,16 @@
+// Generated variants use the same colour roles as the desktop.
+themes {
+    vdx {
+        fg "#3760bf"
+        bg "#e1e2e7"
+        black "#c4c8da"
+        red "#f52a65"
+        green "#587539"
+        yellow "#8c6c3e"
+        blue "#2e7de9"
+        magenta "#9854f1"
+        cyan "#118c74"
+        white "#2e3c64"
+        orange "#b15c00"
+    }
+}

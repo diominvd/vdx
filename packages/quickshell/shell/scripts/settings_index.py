@@ -39,6 +39,7 @@ PAGES = [
     ("hub", "Hub", ["HubPage.qml", "HubBlocksList.qml"]),
     ("live", "Live activities", ["LivePage.qml"]),
     ("windows", "Windows", ["WindowsPage.qml"]),
+    ("terminal", "Terminal", ["TerminalPage.qml"]),
     ("network", "Network", ["NetworkPage.qml"]),
     ("sound", "Sound", ["SoundPage.qml"]),
     ("power", "Power", ["PowerPage.qml"]),

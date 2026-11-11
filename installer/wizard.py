@@ -1,7 +1,7 @@
 """dotfiles installer — `install`: the wizard, screen by screen, then setup.
 
 Welcome (the machine, the checks) → hardware → one screen per group of
-components → settings (theme, keyboard) → summary → setup runs in the
+components → terminal multiplexer → settings (theme, keyboard) → summary → setup runs in the
 terminal. Keys: ↑ ↓ move · space tick / change · → or enter next · ← or esc
 back · q twice quit. Nothing is written before the summary is confirmed.
 
@@ -61,6 +61,14 @@ class Picks:
             return ""
         self.on = components.closure(self.on | {name} | set(self.cat[name]["suggests"]), self.cat)
         return ""
+
+    def multiplexer(self) -> str:
+        return next((n for n in ("zellij", "tmux") if n in self.on), "none")
+
+    def select_multiplexer(self, name: str) -> None:
+        self.on.difference_update({"tmux", "zellij"})
+        if name != "none":
+            self.on = components.closure(self.on | {name}, self.cat)
 
     def packages(self) -> tuple[list[str], list[str]]:
         return components.unique(self.on, self.cat, "pacman"), components.unique(self.on, self.cat, "aur")
@@ -231,7 +239,7 @@ class UI:
                 return 0
 
     def group(self, step, total, group: str) -> int:
-        names = [n for n, c in self.cat.items() if c["group"] == group]
+        names = [n for n, c in self.cat.items() if c["group"] == group and n not in {"tmux", "zellij"}]
         title, subtitle = GROUP_TITLES.get(group, (group.title(), ""))
         cur = 0
         offset = 0
@@ -269,6 +277,32 @@ class UI:
             elif k == "space" and names:
                 self.message = self.a.picks.toggle(names[cur])
             elif k in ("right", "enter"):
+                return 1
+            elif k == "left":
+                return -1
+            elif k == "quit":
+                return 0
+
+    def multiplexer(self, step, total) -> int:
+        options = [("tmux", "tmux — prefix-based terminal multiplexer"),
+                   ("zellij", "Zellij — modes and built-in key hints"),
+                   ("none", "Plain shell — no multiplexer")]
+        cur = next(i for i, (n, _) in enumerate(options) if n == self.a.picks.multiplexer())
+        while True:
+            top, _ = self.frame(step, total, "Terminal multiplexer", "Choose what kitty opens",
+                                "↑ ↓ move · space select · → next · ← back · q quit")
+            for i, (name, label) in enumerate(options):
+                self.put(top + i * 2, 2, "›" if i == cur else " ", self.CYAN)
+                self.put(top + i * 2, 4, ("(x) " if name == self.a.picks.multiplexer() else "( ) ") + label)
+            k = self.key()
+            if k == "up":
+                cur = max(0, cur - 1)
+            elif k == "down":
+                cur = min(len(options) - 1, cur + 1)
+            elif k == "space":
+                self.a.picks.select_multiplexer(options[cur][0])
+            elif k in ("right", "enter"):
+                self.a.picks.select_multiplexer(options[cur][0])
                 return 1
             elif k == "left":
                 return -1
@@ -371,7 +405,7 @@ class UI:
     def run(self) -> bool:
         groups = [g for g in components.GROUPS if g != "core" and any(c["group"] == g for c in self.cat.values())]
         pages = ([self.welcome] + [lambda s, t, g=g: self.group(s, t, g) for g in ["hardware"] + [g for g in groups if g != "hardware"]]
-                 + [self.settings, self.summary])
+                 + [self.multiplexer, self.settings, self.summary])
         i = 0
         while 0 <= i < len(pages):
             h, w = self.scr.getmaxyx()

@@ -14,7 +14,7 @@ spec.loader.exec_module(si)
 
 TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "colours", "animations",
         "bar", "barlook", "barmonitor", "modules", "windows", "lockscreen", "notifications",
-        "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings"}
+        "terminal", "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings"}
 
 # a word typed -> where the task is done
 JOURNEYS = {

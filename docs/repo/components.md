@@ -27,3 +27,28 @@ hardware (`gpu-nvidia`, `laptop`). Its header documents every field.
   `quickshell`) is on wherever its parent is, unless `[components] off`
   names it; leaving it out (wizard, `components remove|set`) writes `off`.
   A selection saved before the split keeps what it had.
+
+The installer offers tmux, Zellij or a plain shell on its multiplexer page.
+`link` records the selection in `components.json`; kitty honours it even
+when both programs remain installed. Shell Manager › Session › Terminal
+can override that choice for new windows; Reset restores the installer
+selection. The override is in `$XDG_STATE_HOME/dotfiles/terminal.json`.
+
+Zellij opens numbered session `1`; new sessions receive the next number.
+Its native tab bar sits above the terminal, with a two-line classic status
+bar below (modes and contextual hints) and standard pane frames. No custom
+plugin is used. Native mode entries retain familiar tmux action keys:
+
+- `Ctrl+P`: `|` right split, `-` down split, `P` close pane, `z` zoom,
+  `hjkl` focus.
+- `Ctrl+T`: `w` new tab, `W` close tab.
+- `Ctrl+N`: `HJKL` resize repeatedly. Both cases grow in that direction;
+  native `-` shrinks.
+- `Ctrl+O`: `s` new numeric session, `t` session manager, `d` detach.
+- `Ctrl+S`: scroll; `Esc` returns to Normal from a mode.
+
+The old `Ctrl+A` prefix remains: `|`, `-`, `hjkl`, `HJKL`, `w`, `W`,
+`P`, `z`, `s`, `t`, `d`, and `[` (scroll). `Alt+1…9` selects tabs;
+`Alt+h/l` reorders them. Native aliases remain available. Closing through
+the tmux overrides is immediate: confirmation prompts, `S` session
+termination, repeat resize timing and resurrect/continuum are not ported.

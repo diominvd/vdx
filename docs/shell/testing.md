@@ -77,7 +77,7 @@ that every shell function or desktop scenario has been reviewed.
 
 | Reviewed area | Automated coverage |
 |---|---|
-| Live device smoke check (2026-10-30) | Read-only backend status succeeded for battery, PipeWire, Wi-Fi, Bluetooth and Hyprland displays; Wi-Fi scan populated three networks and the Bluetooth popup rendered the paired AirPods state. No connection, volume, power or display settings were changed |
+| Live device smoke check (2026-10-30) | Read-only backend status succeeded for battery, PipeWire, Wi-Fi, Bluetooth and Hyprland displays; Wi-Fi scan populated three networks and the Bluetooth popup rendered the paired headset state. No connection, volume, power or display settings were changed |
 | List reply compatibility | Eight production consumer handlers with populated/empty arrays, error objects, null and malformed JSON; separate object/list parser contracts |
 | Shared controls / Launcher | Object-only backend replies; select activation and pending states; literal search, query cancellation and navigation bounds |
 | Files | Production selection model: Shift extension/contraction, visible-row pruning and single picker selection; FIFO mutations and cancellation; history changes only after success and creation redo without duplicate entries; folder-list process-start failure clears loading and reports an error |

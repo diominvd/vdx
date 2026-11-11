@@ -107,3 +107,5 @@ wifi wifi
 wifi-off wifi-off
 x close
 zap lightning
+# Terminal: MingCute source commit 9dc7d3ad074fb16477096a6a8109a6467d0e2fe3, assets/svg/core/{regular,filled}/development/terminal_box.svg
+terminal terminal-box

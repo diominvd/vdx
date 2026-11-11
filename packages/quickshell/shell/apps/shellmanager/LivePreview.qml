@@ -122,7 +122,7 @@ Item {
     Row {
       spacing: Theme.gapMedium
       LiveGlyph { surface: chip.color; size: root.coverSize; corner: root.badgeRadius; name: "bluetooth"; tint: Theme.blue }
-      KitText { anchors.verticalCenter: parent.verticalCenter; text: "AirPods"; color: Theme.foreground1 }
+      KitText { anchors.verticalCenter: parent.verticalCenter; text: "Headphones"; color: Theme.foreground1 }
       LiveCap { surface: chip.color; text: "80%"; tint: Theme.blue; size: root.coverSize; corner: root.badgeRadius; plainBold: false }
     }
   }
