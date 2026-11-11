@@ -1529,6 +1529,12 @@
   ]
  },
  {
+  "label": "Width",
+  "hint": "How wide the centre opens",
+  "where": "Notifications › POPUP",
+  "target": "notifications"
+ },
+ {
   "label": "Notifications shown",
   "hint": "Before the list scrolls",
   "where": "Notifications › POPUP",

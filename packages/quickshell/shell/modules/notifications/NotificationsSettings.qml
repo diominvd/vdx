@@ -28,6 +28,12 @@ KitColumn {
   KitLabel { text: "POPUP"; about: "The centre: the history you open from the bell" }
 
   KitOptionRow {
+    module: "notifications"; key: "width"; fallback: Theme.modulePopupWidth
+    label: "Width"; hint: "How wide the centre opens"
+    model: [{ label: "Normal", value: Theme.modulePopupWidth }, { label: "Wide", value: 440 }, { label: "Wider", value: 540 }]
+  }
+
+  KitOptionRow {
     module: "notifications"; key: "rows"; fallback: 6
     label: "Notifications shown"; hint: "Before the list scrolls"
     model: [{ label: "4", value: 4 }, { label: "6", value: 6 }, { label: "10", value: 10 }]

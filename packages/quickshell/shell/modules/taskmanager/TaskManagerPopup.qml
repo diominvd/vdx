@@ -44,25 +44,64 @@ KitFrame {
 
   KitLine {}
 
-  // ---- load ----
-  Column {
+  // ---- load: four tiles ----
+  Grid {
+    id: tiles
     width: parent.width
-    spacing: Theme.gapMedium
+    columns: 2
+    spacing: Theme.gapSmall
+    readonly property real tile: Math.floor((width - spacing) / 2)
 
-    KitLabel { text: "CPU"; value: Math.round(root.tm.cpu) + "%"; valueColor: Theme.loadColor(root.tm.cpu) }
-    KitBar { value: root.tm.cpu / 100; tint: Theme.loadColor(root.tm.cpu) }
+    Repeater {
+      model: [
+        { name: "CPU", value: root.tm.cpu, text: Math.round(root.tm.cpu) + "%" },
+        { name: "MEMORY", value: 100 * root.tm.memUsed / Math.max(1, root.tm.memTotal), text: Format.shortSize(root.tm.memUsed) + " / " + Format.shortSize(root.tm.memTotal) },
+        { name: "GPU", value: root.tm.gpu, text: Math.round(root.tm.gpu) + "%" },
+        { name: "NETWORK", value: -1, text: "" }
+      ]
 
-    KitLabel {
-      text: "MEMORY"
-      value: Format.shortSize(root.tm.memUsed) + " / " + Format.shortSize(root.tm.memTotal)
-      valueColor: Theme.loadColor(100 * root.tm.memUsed / root.tm.memTotal)
+      Rectangle {
+        id: tile
+        required property var modelData
+        readonly property bool bar: modelData.value >= 0
+        width: tiles.tile
+        height: 58
+        radius: Theme.radiusControl
+        color: Theme.groupFill
+        border.width: Theme.frameWidth
+        border.color: Theme.controlLine
+
+        KitText {
+          x: Theme.gapMedium; y: Theme.gapMedium - 2
+          text: tile.modelData.name
+          color: Theme.muted
+          font.pixelSize: Theme.fontSize - 2
+          font.letterSpacing: 1
+        }
+
+        KitText {
+          visible: tile.bar
+          anchors { right: parent.right; rightMargin: Theme.gapMedium; top: parent.top; topMargin: Theme.gapMedium - 3 }
+          text: tile.modelData.text
+          color: Theme.loadColor(tile.modelData.value)
+          font.weight: Font.Medium
+        }
+
+        KitBar {
+          visible: tile.bar
+          anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: Theme.gapMedium }
+          value: Math.min(1, tile.modelData.value / 100)
+          tint: Theme.loadColor(tile.modelData.value)
+        }
+
+        Column {
+          visible: !tile.bar
+          anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: Theme.gapMedium }
+          KitText { text: "↓ " + Format.humanRate(root.tm.rx); font.pixelSize: Theme.fontSize - 1; color: Theme.foreground2 }
+          KitText { text: "↑ " + Format.humanRate(root.tm.tx); font.pixelSize: Theme.fontSize - 1; color: Theme.foreground2 }
+        }
+      }
     }
-    KitBar { value: root.tm.memUsed / root.tm.memTotal; tint: Theme.loadColor(100 * root.tm.memUsed / root.tm.memTotal) }
-
-    KitLabel { text: "GPU · " + root.tm.gpuName; value: Math.round(root.tm.gpu) + "%"; valueColor: Theme.loadColor(root.tm.gpu) }
-    KitBar { value: root.tm.gpu / 100; tint: Theme.loadColor(root.tm.gpu) }
-
-    KitLabel { text: "NETWORK"; value: "↓ " + Format.humanRate(root.tm.rx) + "  ↑ " + Format.humanRate(root.tm.tx); valueColor: Theme.foreground2 }
   }
 
   KitLine {}
@@ -70,7 +109,7 @@ KitFrame {
   // ---- the busiest ----
   Column {
     width: parent.width
-    spacing: Theme.gapSmall
+    spacing: Theme.gapHair
 
     KitLabel {
       text: root.tm.sortBy === "mem" ? "TOP BY MEMORY" : root.tm.sortBy === "name" ? "BY NAME" : "TOP BY CPU"
@@ -80,16 +119,22 @@ KitFrame {
     Repeater {
       model: root.tm.popupRows.slice(0, root.count)
 
-      Item {
+      Rectangle {
         id: row
 
         required property var modelData
+        readonly property bool armed: root.armed === modelData.key
+        readonly property bool busy: root.tm.busy && root.ending === modelData.key
 
         width: parent.width
-        height: 28
+        height: 32
+        radius: Theme.radiusControl
+        color: armed ? Theme.mix(Theme.background0, Theme.red, 0.14) : hover.hovered ? Theme.controlHover : Theme.clear
+        Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
+        HoverHandler { id: hover }
 
         KitText {
-          anchors { left: parent.left; right: cpuText.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
+          anchors { left: parent.left; leftMargin: Theme.gapMedium; right: cpuText.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
           text: row.modelData.name + (row.modelData.count > 1 ? "  ×" + row.modelData.count : "")
           elide: Text.ElideRight
         }
@@ -97,27 +142,30 @@ KitFrame {
         KitText {
           id: cpuText
           anchors { right: memText.left; rightMargin: Theme.gapWide; verticalCenter: parent.verticalCenter }
-          width: 52
+          width: 48
           horizontalAlignment: Text.AlignRight
           text: row.modelData.cpu.toFixed(1) + "%"
-          color: row.modelData.cpu >= 1 ? Theme.loadColor(row.modelData.cpu) : Theme.foreground2
+          color: row.modelData.cpu >= 1 ? Theme.loadColor(row.modelData.cpu) : Theme.muted
         }
 
         KitText {
           id: memText
-          anchors { right: endButton.left; rightMargin: Theme.gapLoose; verticalCenter: parent.verticalCenter }
-          width: 64
+          anchors { right: endButton.left; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+          width: 60
           horizontalAlignment: Text.AlignRight
           text: Format.shortSize(row.modelData.mem)
           color: Theme.foreground2
         }
 
+        // End shows on hover (and stays while it waits for its second click or runs)
         KitButton {
           id: endButton
-          anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-          icon: root.armed === row.modelData.key ? "check" : "x"
-          selected: root.armed === row.modelData.key
-          busy: root.tm.busy && root.ending === row.modelData.key
+          anchors { right: parent.right; rightMargin: 2; verticalCenter: parent.verticalCenter }
+          icon: row.armed ? "check" : "x"
+          selected: row.armed
+          busy: row.busy
+          opacity: hover.hovered || row.armed || row.busy ? 1 : 0.35
+          Behavior on opacity { enabled: Motion.controls; NumberAnimation { duration: Motion.quick } }
           onClicked: root.end(row.modelData)
         }
       }

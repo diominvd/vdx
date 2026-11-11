@@ -75,7 +75,20 @@ Column {
           readonly property int base: Theme.rowHeight
           // the hairline between two options and the gap under it: the list's gap above is the other half
           readonly property int lead: index > 0 ? Theme.dividerThickness + Theme.settingsRowInset : 0
-          height: lead + base
+          // while the name is typed, the apps that fit it stand under the field as choices
+          readonly property string typed: field.typing ? typer.text.trim().toLowerCase() : ""
+          readonly property var ruled: root.rules.map(r => (r.app ?? "").toLowerCase())
+          readonly property var suggestions: {
+            if (!field.typing) return [];
+            const fit = root.appNames.filter(a => !ruled.includes(a.toLowerCase()) && (typed === "" || a.toLowerCase().includes(typed)));
+            // names that start with what is typed first, apps that notified before the installed ones
+            const rank = a => (a.toLowerCase().startsWith(typed) ? 0 : 2) + (root.heard.includes(a) ? 0 : 1);
+            return fit.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b)).slice(0, 8);
+          }
+          readonly property int pickRows: suggestions.length > 0 ? 1 : 0
+          height: lead + base + (pickRows > 0 ? picks.height + Theme.gapSmall : 0)
+          Behavior on height { enabled: Motion.controls; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
+          clip: true
           KitAppear { target: rule; seen: root.known; key: "rule" + rule.index }
 
           Rectangle {
@@ -137,7 +150,7 @@ Column {
               anchors.fill: parent
               placeholder: "App name"
               Component.onCompleted: if (field.typing) input.forceActiveFocus()
-              completions: field.typing ? root.appNames : []
+              completions: field.typing ? rule.suggestions : []
               passKeys: [Qt.Key_Escape]
               onAccepted: field.commit()
               onKeyPassed: key => {
@@ -161,6 +174,38 @@ Column {
             icon: "x"
             Accessible.name: "Remove the rule"
             onClicked: root.remove(rule.index)
+          }
+
+          // the choices: a tap fills the name and keeps the rule
+          Flow {
+            id: picks
+            visible: rule.pickRows > 0
+            x: sample.width + Theme.gapWide
+            y: rule.lead + rule.base
+            width: parent.width - x
+            spacing: Theme.gapSmall
+            Repeater {
+              model: rule.suggestions
+              Rectangle {
+                id: chip
+                required property string modelData
+                height: 26
+                width: chipText.implicitWidth + 2 * Theme.gapMedium
+                radius: Theme.radiusFor(height)
+                color: chipArea.containsMouse ? Theme.controlHover : Theme.fillOn(true)
+                border.width: Theme.frameWidth
+                border.color: Theme.controlLine
+                Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
+                KitText { id: chipText; anchors.centerIn: parent; text: chip.modelData; font.pixelSize: Theme.fontSize - 1; color: Theme.foreground2 }
+                MouseArea {
+                  id: chipArea
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: { typer.text = chip.modelData; field.commit(); }
+                }
+              }
+            }
           }
 
           KitColourRow {

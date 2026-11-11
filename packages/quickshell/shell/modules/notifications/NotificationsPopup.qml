@@ -11,6 +11,9 @@ import "../../kit/markup.js" as Markup
 KitFrame {
   id: root
 
+  // the centre's width (Notifications › Popup › Width)
+  implicitWidth: ModuleSettings.get("notifications", "width", Theme.modulePopupWidth)
+
   readonly property var items: NotificationsService.items
   // a notification that comes in while it is open eases in
   property KitSeen seen: KitSeen {}

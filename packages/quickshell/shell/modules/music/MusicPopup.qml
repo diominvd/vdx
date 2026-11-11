@@ -73,43 +73,14 @@ KitFrame {
     }
   }
 
-  Rectangle {
+  KitNotice {
     id: playbackError
-    width: parent.width
-    visible: MpdService.error !== ""
-    implicitHeight: errorRow.implicitHeight + Theme.gapMedium * 2
-    color: Theme.groupFill
-    radius: Theme.radiusCard
-    border.width: Theme.frameWidth
-    border.color: Theme.controlLineRest
-
-    Row {
-      id: errorRow
-      anchors { fill: parent; margins: Theme.gapMedium }
-      spacing: Theme.gapSmall
-
-      KitIcon {
-        id: errorIcon
-        anchors.top: parent.top
-        name: "info"
-        tint: Theme.red
-        size: Theme.iconSmall
-      }
-
-      KitText {
-        width: Math.max(0, parent.width - errorIcon.width - dismiss.width - 2 * parent.spacing)
-        text: MpdService.error
-        color: Theme.red
-        wrapMode: Text.WordWrap
-        font.pixelSize: Theme.fontSize - 1
-      }
-
-      KitButton {
-        id: dismiss
-        icon: "x"
-        Accessible.name: "Dismiss playback error"
-        onClicked: MpdService.clearError()
-      }
-    }
+    shown: MpdService.error !== ""
+    icon: "info"
+    tone: Theme.red
+    title: "Playback error"
+    text: MpdService.error
+    action: "Dismiss"
+    onActed: MpdService.clearError()
   }
 }
