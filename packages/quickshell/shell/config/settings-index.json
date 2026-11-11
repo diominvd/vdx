@@ -675,6 +675,12 @@
   "target": "terminal"
  },
  {
+  "label": "Zen mode",
+  "hint": "Open and new sessions · Alt + Z toggles",
+  "where": "Terminal › OPENING",
+  "target": "terminal"
+ },
+ {
   "label": "Horizontal padding",
   "hint": "",
   "where": "Terminal › PADDING",

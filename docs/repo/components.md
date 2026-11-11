@@ -39,6 +39,14 @@ Its native tab bar sits above the terminal, with a two-line classic status
 bar below (modes and contextual hints) and standard pane frames. No custom
 plugin is used. Native mode entries retain familiar tmux action keys:
 
+- `Alt+Z`: toggle Zen mode (focused pane fills the terminal, without UI bars);
+  available in every mode, including Locked. Press again to restore the layout.
+  Shell Manager › Terminal › Zen mode saves the default and applies it to the
+  focused pane of each open session. New/resumed sessions use it on attachment;
+  Alt+Z temporarily overrides it. Startup reconciliation stops after readiness
+  or an eight-second deadline (individual CLI calls have two-second timeouts).
+  No process remains afterwards. The preference is in
+  `$XDG_STATE_HOME/dotfiles/zellij.json`.
 - `Ctrl+P`: `|` right split, `-` down split, `P` close pane, `z` zoom,
   `hjkl` focus.
 - `Ctrl+T`: `w` new tab, `W` close tab.
@@ -52,3 +60,11 @@ The old `Ctrl+A` prefix remains: `|`, `-`, `hjkl`, `HJKL`, `w`, `W`,
 `Alt+h/l` reorders them. Native aliases remain available. Closing through
 the tmux overrides is immediate: confirmation prompts, `S` session
 termination, repeat resize timing and resurrect/continuum are not ported.
+
+Tmux also uses Alt+Z for a temporary Zen toggle: the current pane is zoomed,
+with status and pane titles hidden. Shell Manager › Terminal › Zen mode is
+shown for tmux and Zellij and fades with the control animation preference.
+The tmux default is stored in `~/.config/tmux/zen.conf`, sourced by tmux.conf.
+Changing it updates open sessions and global defaults; native new-session
+and new-window hooks apply zoom without a helper process or polling.
+Existing tmux servers need a config reload to acquire the new key and hooks.

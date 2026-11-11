@@ -1,4 +1,4 @@
-// Native Zellij modes and classic two-line hints; Ctrl+A remains available.
+// Native Zellij modes and classic contextual hints; Ctrl+A remains available.
 default_shell "zsh"
 default_mode "normal"
 default_layout "vdx"
@@ -15,6 +15,10 @@ show_startup_tips false
 show_release_notes false
 keybinds {
     unbind "Ctrl b"
+    // Zen: toggle the focused pane without bars or other panes, in every mode.
+    shared {
+        bind "Alt z" { ToggleFocusNoUiFullscreen; }
+    }
     shared_except "tmux" "locked" {
         bind "Ctrl a" { SwitchToMode "Tmux"; }
     }

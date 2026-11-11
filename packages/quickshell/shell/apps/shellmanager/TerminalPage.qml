@@ -14,8 +14,9 @@ Column {
   readonly property string script: Paths.scriptsDir + "/terminal.py"
   property var info: ({})
   property string error: ""
+  property bool settingsLoaded: false
   readonly property bool busy: proc.running
-  readonly property bool changed: info.selected !== undefined && (info.selected !== info.default || info.padding.horizontal !== 6 || info.padding.vertical !== 6)
+  readonly property bool changed: info.selected !== undefined && (info.selected !== info.default || info.padding.horizontal !== 6 || info.padding.vertical !== 6 || info.zenChanged === true)
   function reset() { run(["reset"]); }
   function run(args) {
     if (busy) return;
@@ -27,15 +28,51 @@ Column {
   spacing: Theme.sectionGap
 
   KitLabel { text: "OPENING" }
-  KitRow {
-    label: "Multiplexer"
-    hint: "Applies to new terminal windows"
-    wide: true
-    KitSegments {
-      model: [{ label: "Shell", value: "none" }, { label: "tmux", value: "tmux" }, { label: "Zellij", value: "zellij" }]
-      current: root.info.selected ?? "none"
-      disabled: root.busy || root.info.selected === undefined
-      onPicked: value => root.run(["set", value])
+  // Keep the selector in the layout while the row and its gap collapse together.
+  Column {
+    id: openingRows
+    width: parent.width
+    readonly property bool zenShown: root.info.selected === "zellij" || root.info.selected === "tmux"
+    property real reveal: zenShown ? 1 : 0
+    spacing: root.spacing * reveal
+    Behavior on reveal {
+      enabled: Motion.controls && root.settingsLoaded
+      NumberAnimation { duration: Motion.normal; easing.type: Motion.easing }
+    }
+    KitRow {
+      label: "Multiplexer"
+      hint: "Applies to new terminal windows"
+      wide: true
+      KitSegments {
+        id: multiplexer
+        model: [{ label: "Shell", value: "none" }, { label: "tmux", value: "tmux" }, { label: "Zellij", value: "zellij" }]
+        current: root.info.selected ?? "none"
+        disabled: root.busy || root.info.selected === undefined
+        onPicked: value => root.run(["set", value])
+      }
+    }
+    Item {
+      width: parent.width
+      height: zenRow.implicitHeight * openingRows.reveal
+      clip: true
+      opacity: openingRows.reveal
+      enabled: openingRows.zenShown
+      KitRow {
+        id: zenRow
+        height: implicitHeight
+        label: "Zen mode"
+        hint: "Open and new sessions · Alt + Z toggles"
+        needs: root.info.zenAvailable ? "" : "Multiplexer is not installed or configured"
+        KitSwitch {
+          checked: root.info.zen === true
+          enabled: !root.busy
+          onToggled: {
+            // A mouse click must not restore the selector's focus after the write.
+            if (!activeFocus) root.forceActiveFocus(Qt.MouseFocusReason);
+            root.run(["zen", checked ? "off" : "on"]);
+          }
+        }
+      }
     }
   }
   KitLine {}
@@ -73,6 +110,10 @@ Column {
     stdout: StdioCollector { onStreamFinished: proc.output = text }
     onExited: {
       const reply = Reply.parse(output, "terminal.py");
+      if (reply.selected !== undefined) {
+        root.info = reply;
+        if (!root.settingsLoaded) Qt.callLater(() => root.settingsLoaded = true);
+      }
       if (reply.ok) { root.info = reply; root.error = ""; }
       else root.error = reply.error ?? "Could not change the terminal";
     }
