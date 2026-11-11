@@ -28,19 +28,19 @@ Column {
   KitRow {
     wide: true
     label: "Current password"
-    KitInput { id: current; echoMode: TextInput.Password; placeholder: "Current"; onAccepted: fresh.input.forceActiveFocus() }
+    KitInput { id: current; echoMode: TextInput.Password; placeholder: "Current"; centerMasked: false; onAccepted: fresh.input.forceActiveFocus() }
   }
   KitRow {
     wide: true
     label: "New password"
-    KitInput { id: fresh; echoMode: TextInput.Password; placeholder: "New"; onAccepted: again.input.forceActiveFocus() }
+    KitInput { id: fresh; echoMode: TextInput.Password; placeholder: "New"; centerMasked: false; onAccepted: again.input.forceActiveFocus() }
   }
   KitRow {
     wide: true
     label: "Repeat it"
     hint: again.text !== "" && again.text !== fresh.text ? "The two do not match" : ""
     hintLevel: "danger"
-    KitInput { id: again; echoMode: TextInput.Password; placeholder: "Repeat"; onAccepted: root.submit() }
+    KitInput { id: again; echoMode: TextInput.Password; placeholder: "Repeat"; centerMasked: false; onAccepted: root.submit() }
   }
   KitRow {
     label: "Change the password"

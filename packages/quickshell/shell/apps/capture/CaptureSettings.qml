@@ -11,8 +11,6 @@ import qs.kit
 Column {
   spacing: Theme.sectionGap
 
-  KitLabel { text: "TOOLBAR"; keepInFlat: true }
-
   KitOptionRow {
     module: "capture"; key: "delay"; fallback: 0
     label: "Delay button"
