@@ -52,7 +52,7 @@ Singleton {
     { id: "focus",         label: "Focus",         zone: "right",  tile: true, icon: "moon", about: "Do not disturb" },
     { id: "ai",            label: "AI",            zone: "right",  icon: "bot", settings: "AiSettings.qml", about: "AI limits and local models" },
     { id: "shell",         label: "Shell",         zone: "right",  icon: "sliders", about: "Shell settings and layout" },
-    { id: "notifications", label: "Notifications", zone: "right",  icon: "bell", settings: "NotificationsSettings.qml", about: "History of notifications" },
+    { id: "notifications", label: "Notifications", zone: "right", island: "end", icon: "bell", settings: "NotificationsSettings.qml", about: "History of notifications" },
     { id: "capture",       label: "Capture",       zone: "right",  icon: "camera", about: "Screenshots and recordings" },
     { id: "clipboard",     label: "Clipboard",     zone: "right",  icon: "clipboard", about: "Clipboard history and images" },
     { id: "sysmon",        label: "System",        zone: "right",  icon: "cpu", settings: "SysmonSettings.qml", about: "CPU, memory, GPU, disks, network, sensors" },
@@ -325,8 +325,8 @@ Singleton {
   // ---- island (Bar › Style island) ----
   // Its own layout per role, apart from the strip's: start / end — beside the
   // clock in the resting pill; hub — the chips when it opens; the rest hidden.
-  // Never arranged, it follows the strip: workspaces at the start, every other
-  // placed module (the folder's too) in the hub.
+  // Never arranged, it follows the strip: workspaces at the start, notifications
+  // at the end; other modules follow their preferred zone or go in the hub.
   // hub: the chips; tiles: the tiles (only modules with `tile: true`), a grid of their own
   readonly property var islandZones: ["start", "end", "hub", "tiles"]
   readonly property var islandOwn: ["clock", "folder"]   // the island shows the time; it needs no folder
