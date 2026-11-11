@@ -7,6 +7,9 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -83,6 +86,41 @@ class Position(unittest.TestCase):
     def test_logical_size_follows_scale(self):
         self.assertEqual(display.logical(self.monitors[0]), (0, 0, 1600, 900))
 
+    def test_saved_lua_reapplies_layout_and_exact_rate_on_reload(self):
+        self.monitors[1]["availableModes"] = ["1920x1080@143.987Hz"]
+        display.save({"scales": {"HDMI-A-2": 1.25},
+                      "rates": {"HDMI-A-2": 143.99},
+                      "positions": {"HDMI-A-2": [1600, -200]}})
+        rules = self.state.with_suffix(".lua").read_text()
+        self.assertIn('mode = "1920x1080@143.987"', rules)
+        self.assertIn('position = "1600x-200", scale = 1.25', rules)
+        self.assertNotIn('output = "eDP-1"', rules)
+        self.assertFalse(self.state.with_suffix(".lua.tmp").exists())
+        lua = shutil.which("lua")
+        if not lua:
+            self.skipTest("Lua runtime unavailable")
+        home = Path(self.tmp.name) / "home"
+        target = home / ".local/state/dotfiles/display.lua"
+        target.parent.mkdir(parents=True)
+        target.write_text(rules)
+        config = SCRIPTS.parents[2] / "hypr/components/monitors.lua"
+        fixture = """
+package.preload['components.machine'] = function() return {load=function() return false end} end
+local last
+hl = {monitor=function(rule) last = rule end}
+for i=1,3 do
+ dofile(arg[1])
+ assert(last.output == 'HDMI-A-2')
+ assert(last.mode == '1920x1080@143.987')
+ assert(last.position == '1600x-200' and last.scale == 1.25)
+end
+"""
+        script = home / "test.lua"
+        script.write_text(fixture)
+        result = subprocess.run([lua, str(script), str(config)],
+                                env=os.environ | {"HOME": str(home)}, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_old_state_without_positions_loads(self):
         self.state.write_text(json.dumps({"scales": {"eDP-1": 1.25}}))
         self.assertEqual(display.saved(), {"scales": {"eDP-1": 1.25}, "rates": {}, "positions": {}})
@@ -142,6 +180,11 @@ class Mode(unittest.TestCase):
             display.apply(m, scale=1.25)
         lua = eval_.call_args[0][0][-1]
         self.assertIn('mode = "1920x1080@144.00301"', lua)
+
+    def test_saved_rounded_rate_resolves_to_exact_offered_mode(self):
+        m = mon("DP-1", 0, 0, modes=("1920x1080@143.987Hz",))
+        self.assertEqual(display.exact_rate(m, 143.99), 143.987)
+        self.assertEqual(display.exact_rate(m, 120), 60.0)
 
     def test_apply_never_restores_awww_cache(self):
         # awww restore redraws the cached picture, not the chosen one (the shell redraws)

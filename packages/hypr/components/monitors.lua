@@ -12,3 +12,11 @@ if not require("components.machine").load("monitors") then
 		scale = "auto",
 	})
 end
+
+-- Saved display choices override the profile on every config reload.
+local saved = os.getenv("HOME") .. "/.local/state/dotfiles/display.lua"
+local file = io.open(saved, "r")
+if file then
+	file:close()
+	dofile(saved)
+end

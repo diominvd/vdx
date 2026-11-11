@@ -199,7 +199,7 @@ names still open the new places (`resolve()` in ShellManager.qml).
 | Notifications | `modules/notifications/`, `scripts/notifications.sh`, `bar/island/IslandNotice.qml`, `IslandService` › notice | mako (server), `dbus-monitor`, `makoctl` | Solid: mako toasts; Island: island toasts, mako `island` mode invisible |
 | Coding agent notices | `scripts/agent_notify.py`; Claude user hooks and Codex project hooks | Claude Code `Notification` / `Stop`; Codex `PermissionRequest` / `Stop` | permission prompts and completed turns use the desktop notification path |
 | Wallpaper | `apps/shellmanager/Wallpaper.qml` (in `shell.qml`), `WallpaperService.qml` | `awww`, `wallpapers/` in the repo | modes theme / custom / image (`ShellSettings.wallpaperMode`) |
-| Displays | Shell Manager › Displays (`DisplaysPage`), `apps/display/` (service, layout), `scripts/display.py` | `hyprctl` | restore at login |
+| Displays | Shell Manager › Displays (`DisplaysPage`), `apps/display/` (service, layout), `scripts/display.py` | `hyprctl` | saved overrides at login and config reload |
 | Audio | `modules/audio/`, `scripts/audio.sh` | Quickshell Pipewire, `pactl` (ports) | one list entry per port |
 | Bluetooth | `modules/bluetooth/`, `apps/shellmanager/BluetoothPage.qml`, `scripts/bluetooth.sh` | BlueZ | — |
 | VPN | `modules/mihomo/`, `apps/shellmanager/VpnPage.qml`, `scripts/mihomo.sh` | Mihomo | — |
