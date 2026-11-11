@@ -5,7 +5,7 @@ import qs.kit
 import "../../kit/reply.js" as Reply
 
 // Page-local processes: one read on opening, one write per selection.
-Column {
+KitColumn {
   id: root
   readonly property string icon: "terminal"
   readonly property string title: "Terminal"
@@ -16,7 +16,7 @@ Column {
   property string error: ""
   property bool settingsLoaded: false
   readonly property bool busy: proc.running
-  readonly property bool changed: settingsLoaded && (info.selected !== info.default || info.padding.horizontal !== 6 || info.padding.vertical !== 6 || info.zenChanged === true)
+  readonly property bool changed: settingsLoaded && (info.selected !== info.default || info.padding.horizontal !== 6 || info.padding.vertical !== 6 || info.zenChanged === true || info.restoreSessions === true)
   readonly property var paddingSnaps: Array.from({ length: 41 }, (_, i) => i / 40)
   function reset() { run(["reset"]); }
   function run(args) {
@@ -29,51 +29,37 @@ Column {
   spacing: Theme.sectionGap
 
   KitLabel { text: "OPENING" }
-  // Keep the selector in the layout while the row and its gap collapse together.
-  Column {
-    id: openingRows
-    width: parent.width
-    readonly property bool zenShown: root.info.selected === "zellij" || root.info.selected === "tmux"
-    property real reveal: zenShown ? 1 : 0
-    spacing: root.spacing * reveal
-    Behavior on reveal {
-      enabled: Motion.controls && root.settingsLoaded
-      NumberAnimation { duration: Motion.normal; easing.type: Motion.easing }
+  KitRow {
+    label: "Multiplexer"
+    hint: "Applies to new terminal windows"
+    wide: true
+    KitSegments {
+      model: [{ label: "Shell", value: "none" }, { label: "tmux", value: "tmux" }, { label: "Zellij", value: "zellij" }]
+      current: root.info.selected ?? "none"
+      disabled: root.info.selected === undefined
+      enabled: !root.busy && !disabled
+      onPicked: value => root.run(["set", value])
     }
-    KitRow {
-      label: "Multiplexer"
-      hint: "Applies to new terminal windows"
-      wide: true
-      KitSegments {
-        id: multiplexer
-        model: [{ label: "Shell", value: "none" }, { label: "tmux", value: "tmux" }, { label: "Zellij", value: "zellij" }]
-        current: root.info.selected ?? "none"
-        disabled: root.busy || root.info.selected === undefined
-        onPicked: value => root.run(["set", value])
-      }
+  }
+  KitRow {
+    visible: root.info.selected === "zellij" || root.info.selected === "tmux"
+    label: "Zen mode"
+    hint: "Open and new sessions · Alt + Z toggles"
+    needs: root.info.zenAvailable ? "" : "Multiplexer is not installed or configured"
+    KitSwitch {
+      checked: root.info.zen === true
+      enabled: !root.busy
+      onToggled: root.run(["zen", checked ? "off" : "on"])
     }
-    Item {
-      width: parent.width
-      height: zenRow.implicitHeight * openingRows.reveal
-      clip: true
-      opacity: openingRows.reveal
-      enabled: openingRows.zenShown
-      KitRow {
-        id: zenRow
-        height: implicitHeight
-        label: "Zen mode"
-        hint: "Open and new sessions · Alt + Z toggles"
-        needs: root.info.zenAvailable ? "" : "Multiplexer is not installed or configured"
-        KitSwitch {
-          checked: root.info.zen === true
-          enabled: !root.busy
-          onToggled: {
-            // A mouse click must not restore the selector's focus after the write.
-            if (!activeFocus) root.forceActiveFocus(Qt.MouseFocusReason);
-            root.run(["zen", checked ? "off" : "on"]);
-          }
-        }
-      }
+  }
+  KitRow {
+    visible: root.info.selected === "zellij"
+    label: "Restore sessions"
+    hint: "Applies to new Zellij sessions"
+    KitSwitch {
+      checked: root.info.restoreSessions === true
+      enabled: !root.busy && root.info.restoreSessions !== undefined
+      onToggled: root.run(["restore", checked ? "off" : "on"])
     }
   }
   KitLine {}
@@ -115,11 +101,12 @@ Column {
         && ["none", "tmux", "zellij"].includes(reply.default)
         && Number.isInteger(reply.padding?.horizontal) && reply.padding.horizontal >= 0 && reply.padding.horizontal <= 40
         && Number.isInteger(reply.padding?.vertical) && reply.padding.vertical >= 0 && reply.padding.vertical <= 40;
-      if (valid) {
+      const validRestore = typeof reply.restoreSessions === "boolean";
+      if (valid && validRestore) {
         root.info = reply;
         if (!root.settingsLoaded) Qt.callLater(() => root.settingsLoaded = true);
       }
-      if (reply.ok && valid) root.error = "";
+      if (reply.ok && valid && validRestore) root.error = "";
       else if (reply.ok) root.error = "Invalid terminal settings reply";
       else root.error = reply.error ?? "Could not change the terminal";
     }

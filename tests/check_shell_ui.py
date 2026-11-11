@@ -42,6 +42,18 @@ def main():
         config = work / "qs/config"
         config.mkdir(parents=True)
         shutil.copytree(SHELL / "kit", work / "qs/kit")
+        # Keep the Terminal view and handlers; replace only its system boundary.
+        terminal_page = (SHELL / "apps/shellmanager/TerminalPage.qml").read_text()
+        terminal_page = terminal_page.replace("import Quickshell.Io\n", "").replace(
+            'import "../../kit/reply.js" as Reply', 'import "reply.js" as Reply')
+        terminal_page = terminal_page.replace(
+            'Paths.scriptsDir + "/terminal.py"', '"unused"').replace(
+            "readonly property bool busy: proc.running", "property bool busy: false\n  property var calls: []")
+        terminal_page = terminal_page.replace(qml_function(terminal_page, "run"),
+            "  function run(args) { calls = calls.concat([args]); }")
+        terminal_page = terminal_page.replace("  Component.onCompleted: run([\"status\"])\n", "")
+        terminal_page = terminal_page.replace(qml_block(terminal_page, "  Process {"), "")
+        (work / "qs/kit/TestTerminalPage.qml").write_text(terminal_page)
         shutil.copy(SHELL / "bar/island/hub/HubLayout.js", work / "qs/kit/HubLayout.js")
         for name in ("EntryFolds.qml", "NavRow.qml", "RailButton.qml"):
             shutil.copy(SHELL / "apps/shellmanager" / name, work / "qs/kit" / name)

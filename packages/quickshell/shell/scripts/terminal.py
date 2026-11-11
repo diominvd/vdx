@@ -21,6 +21,14 @@ def read_choice(path, fallback):
         return fallback
 
 
+def terminal_preferences():
+    try:
+        value = json.loads((STATE / "terminal.json").read_text())
+        return value if isinstance(value, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
 def padding_values():
     try:
         words = (CONFIG / "kitty/padding.conf").read_text().split()
@@ -125,14 +133,17 @@ def set_zen(value, multiplexer=None):
 
 
 def status():
+    preferences = terminal_preferences()
     default = read_choice(STATE / "components.json", "none")
-    selected = read_choice(STATE / "terminal.json", default)
+    selected = preferences.get("multiplexer", default)
+    if not isinstance(selected, str) or selected not in OPTIONS:
+        selected = default
     available = {"none": True, "tmux": bool(shutil.which("tmux") and (CONFIG / "tmux/tmux.conf").is_file()),
                  "zellij": bool(shutil.which("zellij") and (CONFIG / "zellij/session.py").is_file())}
     zen = {name: zen_enabled(name) for name in ("tmux", "zellij")}
     return {"ok": True, "selected": selected, "default": default, "available": available, "padding": padding_values(),
             "zen": zen.get(selected, False), "zenAvailable": selected in zen and available[selected],
-            "zenChanged": any(zen.values())}
+            "zenChanged": any(zen.values()), "restoreSessions": preferences.get("restoreSessions") is True}
 
 
 def select(value):
@@ -143,7 +154,22 @@ def select(value):
     STATE.mkdir(parents=True, exist_ok=True)
     target = STATE / "terminal.json"
     temporary = target.with_suffix(".tmp")
-    temporary.write_text(json.dumps({"multiplexer": value}) + "\n")
+    preferences = terminal_preferences()
+    preferences["multiplexer"] = value
+    temporary.write_text(json.dumps(preferences) + "\n")
+    temporary.replace(target)
+    return status()
+
+
+def set_restore_sessions(value):
+    if value not in {"on", "off"}:
+        raise ValueError("Expected on or off")
+    STATE.mkdir(parents=True, exist_ok=True)
+    target = STATE / "terminal.json"
+    temporary = target.with_suffix(".tmp")
+    preferences = terminal_preferences()
+    preferences["restoreSessions"] = value == "on"
+    temporary.write_text(json.dumps(preferences) + "\n")
     temporary.replace(target)
     return status()
 
@@ -158,6 +184,8 @@ def main():
             out(set_padding(sys.argv[2], sys.argv[3]))
         elif len(sys.argv) == 3 and sys.argv[1] == "zen":
             out(set_zen(sys.argv[2]))
+        elif len(sys.argv) == 3 and sys.argv[1] == "restore":
+            out(set_restore_sessions(sys.argv[2]))
         elif sys.argv[1:] == ["reset"]:
             for multiplexer in ("tmux", "zellij"):
                 if zen_enabled(multiplexer):
@@ -168,7 +196,7 @@ def main():
             (STATE / "terminal.json").unlink(missing_ok=True)
             out(status())
         else:
-            fail("Usage: terminal.py status | set none|tmux|zellij | padding horizontal|vertical 0..40 | zen on|off | reset")
+            fail("Usage: terminal.py status | set none|tmux|zellij | padding horizontal|vertical 0..40 | zen on|off | restore on|off | reset")
     except (OSError, ValueError) as error:
         fail(str(error))
 

@@ -634,6 +634,21 @@ Item {
       keyClick(Qt.Key_Right); compare(segments.current, 3);
       keyClick(Qt.Key_Home); compare(segments.current, 1);
     }
+    function test_segments_mouse_does_not_acquire_focus_after_save() {
+      button.forceActiveFocus();
+      mouseClick(segments, segments.width / 2, segments.height / 2);
+      compare(segments.current, 2);
+      verify(!segments.activeFocus);
+      segments.disabled = true;
+      wait(10);
+      segments.disabled = false;
+      wait(10);
+      verify(!segments.activeFocus);
+      segments.forceActiveFocus(Qt.TabFocusReason);
+      verify(segments.activeFocus);
+      keyClick(Qt.Key_Right);
+      compare(segments.current, 3);
+    }
     function test_select_pushes_following_content_data() {
       return [{tag: "popup", grouped: false}, {tag: "settings", grouped: true}];
     }

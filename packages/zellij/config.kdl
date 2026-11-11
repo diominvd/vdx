@@ -8,7 +8,7 @@ pane_frames true
 pane_frame_style "full"
 simplified_ui false
 scroll_buffer_size 10000
-session_serialization true
+session_serialization false
 serialize_pane_viewport false
 on_force_close "detach"
 show_startup_tips false

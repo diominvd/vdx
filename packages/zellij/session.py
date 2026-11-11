@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Numbered sessions and a persistent, event-driven Zen preference."""
+"""Numbered sessions, Zen preference, and session restoration preference."""
 import fcntl
 import json
 import os
@@ -24,6 +24,29 @@ def zen_enabled():
         return json.loads(zen_preference().read_text()).get("zen") is True
     except (OSError, ValueError, AttributeError):
         return False
+
+
+def restore_sessions_enabled():
+    state = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state")
+    try:
+        return json.loads((state / "dotfiles/terminal.json").read_text()).get("restoreSessions") is True
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
+def discard_exited_default_session(binary):
+    result = subprocess.run([binary, "list-sessions", "--no-formatting"],
+                            capture_output=True, text=True, timeout=2)
+    if result.returncode:
+        if "No active zellij sessions" in result.stderr + result.stdout:
+            return
+        raise ValueError(result.stderr.strip() or "Could not list Zellij sessions")
+    for line in result.stdout.splitlines():
+        name = line.split(" [Created ", 1)[0]
+        if name == "1" and "(EXITED" in line:
+            subprocess.run([binary, "delete-session", "1"], capture_output=True,
+                           text=True, timeout=2, check=True)
+            return
 
 
 def query(binary, session, action):
@@ -117,7 +140,11 @@ def main():
         return
     if sys.argv[1:] != ["new"]:
         schedule_zen("1")
-        os.execv(binary, [binary, "attach", "--create", "1"])
+        restore = restore_sessions_enabled()
+        if not restore:
+            discard_exited_default_session(binary)
+        serialization = "true" if restore else "false"
+        os.execv(binary, [binary, "attach", "--create", "1", "options", "--session-serialization", serialization])
     source = os.environ.get("ZELLIJ_SESSION_NAME")
     if not source:
         raise SystemExit("Create sessions from inside Zellij")

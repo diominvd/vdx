@@ -681,6 +681,12 @@
   "target": "terminal"
  },
  {
+  "label": "Restore sessions",
+  "hint": "Applies to new Zellij sessions",
+  "where": "Terminal › OPENING",
+  "target": "terminal"
+ },
+ {
   "label": "Horizontal padding",
   "hint": "",
   "where": "Terminal › PADDING",

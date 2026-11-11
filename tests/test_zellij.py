@@ -45,6 +45,16 @@ spec.loader.exec_module(module)
 
 
 class Zen(unittest.TestCase):
+    def test_launcher_passes_restoration_to_attach_options(self):
+        class Executed(Exception):
+            pass
+        for restore in (True, False):
+            with self.subTest(restore=restore), mock.patch.object(module.sys, "argv", ["session.py"]), mock.patch.object(module.shutil, "which", return_value="zellij"), mock.patch.object(module, "schedule_zen"), mock.patch.object(module, "restore_sessions_enabled", return_value=restore), mock.patch.object(module, "discard_exited_default_session") as discard, mock.patch.object(module.os, "execv", side_effect=Executed) as execute:
+                with self.assertRaises(Executed):
+                    module.main()
+                self.assertEqual(execute.call_args.args[1], ["zellij", "attach", "--create", "1", "options", "--session-serialization", str(restore).lower()])
+                self.assertEqual(discard.call_count, int(not restore))
+
     def test_targets_active_tab_and_distinguishes_regular_zoom(self):
         tabs = [{"tab_id": 3, "active": True}, {"tab_id": 7, "active": False}]
         pane = {"id": 22, "tab_id": 3, "is_focused": True, "is_plugin": False,

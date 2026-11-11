@@ -303,5 +303,8 @@ commit; a new boundary or store is agreed with the owner first.
 
 Session › Terminal uses `scripts/terminal.py` on page opening and changes
 only. It writes the launcher override in `dotfiles/terminal.json` under the
-state directory; kitty reads it before the installer default. No polling
-or persistent process is added.
+state directory; kitty reads it before the installer default. The same file
+stores whether Zellij session panes should be serialized for restoration.
+`session.py` applies the preference at startup and discards only an exited
+default-session snapshot when restoration is off. This adds one bounded session
+list query at terminal startup and no polling or persistent process.

@@ -16,6 +16,17 @@ spec.loader.exec_module(terminal)
 
 
 class Terminal(unittest.TestCase):
+    def test_restore_preference_survives_selection_changes_and_reaches_launcher(self):
+        from tests.test_zellij import module as session
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(terminal.os.environ, {"XDG_STATE_HOME": tmp}), mock.patch.object(terminal, "STATE", Path(tmp) / "dotfiles"):
+            self.assertFalse(session.restore_sessions_enabled())
+            self.assertTrue(terminal.set_restore_sessions("on")["restoreSessions"])
+            terminal.select("none")
+            self.assertTrue(session.restore_sessions_enabled())
+            self.assertEqual(launcher.choice(), "none")
+            self.assertFalse(terminal.set_restore_sessions("off")["restoreSessions"])
+            self.assertFalse(session.restore_sessions_enabled())
+
     def test_override_survives_default_change_and_reset_restores_default(self):
         with tempfile.TemporaryDirectory() as tmp:
             state = Path(tmp) / "dotfiles"

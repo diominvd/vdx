@@ -74,10 +74,6 @@ Rectangle {
 
   signal picked(var value)
 
-  // a click focuses it (the keys work) but draws no ring: the ring is for Tab
-  property bool byMouse: false
-  onActiveFocusChanged: if (!activeFocus && Window.active) byMouse = false     // the window losing focus keeps it
-
   readonly property bool m3: Theme.material
   readonly property int inset: m3 ? 0 : 4
   // Strict: the plate and each segment's hover round with the track's inside (nested radii)
@@ -95,7 +91,7 @@ Rectangle {
     anchors { fill: parent; margins: -3 }
     radius: Theme.radiusFor(height)
     color: Theme.clear
-    visible: root.activeFocus && !root.byMouse
+    visible: root.activeFocus
     border.width: Theme.focusWidth
     border.color: Theme.focusRing
   }
@@ -175,8 +171,6 @@ Rectangle {
             cursorShape: root.disabled ? Qt.ArrowCursor : Qt.PointingHandCursor
             onClicked: {
               if (root.disabled) return;
-              root.forceActiveFocus(Qt.MouseFocusReason);
-              root.byMouse = true;
               if (!segment.selected) root.picked(segment.modelData.value);
             }
           }
