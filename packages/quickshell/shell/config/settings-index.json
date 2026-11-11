@@ -1356,6 +1356,12 @@
   "target": "colours"
  },
  {
+  "label": "Windows",
+  "hint": "",
+  "where": "Colours",
+  "target": "colours"
+ },
+ {
   "label": "Switches",
   "hint": "On switches",
   "where": "Colours",
@@ -1401,6 +1407,12 @@
   "label": "Own colours",
   "hint": "How many can be saved",
   "where": "Colours › OWN COLOURS",
+  "target": "colours"
+ },
+ {
+  "label": "Window frames",
+  "hint": "In Windows › Look",
+  "where": "Colours › WINDOWS",
   "target": "colours"
  },
  {

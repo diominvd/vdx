@@ -112,5 +112,12 @@ Column {
       onPicked: value => ShellSettings.set("customColoursMax", value)
     }
   }
+  KitLine {}
+  KitLabel { text: "WINDOWS" }
+  KitLinkRow {
+    label: "Window frames"
+    hint: "In Windows › Look"
+    target: "windows:look"
+  }
   KitGrouper {}
 }
