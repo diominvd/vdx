@@ -97,7 +97,7 @@ Rectangle {
          : root.m3 ? (root.checked ? Theme.background0 : root.hovered ? Theme.foreground2 : Theme.gray)
          : root.checked ? Theme.background0 : root.hovered ? Theme.foreground2 : Theme.gray
 
-    Behavior on x { enabled: Motion.controls; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
+    Behavior on x { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.spring; easing.overshoot: Motion.overshoot * 1.4 } }
     Behavior on size { enabled: Motion.controls; NumberAnimation { duration: Motion.quick; easing.type: Motion.easing } }
     Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 

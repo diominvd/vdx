@@ -188,6 +188,12 @@
   "target": "animations:general"
  },
  {
+  "label": "Lively",
+  "hint": "Things settle with a small bounce",
+  "where": "Motion › GENERAL",
+  "target": "animations:general"
+ },
+ {
   "label": "Sample",
   "hint": "Click to preview",
   "where": "Motion › GENERAL",

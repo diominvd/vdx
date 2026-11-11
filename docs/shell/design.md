@@ -178,7 +178,7 @@ uses tonal layers and more spacious controls.
 - Refactors keep the look; a new look is prototyped on one popup first.
 - Motion: every animation goes through `config/Motion.qml` — a Behavior takes
   `enabled: Motion.<part>` (popups, panels, controls, bar, pages, lock, island) and a
-  duration from it (`quick`, `normal`, `slow`, `ms()`), easing `Motion.easing` (`morph` for a shape that resizes, `tint` for a colour);
+  duration from it (`quick`, `normal`, `slow`, `ms()`), easing `Motion.easing` (`morph` for a shape that resizes, `tint` for a colour, `spring` for the optional Lively overshoot);
   set in Shell Manager › Motion. Rows that show and hide sit in a
   `KitColumn` (KitFrame's column is one): they fade in at their final positions; group geometry settles immediately. A
   list's new row (a Repeater remakes them all): `KitAppear` keyed in the list's

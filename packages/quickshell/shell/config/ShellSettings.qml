@@ -123,6 +123,7 @@ Singleton {
   readonly property bool motionBar: state.motionBar               // workspaces, bar values
   readonly property bool motionPages: state.motionPages           // Shell Manager pages and sidebar
   readonly property bool motionTabs: state.motionTabs             // the sections of a page (Interface / Colours)
+  readonly property bool motionLively: state.motionLively         // things settle with a small overshoot
   readonly property bool motionIsland: state.motionIsland         // the island morphing between its views
   readonly property bool motionLock: state.motionLock             // the lock screen coming in, a wrong password
 

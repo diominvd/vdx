@@ -115,7 +115,7 @@ Rectangle {
       height: parent.height
       radius: root.innerRadius
       color: Theme.pickFill
-      Behavior on x { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
+      Behavior on x { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.spring; easing.overshoot: Motion.overshoot } }
       Behavior on width { enabled: Motion.controls; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
     }
 

@@ -17,7 +17,7 @@ Item {
   ParallelAnimation {
     id: appear
     NumberAnimation { target: root.target; property: "opacity"; from: 0; to: 1; duration: Motion.normal; easing.type: Motion.easing }
-    NumberAnimation { target: root.target; property: "scale"; from: 0.97; to: 1; duration: Motion.normal; easing.type: Motion.easing }
+    NumberAnimation { target: root.target; property: "scale"; from: Motion.lively ? 0.94 : 1; to: 1; duration: Motion.normal; easing.type: Motion.spring; easing.overshoot: Motion.overshoot }
   }
 
   Component.onCompleted: if (seen && key !== "" && seen.arrived(key)) appear.start()

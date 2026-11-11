@@ -194,34 +194,38 @@ Column {
     }
   }
 
-  // Choices are always inline: opening reserves space in every host.
+  // Choices are always inline: opening reserves space in every host. The room grows
+  // and shrinks with `reveal`; the list slides down out of the box and fades in, the
+  // first rows following one after another. Closing is quicker than opening.
+  property real reveal: expanded ? 1 : 0
+  Behavior on reveal {
+    enabled: Motion.controls
+    NumberAnimation { duration: root.expanded ? Motion.normal : Motion.quick; easing.type: root.expanded ? Motion.easing : Easing.InCubic }
+  }
+  function scrollToCurrent() {
+    const i = root.model.findIndex(c => c.value === root.current);
+    scroller.contentY = Math.max(0, Math.min(scroller.contentHeight - scroller.height, (i - 1) * root.rowHeight));
+  }
+  onExpandedChanged: if (expanded) scrollToCurrent()
+
   Item {
     id: slot
     width: parent.width
-    height: list.height
-    visible: root.expanded
+    height: list.height * Math.min(1, root.reveal)
+    visible: root.reveal > 0.001
+    clip: true
 
     Rectangle {
       id: list
-      visible: root.expanded
       width: parent.width
       x: 0
+      y: -(1 - Math.min(1, root.reveal)) * Theme.gapMedium
       height: Math.min(options.implicitHeight, root.maxRows * root.rowHeight) + 2 * inset
       radius: Theme.radiusControl
       // round corners keep the rows off the frame's curve
       readonly property int inset: Theme.frameWidth + (Theme.round ? 3 : 0)
 
-      // Fade within the reserved area without crossing neighbouring rows.
-      property real shown: 1
-      opacity: shown
-      onVisibleChanged: {
-        if (!visible) return;
-        if (Motion.controls) dropIn.restart();
-        // the current choice in view, a row above it showing
-        const i = root.model.findIndex(c => c.value === root.current);
-        scroller.contentY = Math.max(0, Math.min(scroller.contentHeight - scroller.height, (i - 1) * root.rowHeight));
-      }
-      NumberAnimation { id: dropIn; target: list; property: "shown"; from: 0; to: 1; duration: Motion.normal; easing.type: Motion.easing }
+      opacity: Math.min(1, root.reveal)
       color: Theme.controlFill
       border.width: Theme.frameWidth
       border.color: Theme.controlLine
@@ -268,6 +272,8 @@ Column {
             width: options.width
             height: root.rowHeight
             radius: Math.max(0, Theme.radiusControl - 2)
+            // the first rows arrive one after another
+            opacity: Motion.controls && index < 8 ? Math.max(0, Math.min(1, root.reveal * 1.8 - index * 0.1)) : 1
             color: active ? Theme.selectedFill : optionArea.containsMouse || (box.activeFocus && index === root.highlighted) ? Theme.controlHover : Theme.clear
             Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 

@@ -50,4 +50,5 @@ JsonAdapter {
   property bool motionTabs: true
   property bool motionLock: true
   property bool motionIsland: true
+  property bool motionLively: true
 }

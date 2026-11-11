@@ -16,7 +16,7 @@ Column {
   readonly property string description: "How the shell moves. Off, everything snaps in place."
 
   // the header's Reset: these ShellSettings keys back to their defaults
-  readonly property var resetKeys: ["motion", "motionSpeed", "motionPopups", "underlineAnimation", "motionPanels", "motionControls", "motionBar", "motionPages", "motionTabs", "motionIsland", "motionLock"]
+  readonly property var resetKeys: ["motion", "motionSpeed", "motionPopups", "underlineAnimation", "motionPanels", "motionControls", "motionBar", "motionPages", "motionTabs", "motionIsland", "motionLock", "motionLively"]
   readonly property bool changed: ShellSettings.changed(resetKeys)
   function reset() { ShellSettings.reset(resetKeys); }
 
@@ -51,6 +51,18 @@ Column {
       model: [{ label: "Slow", value: "slow" }, { label: "Normal", value: "normal" }, { label: "Fast", value: "fast" }]
       current: ShellSettings.motionSpeed
       onPicked: value => { ShellSettings.set("motionSpeed", value); sample.play(); }
+    }
+  }
+
+  KitRow {
+    label: "Lively"
+    hint: "Things settle with a small bounce"
+
+    KitSwitch {
+      accessibleName: "Lively"
+      disabled: !ShellSettings.motion
+      checked: ShellSettings.motionLively
+      onToggled: ShellSettings.set("motionLively", !checked)
     }
   }
 

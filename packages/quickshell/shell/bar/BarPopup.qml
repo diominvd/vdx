@@ -162,8 +162,9 @@ PopupWindow {
     target: root
     property: "reveal"
     to: 1
-    duration: Motion.normal
-    easing.type: Motion.easing
+    duration: Motion.ms(260)
+    easing.type: Motion.spring
+    easing.overshoot: Motion.overshoot
   }
 
   FrameAnimation {

@@ -38,9 +38,14 @@ Singleton {
   readonly property int normal: ms(200)
   readonly property int slow: ms(380)
 
-  // things coming in decelerate; nothing bounces
+  // default moves decelerate; Lively opts into a small overshoot below
   readonly property int easing: Easing.OutCubic
   // a shape that resizes (the island): a longer tail; a colour that changes: a gentle one
   readonly property int morph: Easing.OutQuint
+  // optional overshoot (Motion › Lively): popups, the island, switches, the segments'
+  // pill, things appearing; `overshoot` is how far
+  readonly property bool lively: ShellSettings.motionLively
+  readonly property int spring: lively ? Easing.OutBack : Easing.OutCubic
+  readonly property real overshoot: lively ? 1.0 : 0
   readonly property int tint: Easing.OutSine
 }
