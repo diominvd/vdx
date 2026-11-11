@@ -84,3 +84,34 @@ class TmuxZen(unittest.TestCase):
             with mock.patch.object(terminal, "run", side_effect=[listed, done, done, done, done, done]) as command:
                 self.assertTrue(terminal.set_zen("on", "tmux")["ok"])
                 self.assertEqual(command.call_args.args[0], ["tmux", "resize-pane", "-Z", "-t", "@2"])
+
+
+class TerminalRegression(unittest.TestCase):
+    def test_invalid_choice_types_fall_back_without_crashing_launcher(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp) / "dotfiles"
+            state.mkdir()
+            (state / "components.json").write_text('{"multiplexer":"tmux"}')
+            with mock.patch.object(terminal, "STATE", state), mock.patch.dict(launcher.os.environ, {"XDG_STATE_HOME": tmp}):
+                for value in ('[]', '{}', 'null', '7'):
+                    target = state / "terminal.json"
+                    target.write_text('{"multiplexer":' + value + '}')
+                    self.assertEqual(terminal.read_choice(target, "tmux"), "tmux")
+                    self.assertEqual(launcher.choice(), "tmux")
+
+    def test_plain_shell_has_no_zen(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(terminal, "STATE", Path(tmp)), mock.patch.object(terminal, "CONFIG", Path(tmp)):
+            self.assertFalse(terminal.status()["zenAvailable"])
+            self.assertFalse(terminal.status()["zen"])
+
+    def test_tmux_updates_inactive_windows_and_linked_window_once(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(terminal, "CONFIG", Path(tmp)), mock.patch.object(terminal, "STATE", Path(tmp) / "state"):
+            listed = subprocess.CompletedProcess([], 0, "$1\t@2\t1\n$1\t@3\t0\n$2\t@3\t0\n", "")
+            done = subprocess.CompletedProcess([], 0, "", "")
+            with mock.patch.object(terminal, "run", side_effect=lambda args: listed if args[1] == "list-windows" else done) as command:
+                self.assertTrue(terminal.set_zen("on", "tmux")["ok"])
+            calls = [call.args[0] for call in command.call_args_list]
+            self.assertEqual(calls.count(["tmux", "resize-pane", "-Z", "-t", "@3"]), 1)
+            self.assertNotIn(["tmux", "resize-pane", "-Z", "-t", "@2"], calls)
+            for session in ("$1", "$2"):
+                self.assertEqual(calls.count(["tmux", "set-option", "-t", session, "status", "off"]), 1)

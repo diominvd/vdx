@@ -28,8 +28,6 @@ Rectangle {
 
   Component.onCompleted: {
     SettingsIndex.load();
-    // the pickers' data (two quick scripts) is read before a page asks for it
-    Qt.callLater(() => { FontService.refresh(); CursorService.refresh(); });
     if (ShellSettings.managerOpen && ShellSettings.managerStart === "last")
       tab = resolve(ShellSettings.managerTab).tab;
   }

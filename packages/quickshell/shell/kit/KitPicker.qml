@@ -126,6 +126,19 @@ Row {
           height: 56
           radius: Theme.radiusControl
           color: picked ? Theme.pickFill : area.containsMouse ? Theme.controlHover : Theme.clear
+          activeFocusOnTab: true
+          border.width: activeFocus ? Theme.focusWidth : 0
+          border.color: Theme.focusRing
+          Accessible.role: Accessible.RadioButton
+          Accessible.name: modelData.label
+          Accessible.checkable: true
+          Accessible.checked: picked
+          function choose() { root.picked(modelData.key); }
+          Accessible.onPressAction: choose()
+          Keys.onSpacePressed: choose()
+          Keys.onReturnPressed: { choose(); root.activated(); }
+          Keys.onEnterPressed: { choose(); root.activated(); }
+          Keys.onEscapePressed: root.escaped()
           Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
 
           Loader {
@@ -180,7 +193,7 @@ Row {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: { root.picked(item.modelData.key); root.focusSearch(); }
+            onClicked: { item.choose(); root.focusSearch(); }
             onDoubleClicked: root.activated()
           }
         }

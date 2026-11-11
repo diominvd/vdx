@@ -71,6 +71,7 @@ KitPicker {
 
   onPicked: key => choice = key
   onActivated: apply()
+  onEscaped: choice = ""
   onSelectedChanged: armed = ""
   Connections { target: FontService; function onCurrentChanged() { root.choice = ""; } }
   // the Loader makes the page already visible: the first show is not a change

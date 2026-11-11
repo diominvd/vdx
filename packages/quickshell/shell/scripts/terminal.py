@@ -16,7 +16,7 @@ OPTIONS = {"none", "tmux", "zellij"}
 def read_choice(path, fallback):
     try:
         value = json.loads(path.read_text()).get("multiplexer")
-        return value if value in OPTIONS else fallback
+        return value if isinstance(value, str) and value in OPTIONS else fallback
     except (OSError, ValueError, AttributeError):
         return fallback
 
@@ -71,19 +71,25 @@ def set_tmux_zen(value):
                          f"set -g status {'off' if enabled else 'on'}\n"
                          f"set -gw pane-border-status {'off' if enabled else 'top'}\n")
     temporary.replace(target)
-    result = run(["tmux", "list-sessions", "-F", "#{session_id}\t#{window_id}\t#{window_zoomed_flag}"])
+    result = run(["tmux", "list-windows", "-a", "-F", "#{session_id}\t#{window_id}\t#{window_zoomed_flag}"])
     if result is None:
         raise ValueError("Could not start tmux")
     if result.returncode:
         if "no server running" in result.stderr or "No such file or directory" in result.stderr:
             return status()
-        raise ValueError(result.stderr.strip() or "Could not list tmux sessions")
+        raise ValueError(result.stderr.strip() or "Could not list tmux windows")
     commands = [["source-file", str(target)]]
+    sessions, windows = set(), set()
     for line in result.stdout.splitlines():
         session, window, zoomed = line.split("\t")
-        commands.extend([["set-option", "-t", session, "@vdx-zen", value],
-                         ["set-option", "-t", session, "status", "off" if enabled else "on"],
-                         ["set-window-option", "-t", window, "pane-border-status", "off" if enabled else "top"]])
+        if session not in sessions:
+            sessions.add(session)
+            commands.extend([["set-option", "-t", session, "@vdx-zen", value],
+                             ["set-option", "-t", session, "status", "off" if enabled else "on"]])
+        if window in windows:
+            continue
+        windows.add(window)
+        commands.append(["set-window-option", "-t", window, "pane-border-status", "off" if enabled else "top"])
         if (zoomed == "1") != enabled:
             commands.append(["resize-pane", "-Z", "-t", window])
     for command in commands:
@@ -123,9 +129,10 @@ def status():
     selected = read_choice(STATE / "terminal.json", default)
     available = {"none": True, "tmux": bool(shutil.which("tmux") and (CONFIG / "tmux/tmux.conf").is_file()),
                  "zellij": bool(shutil.which("zellij") and (CONFIG / "zellij/session.py").is_file())}
+    zen = {name: zen_enabled(name) for name in ("tmux", "zellij")}
     return {"ok": True, "selected": selected, "default": default, "available": available, "padding": padding_values(),
-            "zen": zen_enabled(selected), "zenAvailable": available.get(selected, False),
-            "zenChanged": zen_enabled("tmux") or zen_enabled("zellij")}
+            "zen": zen.get(selected, False), "zenAvailable": selected in zen and available[selected],
+            "zenChanged": any(zen.values())}
 
 
 def select(value):

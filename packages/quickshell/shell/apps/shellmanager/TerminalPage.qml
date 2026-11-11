@@ -16,7 +16,8 @@ Column {
   property string error: ""
   property bool settingsLoaded: false
   readonly property bool busy: proc.running
-  readonly property bool changed: info.selected !== undefined && (info.selected !== info.default || info.padding.horizontal !== 6 || info.padding.vertical !== 6 || info.zenChanged === true)
+  readonly property bool changed: settingsLoaded && (info.selected !== info.default || info.padding.horizontal !== 6 || info.padding.vertical !== 6 || info.zenChanged === true)
+  readonly property var paddingSnaps: Array.from({ length: 41 }, (_, i) => i / 40)
   function reset() { run(["reset"]); }
   function run(args) {
     if (busy) return;
@@ -81,7 +82,7 @@ Column {
     label: "Horizontal padding"
     value: (root.info.padding?.horizontal ?? 6) / 40
     text: Math.round((pressed ? dragValue * 40 : root.info.padding?.horizontal ?? 6)) + " pt"
-    snaps: Array.from({ length: 41 }, (_, i) => i / 40)
+    snaps: root.paddingSnaps
     enabled: !root.busy && root.info.padding !== undefined
     onReleased: value => root.run(["padding", "horizontal", String(Math.round(value * 40))])
   }
@@ -89,7 +90,7 @@ Column {
     label: "Vertical padding"
     value: (root.info.padding?.vertical ?? 6) / 40
     text: Math.round((pressed ? dragValue * 40 : root.info.padding?.vertical ?? 6)) + " pt"
-    snaps: Array.from({ length: 41 }, (_, i) => i / 40)
+    snaps: root.paddingSnaps
     enabled: !root.busy && root.info.padding !== undefined
     onReleased: value => root.run(["padding", "vertical", String(Math.round(value * 40))])
   }
@@ -110,11 +111,16 @@ Column {
     stdout: StdioCollector { onStreamFinished: proc.output = text }
     onExited: {
       const reply = Reply.parse(output, "terminal.py");
-      if (reply.selected !== undefined) {
+      const valid = ["none", "tmux", "zellij"].includes(reply.selected)
+        && ["none", "tmux", "zellij"].includes(reply.default)
+        && Number.isInteger(reply.padding?.horizontal) && reply.padding.horizontal >= 0 && reply.padding.horizontal <= 40
+        && Number.isInteger(reply.padding?.vertical) && reply.padding.vertical >= 0 && reply.padding.vertical <= 40;
+      if (valid) {
         root.info = reply;
         if (!root.settingsLoaded) Qt.callLater(() => root.settingsLoaded = true);
       }
-      if (reply.ok) { root.info = reply; root.error = ""; }
+      if (reply.ok && valid) root.error = "";
+      else if (reply.ok) root.error = "Invalid terminal settings reply";
       else root.error = reply.error ?? "Could not change the terminal";
     }
   }

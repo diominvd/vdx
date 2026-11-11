@@ -10,7 +10,7 @@ def choice():
     for name in ("terminal.json", "components.json"):
         try:
             value = json.loads((state / "dotfiles" / name).read_text()).get("multiplexer")
-            if value in {"none", "tmux", "zellij"}:
+            if isinstance(value, str) and value in {"none", "tmux", "zellij"}:
                 return value
         except (OSError, ValueError, AttributeError):
             pass

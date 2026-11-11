@@ -103,7 +103,7 @@ Item {
         KitText { anchors.centerIn: parent; visible: ShellSettings.liveNoticeMark === "initial"; text: "N"; color: Theme.blue; font.pixelSize: Theme.fontSize - 2; font.weight: Font.Medium }
       }
       Rectangle { visible: root.kind === "notice" && ShellSettings.liveNoticeMark === "dot"; anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; radius: Theme.pill(height); color: Theme.blue; }
-      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "notice"; text: "Nikita: скину"; font.pixelSize: Theme.fontSize - 1 }
+      KitText { anchors.verticalCenter: parent.verticalCenter; visible: root.kind === "notice"; text: "Nikita: Hey!"; font.pixelSize: Theme.fontSize - 1 }
     }
   }
 

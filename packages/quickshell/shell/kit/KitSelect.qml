@@ -213,6 +213,7 @@ Column {
     width: parent.width
     height: list.height * Math.min(1, root.reveal)
     visible: root.reveal > 0.001
+    enabled: root.expanded && !root.disabled && !root.busy
     clip: true
 
     Rectangle {

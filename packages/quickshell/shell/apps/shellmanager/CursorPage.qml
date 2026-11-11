@@ -37,6 +37,10 @@ KitPicker {
     cursorSize = CursorService.size;
     cursorCustom = CursorService.mode === "custom" ? CursorService.fill : "d8a657";
   }
+  function applyCursor() {
+    if (!cursorRow || !cursorChanged || CursorService.busy || (cursorMode === "custom" && !cursorCustomValid)) return;
+    CursorService.apply(cursorRow, cursorSize, cursorMode, cursorCustom);
+  }
 
   readonly property string icon: "cursor"
   readonly property string title: "Cursor"
@@ -57,7 +61,8 @@ KitPicker {
     return out;
   }
   onPicked: key => cursorChoice = key
-  onActivated: if (cursorChanged && !CursorService.busy) CursorService.apply(cursorRow, cursorSize, cursorMode, cursorCustom)
+  onActivated: applyCursor()
+  onEscaped: resetCursor()
   Connections { target: CursorService; function onBaseChanged() { root.cursorChoice = ""; } }
   // the Loader makes the page already visible: the first show is not a change
   Component.onCompleted: visibleChanged()
@@ -79,7 +84,7 @@ KitPicker {
         text: root.cursorRow && !root.cursorRow.installed ? "Download & use" : "Apply"
         busy: CursorService.busy
         disabled: root.cursorRow === null || (root.cursorMode === "custom" && !root.cursorCustomValid)
-        onClicked: CursorService.apply(root.cursorRow, root.cursorSize, root.cursorMode, root.cursorCustom)
+        onClicked: root.applyCursor()
       }
     ]
 

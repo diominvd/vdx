@@ -33,7 +33,7 @@ Item {
   Image {
     id: image
     anchors.fill: parent
-    source: root.name === "" ? ""
+    source: root.name === "" || root.filledGlyph ? ""
       : root.set === "tabler" ? Qt.resolvedUrl("icons/tabler/" + root.name + ".svg")
       : root.set === "lucide" ? Qt.resolvedUrl("icons/lucide/" + root.name + ".svg")
       : root.set === "phosphor" ? Qt.resolvedUrl("icons/phosphor/" + (root.solid ? "solid/" : "") + root.name + ".svg")
@@ -52,59 +52,66 @@ Item {
     colorizationColor: root.tint
   }
 
-  // the three filled glyphs are drawn, not files: built only for an icon that is one of them
-  Loader { anchors.fill: parent; active: root.filledGlyph; sourceComponent: filledParts }
+  // Only the selected glyph is built; filled controls need no SVG or effect source.
+  Loader {
+    anchors.fill: parent
+    active: root.filledGlyph
+    sourceComponent: root.name === "pause" ? pauseGlyph : root.name === "square" ? stopGlyph : playGlyph
+  }
 
   Component {
-    id: filledParts
+    id: pauseGlyph
     Item {
-        Row {
-          visible: root.filledGlyph && root.name === "pause"
-          anchors.centerIn: parent
-          spacing: root.size * 0.2
-          Repeater {
-            model: 2
-            Rectangle {
-              width: root.size * 0.22
-              height: root.size * 0.72
-              radius: root.size * 0.04
-              anchors.verticalCenter: parent.verticalCenter
-              color: root.tint
-            }
+      Row {
+        anchors.centerIn: parent
+        spacing: root.size * 0.2
+        Repeater {
+          model: 2
+          Rectangle {
+            width: root.size * 0.22
+            height: root.size * 0.72
+            radius: root.size * 0.04
+            color: root.tint
           }
         }
+      }
+    }
+  }
 
-        Rectangle {
-          visible: root.filledGlyph && root.name === "square"
-          anchors.centerIn: parent
-          width: root.size * 0.64
-          height: width
-          radius: root.size * 0.08
-          color: root.tint
-        }
+  Component {
+    id: stopGlyph
+    Item {
+      Rectangle {
+        anchors.centerIn: parent
+        width: root.size * 0.64
+        height: width
+        radius: root.size * 0.08
+        color: root.tint
+      }
+    }
+  }
 
-        Canvas {
-          id: play
-          visible: root.filledGlyph && root.name === "play"
-          anchors.fill: parent
-          onPaint: {
-            const ctx = getContext("2d");
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = root.tint;
-            ctx.beginPath();
-            ctx.moveTo(width * 0.25, height * 0.12);
-            ctx.lineTo(width * 0.82, height * 0.5);
-            ctx.lineTo(width * 0.25, height * 0.88);
-            ctx.closePath();
-            ctx.fill();
-          }
-          onWidthChanged: requestPaint()
-          onHeightChanged: requestPaint()
-          Connections {
-            target: root
-            function onTintChanged() { play.requestPaint(); }
-          }
-        }
+  Component {
+    id: playGlyph
+    Canvas {
+      id: play
+      onPaint: {
+        const ctx = getContext("2d");
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = root.tint;
+        ctx.beginPath();
+        ctx.moveTo(width * 0.25, height * 0.12);
+        ctx.lineTo(width * 0.82, height * 0.5);
+        ctx.lineTo(width * 0.25, height * 0.88);
+        ctx.closePath();
+        ctx.fill();
+      }
+      onWidthChanged: requestPaint()
+      onHeightChanged: requestPaint()
+      Connections {
+        target: root
+        function onTintChanged() { play.requestPaint(); }
+      }
     }
   }
 }

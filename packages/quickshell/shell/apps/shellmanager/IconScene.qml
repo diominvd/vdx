@@ -98,6 +98,14 @@ Item {
           Behavior on color { enabled: Motion.controls; ColorAnimation { duration: Motion.quick } }
           Accessible.role: Accessible.Button
           Accessible.name: modelData.label
+          activeFocusOnTab: true
+          border.width: activeFocus ? Theme.focusWidth : 0
+          border.color: Theme.focusRing
+          function choose() { root.kept = modelData.name; }
+          Accessible.onPressAction: choose()
+          Keys.onSpacePressed: choose()
+          Keys.onReturnPressed: choose()
+          Keys.onEnterPressed: choose()
 
           KitIcon { anchors.centerIn: parent; name: cell.modelData.name; size: root.size; tint: Theme.foreground1 }
 
@@ -107,7 +115,7 @@ Item {
             hoverEnabled: true
             onEntered: root.hovered = cell.modelData.name
             onExited: if (root.hovered === cell.modelData.name) root.hovered = ""
-            onClicked: root.kept = cell.modelData.name
+            onClicked: cell.choose()
           }
         }
       }
