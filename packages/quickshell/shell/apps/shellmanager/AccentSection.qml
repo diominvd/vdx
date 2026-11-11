@@ -72,13 +72,6 @@ KitColumn {
       }
     }
   }
-  KitLinkRow {
-    visible: ShellSettings.accent
-    label: "Window frames"
-    hint: "In Windows › Look"
-    target: "windows:look"
-  }
-
   KitLine {}
   KitLabel { text: "OWN COLOURS"; about: "Colours you make with the plus dot, up to the limit" }
   KitRow {

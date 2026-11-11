@@ -2,14 +2,13 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// A page's row in the Shell Manager's sidebar: icon and name, the open page
-// marked. `entry` is the section ({value, label, icon}), `current` the open page.
+// A direct page link in the Shell Manager's sidebar. `entry` is the section
+// ({value, label, icon}); `current` is the open page.
 Rectangle {
   id: row
 
   property var entry
   property string current: ""
-  property bool indent: false      // a child page (the island's Hub, Live activities)
   readonly property bool active: entry.value === current
 
   signal picked()
@@ -28,21 +27,10 @@ Rectangle {
   color: active ? Theme.pickFill : area.containsMouse || activeFocus ? Theme.controlHover : Theme.clear
   Behavior on color { enabled: Motion.pages; ColorAnimation { duration: Motion.quick } }
 
-  // a child page carries a short bar at its left (as the slider's mark), bright when it is the open one
-  Rectangle {
-    visible: row.indent
-    x: Theme.gapLoose + 7
-    anchors.verticalCenter: parent.verticalCenter
-    width: 2
-    height: 16
-    radius: Theme.pill(height)
-    color: row.active ? Theme.foreground0 : Theme.dividerColor
-  }
-
   KitIconTile {
     id: icon
     visible: ShellSettings.menuIcons
-    anchors { left: parent.left; leftMargin: (ShellSettings.iconTiles ? Theme.gapSmall : Theme.gapLoose) + (row.indent ? Theme.gapWide + 8 : 0); verticalCenter: parent.verticalCenter }
+    anchors { left: parent.left; leftMargin: ShellSettings.iconTiles ? Theme.gapSmall : Theme.gapLoose; verticalCenter: parent.verticalCenter }
     name: row.entry.icon
     active: row.active
     hovered: area.containsMouse
@@ -51,7 +39,7 @@ Rectangle {
   }
 
   KitText {
-    anchors { left: ShellSettings.menuIcons ? icon.right : parent.left; leftMargin: ShellSettings.menuIcons ? Theme.gapLoose : Theme.gapLoose + (row.indent ? Theme.gapWide + 8 : 0); right: parent.right; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
+    anchors { left: ShellSettings.menuIcons ? icon.right : parent.left; leftMargin: Theme.gapLoose; right: parent.right; rightMargin: Theme.gapMedium; verticalCenter: parent.verticalCenter }
     text: row.entry.label
     elide: Text.ElideRight
     color: row.active ? Theme.foreground0 : Theme.foreground2

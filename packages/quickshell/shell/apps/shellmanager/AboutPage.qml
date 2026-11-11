@@ -242,6 +242,19 @@ Column {
   KitLabel { id: settings; text: "SETTINGS"; value: root.ioStatus.toUpperCase() }
 
   KitRow {
+    label: "Navigation layout"
+    hint: ShellSettings.managerNavigation === "grouped" ? "Section rail and pages from the selected section" : "All settings pages in one list"
+    wide: true
+    KitSegments {
+      model: [{ label: "By section", value: "grouped" }, { label: "All pages", value: "all" }]
+      current: ShellSettings.managerNavigation
+      onPicked: value => ShellSettings.set("managerNavigation", value)
+    }
+  }
+
+  KitLine {}
+
+  KitRow {
     label: "Export"
     hint: "Options, bar layout, windows"
 

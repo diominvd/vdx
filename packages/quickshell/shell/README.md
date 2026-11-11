@@ -31,8 +31,11 @@ Registry: `apps/apps.json` (read by the Shell Manager, the launcher,
 
 The launcher's **Commands** tab searches shell actions, applications, bar
 modules and settings in one place. Type to filter, use ↑ / ↓ and Enter to run;
-Apps, Files and Power remain available as focused lists. In Shell Manager,
-Ctrl+K focuses settings search and Alt+← returns to the previous settings page.
+Apps, Files and Power remain available as focused lists. Shell Manager offers
+two navigation layouts in Settings: By section uses an icon rail and shows the
+selected section's pages; All pages shows every page under section headings and
+adds settings search. Ctrl+K focuses search in All pages, and Alt+← returns to
+the previous settings page.
 Escape closes the current popup; Island Escape returns to the Hub when there is
 a parent view.
 | Taskbar | — | floating mode only |
@@ -205,8 +208,8 @@ island of its own, with its modules' popups inside it.
 
 ## Look
 
-All in Shell Manager's LOOK group: Interface, Themes, Colours, Wallpaper,
-Fonts, Icons, Cursor, Motion.
+In Shell Manager's Appearance group: Interface, Themes, Colours, Fonts, Icons,
+Cursor, Motion. Wallpaper is in Desktop, alongside Windows.
 
 - **Style**: Strict (quiet outlined controls) or Material 3 (tonal surfaces, spacious
   filled controls). Appearance shows both choices as cards; corners remain a

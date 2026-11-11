@@ -2,8 +2,7 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// An icon button of the Shell Manager's rail: a group, or a page of the shell's own.
-// The open group's name heads the list beside the rail.
+// An icon-only button for a Shell Manager sidebar action.
 Rectangle {
   id: button
 

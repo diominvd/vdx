@@ -621,12 +621,6 @@
   "target": "windows:look"
  },
  {
-  "label": "Window corners",
-  "hint": "In Interface › Shape",
-  "where": "Windows › LOOK",
-  "target": "windows:look"
- },
- {
   "label": "Window previews",
   "hint": "Off shows icons, not pictures",
   "where": "Windows › OVERVIEW",
@@ -1188,6 +1182,12 @@
   "target": "about:author"
  },
  {
+  "label": "Navigation layout",
+  "hint": "",
+  "where": "Settings › SETTINGS",
+  "target": "settings"
+ },
+ {
   "label": "Export",
   "hint": "Options, bar layout, windows",
   "where": "Settings › SETTINGS",
@@ -1383,12 +1383,6 @@
   "label": "Colour",
   "hint": "A named one, or your own",
   "where": "Colours › ACCENT",
-  "target": "colours"
- },
- {
-  "label": "Window frames",
-  "hint": "In Windows › Look",
-  "where": "Colours › ACCENT TARGETS",
   "target": "colours"
  },
  {

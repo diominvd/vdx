@@ -212,12 +212,6 @@ KitColumn {
     }
   }
 
-  KitLinkRow {
-    label: "Window corners"
-    hint: "In Interface › Shape"
-    target: "appearance:shape"
-  }
-
     KitGrouper {}
   }
   // ---- overview: Super + Tab, every window mode (ModuleSettings "overview") ----

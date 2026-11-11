@@ -9,6 +9,7 @@ JsonAdapter {
   property bool solidIcons: false
   property bool menuIcons: true
   property bool iconTiles: false
+  property string managerNavigation: "grouped"
   property string managerStart: "main"
   property string managerTab: "appearance"
   property string font: "JetBrainsMono Nerd Font"

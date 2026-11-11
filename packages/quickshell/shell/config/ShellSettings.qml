@@ -14,6 +14,7 @@ Singleton {
   readonly property bool solidIcons: state.solidIcons             // filled twins for Material, Phosphor and Mingcute
   readonly property bool iconTiles: state.iconTiles               // list icons in framed tiles (Appearance › Icons)
   readonly property bool menuIcons: state.menuIcons               // an icon before each page in the Shell Manager's list
+  readonly property string managerNavigation: state.managerNavigation // grouped | all
   readonly property string managerStart: state.managerStart        // main | last: the page the Shell Manager opens on
   readonly property string managerTab: state.managerTab            // the page it was left on
   readonly property string font: state.font                       // family, kept in step with fontconfig

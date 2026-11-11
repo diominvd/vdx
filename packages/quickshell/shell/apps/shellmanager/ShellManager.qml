@@ -6,21 +6,18 @@ import qs.bar
 import qs.config
 import qs.kit
 
-// Shell Manager: settings laid out like a system settings window — sections
+// Shell Manager: settings laid out like a system settings window — navigation
 // on the left, the chosen page on the right under its fixed header, scrolling
-// on its own. Under the open section its groups (`jumps` of the page) jump
-// there on a click.
-// The sections come in groups, by what the user is after (a rail button each; the
-// list beside it shows the open group). In a group the most used page comes first, a
-// page shared with others (`pageTab`) sits next to them, the rare ones last:
-//   LOOK     — how it looks and moves: Interface, Themes, Colours, Wallpaper, Fonts,
-//              Icons, Cursor, Motion
-//   BAR      — Bar, Bar look, Bar modules, Hub, Live activities, Bar monitors
-//   DESKTOP  — the session around the windows: Windows, Notifications, Lock screen
-//   CONNECT  — Network, Bluetooth, VPN
+// on its own. Navigation can show one section beside an icon rail or every
+// page in a single grouped list. A page shared with others (`pageTab`) appears once:
+//   APPEARANCE — Interface, Themes, Colours, Fonts, Icons, Cursor, Motion
+//   DESKTOP    — Wallpaper, Windows
+//   BAR        — Bar, Bar look, Bar monitors, Bar modules, Hub, Live activities
+//   SESSION    — Notifications, Lock screen, Profile
+//   CONNECTIVITY — Network, Bluetooth, VPN
 //   DEVICES  — Sound, Displays, Power
-//   SYSTEM   — what runs on the machine: Apps (each app's options and window), Updates
-//   SHELL    — Profile, System, Settings, About: the rail's foot (`foot`)
+//   SYSTEM   — Apps (each app's options and window), Updates, System
+//   SHELL    — Settings, About
 // A page may offer `changed` + `reset()`: Reset (two steps) in the header.
 Rectangle {
   id: root
@@ -49,36 +46,35 @@ Rectangle {
     }
   }
 
-  // `caption` opens a group in the sidebar
-  // `foot`: a button at the rail's foot, outside the groups (the shell's own pages)
-  // `child`: a page that belongs to the one above it, indented (none now: the island's Hub and Live activities are plain rows);
+  // `caption` names a page group; the rail opens that group's pages
   // `island`: only while the island is the bar style
 // `page` + `pageTab`: a section that is one tab of another page (Bar look is the Bar page's Look tab):
 // the page opens on that tab, its tab strip stays hidden, `label` and `description` head it
   readonly property var allSections: [
-    { value: "appearance", label: "Interface",  icon: "sliders",    caption: "LOOK",
+    { value: "appearance", label: "Interface",  icon: "sliders",    caption: "APPEARANCE",
       page: "appearance", pageTab: "style", description: "Style, fields and corners." },
     { value: "themes",     label: "Themes",     icon: "brush" },
     { value: "colours",    label: "Colours",    icon: "paint-bucket",
       page: "appearance", pageTab: "accent", description: "The accent colour and where it shows." },
-    { value: "wallpaper",  label: "Wallpaper",  icon: "image" },
     { value: "fonts",      label: "Fonts",      icon: "text" },
     { value: "icons",      label: "Icons",      icon: "icons" },
     { value: "cursor",     label: "Cursor",     icon: "cursor" },
     { value: "animations", label: "Motion",     icon: "curve" },
+    { value: "wallpaper",  label: "Wallpaper",  icon: "image",      caption: "DESKTOP" },
+    { value: "windows",    label: "Windows",    icon: "tiling" },
     { value: "bar",        label: "Bar",        icon: "columns",     caption: "BAR",
       page: "bar", pageTab: "layout", description: "Where each module sits on the bar." },
     { value: "barlook",    label: "Bar look",   icon: "layout",
       page: "bar", pageTab: "appearance", description: "The bar's style, size and spacing." },
+    { value: "barmonitor", label: "Bar monitors", icon: "laptop",
+      page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
     { value: "modules",    label: "Bar modules", icon: "assembly" },
     { value: "hub",        label: "Hub",        icon: "home",    island: true },
     { value: "live",       label: "Live activities", icon: "activity", island: true },
-    { value: "barmonitor", label: "Bar monitors", icon: "laptop",
-      page: "bar", pageTab: "monitor", description: "Which monitors have a bar, and which one is the main." },
-    { value: "windows",    label: "Windows",    icon: "tiling", caption: "DESKTOP" },
-    { value: "notifications", label: "Notifications", icon: "bell" },
+    { value: "notifications", label: "Notifications", icon: "bell", caption: "SESSION" },
     { value: "lockscreen", label: "Lock screen", icon: "lock" },
-    { value: "network",    label: "Network",    icon: "public",       caption: "CONNECT" },
+    { value: "profile",    label: "Profile",    icon: "user" },
+    { value: "network",    label: "Network",    icon: "public",       caption: "CONNECTIVITY" },
     { value: "bluetooth",  label: "Bluetooth",  icon: "bluetooth" },
     { value: "vpn",        label: "VPN",        icon: "vpn", module: "mihomo" },
     { value: "sound",      label: "Sound",      icon: "volume",     caption: "DEVICES" },
@@ -86,43 +82,73 @@ Rectangle {
     { value: "power",      label: "Power",      icon: "zap" },
     { value: "apps",       label: "Apps",       icon: "grid",       caption: "SYSTEM" },
     { value: "updates",    label: "Updates",    icon: "download" },
-    { value: "profile",    label: "Profile",    icon: "user",       caption: "SHELL", foot: true },
-    { value: "system",     label: "System",     icon: "gauge",        foot: true,
+    { value: "system",     label: "System",     icon: "gauge",
       page: "about", pageTab: "system", description: "The machine, the shell's health and its resources." },
-    { value: "settings",   label: "Settings",   icon: "settings",   foot: true,
+    { value: "settings",   label: "Settings",   icon: "settings",   caption: "SHELL",
       page: "about", pageTab: "settings", description: "Export, import and reset every option; restart the shell." },
-    { value: "about",      label: "About",      icon: "info",       foot: true,
+    { value: "about",      label: "About",      icon: "info",
       page: "about", pageTab: "about", description: "What this shell believes, how it is put together and who made it." }
   ]
   readonly property var sections: allSections.filter(s => (!s.island || Theme.island) && (!s.module || BarLayout.usable(s.module)))
 
-  // the rail's groups: one button each, the list beside it shows the open group's pages
-  readonly property var groups: [
-    { name: "LOOK", icon: "palette" }, { name: "BAR", icon: "menu" }, { name: "DESKTOP", icon: "app-window" },
-    { name: "CONNECT", icon: "wifi" }, { name: "DEVICES", icon: "usb" }, { name: "SYSTEM", icon: "cpu" }
-  ]
-  readonly property var footSections: sections.filter(s => s.foot)
-  readonly property var navSections: sections.filter(s => !s.foot && groupOf(s.value) === openGroup)
-  property string openGroup: "LOOK"
-  function openGroupOf(name) {
-    if (groupOf(tab) !== name) select(sections.find(s => !s.foot && groupOf(s.value) === name).value);
+  readonly property var groups: navItems.filter(item => item.kind === "heading").map(item => ({ name: item.label, icon: item.icon }))
+  // All pages stay direct links. The selected view decides whether the sidebar
+  // shows one section or the complete, grouped list.
+  readonly property var navItems: {
+    const result = [];
+    const groupIcons = {
+      APPEARANCE: "palette", DESKTOP: "app-window", BAR: "menu", SESSION: "clock",
+      CONNECTIVITY: "wifi", DEVICES: "usb", SYSTEM: "cpu", SHELL: "settings"
+    };
+    for (const section of sections) {
+      if (section.caption) result.push({ kind: "heading", label: section.caption, icon: groupIcons[section.caption] ?? "grid" });
+      result.push({ kind: "page", entry: section });
+    }
+    return result;
   }
+  readonly property var visibleNavItems: {
+    if (ShellSettings.managerNavigation === "all") return navItems;
+    const pages = sections.filter(section => groupOf(section.value) === openGroup)
+      .map(entry => ({ kind: "page", entry }));
+    return [{ kind: "heading", label: openGroup }].concat(pages);
+  }
+  property string openGroup: "APPEARANCE"
+
+  onSectionsChanged: {
+    if (!groups.some(group => group.name === openGroup))
+      openGroup = groups.length ? groups[0].name : "";
+  }
+
+  function openGroupOf(name) {
+    const first = sections.find(section => groupOf(section.value) === name);
+    if (!first) return;
+    openGroup = name;
+    select(first.value);
+  }
+
   function select(value) {
     if (value === tab) return;
     navHistory = navHistory.concat([{ tab: tab, target: "" }]).slice(-32);
     tab = value;
   }
 
-  // the sidebar group a page sits in (LOOK, BAR, ...): the crumb over its title
+  // the sidebar group a page sits in (APPEARANCE, BAR, ...): the crumb over its title
   function sectionOf(value) { return allSections.find(s => s.value === value) ?? null; }
 
   function groupOf(tab) {
+    const page = sectionOf(tab);
+    if (!page) return "";
     let group = "";
-    for (const s of sections) {
+    for (const s of allSections) {
       if (s.caption) group = s.caption;
       if (s.value === tab) return group;
     }
     return "";
+  }
+
+  function revealNav(value) {
+    const index = visibleNavItems.findIndex(item => item.kind === "page" && item.entry.value === value);
+    if (index >= 0) Qt.callLater(() => nav.positionViewAtIndex(index, ListView.Contain));
   }
 
   // the pages that moved: Launcher and Keybinds are apps (Apps), Media is the
@@ -163,13 +189,22 @@ Rectangle {
   // the sidebar's search (the field over the sections): every page's rows
   // (SettingsIndex); a pick opens its place
   readonly property bool searching: searchField.text.trim() !== ""
+  readonly property bool sectionMode: ShellSettings.managerNavigation === "grouped"
   property int picked: 0
   readonly property var results: SettingsIndex.search(searchField.text)
   onResultsChanged: picked = 0
 
   function search(words) {
+    if (sectionMode) return;
     searchField.text = words;
     searchField.input.forceActiveFocus();
+  }
+
+  Connections {
+    target: ShellSettings
+    function onManagerNavigationChanged() {
+      if (root.sectionMode) searchField.text = "";
+    }
   }
 
   function openResult(e) {
@@ -189,7 +224,7 @@ Rectangle {
 
   Shortcut {
     sequences: ["Ctrl+K"]
-    enabled: ShellSettings.managerOpen && !root.dialogOpen
+    enabled: ShellSettings.managerOpen && !root.dialogOpen && !root.sectionMode
     onActivated: searchField.input.forceActiveFocus()
   }
   Shortcut {
@@ -215,6 +250,7 @@ Rectangle {
     else select(r.tab);
     const p = pageContent.item;
     if (!p) return;
+    revealNav(r.tab);
     const j = p.jumps.find(x => x.key === r.target);
     if (j) Qt.callLater(() => root.jumpTo(j));
     else if (r.target && typeof p.jump === "function") {
@@ -296,14 +332,46 @@ Rectangle {
   // ---- navigation ----
   Rectangle {
     id: sidebar
-    // the list's width plus the window's frame on its left: the labels keep their room
-    width: railWidth + Theme.sideWidth + Theme.windowPadding
+    readonly property int railWidth: root.sectionMode ? 52 : 0
+    width: Theme.sideWidth + Theme.windowPadding + railWidth
     height: parent.height
     color: Theme.sideFill
+    Behavior on width { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
 
-    // the rail's width; the list and the header start after it
-    readonly property int railWidth: 52
     readonly property int listX: railWidth + Theme.windowPadding
+
+    Loader {
+      id: railLoader
+      active: root.sectionMode
+      visible: active
+      width: sidebar.railWidth
+      height: sidebar.height
+      sourceComponent: Component {
+        Item {
+          width: railLoader.width
+          height: railLoader.height
+
+          KitLine { vertical: true; anchors { right: parent.right; top: parent.top; bottom: parent.bottom } }
+
+          Column {
+            x: (parent.width - width) / 2
+            y: Theme.windowPadding
+            spacing: Theme.gapHair
+            Repeater {
+              model: root.groups
+              RailButton {
+                required property var modelData
+                icon: modelData.icon
+                label: modelData.name
+                active: !root.searching && root.groupOf(root.tab) === modelData.name
+                onClicked: root.openGroupOf(modelData.name)
+              }
+            }
+          }
+
+        }
+      }
+    }
 
     // the window's header, centred between the window's top and its line, which is level with the page's
     KitLine {
@@ -330,94 +398,70 @@ Rectangle {
       width: nav.width
       icon: "search"
       placeholder: "Search settings"
+      visible: !root.sectionMode
       passKeys: [Qt.Key_Up, Qt.Key_Down]
       onAccepted: root.openResult(root.results[root.picked])
       onKeyPassed: key => root.picked = Math.max(0, Math.min(root.results.length - 1, root.picked + (key === Qt.Key_Down ? 1 : -1)))
     }
 
-    // the rail: a button per group, the shell's own pages at its foot
-    Item {
-      id: rail
-      width: sidebar.railWidth
-      height: parent.height
-
-      KitLine { vertical: true; anchors { right: parent.right; top: parent.top; bottom: parent.bottom } }
-
-      Column {
-        x: (rail.width - width) / 2
-        y: Theme.windowPadding
-        spacing: Theme.gapHair
-
-        Repeater {
-          model: root.groups
-          RailButton {
-            required property var modelData
-            icon: modelData.icon
-            label: modelData.name
-            active: root.openGroup === modelData.name && !root.searching
-            onClicked: root.openGroupOf(modelData.name)
-          }
-        }
-      }
-
-      Column {
-        x: (rail.width - width) / 2
-        anchors { bottom: parent.bottom; bottomMargin: Theme.windowPadding }
-        spacing: Theme.gapHair
-
-        Repeater {
-          model: root.footSections
-          RailButton {
-            required property var modelData
-            icon: modelData.icon
-            label: modelData.label
-            active: root.tab === modelData.value
-            onClicked: root.select(modelData.value)
-          }
-        }
-      }
-    }
-
-    // the open group's pages
-    Flickable {
+    // Virtualized sidebar: one selected section, or all pages with headings.
+    ListView {
       id: nav
       Controls.ScrollBar.vertical: KitScrollBar {}
       x: sidebar.listX
-      y: searchField.y + searchField.height + root.contentGap
+      y: root.sectionMode ? brandLine.y + brandLine.height + root.contentGap : searchField.y + searchField.height + root.contentGap
       width: parent.width - sidebar.listX - Theme.windowPadding
       height: parent.height - y - Theme.windowPadding
       visible: !root.searching
-      contentHeight: navColumn.implicitHeight
       clip: true
       interactive: contentHeight > height
       boundsBehavior: Flickable.StopAtBounds
-
-      Column {
-        id: navColumn
+      spacing: Theme.gapHair
+      model: root.visibleNavItems
+      Behavior on x { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
+      Behavior on y { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
+      Behavior on width { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
+      Behavior on height { enabled: Motion.pages; NumberAnimation { duration: Motion.ms(220); easing.type: Motion.easing } }
+      add: Transition {
+        enabled: Motion.pages
+        ParallelAnimation {
+          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.ms(180); easing.type: Motion.easing }
+          NumberAnimation { property: "x"; from: 10; to: 0; duration: Motion.ms(180); easing.type: Motion.easing }
+        }
+      }
+      remove: Transition {
+        enabled: Motion.pages
+        NumberAnimation { property: "opacity"; to: 0; duration: Motion.ms(100); easing.type: Motion.easing }
+      }
+      delegate: Item {
+        id: navItem
+        required property var modelData
         width: nav.width - Theme.gapMedium
-        spacing: Theme.gapHair
-        // another group is opened: its pages come in, a fade and a short rise
-        opacity: groupIn.shown
-        transform: Translate { y: (1 - groupIn.shown) * 10 }
+        height: modelData.kind === "heading" ? Theme.fontSize + Theme.gapWide
+              : modelData.kind === "separator" ? Theme.gapWide : Theme.navigationHeight
 
         KitText {
+          visible: navItem.modelData.kind === "heading"
           x: Theme.gapLoose
-          text: root.openGroup
+          anchors.verticalCenter: parent.verticalCenter
+          text: navItem.modelData.label
           color: Theme.muted
           font.pixelSize: Theme.fontSize - 2
           font.weight: Font.DemiBold
         }
 
-        Repeater {
-          model: root.navSections
-          NavRow {
-            required property var modelData
-            entry: modelData
-            current: root.tab
-            width: navColumn.width
-            indent: !!modelData.child
-            onPicked: root.select(modelData.value)
-          }
+        NavRow {
+          visible: navItem.modelData.kind === "page"
+          entry: navItem.modelData.entry
+          current: root.tab
+          width: navItem.width
+          onPicked: root.select(entry.value)
+        }
+
+        KitLine {
+          visible: navItem.modelData.kind === "separator"
+          anchors.verticalCenter: parent.verticalCenter
+          width: parent.width
         }
       }
     }
@@ -679,10 +723,6 @@ Rectangle {
     }
   }
 
-  QtObject { id: groupIn; property real shown: 1 }
-  NumberAnimation { id: groupAnim; target: groupIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(200); easing.type: Motion.easing }
-  onOpenGroupChanged: if (Motion.pages) groupAnim.restart()
-
   QtObject { id: pageIn; property real shown: 1 }
   NumberAnimation { id: pageAnim; target: pageIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(260); easing.type: Motion.easing }
   // the page is built in the frame the tab changes; the clock of its entrance starts after that
@@ -694,12 +734,13 @@ Rectangle {
   }
 
   onTabChanged: {
+    const group = groupOf(tab);
+    if (group) openGroup = group;
     syncPageTab();
     if (Motion.pages) { pageAnim.stop(); pageIn.shown = 0; pageWait = 1; }
     ShellSettings.set("managerTab", tab);   // kept for Shell apps › Shell Manager › Last page
     page.contentY = 0;
     pinnedJump = "";
-    const g = groupOf(tab);
-    if (groups.some(x => x.name === g)) openGroup = g;
+    revealNav(tab);
   }
 }
