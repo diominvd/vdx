@@ -13,6 +13,7 @@ Row {
   readonly property var player: kind === "media" ? PlayerService.media : PlayerService.music
   property int coverSize: 18
   property int badgeRadius: 4
+  height: Math.max(coverSize, Theme.fontSize)
   spacing: Theme.gapMedium
   visible: kind !== ""
 

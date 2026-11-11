@@ -13,6 +13,7 @@ Row {
   property bool inputEnabled: true
   property int coverSize: 18
   property int badgeRadius: 4
+  height: Math.max(coverSize, Theme.fontSize)
   spacing: Theme.gapMedium
   visible: kind !== ""
 

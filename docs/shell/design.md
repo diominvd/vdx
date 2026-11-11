@@ -181,7 +181,9 @@ uses tonal layers and more spacious controls.
   set in Shell Manager › Motion. Rows that show and hide sit in a
   `KitColumn` (KitFrame's column is one): they fade in at their final positions; group geometry settles immediately. A
   list's new row (a Repeater remakes them all): `KitAppear` keyed in the list's
-  `KitSeen`. A hover / selected fill fades (`Motion.controls`, `quick`) from
+  `KitSeen`. Bar rearrangements animate visual offsets against final layout positions;
+  popup visibility and live activity resizing MUST NOT animate positioner coordinates.
+  A hover / selected fill fades (`Motion.controls`, `quick`) from
   `Theme.clear`, never `"transparent"` (black: it flashes dark); rows in a
   filled box hover with `Theme.controlHover`, the whole row lit, not the text.
 

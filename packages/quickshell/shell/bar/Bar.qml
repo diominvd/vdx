@@ -64,19 +64,27 @@ PanelWindow {
     }
 
     spacing: Theme.moduleSpacing
-    onIdsChanged: { root.scheduleFold(); BarLayout.syncFaceModel(faceModel, ids); }
-    Component.onCompleted: BarLayout.syncFaceModel(faceModel, ids)
-    ListModel { id: faceModel }
-    move: Transition {
-      enabled: Motion.bar
-      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    property bool modelReady: false
+    property bool reordering: false
+    onIdsChanged: {
+      root.scheduleFold();
+      reordering = modelReady;
+      BarLayout.syncFaceModel(faceModel, ids);
+      if (modelReady) zoneReorderDone.restart();
     }
+    Component.onCompleted: { BarLayout.syncFaceModel(faceModel, ids); modelReady = true; }
+    Timer { id: zoneReorderDone; interval: Motion.normal; onTriggered: zone.reordering = false }
+    ListModel { id: faceModel }
 
     Repeater {
       model: faceModel
 
       Row {
         id: cell
+        // Animate a visual offset; the positioner always owns the final geometry.
+        property real displayedX: x
+        Behavior on displayedX { enabled: Motion.bar && zone.reordering && cell.visible; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
+        transform: Translate { x: cell.displayedX - cell.x }
 
         required property string moduleId
         readonly property string modelData: moduleId

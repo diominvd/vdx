@@ -40,27 +40,32 @@ Item {
     height: Theme.islandHeight
     anchors.centerIn: parent
     spacing: Theme.gapGroup
-    move: Transition {
-      enabled: Motion.bar
-      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
-    }
 
   Row {
-    id: left
+    id: startModules
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.gapWide
-    move: Transition {
-      enabled: Motion.bar
-      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
-    }
 
     readonly property var ids: BarLayout.islandIn("start", root.screen)
-    onIdsChanged: BarLayout.syncFaceModel(leftModel, ids)
-    Component.onCompleted: BarLayout.syncFaceModel(leftModel, ids)
+    property bool modelReady: false
+    property bool reordering: false
+    onIdsChanged: {
+      reordering = modelReady;
+      BarLayout.syncFaceModel(leftModel, ids);
+      if (modelReady) leftReorderDone.restart();
+    }
+    Component.onCompleted: { BarLayout.syncFaceModel(leftModel, ids); modelReady = true; }
+    Timer { id: leftReorderDone; interval: Motion.normal; onTriggered: startModules.reordering = false }
     ListModel { id: leftModel }
     Repeater {
       model: leftModel
       Loader {
+        id: leftFace
+        // Animate a visual offset; the positioner always owns the final geometry.
+        property real displayedX: x
+        Behavior on displayedX { enabled: Motion.bar && startModules.reordering && leftFace.visible; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
+        transform: Translate { x: leftFace.displayedX - leftFace.x }
+
         required property string moduleId
         readonly property string modelData: moduleId
         anchors.verticalCenter: parent.verticalCenter
@@ -108,21 +113,30 @@ Item {
   }
 
   Row {
-    id: right
+    id: endModules
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.gapWide
-    move: Transition {
-      enabled: Motion.bar
-      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
-    }
 
     readonly property var ids: BarLayout.islandIn("end", root.screen)
-    onIdsChanged: BarLayout.syncFaceModel(rightModel, ids)
-    Component.onCompleted: BarLayout.syncFaceModel(rightModel, ids)
+    property bool modelReady: false
+    property bool reordering: false
+    onIdsChanged: {
+      reordering = modelReady;
+      BarLayout.syncFaceModel(rightModel, ids);
+      if (modelReady) rightReorderDone.restart();
+    }
+    Component.onCompleted: { BarLayout.syncFaceModel(rightModel, ids); modelReady = true; }
+    Timer { id: rightReorderDone; interval: Motion.normal; onTriggered: endModules.reordering = false }
     ListModel { id: rightModel }
     Repeater {
       model: rightModel
       Loader {
+        id: rightFace
+        // Animate a visual offset; the positioner always owns the final geometry.
+        property real displayedX: x
+        Behavior on displayedX { enabled: Motion.bar && endModules.reordering && rightFace.visible; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
+        transform: Translate { x: rightFace.displayedX - rightFace.x }
+
         required property string moduleId
         readonly property string modelData: moduleId
         anchors.verticalCenter: parent.verticalCenter

@@ -3,7 +3,7 @@ import qs.config
 
 // Shared crossfade face. Only the selected activity group is instantiated;
 // hidden groups do not keep media effects, sound bars or service bindings alive.
-Row {
+Item {
   id: face
 
   property string kind: ""
@@ -28,7 +28,12 @@ Row {
   // far in as its ink is from the chip's top, and no closer than the corner's radius
   // (in a round end that is the same gap, measured to the curve).
   readonly property int capHeight: Math.round(Theme.fontSize * 0.73)   // the shell's monospace caps, ~0.73 em
+  // Effective child visibility becomes false while the compact bar is hidden.
+  // Keep its measured ends so opening a popup cannot change the resting width.
+  property var retainedEnds: [null, null]
+  onEndsChanged: if (visible) retainedEnds = ends
   readonly property var ends: {
+    if (!visible) return retainedEnds;
     const body = loader.item;
     if (!body) return [null, null];
     let first = null, last = null;
@@ -49,7 +54,10 @@ Row {
   readonly property int leadPad: padFor(ends[0])
   readonly property int trailPad: padFor(ends[1])
 
-  height: coverSize
+  implicitWidth: loader.implicitWidth
+  implicitHeight: coverSize
+  width: implicitWidth
+  height: implicitHeight
   x: shift + leadPad
   anchors.verticalCenter: parent.verticalCenter
   visible: kind !== ""

@@ -72,17 +72,25 @@ Rectangle {
     Behavior on opacity { enabled: Motion.island && Theme.island; NumberAnimation { duration: Motion.quick } }
 
     readonly property var ids: BarLayout.barModules(root.bar.modelData.name, root.modelData.id)
-    onIdsChanged: BarLayout.syncFaceModel(faceModel, ids)
-    Component.onCompleted: BarLayout.syncFaceModel(faceModel, ids)
-    ListModel { id: faceModel }
-    move: Transition {
-      enabled: Motion.bar
-      NumberAnimation { properties: "x,y"; duration: Motion.normal; easing.type: Motion.easing }
+    property bool modelReady: false
+    property bool reordering: false
+    onIdsChanged: {
+      reordering = modelReady;
+      BarLayout.syncFaceModel(faceModel, ids);
+      if (modelReady) kidsReorderDone.restart();
     }
+    Component.onCompleted: { BarLayout.syncFaceModel(faceModel, ids); modelReady = true; }
+    Timer { id: kidsReorderDone; interval: Motion.normal; onTriggered: kids.reordering = false }
+    ListModel { id: faceModel }
     Repeater {
       model: faceModel
 
       Row {
+        id: childFace
+        // Animate a visual offset; the positioner always owns the final geometry.
+        property real displayedX: x
+        Behavior on displayedX { enabled: Motion.bar && kids.reordering && childFace.visible; NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } }
+        transform: Translate { x: childFace.displayedX - childFace.x }
         required property string moduleId
         readonly property string modelData: moduleId
         required property int index
