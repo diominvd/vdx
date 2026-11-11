@@ -36,15 +36,13 @@ selection. The override is in `$XDG_STATE_HOME/dotfiles/terminal.json`.
 
 Zellij opens numbered session `1`; new sessions receive the next number.
 Its native tab bar sits above the terminal, with a two-line classic status
-bar below (modes and contextual hints) and standard pane frames. A one-line showy-quota strip displays AI quota through CodexBar (120-second
-refresh, one shared local serve). Autolock 0.3.0 starts headless and locks
+bar below (modes and contextual hints) and standard pane frames. Autolock 0.3.0 starts headless and locks
 interactive editors, pagers, pickers and agent CLIs; Ctrl+A stays available
 while locked. Forgot 0.4.2 opens on demand with Alt+F and reads the actual
-keybindings. showy-quota is pinned to 0.9.0; CodexBar CLI to 0.84.0.
-WASM assets live in `~/.config/zellij/plugins/`, CodexBar in `~/.local/bin/`;
-they are workstation installs, not tracked binaries. Accept plugin permission
-prompts on first use. New tabs use the quota layout; Ctrl+A then r reapplies
-it to the active tab. CodexBar uses existing provider authentication. Native mode entries retain familiar tmux action keys:
+keybindings. WASM assets live in `~/.config/zellij/plugins/`; they are
+workstation installs, not tracked binaries. Accept plugin permission prompts
+on first use. New tabs use the configured layout; Ctrl+A then r reapplies it
+to the active tab. Native mode entries retain familiar tmux action keys:
 
 - `Alt+Z`: toggle Zen mode (focused pane fills the terminal, without UI bars);
   available in every mode, including Locked. Press again to restore the layout.
