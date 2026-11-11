@@ -307,3 +307,7 @@ The colour picker offers named palette choices with keyboard activation.
 Scrollbars hide while idle.
 Notification colour rules offer app-name completion: Tab accepts the hint,
 Enter or Save stores the name, and Escape cancels the edit.
+
+Terminal settings in Shell Manager control the multiplexer and horizontal/vertical
+kitty padding (0–40 pt, default 6 pt) for new windows. Reset restores both.
+Padding is stored locally in `~/.config/kitty/padding.conf`.

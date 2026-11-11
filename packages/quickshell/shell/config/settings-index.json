@@ -663,9 +663,27 @@
   "target": "terminal"
  },
  {
+  "label": "Padding",
+  "hint": "",
+  "where": "Terminal",
+  "target": "terminal"
+ },
+ {
   "label": "Multiplexer",
   "hint": "Applies to new terminal windows",
   "where": "Terminal › OPENING",
+  "target": "terminal"
+ },
+ {
+  "label": "Horizontal padding",
+  "hint": "",
+  "where": "Terminal › PADDING",
+  "target": "terminal"
+ },
+ {
+  "label": "Vertical padding",
+  "hint": "",
+  "where": "Terminal › PADDING",
   "target": "terminal"
  },
  {
