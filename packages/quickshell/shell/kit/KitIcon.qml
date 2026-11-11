@@ -19,6 +19,7 @@ Item {
   property color tint: Theme.foreground0
   property int size: Theme.fontSize + 3
   property bool solid: ShellSettings.solidIcons
+  property string set: ShellSettings.iconSet      // another set only for a preview (Icons page)
   property bool filled: false              // force filled pause / play / stop glyphs
   readonly property bool filledGlyph: filled && ["pause", "play", "square"].includes(name)
 
@@ -33,10 +34,10 @@ Item {
     id: image
     anchors.fill: parent
     source: root.name === "" ? ""
-      : ShellSettings.iconSet === "tabler" ? Qt.resolvedUrl("icons/tabler/" + root.name + ".svg")
-      : ShellSettings.iconSet === "lucide" ? Qt.resolvedUrl("icons/lucide/" + root.name + ".svg")
-      : ShellSettings.iconSet === "phosphor" ? Qt.resolvedUrl("icons/phosphor/" + (root.solid ? "solid/" : "") + root.name + ".svg")
-      : ShellSettings.iconSet === "mingcute" ? Qt.resolvedUrl("icons/mingcute/" + (root.solid ? "filled/" : "regular/") + root.name + ".svg")
+      : root.set === "tabler" ? Qt.resolvedUrl("icons/tabler/" + root.name + ".svg")
+      : root.set === "lucide" ? Qt.resolvedUrl("icons/lucide/" + root.name + ".svg")
+      : root.set === "phosphor" ? Qt.resolvedUrl("icons/phosphor/" + (root.solid ? "solid/" : "") + root.name + ".svg")
+      : root.set === "mingcute" ? Qt.resolvedUrl("icons/mingcute/" + (root.solid ? "filled/" : "regular/") + root.name + ".svg")
       : Qt.resolvedUrl("icons/" + (Theme.round ? "round/" : "") + (root.solid ? "solid/" : "") + root.name + ".svg")
     sourceSize { width: root.implicitWidth * 2; height: root.implicitHeight * 2 }
     smooth: true
@@ -51,51 +52,59 @@ Item {
     colorizationColor: root.tint
   }
 
-  Row {
-    visible: root.filledGlyph && root.name === "pause"
-    anchors.centerIn: parent
-    spacing: root.size * 0.2
-    Repeater {
-      model: 2
-      Rectangle {
-        width: root.size * 0.22
-        height: root.size * 0.72
-        radius: root.size * 0.04
-        anchors.verticalCenter: parent.verticalCenter
-        color: root.tint
-      }
-    }
-  }
+  // the three filled glyphs are drawn, not files: built only for an icon that is one of them
+  Loader { anchors.fill: parent; active: root.filledGlyph; sourceComponent: filledParts }
 
-  Rectangle {
-    visible: root.filledGlyph && root.name === "square"
-    anchors.centerIn: parent
-    width: root.size * 0.64
-    height: width
-    radius: root.size * 0.08
-    color: root.tint
-  }
+  Component {
+    id: filledParts
+    Item {
+        Row {
+          visible: root.filledGlyph && root.name === "pause"
+          anchors.centerIn: parent
+          spacing: root.size * 0.2
+          Repeater {
+            model: 2
+            Rectangle {
+              width: root.size * 0.22
+              height: root.size * 0.72
+              radius: root.size * 0.04
+              anchors.verticalCenter: parent.verticalCenter
+              color: root.tint
+            }
+          }
+        }
 
-  Canvas {
-    id: play
-    visible: root.filledGlyph && root.name === "play"
-    anchors.fill: parent
-    onPaint: {
-      const ctx = getContext("2d");
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = root.tint;
-      ctx.beginPath();
-      ctx.moveTo(width * 0.25, height * 0.12);
-      ctx.lineTo(width * 0.82, height * 0.5);
-      ctx.lineTo(width * 0.25, height * 0.88);
-      ctx.closePath();
-      ctx.fill();
-    }
-    onWidthChanged: requestPaint()
-    onHeightChanged: requestPaint()
-    Connections {
-      target: root
-      function onTintChanged() { play.requestPaint(); }
+        Rectangle {
+          visible: root.filledGlyph && root.name === "square"
+          anchors.centerIn: parent
+          width: root.size * 0.64
+          height: width
+          radius: root.size * 0.08
+          color: root.tint
+        }
+
+        Canvas {
+          id: play
+          visible: root.filledGlyph && root.name === "play"
+          anchors.fill: parent
+          onPaint: {
+            const ctx = getContext("2d");
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = root.tint;
+            ctx.beginPath();
+            ctx.moveTo(width * 0.25, height * 0.12);
+            ctx.lineTo(width * 0.82, height * 0.5);
+            ctx.lineTo(width * 0.25, height * 0.88);
+            ctx.closePath();
+            ctx.fill();
+          }
+          onWidthChanged: requestPaint()
+          onHeightChanged: requestPaint()
+          Connections {
+            target: root
+            function onTintChanged() { play.requestPaint(); }
+          }
+        }
     }
   }
 }

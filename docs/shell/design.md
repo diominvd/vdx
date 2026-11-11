@@ -209,11 +209,17 @@ Pages by the user's area; the look follows macOS System Settings.
   the right (code, a prompt, controls, the colours and tones as named pills).
   A search over the list works on one mode (Themes › Dark / Light) at a time. ↑/↓
   previews, Enter / Apply switches, Esc goes back.
-  Apps, Bar modules and Themes fill the window and scroll their panes, not the page.
-  Fonts: a card per font written in itself, with its state (in use, installed,
-  not installed: a second click downloads).
-  Cursor: its shapes large, colour and size, a card per cursor theme; a pick waits
-  for Apply.
+  Apps, Bar modules, Themes, Fonts, Cursor and Icons fill the window and scroll their panes, not the page.
+  Themes, Fonts, Cursor and Icons are a `KitPicker`: search and a virtualised list on the left
+  (thumbnail, name, check on the one in use, sections), on the right a `KitPickerHead` and one
+  card that fills the rest and holds only the preview. The head: the name, then a status of
+  one vocabulary (`phase`: In use / Preview / Not installed / Applying… / Loading…), the
+  actions on the right (Cancel and the primary Apply, shown only when there is something to
+  apply), and the page's options as `KitPickerOption` lines — captions from the pane's left
+  edge in a column of ten characters, every control from one x, ending at the right edge,
+  no hints. Every option is a `KitSegments` to the right edge (a colour: a row of dots) — no
+  switches there: two states are a track of two segments, three (Off / Plain / Framed) one of three.
+  The cursor preview labels its 2× stage and shows a strip at the chosen size. Fonts, Cursor and Themes wait for Apply (a download asks twice); Icons applies at once.
 - MUST — a page over many entries with options of their own (Apps, Bar modules) is an
   `EntryFolds`: a search, then one box of `KitFoldRow`s by name, like Live activities: icon,
   name, its state under it, an arrow. One entry, one dropdown: its options unfold in place,
@@ -327,7 +333,7 @@ Pages by the user's area; the look follows macOS System Settings.
   and order controls as an alternative to drag. Available modules are searchable.
 - Hub and Live activities have their own pages. Hub appearance
   options always address the Island settings, even when Solid is active.
-- Fonts and Cursor use searchable rows and one preview. Picking a row does
+- Fonts and Cursor use searchable rows and one preview (KitPicker). Picking a row does
   not apply it. Downloads and changes use an explicit action. Themes applies
   the variant currently shown by its preview, including Light / Dark.
 - Password fields always use dots. The old key remains readable for settings

@@ -31,6 +31,8 @@ Rectangle {
 
   Component.onCompleted: {
     SettingsIndex.load();
+    // the pickers' data (two quick scripts) is read before a page asks for it
+    Qt.callLater(() => { FontService.refresh(); CursorService.refresh(); });
     if (ShellSettings.managerOpen && ShellSettings.managerStart === "last")
       tab = resolve(ShellSettings.managerTab).tab;
   }
@@ -591,7 +593,7 @@ Rectangle {
     anchors { left: sidebar.right; leftMargin: 1; right: parent.right; rightMargin: previewDock.visible ? previewDock.width + Theme.windowPadding + Theme.gapWide : 0; top: header.bottom; bottom: parent.bottom }
     // to the window's edge: the rows scroll out of it, not out of a line above it
     // Apps, Bar modules and Themes fill the window and scroll their panes themselves: the page stays
-    contentHeight: (root.currentPage?.fillsViewport ?? false) || ["apps", "modules", "themes"].includes(root.tab) ? height : pages.implicitHeight + pages.y + Theme.windowPadding
+    contentHeight: (root.currentPage?.fillsViewport ?? false) || ["apps", "modules", "themes", "fonts", "cursor", "icons"].includes(root.tab) ? height : pages.implicitHeight + pages.y + Theme.windowPadding
     clip: true
     boundsBehavior: Flickable.StopAtBounds
     interactive: contentHeight > height
@@ -617,11 +619,13 @@ Rectangle {
       id: pages
       readonly property real availableWidth: Math.max(0, page.width - 2 * Theme.windowPadding)
       x: Theme.windowPadding + (availableWidth - width) / 2
-      opacity: pageIn.shown
+      // a hair above 0 while the page waits for its first frames: a fully transparent subtree is
+      // skipped by the renderer, and its glyphs and layers would be made in the first frame of the move
+      opacity: Math.max(pageIn.shown, root.pageWait > 0 ? 0.002 : 0)
       transform: Translate { x: (1 - pageIn.shown) * 18 }     // a short move in from the right
       y: root.contentGap
       // Themes is a two-pane gallery; all settings pages share the form width.
-      width: root.tab === "themes" ? availableWidth : Math.min(availableWidth, Theme.settingsMaxWidth)
+      width: ["themes", "fonts", "cursor", "icons"].includes(root.tab) ? availableWidth : Math.min(availableWidth, Theme.settingsMaxWidth)
       height: Math.max(implicitHeight, page.height - y)
       implicitHeight: pageContent.item?.implicitHeight ?? 0
 
@@ -651,10 +655,10 @@ Rectangle {
       Component { id: appearanceComponent; AppearancePage { width: pages.width; height: page.height - pages.y - Theme.windowPadding } }
       Component { id: barComponent; BarPage { width: pages.width; height: page.height - pages.y - Theme.windowPadding } }
       Component { id: themesComponent; ThemesPage { width: pages.width; height: page.height - pages.y } }
-      Component { id: fontsComponent; FontsPage { width: pages.width } }
-      Component { id: iconsComponent; IconsPage { width: pages.width } }
+      Component { id: fontsComponent; FontsPage { width: pages.width; height: page.height - pages.y } }
+      Component { id: iconsComponent; IconsPage { width: pages.width; height: page.height - pages.y } }
       Component { id: wallpaperComponent; WallpaperPage { width: pages.width } }
-      Component { id: cursorComponent; CursorPage { width: pages.width } }
+      Component { id: cursorComponent; CursorPage { width: pages.width; height: page.height - pages.y } }
       Component { id: animationsComponent; AnimationsPage { width: pages.width } }
       Component { id: appsComponent; ShellAppsPage { width: pages.width; height: page.height - pages.y; viewportRightInset: page.width - pages.x - pages.width } }
       Component { id: windowsComponent; WindowsPage { width: pages.width } }
@@ -680,11 +684,18 @@ Rectangle {
   onOpenGroupChanged: if (Motion.pages) groupAnim.restart()
 
   QtObject { id: pageIn; property real shown: 1 }
-  NumberAnimation { id: pageAnim; target: pageIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(240); easing.type: Motion.easing }
+  NumberAnimation { id: pageAnim; target: pageIn; property: "shown"; from: 0; to: 1; duration: Motion.ms(260); easing.type: Motion.easing }
+  // the page is built in the frame the tab changes; the clock of its entrance starts after that
+  // frame is drawn, or the first part of the move is lost to the build
+  property int pageWait: 0
+  FrameAnimation {
+    running: root.pageWait > 0
+    onTriggered: { if (++root.pageWait > 3) { root.pageWait = 0; pageAnim.restart(); } }
+  }
 
   onTabChanged: {
     syncPageTab();
-    if (Motion.pages) pageAnim.restart();
+    if (Motion.pages) { pageAnim.stop(); pageIn.shown = 0; pageWait = 1; }
     ShellSettings.set("managerTab", tab);   // kept for Shell apps › Shell Manager › Last page
     page.contentY = 0;
     pinnedJump = "";

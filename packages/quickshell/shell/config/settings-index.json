@@ -50,6 +50,12 @@
   ]
  },
  {
+  "label": "Mode",
+  "hint": "",
+  "where": "Themes",
+  "target": "themes"
+ },
+ {
   "label": "Fonts",
   "hint": "",
   "where": "",
@@ -62,26 +68,20 @@
   "target": "fonts:size"
  },
  {
-  "label": "Preview",
+  "label": "Text size",
   "hint": "",
   "where": "Fonts",
-  "target": "fonts:preview"
- },
- {
-  "label": "Families",
-  "hint": "",
-  "where": "Fonts",
-  "target": "fonts:families"
+  "target": "fonts"
  },
  {
   "label": "Text size",
-  "hint": "Shell text and controls",
+  "hint": "",
   "where": "Fonts › TEXT SIZE",
   "target": "fonts:size"
  },
  {
-  "label": "GTK apps text",
-  "hint": "Applied at once, GTK only",
+  "label": "GTK apps",
+  "hint": "",
   "where": "Fonts › TEXT SIZE",
   "target": "fonts:size"
  },
@@ -92,27 +92,21 @@
   "target": "icons"
  },
  {
-  "label": "Icons",
+  "label": "Style",
   "hint": "",
   "where": "Icons",
   "target": "icons"
  },
  {
-  "label": "Menu",
+  "label": "Style",
   "hint": "",
-  "where": "Icons",
+  "where": "Icons › STYLE",
   "target": "icons"
  },
  {
-  "label": "Framed icons",
-  "hint": "A tile around icons in lists",
-  "where": "Icons › MENU",
-  "target": "icons"
- },
- {
-  "label": "Icons in the list",
-  "hint": "Off: the pages are names only",
-  "where": "Icons › MENU",
+  "label": "List icons",
+  "hint": "",
+  "where": "Icons › STYLE",
   "target": "icons"
  },
  {
@@ -128,22 +122,16 @@
   "target": "cursor"
  },
  {
-  "label": "Preview",
-  "hint": "",
-  "where": "Cursor",
-  "target": "cursor:preview"
- },
- {
   "label": "Style",
   "hint": "",
   "where": "Cursor",
   "target": "cursor:style"
  },
  {
-  "label": "Cursor themes",
+  "label": "Style",
   "hint": "",
   "where": "Cursor",
-  "target": "cursor:themes"
+  "target": "cursor"
  },
  {
   "label": "Colour",
@@ -152,8 +140,14 @@
   "target": "cursor:style"
  },
  {
+  "label": "Palette",
+  "hint": "",
+  "where": "Cursor › STYLE",
+  "target": "cursor:style"
+ },
+ {
   "label": "Size",
-  "hint": "Pixels at scale 1, Apply to use",
+  "hint": "",
   "where": "Cursor › STYLE",
   "target": "cursor:style"
  },

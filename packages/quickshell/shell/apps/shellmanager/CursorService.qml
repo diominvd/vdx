@@ -116,12 +116,14 @@ Singleton {
       onStreamFinished: {
         const r = root.parse(text);
         if (!r.ok) { root.error = r.error; return; }
-        root.cursors = r.cursors;
-        root.base = r.base;
+        root.base = r.base;                 // before the list: a page picking by `base` never sees a list without it
         root.size = r.size;
         root.mode = r.mode;
         root.fill = r.fill;
         root.outline = r.outline;
+        root.cursors = r.cursors;
+        // the shapes are ready before the page is opened
+        if (root.base !== "" && !previewProc.running) root.preview(root.base, root.mode, root.fill);
         follow.restart();
       }
     }

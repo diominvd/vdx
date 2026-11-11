@@ -62,8 +62,8 @@ Singleton {
       onStreamFinished: {
         const r = root.parse(text);
         if (!r.ok) { root.error = r.error; return; }
+        root.current = r.current;           // before the list: a page picking by `current` never sees a list without it
         root.fonts = r.fonts;
-        root.current = r.current;
       }
     }
   }

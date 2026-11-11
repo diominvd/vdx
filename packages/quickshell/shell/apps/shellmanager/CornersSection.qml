@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 import qs.kit
 
-// Appearance › SHAPE (with IconsSection): sharp or round, for
+// Appearance › SHAPE (the icon sets are the Icons page): sharp or round, for
 // the whole shell — popups, windows, controls, rows, the island, the icons (the
 // Rounded set). Round sets one radius on a ticked slider; smaller things take a
 // share of it (Theme). Separately: a slider per part (windows, cards, controls,

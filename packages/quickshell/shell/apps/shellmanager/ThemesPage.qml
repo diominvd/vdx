@@ -197,39 +197,29 @@ Row {
     height: side.height
     spacing: Theme.gapWide
 
-    Column {
-      width: parent.width
-      spacing: Theme.gapSmall
-      KitText {
-        width: parent.width
-        text: ThemeService.baseOf(root.selected)
-        font.weight: Font.Medium
-        font.pixelSize: Theme.fontSize + 5
-        elide: Text.ElideRight
-      }
-      KitText {
-        text: root.character(root.previewed) + (root.changed ? " · Preview" : " · In use")
-        color: Theme.muted
-        font.pixelSize: Theme.fontSize - 1
-      }
-      Item {
-        width: parent.width
-        height: Theme.controlHeight
+    KitPickerHead {
+      title: ThemeService.baseOf(root.selected)
+      phase: ThemeService.busy ? "busy" : root.changed ? "preview" : "inuse"
+      busyText: "Applying…"
+      actions: [
+        KitButton { visible: root.changed && !ThemeService.busy; text: "Cancel"; onClicked: { root.selected = ThemeService.current; root.previewLight = ThemeService.light; } },
+        KitButton {
+          visible: root.changed || ThemeService.busy
+          primary: true
+          icon: "check"
+          text: "Apply"
+          busy: ThemeService.busy
+          disabled: root.shown.length === 0
+          onClicked: root.apply()
+        }
+      ]
+      KitPickerOption {
+        label: "Mode"
         KitSegments {
-          width: Math.min(180, parent.width - applyButton.width - Theme.gapSmall)
+          width: parent.width
           model: [{ label: "Dark", value: false }, { label: "Light", value: true }]
           current: root.previewLight
           onPicked: value => root.previewLight = value
-        }
-        KitButton {
-          id: applyButton
-          anchors.right: parent.right
-          icon: "check"
-          iconTint: Theme.green
-          text: "Apply"
-          busy: ThemeService.busy
-          disabled: !root.changed || root.shown.length === 0
-          onClicked: root.apply()
         }
       }
     }
