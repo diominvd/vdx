@@ -17,7 +17,7 @@ to <fill>–<outline> (rrggbb), alpha kept: ~/.local/share/icons/dotfiles-cursor
 cursor (~/.local/share/icons/default/index.theme, which GTK's `default` and
 Xcursor follow), Hyprland's `setcursor` and the GNOME interface keys (GTK 4);
 kept in ~/.local/state/dotfiles/cursor.json. Errors: {"ok": false, "error": "..."}."""
-import json, shutil, struct, subprocess, sys, tarfile, tempfile, urllib.request, zlib
+import configparser, json, shutil, struct, subprocess, sys, tarfile, tempfile, urllib.request, zlib
 from array import array
 from pathlib import Path
 from backend import out
@@ -125,6 +125,8 @@ def tinter(fill, outline):
 
 
 def tint_file(data, tint):
+    if not data.startswith(b"Xcur"):
+        return data
     buf = bytearray(data)
     for _, off, w, h in chunks(data):
         end = off + 4 * w * h
@@ -215,9 +217,9 @@ def cmd_preview(base, fill=None, outline=None):
 
 
 def build_tinted(base, fill, outline):
-    """A tinted copy of `base`; the previous copies go."""
+    """A complete tinted copy of `base`, including shapes inherited from parents."""
     name = f"{TINTED}{fill}-{outline}"
-    src, dst = theme_dir(base), ICONS / name
+    dst = ICONS / name
     for old in ICONS.glob(TINTED + "*"):
         if old != dst:
             shutil.rmtree(old, ignore_errors=True)
@@ -225,13 +227,62 @@ def build_tinted(base, fill, outline):
         shutil.rmtree(dst)
     (dst / "cursors").mkdir(parents=True)
     tint = tinter(fill, outline)
-    for f in (src / "cursors").iterdir():
-        target = dst / "cursors" / f.name
-        # Cursor themes commonly alias shapes with symlinks. Copy and tint the
-        # resolved image too, otherwise those shapes keep the original colour.
-        if f.is_file():
-            target.write_bytes(tint_file(f.read_bytes(), tint))
-    (dst / "index.theme").write_text(f"[Icon Theme]\nName={name}\nComment={base} tinted by the Shell Manager\nInherits={base}\n")
+
+    def cursor_files(theme, seen=()):
+        """Return the effective cursor files, with child themes taking precedence."""
+        if theme in seen:
+            return {}
+        folder = theme_dir(theme)
+        if not folder:
+            return {}
+
+        parents = []
+        index = folder / "index.theme"
+        if index.is_file():
+            metadata = configparser.ConfigParser(interpolation=None)
+            try:
+                metadata.read(index)
+                parents = [item.strip() for item in metadata.get("Icon Theme", "Inherits", fallback="").split(",") if item.strip()]
+            except configparser.Error:
+                pass
+
+        files = {}
+        # The first listed parent has priority over later fallbacks.
+        for parent in reversed(parents):
+            files.update(cursor_files(parent, (*seen, theme)))
+
+        cursors = folder / "cursors"
+        if cursors.is_dir():
+            for entry in cursors.iterdir():
+                if entry.is_file():
+                    files[entry.name] = entry.read_bytes()
+                elif entry.is_symlink():
+                    # A dangling alias can point to a shape supplied by an inherited theme.
+                    files[entry.name] = Path(entry.readlink()).name
+
+        # Resolve aliases after merging parents so dangling child aliases can
+        # target an inherited shape. Cyclic or unresolved aliases are omitted.
+        resolved = {}
+
+        def resolve(key, trail=()):
+            if key in resolved:
+                return resolved[key]
+            value = files.get(key)
+            if isinstance(value, bytes):
+                resolved[key] = value
+            elif isinstance(value, str) and key not in trail and value != key:
+                return resolve(value, (*trail, key))
+            return resolved.get(key)
+
+        for key in files:
+            data = resolve(key)
+            if data is not None:
+                resolved[key] = data
+        return resolved
+
+    for filename, data in cursor_files(base).items():
+        (dst / "cursors" / filename).write_bytes(tint_file(data, tint))
+    (dst / "index.theme").write_text(f"[Icon Theme]\nName={name}\nComment={base} tinted by the Shell Manager\n")
     return name
 
 

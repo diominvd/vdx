@@ -144,7 +144,10 @@ KitPicker {
     KitEmptyState {
       anchors.fill: parent
       visible: root.cursorRow !== null && !root.cursorRow.installed
-      icon: "download"; title: "Preview after download"; hint: "Not on this machine yet"
+      centered: true
+      icon: ""
+      title: "Preview after download"
+      hint: "Not on this machine yet"
     }
   }
 
