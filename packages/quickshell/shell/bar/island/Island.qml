@@ -165,8 +165,8 @@ Item {
 
     // growing into a view settles with a small overshoot (alive); going back to the bar's pill is a plain ease
     readonly property bool growing: root.shown !== "compact"
-    Behavior on width { enabled: Motion.island && !(root.shown === "compact" && compact.slotMoving); NumberAnimation { duration: shape.growing ? Motion.ms(230) : Motion.normal; easing.type: shape.growing ? Motion.spring : Motion.morph; easing.overshoot: Motion.overshoot } }
-    Behavior on height { enabled: Motion.island; NumberAnimation { duration: shape.growing ? Motion.ms(230) : Motion.normal; easing.type: shape.growing ? Motion.spring : Motion.morph; easing.overshoot: Motion.overshoot } }
+    Behavior on width { enabled: Motion.island && !(root.shown === "compact" && compact.slotMoving); NumberAnimation { duration: Motion.normal; easing.type: shape.growing ? Motion.spring : Motion.morph; easing.overshoot: Motion.overshoot } }
+    Behavior on height { enabled: Motion.island; NumberAnimation { duration: Motion.normal; easing.type: shape.growing ? Motion.spring : Motion.morph; easing.overshoot: Motion.overshoot } }
 
     // the pill answers the pointer: a small swell while it is hovered
     scale: Motion.lively && hover.hovered && root.shown === "compact" ? 1.02 : 1
@@ -214,8 +214,8 @@ Item {
       // the shape grows first, then the hub's content comes in: fading up and settling from slightly smaller
       transformOrigin: Item.Top
       scale: root.shown === "hub" || !Motion.lively ? 1 : 0.94
-      transform: Translate { y: root.shown === "hub" || !Motion.lively ? 0 : -8; Behavior on y { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "hub" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.ms(240); easing.type: Motion.spring } } } }
-      Behavior on scale { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "hub" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.ms(240); easing.type: Motion.spring; easing.overshoot: Motion.overshoot } } }
+      transform: Translate { y: root.shown === "hub" || !Motion.lively ? 0 : -8; Behavior on y { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "hub" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.normal; easing.type: Motion.spring } } } }
+      Behavior on scale { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "hub" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.normal; easing.type: Motion.spring; easing.overshoot: Motion.overshoot } } }
       Behavior on opacity { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "hub" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } } }
       onPower: root.openView("power")
       onManager: { root.collapse(); ShellSettings.managerOpen = true; }
@@ -286,8 +286,8 @@ Item {
       // the same entrance as the hub's: the shape grows first, then the content settles in
       transformOrigin: Item.Top
       scale: root.shown === "module" || !Motion.lively ? 1 : 0.94
-      transform: Translate { y: root.shown === "module" || !Motion.lively ? 0 : -8; Behavior on y { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "module" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.ms(240); easing.type: Motion.spring; easing.overshoot: Motion.overshoot } } } }
-      Behavior on scale { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "module" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.ms(240); easing.type: Motion.spring; easing.overshoot: Motion.overshoot } } }
+      transform: Translate { y: root.shown === "module" || !Motion.lively ? 0 : -8; Behavior on y { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "module" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.normal; easing.type: Motion.spring; easing.overshoot: Motion.overshoot } } } }
+      Behavior on scale { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "module" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.normal; easing.type: Motion.spring; easing.overshoot: Motion.overshoot } } }
       Behavior on opacity { enabled: Motion.island; SequentialAnimation { PauseAnimation { duration: root.shown === "module" && Motion.lively ? Motion.ms(30) : 0 } NumberAnimation { duration: Motion.normal; easing.type: Motion.easing } } }
       Keys.onEscapePressed: PopupManager.back(() => root.fromHub ? root.backToHub() : root.collapse())
       // the content's children land here (showPopup)

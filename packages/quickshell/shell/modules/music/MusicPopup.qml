@@ -65,12 +65,9 @@ KitFrame {
   }
 
   MusicLibrary {
+    id: library
     width: parent.width
     visible: root.shownTab === "library"
-    onOpenWindow: {
-      root.openWindow();
-      ShellIpc.call("music", "open");
-    }
   }
 
   KitNotice {
@@ -80,7 +77,18 @@ KitFrame {
     tone: Theme.red
     title: "Playback error"
     text: MpdService.error
-    action: "Dismiss"
-    onActed: MpdService.clearError()
+  }
+
+  KitLine { visible: root.shownTab === "library" && library.available }
+
+  KitButton {
+    visible: root.shownTab === "library" && library.available
+    width: parent.width
+    icon: "external"
+    text: "Open Music"
+    onClicked: {
+      root.openWindow();
+      ShellIpc.call("music", "open");
+    }
   }
 }

@@ -12,10 +12,9 @@ import qs.modules.yandex
 Column {
   id: root
 
-  signal openWindow()
-
   readonly property bool yandexOn: BarLayout.installed("yandex")
   readonly property bool filesOn: BarLayout.installed("files")
+  readonly property bool available: yandexOn || filesOn
   readonly property var folders: ModuleSettings.get("music", "folders", ["~/Music"])
   readonly property real half: Math.floor((width - Theme.gapMedium) / 2)
 
@@ -80,7 +79,7 @@ Column {
         MusicTile {
           required property var modelData
           readonly property string path: root.home(modelData)
-          width: root.half
+          width: root.folders.length === 1 ? parent.width : root.half
           icon: "folder"
           text: Paths.nameOf(path)
           caption: "Folder"
@@ -90,13 +89,5 @@ Column {
         }
       }
     }
-  }
-
-  KitButton {
-    visible: root.yandexOn || root.filesOn
-    width: parent.width
-    icon: "external"
-    text: "Open Music"
-    onClicked: root.openWindow()
   }
 }
