@@ -15,6 +15,8 @@ Item {
 
   property string screen: ""
   readonly property string kind: IslandService.liveFor(screen)
+  readonly property var notice: kind === "notice" ? IslandService.noticeItem : null
+  property bool ready: false
   readonly property real travel: Theme.islandHeight * 0.6
 
   // two faces take turns: `front` is the shown one; `t` runs 0 → 1 while a step slides
@@ -24,7 +26,7 @@ Item {
   readonly property Item frontFace: front === 0 ? faceA : faceB
   readonly property Item backFace: front === 0 ? faceB : faceA
 
-  clip: sliding        // only while a step slides
+  clip: true          // contain text while the chip grows or changes activity
   // the activity sits in a chip of its own, always whole: concentric with the
   // pill — the same gap (`edge`) to the pill's rim above and below, its corners
   // the pill's less that gap; a cover inside sits `inset` from the chip's rim
@@ -76,16 +78,31 @@ Item {
   }
   onTChanged: place()
 
-  onKindChanged: {
+  onKindChanged: Qt.callLater(syncFace)
+  onNoticeChanged: Qt.callLater(syncFace)
+
+  function syncFace() {
+    if (!ready) return;
+    const incoming = sliding ? backFace : frontFace;
+    if (incoming.kind === kind && (kind !== "notice" || incoming.notice === notice)) return;
     slide.stop();
+    // A newer message can arrive before the previous transition finishes.
+    if (sliding) {
+      frontFace.kind = "";
+      frontFace.notice = null;
+      front = 1 - front;
+    }
     sliding = false;
     // nothing before or nothing after: no slide, the face just is
     if (kind === "" || frontFace.kind === "" || !Motion.island) {
+      frontFace.notice = notice;
       frontFace.kind = kind;
       backFace.kind = "";
+      backFace.notice = null;
       place();
       return;
     }
+    backFace.notice = notice;
     backFace.kind = kind;
     t = 0;
     sliding = true;
@@ -103,6 +120,7 @@ Item {
     onFinished: {
       root.sliding = false;
       root.frontFace.kind = "";
+      root.frontFace.notice = null;
       root.front = 1 - root.front;
       root.place();
     }
@@ -180,7 +198,7 @@ Item {
   IslandLiveFace { id: faceA; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; shift: root.dotsShift; inputEnabled: !root.sliding && !root.moving }
   IslandLiveFace { id: faceB; coverSize: root.coverSize; badgeRadius: root.badgeRadius; chipHeight: root.chipHeight; chipRadius: root.chipRadius; inset: root.inset; shift: root.dotsShift; inputEnabled: !root.sliding && !root.moving }
 
-  Component.onCompleted: { faceA.kind = kind; place(); }
+  Component.onCompleted: { ready = true; syncFace(); place(); }
 
   // the wheel pages; a click opens what the activity is about (IslandService.liveTarget:
   // the module's popup, else its options); on a notification it brings its

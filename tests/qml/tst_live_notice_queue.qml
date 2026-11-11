@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import qs.config
 import qs.kit
 
 Item {
@@ -8,7 +9,10 @@ Item {
   TestCase {
     name: "IslandLiveNoticeQueue"
 
+    function cleanup() { ShellSettings.setLook("liveNoticeMs", 5000, "island"); }
+
     function init() {
+      ShellSettings.setLook("liveNoticeMs", 5000, "island");
       queue.noticeQueue = [];
       queue.noticeItem = null;
       queue.markedSeen = 0;
@@ -52,6 +56,42 @@ Item {
       compare(queue.noticeItem.key, "critical");
       compare(queue.noticeQueue.length, 1);
       compare(queue.noticeQueue[0].key, "ordinary");
+    }
+
+    function test_held_notifications_show_latest_without_backlog() {
+      ShellSettings.setLook("liveNoticeMs", 0, "island");
+      for (let i = 0; i < 100; i++)
+        queue.enqueueLiveNotices([notice("message-" + i, "normal", "Body " + i)]);
+      compare(queue.noticeItem.key, "message-99");
+      compare(queue.noticeQueue.length, 0);
+      verify(!queue.timerRunning);
+      queue.dismissLiveNotice();
+      compare(queue.noticeItem, null);
+      compare(queue.noticeQueue.length, 0);
+      compare(queue.markedSeen, 1);
+      queue.enqueueLiveNotices([notice("new", "normal", "After dismissal")]);
+      compare(queue.noticeItem.key, "new");
+    }
+
+    function test_held_batch_keeps_latest_critical() {
+      ShellSettings.setLook("liveNoticeMs", 0, "island");
+      queue.enqueueLiveNotices([notice("first", "normal"), notice("urgent", "critical"),
+        notice("ordinary", "normal", "Later"), notice("latest-urgent", "critical", "Latest"),
+        notice("last", "normal", "Last")]);
+      compare(queue.noticeItem.key, "latest-urgent");
+      compare(queue.noticeQueue.length, 0);
+      verify(!queue.timerRunning);
+    }
+
+    function test_held_dismissal_clears_existing_timed_backlog() {
+      queue.enqueueLiveNotices([notice("first", "normal"), notice("second", "normal", "Different")]);
+      compare(queue.noticeQueue.length, 1);
+      ShellSettings.setLook("liveNoticeMs", 0, "island");
+      queue.dismissLiveNotice();
+      compare(queue.noticeItem, null);
+      compare(queue.noticeQueue.length, 0);
+      verify(!queue.timerRunning);
+      compare(queue.markedSeen, 1);
     }
   }
 }

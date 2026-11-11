@@ -258,7 +258,7 @@ Singleton {
     target: ShellSettings
     function onLiveNoticeMsChanged() {
       if (!root.noticeItem || root.noticeItem.urgency === "critical") return;
-      if (ShellSettings.liveNoticeMs === 0) noticeLiveTimer.stop();
+      if (ShellSettings.liveNoticeMs === 0) { root.noticeQueue = []; noticeLiveTimer.stop(); }
       else { noticeLiveTimer.interval = ShellSettings.liveNoticeMs; noticeLiveTimer.restart(); }
     }
   }
@@ -322,7 +322,7 @@ Singleton {
     else { noticeLiveTimer.interval = ShellSettings.liveNoticeMs; noticeLiveTimer.restart(); }
   }
   function enqueueLiveNotices(items) {
-    let queue = noticeQueue.slice();
+    let queue = ShellSettings.liveNoticeMs === 0 ? [] : noticeQueue.slice();
     for (const item of items) {
       if (noticeItem && noticeItem.key === item.key) {
         noticeItem = Object.assign({}, item, { repeats: noticeItem.repeats ?? 1 });
@@ -333,6 +333,13 @@ Singleton {
       if (noticeItem && sameNotice(noticeItem, item)) {
         noticeItem = Object.assign({}, noticeItem, { repeats: (noticeItem.repeats ?? 1) + 1 });
         if (noticeItem.urgency !== "critical" && ShellSettings.liveNoticeMs > 0) noticeLiveTimer.restart();
+        continue;
+      }
+      // A held line shows the latest news, without a backlog to click through.
+      if (ShellSettings.liveNoticeMs === 0) {
+        if (!noticeItem || noticeItem.urgency !== "critical" || item.urgency === "critical")
+          noticeItem = Object.assign({ repeats: 1 }, item);
+        noticeLiveTimer.stop();
         continue;
       }
       if (item.urgency === "critical" && noticeItem && noticeItem.urgency !== "critical") {
@@ -359,7 +366,15 @@ Singleton {
     if (!noticeItem) showNextLiveNotice();
   }
   Timer { id: noticeLiveTimer; onTriggered: root.showNextLiveNotice(false) }
-  function dismissLiveNotice() { noticeLiveTimer.stop(); showNextLiveNotice(true); }
+  function dismissLiveNotice() {
+    if (ShellSettings.liveNoticeMs === 0) {
+      clearLiveNotices();
+      NotificationsService.markSeen();
+    } else {
+      noticeLiveTimer.stop();
+      showNextLiveNotice(true);
+    }
+  }
 
   function hasCritical() { return root.notices.some(n => n.urgency === "critical"); }
 

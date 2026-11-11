@@ -157,7 +157,24 @@ def main():
             '  Timer { id: noticeLiveTimer }\n'
             + qml_function(island_service, "sameNotice") + '\n'
             + qml_function(island_service, "showNextLiveNotice").replace("NotificationsService.markSeen()", "root.markNoticesSeen()") + '\n'
-            + qml_function(island_service, "enqueueLiveNotices") + '\n}\n')
+            + qml_function(island_service, "enqueueLiveNotices") + '\n'
+            + qml_function(island_service, "clearLiveNotices") + '\n'
+            + qml_function(island_service, "dismissLiveNotice").replace("NotificationsService.markSeen()", "root.markNoticesSeen()") + '\n}\n')
+        live = (SHELL / "bar/island/IslandLive.qml").read_text()
+        transition = live.split("  Rectangle {", 1)[0]
+        transition = transition.replace("import qs.apps.auth\n", "").replace("import qs.modules.focus\n", "")
+        transition = transition.replace("IslandService.liveFor(screen)", "currentKind")
+        transition = transition.replace("IslandService.noticeItem", "currentNotice")
+        transition = transition.replace("IslandService.liveDirection(root.screen)", "1")
+        transition = transition.replace("IslandService.activities", '["notice"]')
+        # Keep production transition state, functions and animation; faces need no services.
+        transition = transition.replace('  property string screen: ""',
+            '  property string currentKind: ""\n  property var currentNotice: null\n  property string screen: ""')
+        (work / "qs/kit/TestIslandLiveTransition.qml").write_text(transition
+            + '  Item { id: faceA; property string kind: ""; property var notice: null; property int leadPad: 0; property int trailPad: 0 }\n'
+            + '  Item { id: faceB; property string kind: ""; property var notice: null; property int leadPad: 0; property int trailPad: 0 }\n'
+            + '  Item { id: more }\n'
+            + qml_block(live, "  Component.onCompleted:") + '\n}\n')
         settings_index = (SHELL / "apps/shellmanager/SettingsIndex.qml").read_text()
         (work / "qs/kit/TestSettingsIndex.qml").write_text(
             'import QtQuick\nQtObject {\n  property var indexed: []\n'

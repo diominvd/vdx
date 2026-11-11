@@ -7,6 +7,7 @@ Row {
   id: face
 
   property string kind: ""
+  property var notice: null
   property bool inputEnabled: true
   property int coverSize: 18
   property int badgeRadius: 4
@@ -59,7 +60,7 @@ Row {
   }
 
   Component { id: taskFace; IslandLiveTask { kind: face.kind; inputEnabled: face.inputEnabled; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
-  Component { id: noticeFace; IslandLiveNoticeFace { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
+  Component { id: noticeFace; IslandLiveNoticeFace { kind: face.kind; notice: face.notice; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
   Component { id: statusFace; IslandLiveStatus { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius } }
   Component { id: mediaFace; IslandLiveMedia { kind: face.kind; coverSize: face.coverSize; badgeRadius: face.badgeRadius; showCover: face.kind === "media" ? ShellSettings.liveMediaCover : ShellSettings.liveMusicCover } }
 }

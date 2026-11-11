@@ -142,6 +142,14 @@ is offered, so moving or discarding a screenshot cannot race wl-copy opening
 its source. Clipboard failures are reported with the temporary path; skipping
 Save as after such a failure retains that cached source for normal cleanup.
 
+Live notification lines with a timeout use an arrival queue. With “until read”
+(`liveNoticeMs: 0`), the latest message replaces the held line; critical messages
+keep priority over ordinary ones. A click clears the live batch and its unseen
+mark; history remains in the notification centre. Live text is plain, single-line
+and elided, clipped during the chip's size animation. Message changes reuse the
+live activity slide/fade with a separate snapshot for each face; the outgoing
+face is unloaded when the transition ends.
+
 ## Themes
 
 `themes/gruvbox/` is the source; `themes/mktheme.py <name>` generates every
