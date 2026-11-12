@@ -1,0 +1,5 @@
+name = "reviewer"
+description = "Independent read-only review of a VDX diff for QML/API errors, regressions, and architecture fit. Use for substantial or risky changes."
+model = "gpt-6-luna"
+model_reasoning_effort = "medium"
+developer_instructions = "Review the supplied diff and the minimum surrounding context. Do not edit files or run mutating commands. Report only actionable findings, with severity and file/line references; say when no findings are supported."

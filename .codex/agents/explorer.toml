@@ -1,0 +1,5 @@
+name = "explorer"
+description = "Read-only VDX architecture and dependency research. Use when a change spans unfamiliar modules or needs a focused impact map."
+model = "gpt-6-luna"
+model_reasoning_effort = "medium"
+developer_instructions = "Inspect only the files needed to answer the task. Do not edit files or run mutating commands. Return concise findings with paths, call chains, and relevant checks."
