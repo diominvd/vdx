@@ -46,12 +46,15 @@ PAGES = [
     ("updates", "Updates", ["UpdatesPage.qml"]),
     ("bluetooth", "Bluetooth", ["BluetoothPage.qml"]),
     ("vpn", "VPN", ["VpnPage.qml"]),
+    ("telegram", "Telegram", ["TelegramPage.qml"]),
     ("displays", "Displays", ["DisplaysPage.qml"]),
     ("about", "About", ["AboutPage.qml"]),
 ]
 # words people type for a thing, by its label: found beside the label (and the normalised
 # form: "wifi" = "Wi-Fi", see norm())
 ALIASES = {
+    "Telegram": ["phone", "bot", "forward notifications"],
+    "Forward notifications": ["phone", "telegram", "duplicate", "mirror"],
     "Bar style": ["island", "solid", "strip", "pill"],
     "Motion": ["animations", "animation", "transitions", "speed"],
     "Themes": ["dark", "light", "dark mode", "light mode", "colour mode", "night mode"],

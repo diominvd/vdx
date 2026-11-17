@@ -1140,6 +1140,113 @@
   "target": "vpn:files"
  },
  {
+  "label": "Telegram",
+  "hint": "",
+  "where": "",
+  "target": "telegram",
+  "aliases": [
+   "phone",
+   "bot",
+   "forward notifications"
+  ]
+ },
+ {
+  "label": "Connection",
+  "hint": "",
+  "where": "Telegram",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Delivery",
+  "hint": "",
+  "where": "Telegram",
+  "target": "telegram:delivery"
+ },
+ {
+  "label": "Rules",
+  "hint": "",
+  "where": "Telegram",
+  "target": "telegram:rules"
+ },
+ {
+  "label": "Bot token",
+  "hint": "From BotFather, for any bot you own",
+  "where": "Telegram › CONNECTION",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Connect a bot",
+  "hint": "Replacing it pauses forwarding",
+  "where": "Telegram › CONNECTION",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Open the pairing link",
+  "hint": "Press Start in the private chat",
+  "where": "Telegram › CONNECTION",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Confirm your chat",
+  "hint": "After pressing Start in Telegram",
+  "where": "Telegram › CONNECTION",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Send a test",
+  "hint": "",
+  "where": "Telegram › CONNECTION",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Disconnect",
+  "hint": "Remove the saved bot and chat",
+  "where": "Telegram › CONNECTION",
+  "target": "telegram:connection"
+ },
+ {
+  "label": "Forward notifications",
+  "hint": "New arrivals only, no saved history",
+  "where": "Telegram › DELIVERY",
+  "target": "telegram:delivery",
+  "aliases": [
+   "phone",
+   "telegram",
+   "duplicate",
+   "mirror"
+  ]
+ },
+ {
+  "label": "Include message text",
+  "hint": "Off: app and title only",
+  "where": "Telegram › DELIVERY",
+  "target": "telegram:delivery"
+ },
+ {
+  "label": "Send without sound",
+  "hint": "Keep Telegram alerts quiet",
+  "where": "Telegram › DELIVERY",
+  "target": "telegram:delivery"
+ },
+ {
+  "label": "Importance",
+  "hint": "",
+  "where": "Telegram › RULES",
+  "target": "telegram:rules"
+ },
+ {
+  "label": "Applications",
+  "hint": "",
+  "where": "Telegram › RULES",
+  "target": "telegram:rules"
+ },
+ {
+  "label": "Application names",
+  "hint": "Exact names, separated by commas",
+  "where": "Telegram › RULES",
+  "target": "telegram:rules"
+ },
+ {
   "label": "Displays",
   "hint": "",
   "where": "",

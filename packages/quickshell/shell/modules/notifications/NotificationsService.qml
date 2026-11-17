@@ -24,6 +24,7 @@ Singleton {
   readonly property int unseen: items.filter(n => n.time > state.seenAt).length
 
   property real openedSeenAt: 0                // seenAt before the popup opened: marks fresh rows
+  property bool forwardReady: false           // the first snapshot after reload is never forwarded
 
   // the centre opened (from anywhere): the island's toasts close
   signal opened()
@@ -106,6 +107,8 @@ Singleton {
   }
 
   function ingest(list) {
+    const forward = forwardReady;
+    forwardReady = true;
     const top = list.reduce((m, n) => Math.max(m, n.id), 0);
     if (!state.tracked) {
       state.lastId = top;
@@ -128,9 +131,11 @@ Singleton {
                   urgency: n.urgency, category: n.category ?? "", time: now });
     }
     state.lastId = Math.max(state.lastId, top);
-    if (news.length > 0)
+    if (news.length > 0) {
       state.items = news.concat(state.items.filter(n => !news.some(f => f.key === n.key)))
                         .slice(0, root.historyMax);
+      if (forward && ModuleSettings.get("telegram", "enabled", false) === true) TelegramService.enqueue(news);
+    }
   }
 
   function refresh() {

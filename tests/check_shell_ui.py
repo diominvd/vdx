@@ -55,6 +55,27 @@ def main():
         terminal_page = terminal_page.replace(qml_block(terminal_page, "  Process {"), "")
         (work / "qs/kit/TestTerminalPage.qml").write_text(terminal_page)
         shutil.copy(SHELL / "bar/island/hub/HubLayout.js", work / "qs/kit/HubLayout.js")
+        shutil.copy(SHELL / "apps/shellmanager/TelegramPage.qml", work / "qs/kit/TestTelegramPage.qml")
+        phone = work / "qs/modules/notifications"
+        phone.mkdir(parents=True)
+        (phone / "qmldir").write_text("module qs.modules.notifications\nsingleton TelegramService 1.0 TelegramService.qml\n")
+        (phone / "TelegramService.qml").write_text('''pragma Singleton
+import QtQuick
+QtObject {
+  property bool configured: false
+  property bool connected: false
+  property bool busy: false
+  property string username: ""
+  property string pairUrl: ""
+  property string error: ""
+  property string status: ""
+  property var calls: []
+  function refresh() { calls = calls.concat(["status"]); }
+  function connect(token) { if (busy) return false; calls = calls.concat(["connect"]); return true; }
+  function disconnect() { calls = calls.concat(["disconnect"]); }
+  function run(action, payload) { calls = calls.concat([action]); }
+}
+''')
         for name in ("EntryFolds.qml", "NavRow.qml", "RailButton.qml"):
             shutil.copy(SHELL / "apps/shellmanager" / name, work / "qs/kit" / name)
         manager_source = (SHELL / "apps/shellmanager/ShellManager.qml").read_text()
@@ -233,7 +254,20 @@ def main():
         (fake / "qmldir").write_text("module TestQuickshell\nsingleton Quickshell 1.0 Quickshell.qml\nsingleton Hyprland 1.0 Hyprland.qml\n")
         (fake / "Quickshell.qml").write_text('pragma Singleton\nimport QtQuick\nQtObject { property var screens: [{name: "HDMI-A-1"}, {name: "eDP-1"}] }\n')
         (fake / "Hyprland.qml").write_text('pragma Singleton\nimport QtQuick\nQtObject { property var focusedMonitor: null }\n')
-        (config / "ModuleSettings.qml").write_text('pragma Singleton\nimport QtQuick\nQtObject { property var values: ({}); function get(module, key, fallback) { return values[module + "/" + key] ?? fallback; } }\n')
+        (config / "ModuleSettings.qml").write_text('''pragma Singleton
+import QtQuick
+QtObject {
+  property var values: ({})
+  function get(module, key, fallback) { return values[module + "/" + key] ?? fallback; }
+  function set(module, key, value) { values = Object.assign({}, values, {[module + "/" + key]: value}); }
+  function changed(module, keys) { return keys.some(k => values[module + "/" + k] !== undefined); }
+  function reset(module, keys) {
+    const next = Object.assign({}, values);
+    for (const key of keys) delete next[module + "/" + key];
+    values = next;
+  }
+}
+''')
         state_file = config / "ShellSettings.qml"
         state_file.write_text(state_file.read_text().replace("id: state", "id: state\n  function set(key, value) { state[key] = value; }", 1))
         for folder in (config, work / "qs/kit", bar, components):
