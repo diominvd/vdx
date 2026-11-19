@@ -15,6 +15,7 @@ commit", "Before a push"): [repo/commits.md](../repo/commits.md) — not repeate
 | `./install.py check components` | the catalog against the repo and pacman |
 | `ruff check` | Python lint (`ruff.toml`) |
 | `python tests/check_shell_ui.py` | offscreen QML behaviour: shared controls, keyboard, disabled/busy states, inline selects, grouping, layout copies, backend reply parsing and LocalSend draft/receive selection |
+| `python -m unittest tests.test_telegram tests.test_telegram_service tests.test_telegram_process` | Telegram: private-chat challenge/expiry, atomic 0600 secrets with other keys retained, redacted API failures and rate limits, message bounds, startup/replacement deduplication, rule matching, bounded queue/expiry and worker completion/start failure; fake API, production JS via Node and real Quickshell worker recovery |
 | `python -m unittest tests.test_overview` | Overview: workspace gaps, wide/narrow insertion slots, shared placement, Lua width policy and focus restoration, production QML drag/cancel/drop/failure and card lifetime with an isolated compositor stub |
 | `python -m unittest tests.test_files_actions` | production FilesActions with real Quickshell child processes, an isolated runtime and a fake backend: FIFO, reply isolation, failure, cancellation and completion reentrancy |
 | `python -m unittest tests.test_localsend_service` | production LocalSend service with fake JSONL child processes: failed starts, retry, crash cleanup, incoming offer lifetime, device invalidation and idle shutdown |
@@ -38,6 +39,13 @@ Logic that can live in a backend script or a pure JS file SHOULD go there so
 it can be tested independently.
 
 ## Shell runtime checks (manual)
+
+Phone › Telegram's page is also covered by the offscreen UI harness: masked token
+entry/clearing, overlap guards, pairing dependencies, Reset preserving the bot,
+and narrow fields in Strict/Material with sharp/round corners. Live pairing and
+delivery still require the owner's bot and private chat; automated tests never
+use real tokens or send messages. Confirm on a live session that reconnecting a
+different bot disables forwarding and that shell reload does not resend history.
 
 - Log: `qs log -c shell | grep -E 'ERROR|WARN'` — empty after the change.
 - Restart (new files, IPC changes): see `packages/quickshell/shell/CLAUDE.md` › Work.

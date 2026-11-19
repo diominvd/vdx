@@ -14,10 +14,12 @@ spec.loader.exec_module(si)
 
 TABS = {"vpn", "profile", "themes", "fonts", "icons", "wallpaper", "cursor", "appearance", "colours", "animations",
         "bar", "barlook", "barmonitor", "modules", "windows", "lockscreen", "notifications",
-        "terminal", "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings"}
+        "terminal", "hub", "live", "network", "sound", "power", "updates", "bluetooth", "displays", "apps", "about", "system", "settings", "telegram"}
 
 # a word typed -> where the task is done
 JOURNEYS = {
+    "phone": "telegram",
+    "bot token": "telegram:connection",
     "wallpaper": "wallpaper",
     "toast": "notifications",
     "show bar": "barmonitor",

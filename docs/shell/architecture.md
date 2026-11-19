@@ -29,6 +29,13 @@ until the supervisor's new `qs` locks again (marker in
 
 ## Layers inside the shell
 
+Phone › Telegram is a lazy Shell Manager page. `NotificationsService.ingest`
+passes only new events after its initial snapshot to `TelegramService` in
+`modules/notifications/`. The service owns a bounded, memory-only delivery queue
+and one short-lived `scripts/telegram.py` worker. It has no idle poll or startup
+process. Non-secret rules use `ModuleSettings("telegram")`; credentials use the
+existing `secrets/env` private manifest entry and never enter settings exports.
+
 | Layer | Where | Owns | Must not |
 |---|---|---|---|
 | Backend scripts | `scripts/*.sh\|py` (`backend.py`) | every system call; one JSON object per command | hold UI state |
