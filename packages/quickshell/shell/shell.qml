@@ -14,6 +14,7 @@ import qs.apps.keybinds
 import qs.apps.taskbar
 import qs.apps.launcher
 import qs.apps.lock
+import qs.apps.localsend
 import qs.apps.overview
 import qs.apps.shellmanager
 import qs.apps.themepicker
@@ -45,6 +46,7 @@ Scope {
   BackupWindow {}
   CaptureWindow {}
   MusicWindow {}
+  LocalSendWindow {}
   Keybinds {}
   Taskbar {}
   Launcher {}
@@ -75,6 +77,7 @@ Scope {
   // mako's island mode follows Bar › Style, Hyprland's and mako's corners
   // Appearance › Corners, from the start
   Component.onCompleted: {
+    LocalSendService.shellReady();
     IslandService.makoMode();
     CornersService.apply();
     AccentService.apply();

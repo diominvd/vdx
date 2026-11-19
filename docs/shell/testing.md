@@ -14,9 +14,10 @@ commit", "Before a push"): [repo/commits.md](../repo/commits.md) — not repeate
 | `./install.py check hypr` | `Hyprland --verify-config` with and without `machine/` |
 | `./install.py check components` | the catalog against the repo and pacman |
 | `ruff check` | Python lint (`ruff.toml`) |
-| `python tests/check_shell_ui.py` | offscreen QML behaviour: shared controls, keyboard, disabled/busy states, inline selects, grouping, layout copies and backend reply parsing |
+| `python tests/check_shell_ui.py` | offscreen QML behaviour: shared controls, keyboard, disabled/busy states, inline selects, grouping, layout copies, backend reply parsing and LocalSend draft/receive selection |
 | `python -m unittest tests.test_overview` | Overview: workspace gaps, wide/narrow insertion slots, shared placement, Lua width policy and focus restoration, production QML drag/cancel/drop/failure and card lifetime with an isolated compositor stub |
 | `python -m unittest tests.test_files_actions` | production FilesActions with real Quickshell child processes, an isolated runtime and a fake backend: FIFO, reply isolation, failure, cancellation and completion reentrancy |
+| `python -m unittest tests.test_localsend_service` | production LocalSend service with fake JSONL child processes: failed starts, retry, crash cleanup, incoming offer lifetime, device invalidation and idle shutdown |
 | `python -m unittest tests.test_fonts tests.test_font_service` | Fonts: required fontconfig command failures, JSON errors, optional reload failures, reply validation, process-start recovery and install/apply sequencing in isolated fixtures |
 | `python -m unittest tests.test_backend tests.test_cursors tests.test_cursor_service tests.test_themes_list tests.test_appearance_process_start tests.test_shellapps tests.test_shellapps_service` | Shared checked commands, cursor/state validation and stale previews, theme-list output, appearance process recovery and Shell apps validation |
 | `python -m unittest tests.test_tasks tests.test_taskmanager_service tests.test_virustotal tests.test_virustotal_service` | Positive PID targeting and PID reuse, atomic task samples, exact upload snapshots and API/service failures; fake processes and APIs |

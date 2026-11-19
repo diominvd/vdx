@@ -1,0 +1,25 @@
+[package]
+name = "vdx-localsend-prototype"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+anyhow = "1"
+bytes = "1"
+futures-util = "0.3"
+localsend = { path = "vendor/localsend-core", default-features = false, features = ["discovery", "http", "multicast"] }
+mime_guess = "2"
+pem = "4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.11"
+tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1"
+tokio-util = { version = "0.7", features = ["rt"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1", features = ["v4"] }
+
+[profile.release]
+strip = "symbols"

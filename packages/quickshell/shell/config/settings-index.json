@@ -3210,6 +3210,30 @@
   "target": "modules:virustotal"
  },
  {
+  "label": "LocalSend",
+  "hint": "Send and receive files on your local network",
+  "where": "Apps",
+  "target": "apps:localsend"
+ },
+ {
+  "label": "Receiving",
+  "hint": "",
+  "where": "Apps › LocalSend",
+  "target": "apps:localsend"
+ },
+ {
+  "label": "Run in background",
+  "hint": "Receive files with the window closed",
+  "where": "Apps › LocalSend › RECEIVING",
+  "target": "apps:localsend"
+ },
+ {
+  "label": "Save files to",
+  "hint": "Downloads/LocalSend",
+  "where": "Apps › LocalSend › RECEIVING",
+  "target": "apps:localsend"
+ },
+ {
   "label": "Files",
   "hint": "Browse and manage files",
   "where": "Apps",

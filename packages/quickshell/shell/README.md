@@ -27,6 +27,7 @@ Registry: `apps/apps.json` (read by the Shell Manager, the launcher,
 | Clipboard | — | `clipboard toggle` |
 | Packages | — | `packages toggle` |
 | VirusTotal | — | `virustotal toggle` |
+| LocalSend | — | `localsend toggle\|open\|close` |
 | Display | — | `display toggle` |
 
 The launcher's **Commands** tab searches shell actions, applications, bar
@@ -107,6 +108,17 @@ folder, with the same replacement confirmation if a file already exists.
 Repeated Esc never confirms replacement. Save as opens after clipboard
 delivery finishes; a clipboard failure shows the temporary file's path, and
 Skip retains that cached screenshot for recovery until normal cache cleanup.
+
+### LocalSend
+
+Send files to nearby LocalSend devices and choose which incoming files to save
+in `~/Downloads/LocalSend`. Install the optional `localsend` component for the
+x86_64 helper. Apps › LocalSend can keep receiving available with the window
+closed; it is off by default. Pending offers appear on the Incoming page and
+expire after one minute. Files are never accepted automatically.
+
+Closing the window keeps active transfers alive. A shell restart can interrupt
+them; failed requests are reported and are never replayed automatically.
 
 ### Music
 

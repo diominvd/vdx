@@ -236,6 +236,29 @@ def main():
         (config / "ModuleSettings.qml").write_text('pragma Singleton\nimport QtQuick\nQtObject { property var values: ({}); function get(module, key, fallback) { return values[module + "/" + key] ?? fallback; } }\n')
         state_file = config / "ShellSettings.qml"
         state_file.write_text(state_file.read_text().replace("id: state", "id: state\n  function set(key, value) { state[key] = value; }", 1))
+        # Exercise the LocalSend views without a real network helper or file picker.
+        localsend = work / "qs/apps/localsend"
+        files = work / "qs/apps/files"
+        localsend.mkdir(parents=True)
+        files.mkdir(parents=True)
+        for name in ("LocalSend.qml", "LocalSendSend.qml", "LocalSendTransfers.qml",
+                     "LocalSendIncoming.qml", "LocalSendEntry.qml"):
+            shutil.copy(SHELL / "apps/localsend" / name, localsend / name)
+        shutil.copy(SHELL / "apps/files/FilesCheck.qml", files / "FilesCheck.qml")
+        (files / "FilesService.qml").write_text(
+            'pragma Singleton\nimport QtQuick\nQtObject { property var pending: null; function pickFiles(title, start, callback) { pending = callback; } function finish(paths) { const callback = pending; pending = null; callback(paths); } }\n')
+        service = (ROOT / "tests/qml/fixtures/LocalSendService.qml").read_text().rstrip().removesuffix("}")
+        service += qml_function((SHELL / "apps/localsend/LocalSendService.qml").read_text(), "copyFiles") + "\n}\n"
+        (localsend / "LocalSendService.qml").write_text(service)
+        formatter = (SHELL / "config/Format.qml").read_text()
+        (config / "Format.qml").write_text(
+            formatter.replace("import Quickshell\n", "").replace("Singleton {", "QtObject {"))
+        for folder, uri in ((localsend, "qs.apps.localsend"), (files, "qs.apps.files")):
+            entries = ["module " + uri]
+            for file in sorted(folder.glob("*.qml")):
+                prefix = "singleton " if "pragma Singleton" in file.read_text() else ""
+                entries.append(f"{prefix}{file.stem} 1.0 {file.name}")
+            (folder / "qmldir").write_text("\n".join(entries) + "\n")
         for folder in (config, work / "qs/kit", bar, components):
             entries = ["module qs." + folder.name]
             for file in sorted(folder.glob("*.qml")):

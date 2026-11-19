@@ -690,6 +690,9 @@ Scope {
   function pick(title, start, directory, filter, onPick) {
     pickAsked({ id: "", mode: "open", title: title, multiple: false, directory: directory, filter: filter, folder: start || home, name: "" }, onPick);
   }
+  function pickFiles(title, start, onPick) {
+    pickAsked({ id: "", mode: "open", title: title, multiple: true, withMetadata: true, directory: false, filter: [], folder: start || home, name: "" }, onPick);
+  }
   function pickFolder(title, start, onPick) { pick(title, start, true, [], onPick); }
 
   function begin(request, onPick) {
@@ -706,7 +709,16 @@ Scope {
   function finishPick(paths, response) {
     if (!picker) return;
     const asked = picker;
-    if (asked.onPick) asked.onPick(response === 0 && paths.length > 0 ? paths[0] : "");
+    if (asked.onPick) {
+      let picked = response === 0 ? (asked.multiple ? paths : paths[0] || "") : asked.multiple ? [] : "";
+      if (response === 0 && asked.multiple && asked.withMetadata) {
+        picked = paths.map(path => {
+          const entry = root.shown.find(item => item.path === path);
+          return { path: path, size: entry && typeof entry.size === "number" ? entry.size : 0 };
+        });
+      }
+      asked.onPick(picked);
+    }
     else answerProc.submit({ done: "answered" }, ["answer", asked.id, JSON.stringify({ response: response, paths: paths })]);
     picker = null;
     pickerDone();

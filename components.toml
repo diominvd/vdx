@@ -184,6 +184,13 @@ default = false
 requires = ["quickshell"]
 modules = ["virustotal"]
 
+[localsend]
+group = "apps"
+about = "LocalSend file transfer support for the shell (x86_64 helper)"
+default = false
+requires = ["quickshell"]
+links = ["localsend"]
+
 # ---- music ----
 
 [mpd]
