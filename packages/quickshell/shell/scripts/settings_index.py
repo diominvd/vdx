@@ -46,7 +46,6 @@ PAGES = [
     ("updates", "Updates", ["UpdatesPage.qml"]),
     ("bluetooth", "Bluetooth", ["BluetoothPage.qml"]),
     ("vpn", "VPN", ["VpnPage.qml"]),
-    ("telegram", "Telegram", ["TelegramPage.qml"]),
     ("displays", "Displays", ["DisplaysPage.qml"]),
     ("about", "About", ["AboutPage.qml"]),
 ]
@@ -197,6 +196,11 @@ def build() -> list:
     out += entries_of(SM / "LockScreenPage.qml", "Lock screen", "lockscreen")
     out += entries_of(SHELL / "modules/notifications/NotificationsSettings.qml", "Notifications", "notifications")
     out += entries_of(SHELL / "modules/notifications/NotificationsColours.qml", "Notifications", "notifications")
+    out += entries_of(SM / "TelegramForwarding.qml", "Notifications", "notifications", "notifications:telegram")
+    for entry in entries_of(SM / "TelegramSettings.qml", "Notifications › Forwarding › Telegram", "notifications"):
+        group = entry["target"].partition(":")[2]
+        entry["target"] = "notifications:telegram" + ("-" + group if group else "")
+        out.append(entry)
     out += entries_of(SM / "BarLive.qml", "Live activities", "live")
     out += entries_of(SM / "NetworkHotspot.qml", "Network › Hotspot", "network", "network:hotspot")
     out += entries_of(SM / "NetworkEthernet.qml", "Network › Ethernet", "network", "network:ethernet")

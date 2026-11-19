@@ -101,6 +101,32 @@ class Telegram(unittest.TestCase):
                 tg.pair(values)
             api.assert_not_called()
 
+    def test_renew_pairing_keeps_token_and_other_secrets_without_network(self):
+        self.env.write_text("OTHER=keep\n")
+        self.connect()
+        before = tg.credentials()
+        tg.save(dict(before, PAIR_CREATED="1", PAIR_OFFSET="456"))
+        with patch.object(tg, "call") as api:
+            result = tg.dispatch("renew", {})
+            api.assert_not_called()
+        after = tg.credentials()
+        self.assertTrue(result["pairUrl"])
+        self.assertFalse(result["connected"])
+        self.assertEqual(after["TOKEN"], before["TOKEN"])
+        self.assertNotEqual(after["PAIR_CODE"], before["PAIR_CODE"])
+        self.assertNotIn("PAIR_OFFSET", after)
+        self.assertNotIn(TOKEN, json.dumps(result))
+        self.assertTrue(self.env.read_text().startswith("OTHER=keep\n"))
+        self.assertEqual(stat.S_IMODE(self.env.stat().st_mode), 0o600)
+
+    def test_renew_never_changes_an_existing_paired_chat(self):
+        self.connect()
+        tg.save(dict(tg.credentials(), CHAT_ID="42"))
+        before = self.env.read_text()
+        with self.assertRaises(tg.TelegramError):
+            tg.dispatch("renew", {})
+        self.assertEqual(self.env.read_text(), before)
+
     def test_atomic_write_failure_keeps_original_and_cleans_temporary_file(self):
         self.env.write_text("OTHER=keep\n")
         with patch.object(tg.os, "replace", side_effect=OSError("disk full")):

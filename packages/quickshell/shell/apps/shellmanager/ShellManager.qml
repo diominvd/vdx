@@ -76,7 +76,6 @@ Rectangle {
     { value: "network",    label: "Network",    icon: "public",       caption: "CONNECTIVITY" },
     { value: "bluetooth",  label: "Bluetooth",  icon: "bluetooth" },
     { value: "vpn",        label: "VPN",        icon: "vpn", module: "mihomo" },
-    { value: "telegram",   label: "Telegram",   icon: "message", caption: "PHONE" },
     { value: "sound",      label: "Sound",      icon: "volume",     caption: "DEVICES" },
     { value: "displays",   label: "Displays",   icon: "monitor" },
     { value: "power",      label: "Power",      icon: "zap" },
@@ -156,6 +155,7 @@ Rectangle {
   // own (05). Their old names still open them: `shell open lock`,
   // `apps:lock`, `modules:notifications`, a saved last page.
   function resolve(value, target) {
+    if (value === "telegram") return { tab: "notifications", target: ["connection", "delivery", "rules"].includes(target) ? "telegram-" + target : "telegram" };
     if (["launcher", "keybinds"].includes(value)) return { tab: "apps", target: value };
     if (value === "lock" || (value === "apps" && target === "lock")) return { tab: "lockscreen", target: "" };
     if (value === "modules" && target === "notifications") return { tab: "notifications", target: "" };
@@ -696,8 +696,7 @@ Rectangle {
                   network: networkComponent, sound: soundComponent, power: powerComponent, updates: updatesComponent,
                   hub: hubComponent, live: liveComponent, profile: profileComponent, bluetooth: bluetoothComponent,
                   vpn: vpnComponent, displays: displaysComponent, modules: modulesComponent, apps: appsComponent,
-                  terminal: terminalComponent, about: aboutComponent, lockscreen: lockscreenComponent, notifications: notificationsComponent,
-                  telegram: telegramComponent })[value] ?? appearanceComponent;
+                  terminal: terminalComponent, about: aboutComponent, lockscreen: lockscreenComponent, notifications: notificationsComponent })[value] ?? appearanceComponent;
       }
 
       Component { id: appearanceComponent; AppearancePage { width: pages.width; height: page.height - pages.y - Theme.windowPadding } }
@@ -724,7 +723,6 @@ Rectangle {
       Component { id: aboutComponent; AboutPage { width: pages.width } }
       Component { id: lockscreenComponent; LockScreenPage { width: pages.width } }
       Component { id: notificationsComponent; NotificationsPage { width: pages.width } }
-      Component { id: telegramComponent; TelegramPage { width: pages.width } }
       Component { id: modulesComponent; ModulesPage { width: pages.width; height: page.height - pages.y; viewportRightInset: page.width - pages.x - pages.width } }
     }
   }

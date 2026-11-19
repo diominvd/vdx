@@ -29,12 +29,16 @@ until the supervisor's new `qs` locks again (marker in
 
 ## Layers inside the shell
 
-Phone › Telegram is a lazy Shell Manager page. `NotificationsService.ingest`
+Telegram is a lazy fold under Notifications › Forwarding. The page reads local
+connection status once; connection and rule controls exist only while open. `NotificationsService.ingest`
 passes only new events after its initial snapshot to `TelegramService` in
 `modules/notifications/`. The service owns a bounded, memory-only delivery queue
 and one short-lived `scripts/telegram.py` worker. It has no idle poll or startup
 process. Non-secret rules use `ModuleSettings("telegram")`; credentials use the
 existing `secrets/env` private manifest entry and never enter settings exports.
+Setup follows bot creation, token validation and private-chat confirmation.
+Expired chat links renew locally from the saved token; pairing is checked only
+on an explicit action, with one local status refresh after a failed check.
 
 | Layer | Where | Owns | Must not |
 |---|---|---|---|

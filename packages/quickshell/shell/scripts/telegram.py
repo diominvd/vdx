@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Phone › Telegram. One JSON reply per command; JSON input is read from stdin.
+"""Notifications › Telegram. One JSON reply per command; JSON input uses stdin.
 
     telegram.py status                 local connection state, never credentials
     telegram.py connect                {token}: validate and create a pairing link
+    telegram.py renew                  create a fresh link using the saved bot
     telegram.py pair                   check one page of updates for our /start code
     telegram.py disconnect             remove only Telegram keys
     telegram.py test                    send a test to the paired private chat
@@ -151,9 +152,21 @@ def connect(payload):
     return status(values)
 
 
+def renew(values):
+    current = status(values)
+    if not current["configured"] or not current["username"]:
+        raise TelegramError("Connect a bot before creating a chat link")
+    if current["connected"]:
+        raise TelegramError("This bot already has a linked chat")
+    values = {key: values[key] for key in ("TOKEN", "USERNAME")}
+    values.update(PAIR_CODE=secrets.token_hex(16), PAIR_CREATED=str(int(time.time())))
+    save(values)
+    return status(values)
+
+
 def pair(values):
     if not active_pair(values):
-        raise TelegramError("Pairing link expired: connect the bot again")
+        raise TelegramError("Chat link expired: create a new link to continue")
     try:
         offset = int(values.get("PAIR_OFFSET", "0"))
     except ValueError:
@@ -182,7 +195,7 @@ def pair(values):
             return status(values)
     values["PAIR_OFFSET"] = str(offset)
     save(values)
-    raise TelegramError("Press Start through the pairing link, then check again")
+    raise TelegramError("No matching Start yet. Open your chat using this link, press Start, then finish connecting here.")
 
 
 def send(values, payload):
@@ -209,6 +222,8 @@ def dispatch(command, payload):
         return status(values)
     if command == "pair":
         return pair(values)
+    if command == "renew":
+        return renew(values)
     if command == "test":
         return send(values, {"text": "vdx · Telegram notifications are connected", "silent": False})
     if command == "send":
@@ -218,7 +233,7 @@ def dispatch(command, payload):
 
 def main():
     if len(sys.argv) != 2:
-        fail("usage: telegram.py status|connect|pair|disconnect|test|send")
+        fail("usage: telegram.py status|connect|renew|pair|disconnect|test|send")
     try:
         payload = {}
         if sys.argv[1] in ("connect", "send"):

@@ -268,7 +268,7 @@ Files you may edit by hand:
 | AI limits | Claude Code login (`~/.claude/.credentials.json`) |
 | AI: Codex limits | Codex CLI session logs (`~/.codex/sessions`, as of its last answer) |
 | File scans | `VIRUSTOTAL_API_KEY` (env or `~/.config/secrets/env`) |
-| Phone › Telegram | Your bot, paired through the GUI; `VDX_TELEGRAM_*` in `~/.config/secrets/env` (0600) |
+| Notifications › Forwarding › Telegram | Your bot, paired through the GUI; `VDX_TELEGRAM_*` in `~/.config/secrets/env` (0600) |
 | Music likes | Yandex Music token (`~/.config/scripts/yandex-music/token`) |
 | Music | MPRIS players (Spotify, a browser, mpv with `mpv-mpris`); Yandex Music, local folders and radio through MPD (components `yandex-music`, `mpd`, `radio`) |
 | Island wave | `cava` (without it the wave is made up) |
@@ -277,21 +277,29 @@ Files you may edit by hand:
 
 System files: `./install.py system install`.
 
-### Phone › Telegram
+### Notifications › Forwarding › Telegram
 
-In Shell Manager, open **Phone › Telegram**, paste a BotFather token, and press
-**Connect**. **Open Telegram** opens a one-time link: press **Start** in your
-private chat, then **Check** in the shell. The link expires after ten minutes;
-Connect creates a new one. An existing webhook or another polling client must
-be stopped before pairing. Check reads at most 100 pending updates per click;
-with an old backlog, check again. **Send a test** verifies delivery; enable
-**Forward notifications** when ready. Replacing the bot pauses forwarding and
-requires pairing again. Disconnect removes the Telegram credentials only.
+In Shell Manager, open **Notifications** and unfold **Forwarding › Telegram**.
+Setup follows three steps: open BotFather and send `/newbot`; paste its API token
+and choose **Continue**; open the bot's private chat, press **Start**, then return
+and choose **Finish connection**. **Use its token** skips bot creation when you
+already have one. Each step shows only the actions needed at that point.
+
+Chat links expire after ten minutes. **Create new link** uses the saved bot token
+without asking for it again. An existing webhook or another polling client must
+be stopped before pairing. Each confirmation reads at most 100 pending updates;
+with an old backlog, try again. There is no background pairing poll.
+
+After connection, **Send test** verifies delivery. **Forward notifications** stays
+off until enabled; its rules then appear below. **Manage** exposes bot replacement
+and disconnect. Replacing the bot pauses forwarding and requires linking a chat
+again; a failed replacement keeps the old credentials. Disconnect requires a
+second confirmation and removes the Telegram credentials only.
 
 Rules choose importance, all/only/except apps (case-insensitive exact names or
 desktop IDs, comma-separated), message bodies and silent delivery. Telegram
 desktop notifications are always excluded to prevent loops. Desktop Focus mode
-does not affect phone delivery. Reset restores the rules and disables forwarding;
+does not affect Telegram delivery. Notifications Reset restores the rules and disables forwarding;
 it keeps the paired bot. The credentials are literal `VDX_TELEGRAM_TOKEN`,
 `VDX_TELEGRAM_USERNAME` and `VDX_TELEGRAM_CHAT_ID` assignments in the existing
 `secrets/env` private manifest entry. Temporary `VDX_TELEGRAM_PAIR_*` keys are

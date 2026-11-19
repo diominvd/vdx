@@ -580,6 +580,10 @@ Item {
       const column = pane.contentItem.children[0];
       verify(column.width > 500, "column width=" + column.width);
       verify(column.implicitHeight > 1000, "column height=" + column.implicitHeight);
+      verify(!manager.allSections.some(section => section.value === "telegram" || section.caption === "PHONE"));
+      compare(manager.resolve("telegram", ""), {tab:"notifications", target:"telegram"});
+      for (const group of ["connection", "delivery", "rules"])
+        compare(manager.resolve("telegram", group), {tab:"notifications", target:"telegram-" + group});
       manager.destroy();
     }
     function test_entry_folds_order_search_and_open() {

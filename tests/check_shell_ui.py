@@ -55,13 +55,22 @@ def main():
         terminal_page = terminal_page.replace(qml_block(terminal_page, "  Process {"), "")
         (work / "qs/kit/TestTerminalPage.qml").write_text(terminal_page)
         shutil.copy(SHELL / "bar/island/hub/HubLayout.js", work / "qs/kit/HubLayout.js")
-        shutil.copy(SHELL / "apps/shellmanager/TelegramPage.qml", work / "qs/kit/TestTelegramPage.qml")
+        for name in ("TelegramSettings.qml", "TelegramForwarding.qml"):
+            shutil.copy(SHELL / "apps/shellmanager" / name, work / "qs/kit" / name)
+        shutil.copytree(SHELL / "apps/shellmanager/assets", work / "qs/kit/assets")
+        shutil.copy(SHELL / "apps/shellmanager/NotificationsPage.qml", work / "qs/kit/TestNotificationsPage.qml")
         phone = work / "qs/modules/notifications"
         phone.mkdir(parents=True)
-        (phone / "qmldir").write_text("module qs.modules.notifications\nsingleton TelegramService 1.0 TelegramService.qml\n")
+        (phone / "qmldir").write_text("module qs.modules.notifications\nsingleton TelegramService 1.0 TelegramService.qml\nNotificationsSettings 1.0 NotificationsSettings.qml\nNotificationsColours 1.0 NotificationsColours.qml\n")
+        shutil.copy(SHELL / "modules/notifications/NotificationsSettings.qml", phone / "NotificationsSettings.qml")
+        (phone / "NotificationsColours.qml").write_text('import QtQuick\nItem {}\n')
         (phone / "TelegramService.qml").write_text('''pragma Singleton
 import QtQuick
+import qs.config
 QtObject {
+  property bool stateKnown: true
+  readonly property bool enabled: ModuleSettings.get("telegram", "enabled", false)
+  readonly property var settingsKeys: ["enabled", "body", "silent", "urgency", "filter", "apps"]
   property bool configured: false
   property bool connected: false
   property bool busy: false
@@ -71,9 +80,9 @@ QtObject {
   property string status: ""
   property var calls: []
   function refresh() { calls = calls.concat(["status"]); }
-  function connect(token) { if (busy) return false; calls = calls.concat(["connect"]); return true; }
+  function connect(token) { if (busy) return false; busy = true; calls = calls.concat(["connect"]); return true; }
   function disconnect() { calls = calls.concat(["disconnect"]); }
-  function run(action, payload) { calls = calls.concat([action]); }
+  function run(action, payload) { if (busy) return false; busy = true; calls = calls.concat([action]); return true; }
 }
 ''')
         for name in ("EntryFolds.qml", "NavRow.qml", "RailButton.qml"):
@@ -101,6 +110,7 @@ QtObject {
         shutil.copy(ROOT / "themes/gruvbox/quickshell/shell/config/Colors.qml", config / "Colors.qml")
         settings = (SHELL / "config/ShellState.qml").read_text()
         settings = settings.replace("import Quickshell.Io", "").replace("JsonAdapter {", "QtObject {")
+        (config / "ShellState.qml").write_text(settings)
         # Exercise the production named-shape accessors against isolated settings.
         source = (SHELL / "config/ShellSettings.qml").read_text()
         start = source.index("  readonly property var lookDefaults:")
@@ -109,7 +119,7 @@ QtObject {
         look_properties = "\n".join(line for line in source.splitlines()
                                     if line.startswith("  readonly property ") and ": look(" in line)
         look_defaults += "\n" + look_properties
-        settings = settings.replace("QtObject {", "QtObject {\n  id: state\n  property bool managerOpen: false\n" + look_defaults + "\n" + qml_function(source, "look") + "\n" + qml_function(source, "setLook"), 1)
+        settings = settings.replace("QtObject {", "QtObject {\n  id: state\n  property bool managerOpen: false\n" + look_defaults + "\n" + qml_function(source, "look") + "\n" + qml_function(source, "setLook") + "\n  property QtObject defaults: ShellState {}\n" + qml_function(source, "reset") + "\n" + qml_function(source, "changed"), 1)
         (config / "ShellSettings.qml").write_text("pragma Singleton\n" + settings)
         # The real selection model has no portal, filesystem or process dependencies.
         shutil.copy(SHELL / "apps/files/FilesSelection.qml", work / "qs/kit/FilesSelection.qml")

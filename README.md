@@ -130,7 +130,7 @@ Nothing secret is in git. API keys go to `~/.config/secrets/env` (template:
 GitHub, Yandex Music and the Mihomo subscriptions stay in their programs'
 config folders, ignored by git.
 
-Phone › Telegram connects any bot through Shell Manager. Its token and private
+Notifications › Forwarding › Telegram connects any bot through Shell Manager. Its token and private
 chat live in `~/.config/secrets/env` too, with owner-only permissions; collect
 that file into `private/` as usual. No credentials go into exported shell settings.
 

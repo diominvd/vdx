@@ -9,6 +9,11 @@ import qs.kit
 // island's pill or the Folder while the bell is off the bar) and, last, the rules for
 // an app's avatar colour (APP COLOURS).
 KitColumn {
+  id: root
+  property Component forwarding: null
+  readonly property Item forwardingItem: forwardingLoader.item
+  readonly property real forwardingY: forwardingLoader.y
+
   spacing: Theme.sectionGap
 
   KitLabel { text: "NEW NOTIFICATIONS"; about: "How a new one reaches you" }
@@ -24,6 +29,15 @@ KitColumn {
   }
 
   KitLine {}
+
+  Loader {
+    id: forwardingLoader
+    width: parent.width
+    active: root.forwarding !== null
+    sourceComponent: root.forwarding
+  }
+
+  KitLine { visible: forwardingLoader.active }
 
   KitLabel { text: "POPUP"; about: "The centre: the history you open from the bell" }
 

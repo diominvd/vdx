@@ -1140,113 +1140,6 @@
   "target": "vpn:files"
  },
  {
-  "label": "Telegram",
-  "hint": "",
-  "where": "",
-  "target": "telegram",
-  "aliases": [
-   "phone",
-   "bot",
-   "forward notifications"
-  ]
- },
- {
-  "label": "Connection",
-  "hint": "",
-  "where": "Telegram",
-  "target": "telegram:connection"
- },
- {
-  "label": "Delivery",
-  "hint": "",
-  "where": "Telegram",
-  "target": "telegram:delivery"
- },
- {
-  "label": "Rules",
-  "hint": "",
-  "where": "Telegram",
-  "target": "telegram:rules"
- },
- {
-  "label": "Bot token",
-  "hint": "From BotFather, for any bot you own",
-  "where": "Telegram › CONNECTION",
-  "target": "telegram:connection"
- },
- {
-  "label": "Connect a bot",
-  "hint": "Replacing it pauses forwarding",
-  "where": "Telegram › CONNECTION",
-  "target": "telegram:connection"
- },
- {
-  "label": "Open the pairing link",
-  "hint": "Press Start in the private chat",
-  "where": "Telegram › CONNECTION",
-  "target": "telegram:connection"
- },
- {
-  "label": "Confirm your chat",
-  "hint": "After pressing Start in Telegram",
-  "where": "Telegram › CONNECTION",
-  "target": "telegram:connection"
- },
- {
-  "label": "Send a test",
-  "hint": "",
-  "where": "Telegram › CONNECTION",
-  "target": "telegram:connection"
- },
- {
-  "label": "Disconnect",
-  "hint": "Remove the saved bot and chat",
-  "where": "Telegram › CONNECTION",
-  "target": "telegram:connection"
- },
- {
-  "label": "Forward notifications",
-  "hint": "New arrivals only, no saved history",
-  "where": "Telegram › DELIVERY",
-  "target": "telegram:delivery",
-  "aliases": [
-   "phone",
-   "telegram",
-   "duplicate",
-   "mirror"
-  ]
- },
- {
-  "label": "Include message text",
-  "hint": "Off: app and title only",
-  "where": "Telegram › DELIVERY",
-  "target": "telegram:delivery"
- },
- {
-  "label": "Send without sound",
-  "hint": "Keep Telegram alerts quiet",
-  "where": "Telegram › DELIVERY",
-  "target": "telegram:delivery"
- },
- {
-  "label": "Importance",
-  "hint": "",
-  "where": "Telegram › RULES",
-  "target": "telegram:rules"
- },
- {
-  "label": "Applications",
-  "hint": "",
-  "where": "Telegram › RULES",
-  "target": "telegram:rules"
- },
- {
-  "label": "Application names",
-  "hint": "Exact names, separated by commas",
-  "where": "Telegram › RULES",
-  "target": "telegram:rules"
- },
- {
   "label": "Displays",
   "hint": "",
   "where": "",
@@ -1764,6 +1657,143 @@
    "avatar colour",
    "notification colour"
   ]
+ },
+ {
+  "label": "Forwarding",
+  "hint": "",
+  "where": "Notifications",
+  "target": "notifications:telegram"
+ },
+ {
+  "label": "Telegram",
+  "hint": "",
+  "where": "Notifications › FORWARDING",
+  "target": "notifications:telegram",
+  "aliases": [
+   "phone",
+   "bot",
+   "forward notifications"
+  ]
+ },
+ {
+  "label": "Connection",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Delivery",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram",
+  "target": "notifications:telegram-delivery"
+ },
+ {
+  "label": "Rules",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram",
+  "target": "notifications:telegram-rules"
+ },
+ {
+  "label": "Create a bot",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Already have a bot?",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Bot token",
+  "hint": "Saved only on this computer",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Check the bot",
+  "hint": "Changing bots pauses forwarding",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Pressed Start already?",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Renew the chat link",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Telegram bot",
+  "hint": "@",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Send a test notification",
+  "hint": "Check it arrives in your Telegram chat",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Change bot",
+  "hint": "A different bot needs a new chat link",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Disconnect Telegram",
+  "hint": "Remove the saved bot and chat",
+  "where": "Notifications › Forwarding › Telegram › CONNECTION",
+  "target": "notifications:telegram-connection"
+ },
+ {
+  "label": "Forward notifications",
+  "hint": "New arrivals only, no saved history",
+  "where": "Notifications › Forwarding › Telegram › DELIVERY",
+  "target": "notifications:telegram-delivery",
+  "aliases": [
+   "phone",
+   "telegram",
+   "duplicate",
+   "mirror"
+  ]
+ },
+ {
+  "label": "Include message text",
+  "hint": "Off: app and title only",
+  "where": "Notifications › Forwarding › Telegram › DELIVERY",
+  "target": "notifications:telegram-delivery"
+ },
+ {
+  "label": "Send without sound",
+  "hint": "Keep Telegram alerts quiet",
+  "where": "Notifications › Forwarding › Telegram › DELIVERY",
+  "target": "notifications:telegram-delivery"
+ },
+ {
+  "label": "Importance",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram › RULES",
+  "target": "notifications:telegram-rules"
+ },
+ {
+  "label": "Applications",
+  "hint": "",
+  "where": "Notifications › Forwarding › Telegram › RULES",
+  "target": "notifications:telegram-rules"
+ },
+ {
+  "label": "Application names",
+  "hint": "Exact names, separated by commas",
+  "where": "Notifications › Forwarding › Telegram › RULES",
+  "target": "notifications:telegram-rules"
  },
  {
   "label": "Live activities",

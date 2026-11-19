@@ -40,8 +40,9 @@ it can be tested independently.
 
 ## Shell runtime checks (manual)
 
-Phone › Telegram's page is also covered by the offscreen UI harness: masked token
-entry/clearing, overlap guards, pairing dependencies, Reset preserving the bot,
+The Notifications › Telegram fold is covered by the offscreen UI harness:
+lazy teardown, guided setup, token clearing, failed bot replacement, renewed links,
+disconnect confirmation, search routing and Reset preserving the bot,
 and narrow fields in Strict/Material with sharp/round corners. Live pairing and
 delivery still require the owner's bot and private chat; automated tests never
 use real tokens or send messages. Confirm on a live session that reconnecting a

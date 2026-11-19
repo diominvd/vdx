@@ -68,7 +68,7 @@ console.log(JSON.stringify({startup, sent:sent.map(n=>n.summary), remaining:stat
                           ("run", "refresh", "enqueue", "schedule", "drain", "consumeReply"))
         return '''
 let enabled=true, busy=false, error="", status="", queue=[], readQueued=false, nextSendAt=0;
-let configured=false, connected=false, username="", pairUrl="";
+let stateKnown=false, configured=false, connected=false, username="", pairUrl="";
 const queueMax=50, queueAgeMs=60000, sendGapMs=1100;
 const root={script:"/unused/telegram.py"};
 const proc={running:false, started:false, payload:"", processStopped:true, replyReady:false};
@@ -130,6 +130,21 @@ proc.running=false;
 console.log(JSON.stringify({busy,error,payload:proc.payload,queue:queue.length}));
 ''')
         self.assertEqual(result, {"busy": False, "error": "Could not start Telegram helper", "payload": "", "queue": 0})
+
+    def test_pairing_failure_refreshes_expiry_without_repeating_the_pair_request(self):
+        result = self.run_js(self.fixture() + '''
+run("pair",{});
+proc.pendingReply={ok:false,error:"Chat link expired"};
+proc.processStopped=true;proc.replyReady=true;proc.running=false;
+consumeReply();
+const checking=busy && proc.action === "status";
+proc.pendingReply={ok:true,configured:true,connected:false,username:"test_bot",pairUrl:""};
+proc.processStopped=true;proc.replyReady=true;proc.running=false;
+consumeReply();
+console.log(JSON.stringify({checking,busy,error,pairUrl,configured,connected}));
+''')
+        self.assertEqual(result, {"checking": True, "busy": False, "error": "Chat link expired",
+                                  "pairUrl": "", "configured": True, "connected": False})
 
     def test_opening_page_keeps_delivery_error_and_disabled_queue_does_no_work(self):
         result = self.run_js(self.fixture() + '''

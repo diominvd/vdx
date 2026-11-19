@@ -7,13 +7,14 @@ import "../../kit/reply.js" as Reply
 import "../../kit/markup.js" as Markup
 import "telegram_rules.js" as Rules
 
-// Phone › Telegram and NotificationsService share one worker. No startup read or
+// Notifications › Forwarding and NotificationsService share one worker. No startup read or
 // idle polling: local status on page open, network only for an action or new notice.
 Singleton {
   id: root
 
   // ---- tuning ----
   readonly property string script: Paths.scriptsDir + "/telegram.py"
+  readonly property var settingsKeys: ["enabled", "body", "silent", "urgency", "filter", "apps"]
   readonly property int queueMax: 50
   readonly property int queueAgeMs: 60000
   readonly property int sendGapMs: 1100
@@ -21,6 +22,7 @@ Singleton {
   // ---- state ----
   readonly property bool enabled: ModuleSettings.get("telegram", "enabled", false) === true
   readonly property string policy: JSON.stringify(["urgency", "filter", "apps", "body", "silent"].map(k => ModuleSettings.get("telegram", k, null)))
+  property bool stateKnown: false
   property bool configured: false
   property bool connected: false
   property string username: ""
@@ -114,10 +116,11 @@ Singleton {
     proc.replyReady = false;
     proc.payload = "";
     let success = o?.ok === true;
-    if (success && ["status", "connect", "pair", "disconnect"].includes(action)) {
+    if (success && ["status", "connect", "renew", "pair", "disconnect"].includes(action)) {
       success = typeof o.configured === "boolean" && typeof o.connected === "boolean"
              && typeof o.username === "string" && typeof o.pairUrl === "string";
       if (success) {
+        stateKnown = true;
         configured = o.configured;
         connected = o.connected;
         username = o.username;
@@ -128,6 +131,7 @@ Singleton {
       error = typeof o?.error === "string" && o.error ? o.error : "Invalid reply from Telegram helper";
       status = "";
       if (action === "send") queue = []; // no automatic retries: timeout can mean delivered
+      if (action === "pair") readQueued = true; // refresh an expired link without asking for the token again
     } else {
       if (action !== "status") error = ""; // opening the page must retain a delivery failure
       status = action === "send" ? "Notification sent" : action === "test" ? "Test sent"

@@ -16,18 +16,28 @@ Column {
   readonly property string title: "Notifications"
   readonly property string description: "How notifications arrive and look."
   readonly property int toast: ModuleSettings.get("notifications", "toastSeconds", 5)
-  readonly property var jumps: []
+  readonly property var jumps: [{ key: "telegram", label: "Telegram", y: settings.y + settings.forwardingY }]
+  function jump(key) { settings.forwardingItem?.open(key); }
+  function rowOf(key) { return settings.forwardingItem?.rowOf(key); }
 
   // the header's Reset: every "notifications" key but `appear` (a card or a live line: the
   // Messages activity's switch, Live activities resets it)
   readonly property var keys: Object.keys(ModuleSettings.values.notifications ?? {}).filter(k => k !== "appear")
   readonly property bool changed: ModuleSettings.changed("notifications", keys) || ShellSettings.changed(["barFolderDot", "barDotColor"])
+                                 || ModuleSettings.changed("telegram", TelegramService.settingsKeys)
   function reset() {
     ModuleSettings.reset("notifications", keys);
     ShellSettings.reset(["barFolderDot", "barDotColor"]);
+    ModuleSettings.reset("telegram", TelegramService.settingsKeys);
   }
 
-  NotificationsSettings { width: parent.width }
+  Component.onCompleted: TelegramService.refresh()
+
+  NotificationsSettings {
+    id: settings
+    width: parent.width
+    forwarding: Component { TelegramForwarding {} }
+  }
 
   KitGrouper {}
 }
