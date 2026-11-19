@@ -8,7 +8,11 @@ and agents. A rule that is in the way is changed in its file.
 | Need | File |
 |---|---|
 | Performance requirements for new features | [AGENTS.md](../AGENTS.md) |
-| Codex validation commands | [agent/validation.md](agent/validation.md) |
+| AI workspace: instructions, skills, clients, local memory | [agent/workspace.md](agent/workspace.md) |
+| User preferences shared by agents | [ai/preferences.md](../ai/preferences.md) |
+| Shell engineering skill | [vdx-quickshell](../ai/skills/vdx-quickshell/SKILL.md) |
+| Shell promo video skill and its resources | [quickshell-promo](../ai/skills/quickshell-promo/SKILL.md) |
+| Validation commands | [agent/validation.md](agent/validation.md) |
 | Where things live, what the installer does with each | [repo/layout.md](repo/layout.md) |
 | `./install.py` commands | [repo/commands.md](repo/commands.md) |
 | Components (`components.toml`), who owns a file | [repo/components.md](repo/components.md) |
@@ -24,10 +28,11 @@ and agents. A rule that is in the way is changed in its file.
 
 | Need | File |
 |---|---|
-| Code rules: modules, apps, settings, restart, QML pitfalls | [packages/quickshell/shell/CLAUDE.md](../packages/quickshell/shell/CLAUDE.md) |
+| Code rules: modules, apps, settings, restart, QML pitfalls | [packages/quickshell/shell/AGENTS.md](../packages/quickshell/shell/AGENTS.md) |
 | How it is built: process, layers, stores, feature map | [shell/architecture.md](shell/architecture.md) |
 | UI rules: tokens, controls, wording, Settings pages | [shell/design.md](shell/design.md) |
 | Recipes: a page, a module's options, a service, review checklist | [shell/writing-code.md](shell/writing-code.md) |
+| Symptom diagnosis, async services, performance investigation | [shell/debugging.md](shell/debugging.md) |
 | Checks, manual scenarios, regressions | [shell/testing.md](shell/testing.md) |
 | The Companion: the lively ball beside the bar | [shell/companion.md](shell/companion.md) |
 | What exists, for users | [packages/quickshell/shell/README.md](../packages/quickshell/shell/README.md) |
@@ -35,8 +40,8 @@ and agents. A rule that is in the way is changed in its file.
 ## Asking an agent
 
 Start with applicable agent instructions and this index; explicitly read the
-topic rules for the work. Do not assume every agent automatically loads
-`CLAUDE.md`. A request says what to do, where, and when to stop. Templates
+topic rules for the work. If your client does not load `AGENTS.md`, read it
+explicitly. A request says what to do, where, and when to stop. Templates
 (any language):
 
 A bug or a small change without a plan:

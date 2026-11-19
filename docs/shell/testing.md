@@ -49,7 +49,7 @@ use real tokens or send messages. Confirm on a live session that reconnecting a
 different bot disables forwarding and that shell reload does not resend history.
 
 - Log: `qs log -c shell | grep -E 'ERROR|WARN'` — empty after the change.
-- Restart (new files, IPC changes): see `packages/quickshell/shell/CLAUDE.md` › Work.
+- Restart (new files, IPC changes): see `packages/quickshell/shell/AGENTS.md` › Work.
   `supervise.sh` resolves the live Hyprland session for `WAYLAND_DISPLAY` before
   launching Quickshell. This replaces an inherited signature from before a
   compositor restart; a bare `qs` launched from that old terminal still has the

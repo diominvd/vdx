@@ -74,7 +74,7 @@ machine must both parse.
 
 ## Add a bar module or a shell app
 
-Follow `packages/quickshell/shell/CLAUDE.md`, then put the module id in
+Follow `packages/quickshell/shell/AGENTS.md`, then put the module id in
 `modules` of the component it depends on (`quickshell` for core ones).
 `link` writes `~/.local/state/dotfiles/components.json` (`installer/shell.py`):
 the modules whose components are all off. `BarLayout` keeps them off every

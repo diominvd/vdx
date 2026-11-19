@@ -20,3 +20,7 @@ Arch Linux + Hyprland. `install.py` (Python ≥ 3.11, stdlib only, code in
 | Installer state | `~/.local/state/dotfiles/` | logs, the setup journal, backups, what the shell reads |
 | Installer tests | `tests/` | `./install.py check tests`; run before every install |
 | Docs: one topic per file | `docs/` | index: `docs/README.md` |
+| Owned AI skills and preferences | `ai/` | explicit `python3 ai/manage.py link`; [workspace guide](../agent/workspace.md) |
+
+Dotfile cleanup preserves symlinks inside the checkout and destinations owned
+by `ai/links.json`; AI links are maintained by `ai/manage.py`.

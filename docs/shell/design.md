@@ -2,7 +2,7 @@
 
 The shell's UI rules: tokens, controls, wording, colour, motion. Binding for
 every face, popup, window and Settings page of `packages/quickshell/shell/`
-(paths below are relative to it). Code rules: `packages/quickshell/shell/CLAUDE.md`.
+(paths below are relative to it). Code rules: `packages/quickshell/shell/AGENTS.md`.
 Rules without a keyword are MUST; new rules say MUST / SHOULD / MAY.
 
 ## Basics

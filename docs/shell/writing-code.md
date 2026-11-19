@@ -1,7 +1,7 @@
 # Writing shell code
 
 The how-to for `packages/quickshell/shell/` (paths are relative to it). Rules
-live elsewhere and are not repeated here: code rules in `CLAUDE.md`, visual
+live elsewhere and are not repeated here: code rules in `AGENTS.md`, visual
 rules in [design.md](design.md), structure in [architecture.md](architecture.md).
 This file is the recipes: copy the nearest existing file, then run the checklist.
 
@@ -134,7 +134,7 @@ Steps:
    `Component { id: …Component; <Name>Page { width: pages.width } }` in `ShellManager.qml`.
 3. A new `ShellSettings` key: declare its default in `ShellState`, add the
    `readonly property` in `ShellSettings.qml` with a comment of its values.
-   A changed stored shape also needs a migration (CLAUDE.md › Settings).
+   A changed stored shape also needs a migration (AGENTS.md › Settings).
 4. Add the page to `PAGES` in `scripts/settings_index.py` (a section of a shared
    form to `SECTIONS`, a group that is its own sidebar page to `GROUP_PAGES`) and run
    it: the search index (`config/settings-index.json`) must match, `check` fails on a
@@ -260,7 +260,7 @@ A setting kept on another page: `KitLinkRow` (label = the setting, hint
 
 ## Recipe: a bar module
 
-Follow CLAUDE.md › A module (script, service, face, popup, register, component).
+Follow AGENTS.md › A module (script, service, face, popup, register, component).
 Specifics that are easy to miss:
 
 - The service owns every `Process` and `Timer`. A poll runs only while its data
@@ -342,7 +342,7 @@ guarded before it starts (`if (!p.running)`), so a double click cannot start two
 
 ## Pitfalls that cost time
 
-See CLAUDE.md › QML pitfalls. Besides them:
+See AGENTS.md › QML pitfalls. Besides them:
 
 - A comment is part of the code: move it with the line it describes.
 - A `Behavior` fades a fill from `Theme.clear`; from `"transparent"` it flashes dark.

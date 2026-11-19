@@ -41,7 +41,7 @@ Every commit answers three checks first.
   change breaks are fixed in the same commit, not skipped.
 - Docs: a doc the change makes wrong is fixed in the same commit (the
   installer module's docstring, its topic file in `docs/`, the README, the
-  component's README, `packages/quickshell/shell/CLAUDE.md` for shell rules).
+  component's README, `packages/quickshell/shell/AGENTS.md` for shell rules).
   Find them by grepping the docs for the names the change touches (function,
   key, file, option). No new docs unless asked.
 - Agents tell the user the three answers, one line each (security / tests /

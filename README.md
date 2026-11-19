@@ -152,6 +152,8 @@ More are very welcome, for any theme, dark or light — a PR with a picture:
 
 ## Changing it
 
+AI instructions, skills and maintenance: [AI workspace](docs/agent/workspace.md).
+
 How it is built and the rules for changes: [docs/README.md](docs/README.md).
 
 [MIT](LICENSE) © diominvd

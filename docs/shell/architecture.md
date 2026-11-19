@@ -1,7 +1,7 @@
 # Shell architecture
 
 How the shell is built and where its responsibilities end. Code rules:
-[packages/quickshell/shell/CLAUDE.md](../../packages/quickshell/shell/CLAUDE.md);
+[packages/quickshell/shell/AGENTS.md](../../packages/quickshell/shell/AGENTS.md);
 repo and installer: [docs/](../README.md); what exists for a
 user: [shell/README.md](../../packages/quickshell/shell/README.md). Paths below are under
 `packages/quickshell/shell/` unless they start with the repo root.

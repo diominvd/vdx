@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import json
 import re
 import shutil
 import subprocess
@@ -134,8 +135,11 @@ def _walk(base: Path):
 
 
 def find_managed() -> list[Path]:
-    """Every symlink under ~ (~/.config included) that points into the repo."""
-    return [p for p in _walk(HOME) if is_managed(p)]
+    """Installed dotfile links, excluding checkout sources and AI-owned links."""
+    manifest = ROOT / "ai/links.json"
+    ai_targets = {HOME / target for target in json.loads(manifest.read_text())["links"]} if manifest.is_file() else set()
+    return [p for p in _walk(HOME)
+            if not p.is_relative_to(ROOT) and p not in ai_targets and is_managed(p)]
 
 
 def stale_links(entries: list[tuple[Path, Path, str]]) -> list[Path]:

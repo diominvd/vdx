@@ -1,0 +1,14 @@
+{
+  "links": {
+    "AI.md": "docs/agent/workspace.md",
+    ".codex/AGENTS.md": "ai/preferences.md",
+    ".claude/CLAUDE.md": "ai/preferences.md",
+    ".agents/skills/vdx-quickshell": "ai/skills/vdx-quickshell",
+    ".agents/skills/quickshell-promo": "ai/skills/quickshell-promo",
+    ".claude/skills/vdx-quickshell": "ai/skills/vdx-quickshell",
+    ".claude/skills/quickshell-promo": "ai/skills/quickshell-promo",
+    ".zcode/skills/vdx-quickshell": "ai/skills/vdx-quickshell",
+    ".zcode/skills/quickshell-promo": "ai/skills/quickshell-promo"
+  },
+  "retire": [".codex/skills/shell", ".zcode/skills/shell"]
+}
